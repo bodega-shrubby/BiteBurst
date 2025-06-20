@@ -125,6 +125,15 @@ html {
   color: #FF6B35;
 }
 
+/* Coral colors */
+.bg-coral-400 {
+  background-color: #FF7F7F;
+}
+
+.bg-coral-500 {
+  background-color: #FF6B6B;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);

@@ -1,189 +1,351 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section - Image 7 Design */}
-      <section className="min-h-screen flex flex-col justify-center items-center px-6 relative overflow-hidden bg-white">
-        <div className="max-w-6xl mx-auto text-center">
-          {/* Logo and Mascot */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="animate-bounce mr-6">
-              {/* Orange slice mascot with arms and legs */}
-              <svg width="120" height="120" viewBox="0 0 200 200" className="drop-shadow-lg">
-                {/* Orange slice body */}
-                <path d="M100 30 C140 30 170 70 170 100 C170 130 140 170 100 170 C60 170 30 130 30 100 C30 70 60 30 100 30 Z" fill="#FF6B35"/>
-                <path d="M100 40 C130 40 155 75 155 100 C155 125 130 160 100 160 C70 160 45 125 45 100 C45 75 70 40 100 40 Z" fill="#FFA500"/>
-                
-                {/* Orange segments */}
-                <path d="M100 50 L100 150 M85 60 L115 140 M115 60 L85 140" stroke="#FF6B35" strokeWidth="3"/>
-                
-                {/* Eyes */}
-                <circle cx="85" cy="90" r="12" fill="white"/>
-                <circle cx="115" cy="90" r="12" fill="white"/>
-                <circle cx="85" cy="90" r="6" fill="black"/>
-                <circle cx="115" cy="90" r="6" fill="black"/>
-                
-                {/* Smile */}
-                <path d="M75 115 Q100 135 125 115" stroke="black" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <div className="min-h-screen bg-white font-sans">
+      {/* Hero Section - Exact match to Image 7 Design */}
+      <section className="min-h-screen flex flex-col justify-center items-center px-6 py-20 bg-white">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Logo and Title */}
+          <div className="flex items-center justify-center mb-12">
+            <div className="mr-6">
+              {/* Orange slice mascot exactly like the design */}
+              <div className="w-24 h-24 relative animate-bounce">
+                <div className="w-24 h-24 bg-orange-500 rounded-full relative overflow-hidden">
+                  {/* Orange slice segments */}
+                  <div className="absolute inset-2 bg-orange-400 rounded-full"></div>
+                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-0.5 h-16 bg-orange-600"></div>
+                  <div className="absolute top-8 left-6 w-12 h-0.5 bg-orange-600 transform rotate-45"></div>
+                  <div className="absolute top-8 right-6 w-12 h-0.5 bg-orange-600 transform -rotate-45"></div>
+                  
+                  {/* Eyes */}
+                  <div className="absolute top-7 left-6 w-3 h-3 bg-white rounded-full"></div>
+                  <div className="absolute top-7 right-6 w-3 h-3 bg-white rounded-full"></div>
+                  <div className="absolute top-8 left-7 w-1.5 h-1.5 bg-black rounded-full"></div>
+                  <div className="absolute top-8 right-7 w-1.5 h-1.5 bg-black rounded-full"></div>
+                  
+                  {/* Smile */}
+                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-8 h-4 border-b-2 border-black rounded-b-full"></div>
+                </div>
                 
                 {/* Arms */}
-                <rect x="20" y="95" width="25" height="8" fill="#FF6B35" rx="4"/>
-                <rect x="155" y="95" width="25" height="8" fill="#FF6B35" rx="4"/>
+                <div className="absolute top-8 -left-6 w-8 h-2 bg-orange-500 rounded-full transform -rotate-12"></div>
+                <div className="absolute top-8 -right-6 w-8 h-2 bg-orange-500 rounded-full transform rotate-12"></div>
                 
                 {/* Legs */}
-                <rect x="85" y="170" width="8" height="20" fill="#FF6B35" rx="4"/>
-                <rect x="107" y="170" width="8" height="20" fill="#FF6B35" rx="4"/>
-                
-                {/* Hands waving */}
-                <circle cx="32" cy="85" r="8" fill="#FF6B35"/>
-                <circle cx="168" cy="85" r="8" fill="#FF6B35"/>
-                
-                {/* Feet */}
-                <ellipse cx="89" cy="195" rx="12" ry="6" fill="#FF6B35"/>
-                <ellipse cx="111" cy="195" rx="12" ry="6" fill="#FF6B35"/>
-              </svg>
+                <div className="absolute -bottom-2 left-7 w-2 h-6 bg-orange-500 rounded-full"></div>
+                <div className="absolute -bottom-2 right-7 w-2 h-6 bg-orange-500 rounded-full"></div>
+              </div>
             </div>
-            <h1 className="text-7xl font-bold text-orange-500">BiteBurst</h1>
+            <h1 className="text-6xl md:text-7xl font-bold text-orange-500">BiteBurst</h1>
           </div>
 
           {/* Main Tagline */}
-          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            The fun, gamified way to eat better<br />and move more!
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight max-w-4xl mx-auto">
+            The fun, gamified way to eat better and move more!
           </h2>
 
           {/* Subtitle */}
-          <p className="text-2xl text-gray-700 mb-16 max-w-4xl mx-auto">
+          <p className="text-xl text-gray-700 mb-16 max-w-3xl mx-auto">
             BiteBurst helps kids and teens learn what to eat, how to stay active, and how food fuels their goals.
           </p>
 
-          {/* Diverse Children Characters - Following exact design */}
-          <div className="flex justify-center items-center space-x-12 mb-16">
-            {/* Orange slice mascot (left) */}
-            <div className="animate-wiggle">
-              <svg width="80" height="80" viewBox="0 0 120 120">
-                <path d="M60 15 C85 15 105 40 105 60 C105 80 85 105 60 105 C35 105 15 80 15 60 C15 40 35 15 60 15 Z" fill="#FF6B35"/>
-                <circle cx="50" cy="50" r="6" fill="white"/>
-                <circle cx="70" cy="50" r="6" fill="white"/>
-                <circle cx="50" cy="50" r="3" fill="black"/>
-                <circle cx="70" cy="50" r="3" fill="black"/>
-                <path d="M45 70 Q60 80 75 70" stroke="black" strokeWidth="2" fill="none"/>
-                <rect x="10" y="55" width="15" height="5" fill="#FF6B35" rx="2"/>
-                <rect x="95" y="55" width="15" height="5" fill="#FF6B35" rx="2"/>
-                <rect x="55" y="105" width="5" height="12" fill="#FF6B35" rx="2"/>
-                <rect x="65" y="105" width="5" height="12" fill="#FF6B35" rx="2"/>
-              </svg>
+          {/* Characters Scene - Exactly matching Image 7 */}
+          <div className="flex justify-center items-end space-x-8 mb-16 relative">
+            {/* Left sparkle */}
+            <div className="absolute left-12 top-0 text-yellow-400 text-2xl animate-bounce">✨</div>
+            
+            {/* Orange slice mascot on left */}
+            <div className="relative">
+              <div className="w-20 h-20 bg-orange-500 rounded-full relative animate-wiggle">
+                <div className="absolute inset-1 bg-orange-400 rounded-full"></div>
+                <div className="absolute top-3 left-3 w-3 h-3 bg-white rounded-full"></div>
+                <div className="absolute top-3 right-3 w-3 h-3 bg-white rounded-full"></div>
+                <div className="absolute top-4 left-4 w-1 h-1 bg-black rounded-full"></div>
+                <div className="absolute top-4 right-4 w-1 h-1 bg-black rounded-full"></div>
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-6 h-3 border-b border-black rounded-b-full"></div>
+                {/* Arms */}
+                <div className="absolute top-6 -left-4 w-6 h-1.5 bg-orange-500 rounded-full"></div>
+                <div className="absolute top-6 -right-4 w-6 h-1.5 bg-orange-500 rounded-full"></div>
+                {/* Legs */}
+                <div className="absolute -bottom-1 left-6 w-1.5 h-4 bg-orange-500 rounded-full"></div>
+                <div className="absolute -bottom-1 right-6 w-1.5 h-4 bg-orange-500 rounded-full"></div>
+              </div>
             </div>
 
-            {/* Girl in yellow (exercising) */}
-            <div className="transform hover:scale-110 hover:-translate-y-3 transition-all duration-300 cursor-pointer">
-              <div className="relative">
-                {/* Body */}
-                <div className="w-20 h-28 bg-yellow-400 rounded-t-full relative">
-                  {/* Hair */}
-                  <div className="absolute -top-2 w-full h-8 bg-yellow-600 rounded-t-full"></div>
-                  {/* Eyes */}
-                  <div className="absolute top-6 left-4 w-2 h-2 bg-black rounded-full"></div>
-                  <div className="absolute top-6 right-4 w-2 h-2 bg-black rounded-full"></div>
-                  {/* Mouth */}
-                  <div className="absolute top-10 left-6 w-1 h-1 bg-pink-400 rounded-full"></div>
-                  {/* Shirt */}
-                  <div className="absolute bottom-0 w-full h-12 bg-purple-500 rounded-b-lg"></div>
-                </div>
-                {/* Legs */}
-                <div className="absolute -bottom-3 left-3 w-4 h-8 bg-blue-500 rounded"></div>
-                <div className="absolute -bottom-3 right-3 w-4 h-8 bg-blue-500 rounded"></div>
-                {/* Arms in motion */}
-                <div className="absolute top-12 -left-2 w-3 h-6 bg-yellow-400 rounded transform -rotate-45"></div>
-                <div className="absolute top-12 -right-2 w-3 h-6 bg-yellow-400 rounded transform rotate-45"></div>
+            {/* Girl in yellow exercising */}
+            <div className="relative transform hover:scale-105 transition-all duration-300">
+              <div className="w-16 h-20 bg-yellow-500 rounded-t-full relative">
+                <div className="absolute top-1 left-1 right-1 h-6 bg-yellow-600 rounded-t-full"></div>
+                <div className="absolute top-4 left-3 w-1.5 h-1.5 bg-black rounded-full"></div>
+                <div className="absolute top-4 right-3 w-1.5 h-1.5 bg-black rounded-full"></div>
+                <div className="absolute bottom-0 w-full h-8 bg-purple-500 rounded-b-lg"></div>
               </div>
+              <div className="absolute -bottom-1 left-2 w-3 h-6 bg-blue-500 rounded"></div>
+              <div className="absolute -bottom-1 right-2 w-3 h-6 bg-blue-500 rounded"></div>
+              {/* Running pose arms */}
+              <div className="absolute top-8 -left-1 w-2 h-4 bg-yellow-500 rounded transform -rotate-45"></div>
+              <div className="absolute top-8 -right-1 w-2 h-4 bg-yellow-500 rounded transform rotate-45"></div>
             </div>
 
             {/* Green apple */}
-            <div className="animate-bounce">
-              <span className="text-6xl">🍎</span>
-            </div>
+            <div className="text-5xl animate-float">🍎</div>
 
-            {/* Boy in orange (running) */}
-            <div className="transform hover:scale-110 hover:-translate-y-3 transition-all duration-300 cursor-pointer">
-              <div className="relative">
-                {/* Body */}
-                <div className="w-20 h-28 bg-orange-600 rounded-t-full relative">
-                  {/* Hair */}
-                  <div className="absolute -top-2 w-full h-8 bg-orange-800 rounded-t-full"></div>
-                  {/* Eyes */}
-                  <div className="absolute top-6 left-4 w-2 h-2 bg-black rounded-full"></div>
-                  <div className="absolute top-6 right-4 w-2 h-2 bg-black rounded-full"></div>
-                  {/* Smile */}
-                  <div className="absolute top-10 left-6 w-1 h-1 bg-pink-400 rounded-full"></div>
-                  {/* Shirt */}
-                  <div className="absolute bottom-0 w-full h-12 bg-orange-500 rounded-b-lg"></div>
-                </div>
-                {/* Legs */}
-                <div className="absolute -bottom-3 left-3 w-4 h-8 bg-blue-600 rounded"></div>
-                <div className="absolute -bottom-3 right-3 w-4 h-8 bg-blue-600 rounded"></div>
-                {/* Arms */}
-                <div className="absolute top-12 -left-2 w-3 h-6 bg-orange-600 rounded"></div>
-                <div className="absolute top-12 -right-2 w-3 h-6 bg-orange-600 rounded"></div>
+            {/* Boy in orange running */}
+            <div className="relative transform hover:scale-105 transition-all duration-300">
+              <div className="w-16 h-20 bg-orange-400 rounded-t-full relative">
+                <div className="absolute top-1 left-1 right-1 h-6 bg-orange-600 rounded-t-full"></div>
+                <div className="absolute top-4 left-3 w-1.5 h-1.5 bg-black rounded-full"></div>
+                <div className="absolute top-4 right-3 w-1.5 h-1.5 bg-black rounded-full"></div>
+                <div className="absolute bottom-0 w-full h-8 bg-orange-500 rounded-b-lg"></div>
               </div>
+              <div className="absolute -bottom-1 left-2 w-3 h-6 bg-blue-600 rounded"></div>
+              <div className="absolute -bottom-1 right-2 w-3 h-6 bg-blue-600 rounded"></div>
+              {/* Running arms */}
+              <div className="absolute top-8 -left-1 w-2 h-4 bg-orange-400 rounded"></div>
+              <div className="absolute top-8 -right-1 w-2 h-4 bg-orange-400 rounded"></div>
             </div>
 
             {/* Red apple */}
-            <div className="animate-float">
-              <span className="text-6xl">🍎</span>
+            <div className="text-5xl animate-bounce">🍎</div>
+
+            {/* Girl with drink */}
+            <div className="relative transform hover:scale-105 transition-all duration-300">
+              <div className="w-16 h-20 bg-pink-300 rounded-t-full relative">
+                <div className="absolute top-1 left-1 right-1 h-6 bg-blue-900 rounded-t-full"></div>
+                <div className="absolute top-4 left-3 w-1.5 h-1.5 bg-black rounded-full"></div>
+                <div className="absolute top-4 right-3 w-1.5 h-1.5 bg-black rounded-full"></div>
+                <div className="absolute bottom-0 w-full h-8 bg-coral-400 rounded-b-lg"></div>
+              </div>
+              <div className="absolute -bottom-1 left-2 w-3 h-6 bg-blue-700 rounded"></div>
+              <div className="absolute -bottom-1 right-2 w-3 h-6 bg-blue-700 rounded"></div>
+              {/* Arm holding drink */}
+              <div className="absolute top-8 -right-2 w-2 h-4 bg-pink-300 rounded"></div>
+              <div className="absolute top-6 -right-4 w-3 h-4 bg-yellow-400 rounded-full"></div>
             </div>
 
-            {/* Girl in coral (with drink) */}
-            <div className="transform hover:scale-110 hover:-translate-y-3 transition-all duration-300 cursor-pointer">
-              <div className="relative">
-                {/* Body */}
-                <div className="w-20 h-28 bg-blue-900 rounded-t-full relative">
-                  {/* Hair */}
-                  <div className="absolute -top-2 w-full h-8 bg-blue-800 rounded-t-full"></div>
-                  {/* Eyes */}
-                  <div className="absolute top-6 left-4 w-2 h-2 bg-black rounded-full"></div>
-                  <div className="absolute top-6 right-4 w-2 h-2 bg-black rounded-full"></div>
-                  {/* Mouth */}
-                  <div className="absolute top-10 left-6 w-1 h-1 bg-pink-400 rounded-full"></div>
-                  {/* Shirt */}
-                  <div className="absolute bottom-0 w-full h-12 bg-coral-500 rounded-b-lg"></div>
-                </div>
-                {/* Legs */}
-                <div className="absolute -bottom-3 left-3 w-4 h-8 bg-blue-700 rounded"></div>
-                <div className="absolute -bottom-3 right-3 w-4 h-8 bg-blue-700 rounded"></div>
+            {/* Right side elements */}
+            <div className="absolute right-8 top-4 text-orange-500 text-xl font-bold animate-pulse">XP</div>
+            <div className="absolute right-4 top-8 text-yellow-400 text-lg animate-bounce">⭐</div>
+            <div className="absolute right-12 bottom-4 text-yellow-400 text-lg animate-float">⭐</div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-3 text-lg rounded-full font-bold shadow-lg">
+              Get Started
+            </Button>
+            <Button variant="outline" className="border-2 border-gray-300 text-gray-700 px-10 py-3 text-lg rounded-full font-bold hover:border-orange-500 hover:text-orange-500">
+              I already have an account
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Section - Image 6 Design */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="inline-block mb-4">
+              <div className="w-16 h-16 bg-orange-500 rounded-full relative animate-bounce">
+                <div className="absolute inset-1 bg-orange-400 rounded-full"></div>
+                <div className="absolute top-2 left-2 w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute top-3 left-2.5 w-1 h-1 bg-black rounded-full"></div>
+                <div className="absolute top-3 right-2.5 w-1 h-1 bg-black rounded-full"></div>
+                <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-4 h-2 border-b border-black rounded-b-full"></div>
                 {/* Arms */}
-                <div className="absolute top-12 -left-2 w-3 h-6 bg-blue-900 rounded"></div>
-                <div className="absolute top-12 -right-2 w-3 h-6 bg-blue-900 rounded transform -rotate-12"></div>
+                <div className="absolute top-4 -left-3 w-4 h-1 bg-orange-500 rounded-full"></div>
+                <div className="absolute top-4 -right-3 w-4 h-1 bg-orange-500 rounded-full"></div>
+                {/* Legs */}
+                <div className="absolute -bottom-1 left-4 w-1 h-3 bg-orange-500 rounded-full"></div>
+                <div className="absolute -bottom-1 right-4 w-1 h-3 bg-orange-500 rounded-full"></div>
+              </div>
+            </div>
+            <h2 className="text-4xl font-bold text-orange-500 mb-4">BiteBurst</h2>
+          </div>
+
+          <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Healthy habits, powered by AI.
+          </h3>
+
+          <p className="text-lg text-gray-700 mb-16 max-w-2xl mx-auto">
+            BiteBurst uses AI to give smart, age-friendly feedback on food and movement. Learn how your meals help you in school, sports, and life.
+          </p>
+
+          {/* Illustration */}
+          <div className="flex justify-center items-center space-x-12 mb-12">
+            {/* AI Eye Scanner */}
+            <div className="relative">
+              <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-12 h-8 bg-blue-600 rounded-lg"></div>
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-blue-700 rounded"></div>
+              {/* Thumbs up */}
+              <div className="absolute top-2 -right-6 w-3 h-6 bg-blue-500 rounded transform rotate-12"></div>
+              <div className="absolute top-0 -right-7 w-4 h-3 bg-blue-500 rounded-full"></div>
+            </div>
+
+            {/* Food Plate */}
+            <div className="relative">
+              <div className="w-16 h-16 bg-white border-4 border-gray-300 rounded-full flex items-center justify-center">
+                <div className="flex space-x-1">
+                  <span className="text-lg">🥦</span>
+                  <span className="text-lg">🥕</span>
+                </div>
+              </div>
+              <div className="absolute -top-2 -right-2 text-yellow-500 animate-ping">⭐</div>
+              <div className="absolute -bottom-2 -left-2 text-yellow-500 animate-ping" style={{ animationDelay: '0.5s' }}>⭐</div>
+            </div>
+
+            {/* Kids */}
+            <div className="flex space-x-3">
+              {/* Boy pointing */}
+              <div className="relative">
+                <div className="w-12 h-16 bg-yellow-400 rounded-t-full relative">
+                  <div className="absolute top-1 left-1 right-1 h-4 bg-orange-600 rounded-t-full"></div>
+                  <div className="absolute top-3 left-2 w-1 h-1 bg-black rounded-full"></div>
+                  <div className="absolute top-3 right-2 w-1 h-1 bg-black rounded-full"></div>
+                  <div className="absolute bottom-0 w-full h-6 bg-yellow-500 rounded-b-lg"></div>
+                </div>
+                <div className="absolute -bottom-1 left-1 w-2 h-4 bg-blue-500 rounded"></div>
+                <div className="absolute -bottom-1 right-1 w-2 h-4 bg-blue-500 rounded"></div>
+                {/* Pointing arm */}
+                <div className="absolute top-6 -left-2 w-3 h-1.5 bg-yellow-400 rounded transform -rotate-45"></div>
+              </div>
+
+              {/* Girl exercising */}
+              <div className="relative">
+                <div className="w-12 h-16 bg-pink-300 rounded-t-full relative">
+                  <div className="absolute top-1 left-1 right-1 h-4 bg-blue-900 rounded-t-full"></div>
+                  <div className="absolute top-3 left-2 w-1 h-1 bg-black rounded-full"></div>
+                  <div className="absolute top-3 right-2 w-1 h-1 bg-black rounded-full"></div>
+                  <div className="absolute bottom-0 w-full h-6 bg-coral-400 rounded-b-lg"></div>
+                </div>
+                <div className="absolute -bottom-1 left-1 w-2 h-4 bg-blue-600 rounded"></div>
+                <div className="absolute -bottom-1 right-1 w-2 h-4 bg-blue-600 rounded"></div>
+                {/* Arms up */}
+                <div className="absolute top-6 -left-1 w-1.5 h-3 bg-pink-300 rounded transform -rotate-45"></div>
+                <div className="absolute top-6 -right-1 w-1.5 h-3 bg-pink-300 rounded transform rotate-45"></div>
               </div>
             </div>
           </div>
 
-          {/* XP text floating */}
-          <div className="absolute top-32 right-32 text-orange-500 text-2xl font-bold animate-bounce">
-            XP
+          {/* XP Progress Bar and Sports Icons */}
+          <div className="flex justify-center items-center space-x-8 mb-8">
+            <span className="text-orange-500 text-xl font-bold">XP</span>
+            <div className="w-32 bg-gray-200 rounded-full h-6 relative">
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 h-6 rounded-full transition-all duration-1000" style={{ width: '75%' }}></div>
+              <div className="absolute right-2 top-1 text-white text-xs font-bold">75</div>
+            </div>
+            <span className="text-gray-700 font-bold">75</span>
           </div>
 
-          {/* Floating stars */}
-          <div className="absolute top-24 left-24 text-yellow-400 text-3xl animate-float">⭐</div>
-          <div className="absolute top-48 right-48 text-yellow-400 text-2xl animate-float-delayed">⭐</div>
+          <div className="flex justify-center space-x-8">
+            <span className="text-3xl animate-bounce">⚽</span>
+            <span className="text-3xl animate-bounce" style={{ animationDelay: '0.3s' }}>🏀</span>
+          </div>
+        </div>
+      </section>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 text-xl rounded-full font-bold transform hover:scale-105 transition-all duration-200 shadow-lg">
-              Get Started
-            </Button>
-            <Button variant="outline" className="border-2 border-gray-300 text-gray-700 px-12 py-4 text-xl rounded-full font-bold hover:border-orange-500 hover:text-orange-500 transform hover:scale-105 transition-all duration-200">
-              I already have an account
-            </Button>
+      {/* Fun Logging Section - Image 5 Design */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-orange-500 mb-6">
+              Tap, snap, go
+            </h2>
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              Log what you eat with bubbles, or a quick photo. Select your activity and get instant feedback on how food helps your body.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Left side - Emoji bubbles exactly like Image 5 */}
+            <div>
+              <div className="grid grid-cols-2 gap-6">
+                {/* Food bubbles */}
+                <div className="bg-red-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🍎
+                </div>
+                <div className="bg-green-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🥦
+                </div>
+                <div className="bg-yellow-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🍞
+                </div>
+                <div className="bg-orange-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🧃
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 mt-8">
+                {/* Activity bubbles */}
+                <div className="bg-gray-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  ⚽
+                </div>
+                <div className="bg-orange-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🏃
+                </div>
+                <div className="bg-red-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🎯
+                </div>
+                <div className="bg-blue-100 rounded-full w-24 h-24 flex items-center justify-center text-4xl cursor-pointer transform hover:scale-110 transition-all duration-200">
+                  🧘
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - Phone with mascot exactly like Image 5 */}
+            <div className="flex justify-center">
+              <div className="relative">
+                {/* Phone body */}
+                <div className="w-64 h-96 bg-orange-500 rounded-3xl p-4 shadow-2xl">
+                  <div className="w-full h-full bg-white rounded-2xl p-6">
+                    {/* Camera icon */}
+                    <div className="bg-blue-500 text-white p-4 rounded-xl mb-6 flex items-center justify-center">
+                      <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        </div>
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Photo preview with watermelon */}
+                    <div className="bg-blue-100 rounded-xl p-6 h-48 flex items-center justify-center">
+                      <span className="text-6xl">🍉</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mascot attached to phone */}
+                <div className="absolute -bottom-8 -right-8 animate-bounce">
+                  <div className="w-20 h-20 bg-orange-500 rounded-full relative">
+                    <div className="absolute inset-1 bg-orange-400 rounded-full"></div>
+                    <div className="absolute top-3 left-3 w-3 h-3 bg-white rounded-full"></div>
+                    <div className="absolute top-3 right-3 w-3 h-3 bg-white rounded-full"></div>
+                    <div className="absolute top-4 left-4 w-1 h-1 bg-black rounded-full"></div>
+                    <div className="absolute top-4 right-4 w-1 h-1 bg-black rounded-full"></div>
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-6 h-3 border-b-2 border-black rounded-b-full"></div>
+                    {/* Arms */}
+                    <div className="absolute top-6 -left-4 w-6 h-1.5 bg-orange-500 rounded-full"></div>
+                    <div className="absolute top-6 -right-4 w-6 h-1.5 bg-orange-500 rounded-full"></div>
+                    {/* Legs */}
+                    <div className="absolute -bottom-1 left-6 w-1.5 h-4 bg-orange-500 rounded-full"></div>
+                    <div className="absolute -bottom-1 right-6 w-1.5 h-4 bg-orange-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
