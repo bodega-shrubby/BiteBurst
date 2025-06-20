@@ -8,35 +8,37 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center">
           {/* Logo and Title */}
           <div className="flex items-center justify-center mb-12">
-            {/* Orange slice mascot waving */}
+            {/* Orange slice mascot - exact match to your design */}
             <div className="w-20 h-20 relative mr-4 animate-bounce">
-              {/* Orange slice body */}
-              <div className="w-20 h-10 bg-orange-500 rounded-t-full relative overflow-hidden">
-                {/* Orange segments */}
-                <div className="absolute top-0 left-2 w-0 h-8 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-6 w-0 h-8 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-10 w-0 h-8 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-14 w-0 h-8 border-l-2 border-orange-400"></div>
-                {/* Orange peel */}
-                <div className="absolute top-0 w-full h-2 bg-orange-600 rounded-t-full"></div>
+              {/* Orange slice body - semicircle */}
+              <div className="w-16 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-t-full relative border-b-4 border-orange-600">
+                {/* Orange segments - radiating lines */}
+                <div className="absolute bottom-0 left-2 w-px h-6 bg-orange-600 transform rotate-12 origin-bottom"></div>
+                <div className="absolute bottom-0 left-4 w-px h-7 bg-orange-600 transform rotate-6 origin-bottom"></div>
+                <div className="absolute bottom-0 left-1/2 w-px h-8 bg-orange-600 transform -translate-x-1/2"></div>
+                <div className="absolute bottom-0 right-4 w-px h-7 bg-orange-600 transform -rotate-6 origin-bottom"></div>
+                <div className="absolute bottom-0 right-2 w-px h-6 bg-orange-600 transform -rotate-12 origin-bottom"></div>
+                
+                {/* White rind at top */}
+                <div className="absolute top-0 w-full h-1 bg-white rounded-t-full"></div>
               </div>
               
-              {/* Eyes */}
-              <div className="absolute top-2 left-4 w-3 h-3 bg-white rounded-full"></div>
-              <div className="absolute top-2 right-4 w-3 h-3 bg-white rounded-full"></div>
-              <div className="absolute top-3 left-5 w-1 h-1 bg-black rounded-full"></div>
-              <div className="absolute top-3 right-5 w-1 h-1 bg-black rounded-full"></div>
+              {/* Eyes - white ovals with black pupils */}
+              <div className="absolute top-2 left-3 w-3 h-4 bg-white rounded-full"></div>
+              <div className="absolute top-2 right-3 w-3 h-4 bg-white rounded-full"></div>
+              <div className="absolute top-3 left-4 w-1.5 h-2 bg-black rounded-full"></div>
+              <div className="absolute top-3 right-4 w-1.5 h-2 bg-black rounded-full"></div>
               
-              {/* Happy mouth */}
-              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 w-6 h-3 border-b-2 border-black rounded-b-full"></div>
+              {/* Happy curved mouth */}
+              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 w-4 h-2 border-b-2 border-black rounded-b-full"></div>
               
-              {/* Arms waving */}
-              <div className="absolute top-3 -left-4 w-2 h-6 bg-orange-500 rounded-full transform -rotate-45"></div>
-              <div className="absolute top-3 -right-4 w-2 h-6 bg-orange-500 rounded-full transform rotate-45"></div>
+              {/* Simple stick arms */}
+              <div className="absolute top-3 -left-2 w-1 h-5 bg-orange-500 rounded-full transform -rotate-45"></div>
+              <div className="absolute top-3 -right-2 w-1 h-5 bg-orange-500 rounded-full transform rotate-45"></div>
               
-              {/* Legs */}
-              <div className="absolute -bottom-4 left-6 w-2 h-6 bg-orange-500 rounded-full"></div>
-              <div className="absolute -bottom-4 right-6 w-2 h-6 bg-orange-500 rounded-full"></div>
+              {/* Simple stick legs */}
+              <div className="absolute -bottom-2 left-4 w-1 h-4 bg-orange-500 rounded-full"></div>
+              <div className="absolute -bottom-2 right-4 w-1 h-4 bg-orange-500 rounded-full"></div>
             </div>
             
             <h1 className="text-6xl font-bold text-orange-500">BiteBurst</h1>
@@ -61,21 +63,33 @@ export default function Home() {
             
             {/* Orange mascot on left */}
             <div className="transform hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-8 bg-orange-500 rounded-t-full relative">
-                <div className="absolute top-0 left-1 w-0 h-6 border-l border-orange-400"></div>
-                <div className="absolute top-0 left-4 w-0 h-6 border-l border-orange-400"></div>
-                <div className="absolute top-0 left-7 w-0 h-6 border-l border-orange-400"></div>
-                <div className="absolute top-0 left-10 w-0 h-6 border-l border-orange-400"></div>
-                <div className="absolute top-0 w-full h-1 bg-orange-600 rounded-t-full"></div>
-                <div className="absolute top-1 left-3 w-2 h-2 bg-white rounded-full"></div>
-                <div className="absolute top-1 right-3 w-2 h-2 bg-white rounded-full"></div>
-                <div className="absolute top-2 left-4 w-0.5 h-0.5 bg-black rounded-full"></div>
-                <div className="absolute top-2 right-4 w-0.5 h-0.5 bg-black rounded-full"></div>
-                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-4 h-2 border-b border-black rounded-b-full"></div>
-                <div className="absolute top-2 -left-3 w-1 h-4 bg-orange-500 rounded-full transform -rotate-45"></div>
-                <div className="absolute top-2 -right-3 w-1 h-4 bg-orange-500 rounded-full transform rotate-45"></div>
-                <div className="absolute -bottom-3 left-4 w-1 h-4 bg-orange-500 rounded-full"></div>
-                <div className="absolute -bottom-3 right-4 w-1 h-4 bg-orange-500 rounded-full"></div>
+              <div className="w-12 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-t-full relative border-b-2 border-orange-600">
+                {/* Orange segments */}
+                <div className="absolute bottom-0 left-1 w-px h-4 bg-orange-600 transform rotate-12 origin-bottom"></div>
+                <div className="absolute bottom-0 left-3 w-px h-5 bg-orange-600 transform rotate-6 origin-bottom"></div>
+                <div className="absolute bottom-0 left-1/2 w-px h-6 bg-orange-600 transform -translate-x-1/2"></div>
+                <div className="absolute bottom-0 right-3 w-px h-5 bg-orange-600 transform -rotate-6 origin-bottom"></div>
+                <div className="absolute bottom-0 right-1 w-px h-4 bg-orange-600 transform -rotate-12 origin-bottom"></div>
+                
+                {/* White rind */}
+                <div className="absolute top-0 w-full h-0.5 bg-white rounded-t-full"></div>
+                
+                {/* Eyes */}
+                <div className="absolute top-1 left-2 w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute top-1 right-2 w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute top-1.5 left-2.5 w-1 h-1 bg-black rounded-full"></div>
+                <div className="absolute top-1.5 right-2.5 w-1 h-1 bg-black rounded-full"></div>
+                
+                {/* Mouth */}
+                <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-3 h-1 border-b border-black rounded-b-full"></div>
+                
+                {/* Arms */}
+                <div className="absolute top-2 -left-1 w-0.5 h-3 bg-orange-500 rounded-full transform -rotate-45"></div>
+                <div className="absolute top-2 -right-1 w-0.5 h-3 bg-orange-500 rounded-full transform rotate-45"></div>
+                
+                {/* Legs */}
+                <div className="absolute -bottom-2 left-3 w-0.5 h-3 bg-orange-500 rounded-full"></div>
+                <div className="absolute -bottom-2 right-3 w-0.5 h-3 bg-orange-500 rounded-full"></div>
               </div>
             </div>
 
@@ -297,22 +311,34 @@ export default function Home() {
                 </div>
                 
                 {/* Orange mascot attached to phone */}
-                <div className="absolute -bottom-4 -right-4">
-                  <div className="w-16 h-8 bg-orange-500 rounded-t-full relative">
-                    <div className="absolute top-0 left-1 w-0 h-6 border-l border-orange-400"></div>
-                    <div className="absolute top-0 left-3 w-0 h-6 border-l border-orange-400"></div>
-                    <div className="absolute top-0 left-5 w-0 h-6 border-l border-orange-400"></div>
-                    <div className="absolute top-0 left-7 w-0 h-6 border-l border-orange-400"></div>
-                    <div className="absolute top-0 w-full h-1 bg-orange-600 rounded-t-full"></div>
-                    <div className="absolute top-1 left-3 w-2 h-2 bg-white rounded-full"></div>
-                    <div className="absolute top-1 right-3 w-2 h-2 bg-white rounded-full"></div>
-                    <div className="absolute top-2 left-4 w-0.5 h-0.5 bg-black rounded-full"></div>
-                    <div className="absolute top-2 right-4 w-0.5 h-0.5 bg-black rounded-full"></div>
-                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-4 h-2 border-b border-black rounded-b-full"></div>
-                    <div className="absolute top-2 -left-3 w-1 h-4 bg-orange-500 rounded-full transform -rotate-45"></div>
-                    <div className="absolute top-2 -right-3 w-1 h-4 bg-orange-500 rounded-full transform rotate-45"></div>
-                    <div className="absolute -bottom-3 left-4 w-1 h-4 bg-orange-500 rounded-full"></div>
-                    <div className="absolute -bottom-3 right-4 w-1 h-4 bg-orange-500 rounded-full"></div>
+                <div className="absolute -bottom-4 -right-4 animate-bounce">
+                  <div className="w-14 h-7 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-t-full relative border-b-2 border-orange-600">
+                    {/* Orange segments */}
+                    <div className="absolute bottom-0 left-1 w-px h-4 bg-orange-600 transform rotate-15 origin-bottom"></div>
+                    <div className="absolute bottom-0 left-3 w-px h-5 bg-orange-600 transform rotate-8 origin-bottom"></div>
+                    <div className="absolute bottom-0 left-1/2 w-px h-7 bg-orange-600 transform -translate-x-1/2"></div>
+                    <div className="absolute bottom-0 right-3 w-px h-5 bg-orange-600 transform -rotate-8 origin-bottom"></div>
+                    <div className="absolute bottom-0 right-1 w-px h-4 bg-orange-600 transform -rotate-15 origin-bottom"></div>
+                    
+                    {/* White rind */}
+                    <div className="absolute top-0 w-full h-0.5 bg-white rounded-t-full"></div>
+                    
+                    {/* Eyes */}
+                    <div className="absolute top-1 left-2 w-2 h-3 bg-white rounded-full"></div>
+                    <div className="absolute top-1 right-2 w-2 h-3 bg-white rounded-full"></div>
+                    <div className="absolute top-2 left-2.5 w-1 h-1.5 bg-black rounded-full"></div>
+                    <div className="absolute top-2 right-2.5 w-1 h-1.5 bg-black rounded-full"></div>
+                    
+                    {/* Happy mouth */}
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-3 h-1 border-b-2 border-black rounded-b-full"></div>
+                    
+                    {/* Waving arms */}
+                    <div className="absolute top-2 -left-1 w-0.5 h-4 bg-orange-500 rounded-full transform -rotate-30"></div>
+                    <div className="absolute top-2 -right-1 w-0.5 h-4 bg-orange-500 rounded-full transform rotate-30"></div>
+                    
+                    {/* Running legs */}
+                    <div className="absolute -bottom-2 left-3 w-0.5 h-3 bg-orange-500 rounded-full transform rotate-15"></div>
+                    <div className="absolute -bottom-2 right-3 w-0.5 h-3 bg-orange-500 rounded-full transform -rotate-15"></div>
                   </div>
                 </div>
               </div>
@@ -344,52 +370,50 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Celebrating orange mascot */}
+          {/* Celebrating orange mascot with thumbs up and rocket flames */}
           <div className="mb-12">
             <div className="inline-block relative">
-              {/* Main orange body */}
-              <div className="w-32 h-16 bg-orange-500 rounded-t-full relative animate-bounce">
+              {/* Main orange slice body */}
+              <div className="w-24 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-t-full relative border-b-4 border-orange-600 animate-bounce">
                 {/* Orange segments */}
-                <div className="absolute top-0 left-4 w-0 h-12 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-8 w-0 h-12 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-12 w-0 h-12 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-16 w-0 h-12 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-20 w-0 h-12 border-l-2 border-orange-400"></div>
-                <div className="absolute top-0 left-24 w-0 h-12 border-l-2 border-orange-400"></div>
+                <div className="absolute bottom-0 left-2 w-px h-8 bg-orange-600 transform rotate-20 origin-bottom"></div>
+                <div className="absolute bottom-0 left-5 w-px h-10 bg-orange-600 transform rotate-10 origin-bottom"></div>
+                <div className="absolute bottom-0 left-1/2 w-px h-12 bg-orange-600 transform -translate-x-1/2"></div>
+                <div className="absolute bottom-0 right-5 w-px h-10 bg-orange-600 transform -rotate-10 origin-bottom"></div>
+                <div className="absolute bottom-0 right-2 w-px h-8 bg-orange-600 transform -rotate-20 origin-bottom"></div>
                 
-                {/* Orange peel */}
-                <div className="absolute top-0 w-full h-3 bg-orange-600 rounded-t-full"></div>
+                {/* White rind */}
+                <div className="absolute top-0 w-full h-1 bg-white rounded-t-full"></div>
                 
-                {/* Eyes */}
-                <div className="absolute top-3 left-6 w-4 h-4 bg-white rounded-full"></div>
-                <div className="absolute top-3 right-6 w-4 h-4 bg-white rounded-full"></div>
-                <div className="absolute top-4 left-7 w-2 h-2 bg-black rounded-full"></div>
-                <div className="absolute top-4 right-7 w-2 h-2 bg-black rounded-full"></div>
+                {/* Large happy eyes */}
+                <div className="absolute top-2 left-4 w-4 h-5 bg-white rounded-full"></div>
+                <div className="absolute top-2 right-4 w-4 h-5 bg-white rounded-full"></div>
+                <div className="absolute top-3 left-5 w-2 h-3 bg-black rounded-full"></div>
+                <div className="absolute top-3 right-5 w-2 h-3 bg-black rounded-full"></div>
                 
-                {/* Happy mouth */}
-                <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-8 h-4 border-b-3 border-black rounded-b-full"></div>
+                {/* Big happy mouth */}
+                <div className="absolute top-7 left-1/2 transform -translate-x-1/2 w-8 h-3 border-b-3 border-black rounded-b-full"></div>
                 
-                {/* Thumbs up */}
-                <div className="absolute top-2 -right-8 w-3 h-6 bg-orange-500 rounded-full transform rotate-12"></div>
-                <div className="absolute top-1 -right-9 w-4 h-3 bg-orange-500 rounded-full"></div>
+                {/* Thumbs up gesture */}
+                <div className="absolute top-1 -right-6 w-2 h-5 bg-orange-500 rounded-full transform rotate-15"></div>
+                <div className="absolute top-0 -right-7 w-3 h-2 bg-orange-500 rounded-full"></div>
                 
-                {/* Arms */}
-                <div className="absolute top-6 -left-8 w-8 h-2 bg-orange-500 rounded-full"></div>
-                <div className="absolute top-6 -right-8 w-8 h-2 bg-orange-500 rounded-full"></div>
+                {/* Regular arm on left */}
+                <div className="absolute top-4 -left-4 w-1 h-5 bg-orange-500 rounded-full transform -rotate-30"></div>
                 
-                {/* Legs with rocket flames */}
-                <div className="absolute -bottom-2 left-10 w-2 h-6 bg-orange-500 rounded-full"></div>
-                <div className="absolute -bottom-2 right-10 w-2 h-6 bg-orange-500 rounded-full"></div>
+                {/* Legs positioned for rocket flames */}
+                <div className="absolute -bottom-2 left-7 w-1 h-4 bg-orange-500 rounded-full"></div>
+                <div className="absolute -bottom-2 right-7 w-1 h-4 bg-orange-500 rounded-full"></div>
                 
-                {/* Rocket flames */}
-                <div className="absolute -bottom-4 left-9 w-4 h-3 bg-yellow-400 rounded-b-full"></div>
-                <div className="absolute -bottom-4 right-9 w-4 h-3 bg-yellow-400 rounded-b-full"></div>
-                <div className="absolute -bottom-6 left-8 w-6 h-2 bg-red-500 rounded-b-full"></div>
-                <div className="absolute -bottom-6 right-8 w-6 h-2 bg-red-500 rounded-b-full"></div>
+                {/* Rocket flames under feet */}
+                <div className="absolute -bottom-4 left-6 w-3 h-2 bg-yellow-400 rounded-b-full"></div>
+                <div className="absolute -bottom-4 right-6 w-3 h-2 bg-yellow-400 rounded-b-full"></div>
+                <div className="absolute -bottom-6 left-5 w-5 h-2 bg-red-500 rounded-b-full"></div>
+                <div className="absolute -bottom-6 right-5 w-5 h-2 bg-red-500 rounded-b-full"></div>
                 
-                {/* Blue shoes */}
-                <div className="absolute -bottom-3 left-6 w-6 h-4 bg-blue-500 rounded-full"></div>
-                <div className="absolute -bottom-3 right-6 w-6 h-4 bg-blue-500 rounded-full"></div>
+                {/* Blue shoes/feet */}
+                <div className="absolute -bottom-3 left-5 w-4 h-2 bg-blue-500 rounded-full"></div>
+                <div className="absolute -bottom-3 right-5 w-4 h-2 bg-blue-500 rounded-full"></div>
               </div>
             </div>
           </div>
@@ -421,11 +445,13 @@ export default function Home() {
 
           {/* BiteBurst logo */}
           <div className="flex items-center justify-center">
-            <div className="w-8 h-4 bg-orange-500 rounded-t-full relative mr-3">
-              <div className="absolute top-0 left-1 w-0 h-3 border-l border-orange-400"></div>
-              <div className="absolute top-0 left-2 w-0 h-3 border-l border-orange-400"></div>
-              <div className="absolute top-0 left-3 w-0 h-3 border-l border-orange-400"></div>
-              <div className="absolute top-0 w-full h-0.5 bg-orange-600 rounded-t-full"></div>
+            <div className="w-8 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-t-full relative mr-3 border-b border-orange-600">
+              {/* Orange segments */}
+              <div className="absolute bottom-0 left-1 w-px h-3 bg-orange-600 transform rotate-12 origin-bottom"></div>
+              <div className="absolute bottom-0 left-1/2 w-px h-4 bg-orange-600 transform -translate-x-1/2"></div>
+              <div className="absolute bottom-0 right-1 w-px h-3 bg-orange-600 transform -rotate-12 origin-bottom"></div>
+              {/* White rind */}
+              <div className="absolute top-0 w-full h-0.5 bg-white rounded-t-full"></div>
             </div>
             <span className="text-2xl font-bold text-orange-500">BiteBurst</span>
           </div>
