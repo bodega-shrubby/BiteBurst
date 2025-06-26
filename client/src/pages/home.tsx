@@ -68,12 +68,12 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center">
           
           {/* Main Headline */}
-          <h2 className="text-4xl sm:text-5xl font-bold text-black mb-8 leading-tight">
+          <h2 className="text-black text-center mb-6 max-w-4xl mx-auto font-extrabold text-[36px] leading-tight">
             Healthy habits, powered by AI.
           </h2>
 
           {/* Description Text */}
-          <p className="text-lg sm:text-xl text-gray-700 max-w-4xl mx-auto mb-16 leading-relaxed">
+          <p className="text-lg font-medium text-black text-center mb-16 max-w-3xl mx-auto leading-relaxed">
             BiteBurst uses AI to give smart, age-friendly feedback on food and movement. Learn how your meals help you in school, sports, and life.
           </p>
 
