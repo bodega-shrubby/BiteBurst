@@ -27,7 +27,7 @@ export default function Home() {
           </div>
 
           {/* Headline */}
-          <h2 className="text-black text-center mb-6 max-w-4xl mx-auto text-[30px] font-extrabold">
+          <h2 className="text-black text-center mb-6 max-w-4xl mx-auto font-extrabold text-[36px]">
             The fun, gamified way to eat better and move more!
           </h2>
 
