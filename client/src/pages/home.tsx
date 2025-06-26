@@ -67,20 +67,6 @@ export default function Home() {
       <section className="py-16 px-8 bg-white">
         <div className="max-w-6xl mx-auto text-center">
           
-          {/* Logo Row */}
-          <div className="flex items-center justify-center mb-8 -space-x-4">
-            <img 
-              src={mascotImage} 
-              alt="BiteBurst Mascot" 
-              className="w-24 h-24 sm:w-32 sm:h-32 object-contain"
-            />
-            <img 
-              src={biteBurstTextImage} 
-              alt="BiteBurst" 
-              className="h-20 sm:h-28 object-contain"
-            />
-          </div>
-
           {/* Main Headline */}
           <h2 className="text-4xl sm:text-5xl font-bold text-black mb-8 leading-tight">
             Healthy habits, powered by AI.
