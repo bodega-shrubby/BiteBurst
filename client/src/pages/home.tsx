@@ -1,86 +1,178 @@
 import { Button } from "@/components/ui/button";
 import mascotImage from "@assets/ChatGPT Image Jun 20, 2025 at 04_16_09 PM_1750421779759.png";
+import runningBoyImage from "@assets/CA2D19FD-6214-4459-B44F-C0503B8D0086_1750932028300.png";
+import girlYellowHoodieImage from "@assets/48172ADF-566D-40CF-AA66-3DD0D4B182D8_1750932044380.png";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white font-sans">
-      {/* Hero Section */}
+      {/* Hero Section - Exact recreation of provided design */}
       <section className="min-h-screen flex flex-col justify-center items-center px-8 py-16 bg-white">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           
-          {/* 1. Logo Row */}
+          {/* Logo Row - Left aligned */}
           <div className="flex items-center justify-center mb-12">
             <img 
               src={mascotImage} 
               alt="BiteBurst Mascot" 
-              className="w-24 h-24 mr-6"
+              className="w-20 h-20 mr-4"
             />
-            <h1 className="text-6xl font-bold text-orange-500" style={{ color: '#FF6A00' }}>
+            <h1 className="text-6xl font-bold" style={{ color: '#FF6A00' }}>
               BiteBurst
             </h1>
           </div>
 
-          {/* 2. Headline */}
-          <h2 className="text-3xl font-bold text-black text-center mb-6 leading-tight">
+          {/* Headline */}
+          <h2 className="text-4xl font-bold text-black text-center mb-6 leading-tight max-w-4xl mx-auto">
             The fun, gamified way to eat better and move more!
           </h2>
 
-          {/* 3. Subheading */}
-          <p className="text-lg font-medium text-black text-center mb-12 max-w-2xl mx-auto leading-relaxed">
+          {/* Subheading */}
+          <p className="text-lg font-medium text-black text-center mb-16 max-w-3xl mx-auto leading-relaxed">
             BiteBurst helps kids and teens learn what to eat, how to stay active, and how food fuels their goals.
           </p>
 
-          {/* 4. Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          {/* Character Scene - Exact positioning from design */}
+          <div className="relative mb-16 h-64">
+            
+            {/* Decorative Elements */}
+            {/* Left sparkle */}
+            <div className="absolute top-4 left-16">
+              <div className="star-sparkle text-yellow-400 text-2xl">✦</div>
+            </div>
+            
+            {/* Top center star */}
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
+              <div className="star-sparkle text-yellow-400 text-3xl">✦</div>
+            </div>
+            
+            {/* XP text with small stars */}
+            <div className="absolute top-4 right-20">
+              <span className="text-yellow-500 font-bold text-2xl">XP</span>
+              <div className="flex space-x-1 mt-1">
+                <div className="star-sparkle text-yellow-400 text-sm">✦</div>
+                <div className="star-sparkle text-yellow-400 text-xs">✦</div>
+              </div>
+            </div>
+            
+            {/* Bottom right sparkles */}
+            <div className="absolute bottom-8 right-32">
+              <div className="star-sparkle text-yellow-400 text-xl">✦</div>
+            </div>
+            
+            <div className="absolute bottom-12 left-32">
+              <div className="star-sparkle text-yellow-400 text-lg">✦</div>
+            </div>
+
+            {/* Characters positioned horizontally across the scene */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center items-end">
+              
+              {/* 1. Orange slice mascot (left) */}
+              <div className="relative mr-8">
+                <img 
+                  src={mascotImage} 
+                  alt="BiteBurst Mascot" 
+                  className="w-16 h-16 animate-float"
+                />
+              </div>
+
+              {/* 2. Girl in yellow hoodie (lunging pose) */}
+              <div className="relative mr-6">
+                <img 
+                  src={girlYellowHoodieImage} 
+                  alt="Girl in Yellow Hoodie" 
+                  className="w-20 h-24"
+                />
+              </div>
+
+              {/* 3. Green apple (floating center) */}
+              <div className="relative mr-6">
+                <div className="w-12 h-12 bg-green-500 rounded-full relative shadow-lg animate-float-delayed">
+                  {/* Apple stem */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-2 bg-green-700 rounded-full"></div>
+                  {/* Apple leaf */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-x-1 w-2 h-1 bg-green-600 rounded-full transform rotate-45"></div>
+                  {/* Apple highlight */}
+                  <div className="absolute top-2 left-2 w-4 h-4 bg-green-300 rounded-full opacity-60"></div>
+                </div>
+              </div>
+
+              {/* 4. Running boy in orange shirt */}
+              <div className="relative mr-6">
+                <img 
+                  src={runningBoyImage} 
+                  alt="Running Boy" 
+                  className="w-20 h-24"
+                />
+              </div>
+
+              {/* 5. Red apple (right of characters) */}
+              <div className="relative mr-4">
+                <div className="w-10 h-10 bg-red-500 rounded-full relative shadow-lg animate-float">
+                  {/* Apple stem */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-1.5 bg-green-700 rounded-full"></div>
+                  {/* Apple leaf */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-x-1 w-1.5 h-1 bg-green-600 rounded-full transform rotate-45"></div>
+                  {/* Apple highlight */}
+                  <div className="absolute top-1 left-2 w-3 h-3 bg-red-300 rounded-full opacity-60"></div>
+                </div>
+              </div>
+
+              {/* 6. Girl with dark hair (standing, far right) - placeholder for now */}
+              <div className="relative">
+                <div className="w-16 h-24 relative">
+                  {/* Head */}
+                  <div className="w-12 h-12 bg-yellow-100 rounded-full relative">
+                    {/* Long dark hair */}
+                    <div className="absolute -top-1 -left-1 w-14 h-8 bg-gray-900 rounded-t-3xl"></div>
+                    <div className="absolute top-1 -left-0.5 w-3 h-12 bg-gray-900 rounded-full"></div>
+                    <div className="absolute top-1 -right-0.5 w-3 h-12 bg-gray-900 rounded-full"></div>
+                    {/* Eyes */}
+                    <div className="absolute top-3 left-2 w-1.5 h-1.5 bg-black rounded-full"></div>
+                    <div className="absolute top-3 right-2 w-1.5 h-1.5 bg-black rounded-full"></div>
+                    {/* Mouth */}
+                    <div className="absolute top-6 left-4 w-4 h-1 border-b border-black rounded-b-full"></div>
+                  </div>
+                  
+                  {/* Pink/red top */}
+                  <div className="absolute top-8 left-1 w-10 h-8 bg-red-400 rounded-lg"></div>
+                  
+                  {/* Arms */}
+                  <div className="absolute top-10 -left-2 w-3 h-6 bg-yellow-100 rounded-full"></div>
+                  <div className="absolute top-10 right-0 w-3 h-6 bg-yellow-100 rounded-full"></div>
+                  
+                  {/* Yellow item being held */}
+                  <div className="absolute top-8 right-2 w-2 h-3 bg-yellow-400 rounded-full"></div>
+                  
+                  {/* Blue jeans */}
+                  <div className="absolute top-14 left-2 w-3 h-12 bg-blue-600 rounded-full"></div>
+                  <div className="absolute top-14 right-2 w-3 h-12 bg-blue-600 rounded-full"></div>
+                  
+                  {/* Belt */}
+                  <div className="absolute top-15 left-1 w-10 h-1 bg-blue-800 rounded"></div>
+                  
+                  {/* Blue shoes */}
+                  <div className="absolute bottom-0 left-1 w-5 h-2 bg-blue-800 rounded"></div>
+                  <div className="absolute bottom-0 right-1 w-5 h-2 bg-blue-800 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
-              className="bg-orange-500 hover:bg-orange-600 hover:shadow-lg text-white px-8 py-3 text-lg font-semibold rounded-full transition-all duration-200"
+              className="hover:shadow-lg text-white px-10 py-4 text-lg font-semibold rounded-full transition-all duration-200"
               style={{ backgroundColor: '#FF6A00' }}
             >
               Get Started
             </Button>
             <Button 
               variant="outline" 
-              className="border-2 border-gray-300 text-black hover:bg-gray-50 hover:shadow-md px-8 py-3 text-lg font-medium rounded-full bg-white transition-all duration-200"
+              className="border-2 border-gray-300 text-black hover:bg-gray-50 hover:shadow-md px-10 py-4 text-lg font-medium rounded-full bg-white transition-all duration-200"
             >
               I already have an account
             </Button>
-          </div>
-
-          {/* 5. Visual Row */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
-            {/* Left: Mascot */}
-            <div className="flex-shrink-0">
-              <img 
-                src={mascotImage} 
-                alt="BiteBurst Mascot" 
-                className="w-32 h-32 animate-float"
-              />
-            </div>
-
-            {/* Right: Kids activities with sparkles */}
-            <div className="relative flex-1 max-w-md">
-              {/* Decorative sparkles */}
-              <div className="absolute -top-4 left-4 text-yellow-400 text-2xl animate-pulse">
-                ✨
-              </div>
-              <div className="absolute -top-2 right-8 text-orange-400 font-bold text-xl">
-                XP
-              </div>
-              <div className="absolute bottom-4 left-8 text-yellow-400 text-lg animate-pulse">
-                ✨
-              </div>
-              <div className="absolute bottom-8 right-4 text-yellow-400 text-2xl animate-pulse">
-                ✨
-              </div>
-
-              {/* Illustration placeholder for kids dancing/running/eating */}
-              <div className="bg-gradient-to-br from-orange-100 to-yellow-100 rounded-3xl p-8 text-center">
-                <div className="text-6xl mb-4">🏃‍♂️ 🍎 💃</div>
-                <p className="text-lg font-semibold text-gray-700">
-                  Kids staying active and eating healthy!
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
