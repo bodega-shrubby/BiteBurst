@@ -21,7 +21,7 @@ export default function Home() {
             <img 
               src={biteBurstTextImage} 
               alt="BiteBurst" 
-              className="h-24 object-contain"
+              className="h-32 object-contain"
             />
           </div>
 
