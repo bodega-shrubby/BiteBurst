@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import mascotImage from "@assets/ChatGPT Image Jun 20, 2025 at 04_16_09 PM_1750421779759.png";
+import biteBurstTextImage from "@assets/F2D3D9CF-D739-4DA8-ACEC-83E301F2A76E_1750932035557.png";
 import runningBoyImage from "@assets/CA2D19FD-6214-4459-B44F-C0503B8D0086_1750932028300.png";
 import girlYellowHoodieImage from "@assets/48172ADF-566D-40CF-AA66-3DD0D4B182D8_1750932044380.png";
 
@@ -15,11 +16,13 @@ export default function Home() {
             <img 
               src={mascotImage} 
               alt="BiteBurst Mascot" 
-              className="w-20 h-20 mr-4"
+              className="w-16 h-16 mr-4 object-contain"
             />
-            <h1 className="text-6xl font-bold" style={{ color: '#FF6A00' }}>
-              BiteBurst
-            </h1>
+            <img 
+              src={biteBurstTextImage} 
+              alt="BiteBurst" 
+              className="h-12 object-contain"
+            />
           </div>
 
           {/* Headline */}
@@ -65,95 +68,97 @@ export default function Home() {
             </div>
 
             {/* Characters positioned horizontally across the scene */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center items-end">
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center items-end space-x-6">
               
               {/* 1. Orange slice mascot (left) */}
-              <div className="relative mr-8">
+              <div className="relative">
                 <img 
                   src={mascotImage} 
                   alt="BiteBurst Mascot" 
-                  className="w-16 h-16 animate-float"
+                  className="w-12 h-12 object-contain animate-float"
                 />
               </div>
 
               {/* 2. Girl in yellow hoodie (lunging pose) */}
-              <div className="relative mr-6">
+              <div className="relative">
                 <img 
                   src={girlYellowHoodieImage} 
                   alt="Girl in Yellow Hoodie" 
-                  className="w-20 h-24"
+                  className="h-20 object-contain"
                 />
               </div>
 
               {/* 3. Green apple (floating center) */}
-              <div className="relative mr-6">
-                <div className="w-12 h-12 bg-green-500 rounded-full relative shadow-lg animate-float-delayed">
+              <div className="relative">
+                <div className="w-10 h-10 bg-green-500 rounded-full relative shadow-lg animate-float-delayed">
                   {/* Apple stem */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-2 bg-green-700 rounded-full"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-1.5 bg-green-700 rounded-full"></div>
                   {/* Apple leaf */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-x-1 w-2 h-1 bg-green-600 rounded-full transform rotate-45"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-x-1 w-1.5 h-0.5 bg-green-600 rounded-full transform rotate-45"></div>
                   {/* Apple highlight */}
-                  <div className="absolute top-2 left-2 w-4 h-4 bg-green-300 rounded-full opacity-60"></div>
+                  <div className="absolute top-1.5 left-1.5 w-3 h-3 bg-green-300 rounded-full opacity-60"></div>
                 </div>
               </div>
 
               {/* 4. Running boy in orange shirt */}
-              <div className="relative mr-6">
+              <div className="relative">
                 <img 
                   src={runningBoyImage} 
                   alt="Running Boy" 
-                  className="w-20 h-24"
+                  className="h-20 object-contain"
                 />
               </div>
 
               {/* 5. Red apple (right of characters) */}
-              <div className="relative mr-4">
-                <div className="w-10 h-10 bg-red-500 rounded-full relative shadow-lg animate-float">
+              <div className="relative">
+                <div className="w-8 h-8 bg-red-500 rounded-full relative shadow-lg animate-float">
                   {/* Apple stem */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-1.5 bg-green-700 rounded-full"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-1 bg-green-700 rounded-full"></div>
                   {/* Apple leaf */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-x-1 w-1.5 h-1 bg-green-600 rounded-full transform rotate-45"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-x-0.5 w-1 h-0.5 bg-green-600 rounded-full transform rotate-45"></div>
                   {/* Apple highlight */}
-                  <div className="absolute top-1 left-2 w-3 h-3 bg-red-300 rounded-full opacity-60"></div>
+                  <div className="absolute top-1 left-1 w-2.5 h-2.5 bg-red-300 rounded-full opacity-60"></div>
                 </div>
               </div>
 
-              {/* 6. Girl with dark hair (standing, far right) - placeholder for now */}
+              {/* 6. Girl with dark hair eating fruit (far right) */}
               <div className="relative">
-                <div className="w-16 h-24 relative">
+                <div className="w-14 h-20 relative">
                   {/* Head */}
-                  <div className="w-12 h-12 bg-yellow-100 rounded-full relative">
+                  <div className="w-10 h-10 bg-yellow-100 rounded-full relative">
                     {/* Long dark hair */}
-                    <div className="absolute -top-1 -left-1 w-14 h-8 bg-gray-900 rounded-t-3xl"></div>
-                    <div className="absolute top-1 -left-0.5 w-3 h-12 bg-gray-900 rounded-full"></div>
-                    <div className="absolute top-1 -right-0.5 w-3 h-12 bg-gray-900 rounded-full"></div>
+                    <div className="absolute -top-0.5 -left-0.5 w-11 h-6 bg-gray-900 rounded-t-3xl"></div>
+                    <div className="absolute top-1 -left-0.5 w-2.5 h-10 bg-gray-900 rounded-full"></div>
+                    <div className="absolute top-1 -right-0.5 w-2.5 h-10 bg-gray-900 rounded-full"></div>
+                    
                     {/* Eyes */}
-                    <div className="absolute top-3 left-2 w-1.5 h-1.5 bg-black rounded-full"></div>
-                    <div className="absolute top-3 right-2 w-1.5 h-1.5 bg-black rounded-full"></div>
-                    {/* Mouth */}
-                    <div className="absolute top-6 left-4 w-4 h-1 border-b border-black rounded-b-full"></div>
+                    <div className="absolute top-2.5 left-1.5 w-1 h-1 bg-black rounded-full"></div>
+                    <div className="absolute top-2.5 right-1.5 w-1 h-1 bg-black rounded-full"></div>
+                    
+                    {/* Small smile */}
+                    <div className="absolute top-5 left-3 w-4 h-1 border-b border-black rounded-b-full"></div>
                   </div>
                   
-                  {/* Pink/red top */}
-                  <div className="absolute top-8 left-1 w-10 h-8 bg-red-400 rounded-lg"></div>
+                  {/* Pink/coral top */}
+                  <div className="absolute top-7 left-0.5 w-9 h-6 bg-red-400 rounded-lg"></div>
                   
-                  {/* Arms */}
-                  <div className="absolute top-10 -left-2 w-3 h-6 bg-yellow-100 rounded-full"></div>
-                  <div className="absolute top-10 right-0 w-3 h-6 bg-yellow-100 rounded-full"></div>
+                  {/* Arms - one holding yellow fruit */}
+                  <div className="absolute top-8 -left-1.5 w-2.5 h-5 bg-yellow-100 rounded-full"></div>
+                  <div className="absolute top-8 right-0 w-2.5 h-5 bg-yellow-100 rounded-full"></div>
                   
-                  {/* Yellow item being held */}
-                  <div className="absolute top-8 right-2 w-2 h-3 bg-yellow-400 rounded-full"></div>
+                  {/* Yellow fruit being held/eaten */}
+                  <div className="absolute top-6 right-1 w-1.5 h-2.5 bg-yellow-400 rounded-full"></div>
                   
                   {/* Blue jeans */}
-                  <div className="absolute top-14 left-2 w-3 h-12 bg-blue-600 rounded-full"></div>
-                  <div className="absolute top-14 right-2 w-3 h-12 bg-blue-600 rounded-full"></div>
+                  <div className="absolute top-12 left-1.5 w-2.5 h-10 bg-blue-600 rounded-full"></div>
+                  <div className="absolute top-12 right-1.5 w-2.5 h-10 bg-blue-600 rounded-full"></div>
                   
                   {/* Belt */}
-                  <div className="absolute top-15 left-1 w-10 h-1 bg-blue-800 rounded"></div>
+                  <div className="absolute top-12 left-0.5 w-9 h-0.5 bg-blue-800 rounded"></div>
                   
                   {/* Blue shoes */}
-                  <div className="absolute bottom-0 left-1 w-5 h-2 bg-blue-800 rounded"></div>
-                  <div className="absolute bottom-0 right-1 w-5 h-2 bg-blue-800 rounded"></div>
+                  <div className="absolute bottom-0 left-0.5 w-4 h-1.5 bg-blue-800 rounded"></div>
+                  <div className="absolute bottom-0 right-0.5 w-4 h-1.5 bg-blue-800 rounded"></div>
                 </div>
               </div>
             </div>
