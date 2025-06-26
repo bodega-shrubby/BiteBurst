@@ -62,6 +62,42 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Section 2 - AI-Powered Habits */}
+      <section className="py-16 px-8 bg-white">
+        <div className="max-w-6xl mx-auto text-center">
+          
+          {/* Logo Row */}
+          <div className="flex items-center justify-center mb-8 -space-x-4">
+            <img 
+              src={mascotImage} 
+              alt="BiteBurst Mascot" 
+              className="w-24 h-24 sm:w-32 sm:h-32 object-contain"
+            />
+            <img 
+              src={biteBurstTextImage} 
+              alt="BiteBurst" 
+              className="h-20 sm:h-28 object-contain"
+            />
+          </div>
+
+          {/* Main Headline */}
+          <h2 className="text-4xl sm:text-5xl font-bold text-black mb-8 leading-tight">
+            Healthy habits, powered by AI.
+          </h2>
+
+          {/* Description Text */}
+          <p className="text-lg sm:text-xl text-gray-700 max-w-4xl mx-auto mb-16 leading-relaxed">
+            BiteBurst uses AI to give smart, age-friendly feedback on food and movement. Learn how your meals help you in school, sports, and life.
+          </p>
+
+          {/* Placeholder for illustration */}
+          <div className="w-full max-w-4xl mx-auto h-96 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            <p className="text-gray-500 text-lg">Illustration placeholder - ready for your image</p>
+          </div>
+
+        </div>
+      </section>
     </div>
   );
 }
