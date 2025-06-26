@@ -11,18 +11,17 @@ export default function Home() {
       <section className="min-h-screen flex flex-col justify-center items-center px-8 py-16 bg-white">
         <div className="max-w-6xl mx-auto">
           
-          {/* Logo Row - Left aligned */}
-          <div className="flex items-center justify-center mb-12">
+          {/* Logo Row - Responsive sizing */}
+          <div className="flex items-center justify-center mb-8 sm:mb-12">
             <img 
               src={mascotImage} 
               alt="BiteBurst Mascot" 
-              className="w-96 h-96 mr-0.5 object-contain"
+              className="w-16 h-16 sm:w-20 md:w-24 lg:w-28 mr-2 object-contain"
             />
             <img 
               src={biteBurstTextImage} 
               alt="BiteBurst" 
-              className="h-144 object-contain"
-              style={{ height: '36rem' }}
+              className="h-12 sm:h-16 md:h-20 lg:h-24 object-contain"
             />
           </div>
 
