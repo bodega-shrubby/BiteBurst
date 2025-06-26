@@ -16,12 +16,12 @@ export default function Home() {
             <img 
               src={mascotImage} 
               alt="BiteBurst Mascot" 
-              className="w-24 h-24 mr-6 object-contain"
+              className="w-32 h-32 mr-3 object-contain"
             />
             <img 
               src={biteBurstTextImage} 
               alt="BiteBurst" 
-              className="h-32 object-contain"
+              className="h-40 object-contain"
             />
           </div>
 
