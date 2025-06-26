@@ -12,16 +12,16 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           
           {/* Logo Row - Responsive sizing */}
-          <div className="flex items-center justify-center mb-8 sm:mb-12">
+          <div className="flex items-center justify-center mb-8 sm:mb-12 -space-x-2">
             <img 
               src={mascotImage} 
               alt="BiteBurst Mascot" 
-              className="w-20 h-20 sm:w-24 md:w-28 lg:w-32 -mr-1 object-contain"
+              className="w-40 h-40 sm:w-48 md:w-56 lg:w-64 object-contain"
             />
             <img 
               src={biteBurstTextImage} 
               alt="BiteBurst" 
-              className="h-16 sm:h-20 md:h-24 lg:h-28 object-contain"
+              className="h-32 sm:h-40 md:h-48 lg:h-56 object-contain"
             />
           </div>
 
