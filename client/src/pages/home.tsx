@@ -6,6 +6,7 @@ import runningBoyImage from "@assets/CA2D19FD-6214-4459-B44F-C0503B8D0086_175093
 import girlYellowHoodieImage from "@assets/48172ADF-566D-40CF-AA66-3DD0D4B182D8_1750932044380.png";
 import characterSceneImage from "@assets/Image 5_1750934217849_1750935387889.png";
 import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_1751018825929.png";
+import tapSnapGoImage from "@assets/f4c590ab-4c94-4bfa-b845-e8013e86f062_1751019859501.png";
 
 export default function Home() {
   const aiSectionAnimation = useScrollAnimation();
@@ -120,11 +121,13 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Image Placeholder - Right side */}
+            {/* Image - Right side */}
             <div className={`flex justify-center lg:justify-end scroll-fade-in-delayed ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
-              <div className="w-full max-w-lg h-96 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                <p className="text-gray-500 text-lg">Image placeholder - ready for your image</p>
-              </div>
+              <img 
+                src={tapSnapGoImage} 
+                alt="Tap, Snap, Go food logging illustration" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
             </div>
 
           </div>
