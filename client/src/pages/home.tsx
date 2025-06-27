@@ -53,7 +53,7 @@ export default function Home() {
             <img 
               src={characterSceneImage} 
               alt="BiteBurst Character Scene" 
-              className="w-full max-w-lg h-auto object-contain"
+              className="w-full max-w-4xl h-auto object-contain"
             />
           </div>
 
