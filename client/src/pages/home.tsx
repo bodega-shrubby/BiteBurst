@@ -70,17 +70,8 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            {/* Left - Illustration */}
-            <div className="flex justify-center lg:justify-start">
-              <img 
-                src={aiIllustrationImage} 
-                alt="AI-powered feedback illustration" 
-                className="w-full max-w-lg h-auto object-contain"
-              />
-            </div>
-
-            {/* Right - Text Content */}
-            <div className="text-center lg:text-left">
+            {/* Text Content - First on mobile, right on desktop */}
+            <div className="text-center lg:text-left order-1 lg:order-2">
               {/* Main Headline */}
               <h2 className="text-black mb-6 font-extrabold text-[36px] leading-tight">
                 Healthy habits, powered by AI.
@@ -90,6 +81,15 @@ export default function Home() {
               <p className="text-lg font-medium text-black leading-relaxed">
                 BiteBurst uses AI to give smart, age-friendly feedback on food and movement. Learn how your meals help you in school, sports, and life.
               </p>
+            </div>
+
+            {/* Illustration - Second on mobile, left on desktop */}
+            <div className="flex justify-center lg:justify-start order-2 lg:order-1">
+              <img 
+                src={aiIllustrationImage} 
+                alt="AI-powered feedback illustration" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
             </div>
 
           </div>
