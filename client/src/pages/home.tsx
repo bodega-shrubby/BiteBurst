@@ -4,6 +4,7 @@ import biteBurstTextImage from "@assets/F2D3D9CF-D739-4DA8-ACEC-83E301F2A76E_175
 import runningBoyImage from "@assets/CA2D19FD-6214-4459-B44F-C0503B8D0086_1750932028300.png";
 import girlYellowHoodieImage from "@assets/48172ADF-566D-40CF-AA66-3DD0D4B182D8_1750932044380.png";
 import characterSceneImage from "@assets/Image 5_1750934217849_1750935387889.png";
+import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_1751018825929.png";
 
 export default function Home() {
   return (
@@ -65,21 +66,32 @@ export default function Home() {
 
       {/* Section 2 - AI-Powered Habits */}
       <section className="py-16 px-8 bg-white">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto">
           
-          {/* Main Headline */}
-          <h2 className="text-black text-center mb-6 max-w-4xl mx-auto font-extrabold text-[36px] leading-tight">
-            Healthy habits, powered by AI.
-          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left - Illustration */}
+            <div className="flex justify-center lg:justify-start">
+              <img 
+                src={aiIllustrationImage} 
+                alt="AI-powered feedback illustration" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
+            </div>
 
-          {/* Description Text */}
-          <p className="text-lg font-medium text-black text-center mb-16 max-w-3xl mx-auto leading-relaxed">
-            BiteBurst uses AI to give smart, age-friendly feedback on food and movement. Learn how your meals help you in school, sports, and life.
-          </p>
+            {/* Right - Text Content */}
+            <div className="text-center lg:text-left">
+              {/* Main Headline */}
+              <h2 className="text-black mb-6 font-extrabold text-[36px] leading-tight">
+                Healthy habits, powered by AI.
+              </h2>
 
-          {/* Placeholder for illustration */}
-          <div className="w-full max-w-4xl mx-auto h-96 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-            <p className="text-gray-500 text-lg">Illustration placeholder - ready for your image</p>
+              {/* Description Text */}
+              <p className="text-lg font-medium text-black leading-relaxed">
+                BiteBurst uses AI to give smart, age-friendly feedback on food and movement. Learn how your meals help you in school, sports, and life.
+              </p>
+            </div>
+
           </div>
 
         </div>
