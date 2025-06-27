@@ -10,6 +10,7 @@ import tapSnapGoImage from "@assets/f4c590ab-4c94-4bfa-b845-e8013e86f062_1751019
 import gamificationImage from "@assets/cb62b801-17ce-4eff-81cc-0184f4408c2e_1751020235628.png";
 import goalsImage from "@assets/7f47fccc-5475-4ef3-b504-c6528f68ecd9_1751025843249.png";
 import scienceImage from "@assets/33f72703-fb94-450f-962e-7f181b611668_1751026267607.png";
+import ctaImage from "@assets/d2518dd4-dec4-4d6b-8707-dfedd442ff07_1751026996268.png";
 
 export default function Home() {
   const aiSectionAnimation = useScrollAnimation();
@@ -17,6 +18,7 @@ export default function Home() {
   const gamificationAnimation = useScrollAnimation();
   const goalsAnimation = useScrollAnimation();
   const scienceAnimation = useScrollAnimation();
+  const ctaAnimation = useScrollAnimation();
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -233,6 +235,47 @@ export default function Home() {
                 alt="Science-backed nutrition education" 
                 className="w-full max-w-lg h-auto object-contain"
               />
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* Section 7 - CTA Block */}
+      <section ref={ctaAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Text Content - Left Side */}
+            <div className={`text-center lg:text-left scroll-fade-in ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+              {/* Main Headline */}
+              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
+                Ready to Burst with Health?
+              </h2>
+
+              {/* Description Text */}
+              <p className="text-lg font-medium text-black leading-relaxed">
+                Join thousands of kids building healthy habits with BiteBurst.
+              </p>
+            </div>
+
+            {/* CTA Image with Button - Right Side */}
+            <div className={`flex flex-col items-center lg:items-end space-y-6 scroll-fade-in-delayed ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+              <img 
+                src={ctaImage} 
+                alt="Health treasure chest with fruits and mascot" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
+              
+              {/* CTA Button - Below Image */}
+              <Button 
+                className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                style={{ backgroundColor: '#FF6A00' }}
+              >
+                🟧 Let's Go!
+              </Button>
             </div>
 
           </div>
