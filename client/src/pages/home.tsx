@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import mascotImage from "@assets/ChatGPT Image Jun 20, 2025 at 04_16_09 PM_1750421779759.png";
 import biteBurstTextImage from "@assets/F2D3D9CF-D739-4DA8-ACEC-83E301F2A76E_1750932035557.png";
 import runningBoyImage from "@assets/CA2D19FD-6214-4459-B44F-C0503B8D0086_1750932028300.png";
@@ -7,6 +8,8 @@ import characterSceneImage from "@assets/Image 5_1750934217849_1750935387889.png
 import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_1751018825929.png";
 
 export default function Home() {
+  const aiSectionAnimation = useScrollAnimation();
+
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Hero Section - Exact recreation of provided design */}
@@ -65,13 +68,13 @@ export default function Home() {
       </section>
 
       {/* Section 2 - AI-Powered Habits */}
-      <section className="py-16 px-8 bg-white">
+      <section ref={aiSectionAnimation.ref} className="py-16 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
             {/* Text Content - First on mobile, right on desktop */}
-            <div className="text-center lg:text-left order-1 lg:order-2">
+            <div className={`text-center lg:text-left order-1 lg:order-2 scroll-fade-in ${aiSectionAnimation.isVisible ? 'visible' : ''}`}>
               {/* Main Headline */}
               <h2 className="text-black mb-6 font-extrabold text-[36px] leading-tight">
                 Healthy habits, powered by AI.
@@ -84,7 +87,7 @@ export default function Home() {
             </div>
 
             {/* Illustration - Second on mobile, left on desktop */}
-            <div className="flex justify-center lg:justify-start order-2 lg:order-1">
+            <div className={`flex justify-center lg:justify-start order-2 lg:order-1 scroll-fade-in-delayed ${aiSectionAnimation.isVisible ? 'visible' : ''}`}>
               <img 
                 src={aiIllustrationImage} 
                 alt="AI-powered feedback illustration" 

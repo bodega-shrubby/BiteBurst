@@ -287,3 +287,48 @@ html {
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Scroll animations */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-fade-in-delayed {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s;
+}
+
+.scroll-fade-in-delayed.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-fade-in-stagger {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out 0.4s, transform 0.6s ease-out 0.4s;
+}
+
+.scroll-fade-in-stagger.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fade-in,
+  .scroll-fade-in-delayed,
+  .scroll-fade-in-stagger {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
