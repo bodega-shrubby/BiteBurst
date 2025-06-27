@@ -76,7 +76,7 @@ export default function Home() {
             {/* Text Content - First on mobile, right on desktop */}
             <div className={`text-center lg:text-left order-1 lg:order-2 scroll-fade-in ${aiSectionAnimation.isVisible ? 'visible' : ''}`}>
               {/* Main Headline */}
-              <h2 className="text-black mb-6 font-extrabold text-[36px] leading-tight">
+              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
                 Healthy habits, powered by AI.
               </h2>
 
