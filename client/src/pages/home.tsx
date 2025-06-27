@@ -108,17 +108,8 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            {/* Image - Left side on desktop, second on mobile */}
-            <div className={`flex justify-center lg:justify-start order-2 lg:order-1 scroll-fade-in-delayed ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
-              <img 
-                src={tapSnapGoImage} 
-                alt="Tap, Snap, Go food logging illustration" 
-                className="w-full max-w-lg h-auto object-contain"
-              />
-            </div>
-
-            {/* Text Content - Right side on desktop, first on mobile */}
-            <div className={`text-center lg:text-left order-1 lg:order-2 scroll-fade-in ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
+            {/* Text Content - Left side */}
+            <div className={`text-center lg:text-left scroll-fade-in ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
               {/* Main Headline */}
               <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
                 Tap, Snap, Go
@@ -128,6 +119,15 @@ export default function Home() {
               <p className="text-lg font-medium text-black leading-relaxed">
                 Log what you eat with bubbles, emojis, or a quick photo. Select your activity and get instant feedback on how food helps your body.
               </p>
+            </div>
+
+            {/* Image - Right side */}
+            <div className={`flex justify-center lg:justify-end scroll-fade-in-delayed ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
+              <img 
+                src={tapSnapGoImage} 
+                alt="Tap, Snap, Go food logging illustration" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
             </div>
 
           </div>
