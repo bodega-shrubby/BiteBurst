@@ -8,11 +8,13 @@ import characterSceneImage from "@assets/Image 5_1750934217849_1750935387889.png
 import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_1751018825929.png";
 import tapSnapGoImage from "@assets/f4c590ab-4c94-4bfa-b845-e8013e86f062_1751019859501.png";
 import gamificationImage from "@assets/cb62b801-17ce-4eff-81cc-0184f4408c2e_1751020235628.png";
+import goalsImage from "@assets/7f47fccc-5475-4ef3-b504-c6528f68ecd9_1751025843249.png";
 
 export default function Home() {
   const aiSectionAnimation = useScrollAnimation();
   const tapSnapGoAnimation = useScrollAnimation();
   const gamificationAnimation = useScrollAnimation();
+  const goalsAnimation = useScrollAnimation();
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -163,6 +165,36 @@ export default function Home() {
               <p className="text-lg font-medium text-black leading-relaxed">
                 Every time you log a meal or workout, you earn XP. Keep your streak alive and unlock cool badges. Your mascot will cheer you on!
               </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* Section 5 - Goals Selection */}
+      <section ref={goalsAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Text Content - Left Side */}
+            <div className={`space-y-6 ${goalsAnimation.isVisible ? 'scroll-fade-in visible' : 'scroll-fade-in'}`}>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight" style={{ color: '#FF6A00' }}>
+                Pick your goals. BiteBurst adapts.
+              </h2>
+              <p className="text-lg font-medium text-black leading-relaxed">
+                Want more energy? Focus in school? Get stronger? BiteBurst helps you choose your goal and gives you custom feedback every day.
+              </p>
+            </div>
+
+            {/* Goals Image - Right Side */}
+            <div className={`${goalsAnimation.isVisible ? 'scroll-fade-in-delayed visible' : 'scroll-fade-in-delayed'} order-first lg:order-last`}>
+              <img 
+                src={goalsImage} 
+                alt="Goals Selection Interface" 
+                className="w-full h-auto rounded-2xl"
+              />
             </div>
 
           </div>
