@@ -40,12 +40,12 @@ export default function Home() {
           </h2>
 
           {/* Subheading */}
-          <p className="text-lg font-medium text-black text-center mb-16 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg font-medium text-black text-center mb-12 max-w-3xl mx-auto leading-relaxed">
             BiteBurst helps kids and teens learn what to eat, how to stay active, and how food fuels their goals.
           </p>
 
           {/* Character Scene - Using your PNG */}
-          <div className="relative mb-16 flex justify-center">
+          <div className="relative mb-12 flex justify-center">
             <img 
               src={characterSceneImage} 
               alt="BiteBurst Character Scene" 
@@ -72,7 +72,7 @@ export default function Home() {
       </section>
 
       {/* Section 2 - AI-Powered Habits */}
-      <section ref={aiSectionAnimation.ref} className="py-16 px-8 bg-white">
+      <section ref={aiSectionAnimation.ref} className="py-8 sm:py-10 lg:py-12 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -105,7 +105,7 @@ export default function Home() {
       </section>
 
       {/* Section 3 - Tap, Snap, Go */}
-      <section ref={tapSnapGoAnimation.ref} className="py-16 px-8 bg-white">
+      <section ref={tapSnapGoAnimation.ref} className="py-8 sm:py-10 lg:py-12 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -138,7 +138,7 @@ export default function Home() {
       </section>
 
       {/* Section 4 - Gamification */}
-      <section ref={gamificationAnimation.ref} className="py-16 px-8 bg-white">
+      <section ref={gamificationAnimation.ref} className="py-8 sm:py-10 lg:py-12 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
