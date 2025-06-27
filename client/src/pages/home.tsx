@@ -263,7 +263,7 @@ export default function Home() {
             </div>
 
             {/* CTA Image - Centered */}
-            <div className={`scroll-fade-in-delayed ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+            <div className={`-mt-2 scroll-fade-in-delayed ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               <img 
                 src={ctaImage} 
                 alt="Health treasure chest with fruits and mascot" 
@@ -272,7 +272,7 @@ export default function Home() {
             </div>
             
             {/* CTA Button - Centered Below Image */}
-            <div className={`scroll-fade-in-stagger ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+            <div className={`-mt-6 scroll-fade-in-stagger ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               <Button 
                 className="text-white px-10 py-4 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
                 style={{ backgroundColor: '#FF6A00' }}
