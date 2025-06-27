@@ -192,11 +192,11 @@ export default function Home() {
             </div>
 
             {/* Goals Image - Right Side */}
-            <div className={`${goalsAnimation.isVisible ? 'scroll-fade-in-delayed visible' : 'scroll-fade-in-delayed'} order-first lg:order-last`}>
+            <div className={`flex justify-center lg:justify-end scroll-fade-in-delayed ${goalsAnimation.isVisible ? 'visible' : ''}`}>
               <img 
                 src={goalsImage} 
                 alt="Goals Selection Interface" 
-                className="w-full h-auto rounded-2xl"
+                className="w-full max-w-lg h-auto object-contain"
               />
             </div>
 
