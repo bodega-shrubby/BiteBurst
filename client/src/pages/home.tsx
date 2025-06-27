@@ -247,12 +247,12 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           
           {/* Centered Content Stack */}
-          <div className="space-y-8">
+          <div className="space-y-4">
             
             {/* Headline and Text - Centered at Top */}
             <div className={`scroll-fade-in ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               {/* Main Headline */}
-              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
+              <h2 className="mb-3 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
                 Ready to Burst with Health?
               </h2>
 
