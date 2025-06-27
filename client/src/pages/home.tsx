@@ -267,7 +267,7 @@ export default function Home() {
               <img 
                 src={ctaImage} 
                 alt="Health treasure chest with fruits and mascot" 
-                className="w-full max-w-md h-auto object-contain mx-auto"
+                className="w-full max-w-md h-56 object-cover object-center mx-auto"
               />
             </div>
             
