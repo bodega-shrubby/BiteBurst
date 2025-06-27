@@ -7,10 +7,12 @@ import girlYellowHoodieImage from "@assets/48172ADF-566D-40CF-AA66-3DD0D4B182D8_
 import characterSceneImage from "@assets/Image 5_1750934217849_1750935387889.png";
 import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_1751018825929.png";
 import tapSnapGoImage from "@assets/f4c590ab-4c94-4bfa-b845-e8013e86f062_1751019859501.png";
+import gamificationImage from "@assets/cb62b801-17ce-4eff-81cc-0184f4408c2e_1751020235628.png";
 
 export default function Home() {
   const aiSectionAnimation = useScrollAnimation();
   const tapSnapGoAnimation = useScrollAnimation();
+  const gamificationAnimation = useScrollAnimation();
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -128,6 +130,39 @@ export default function Home() {
                 alt="Tap, Snap, Go food logging illustration" 
                 className="w-full max-w-lg h-auto object-contain"
               />
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* Section 4 - Gamification */}
+      <section ref={gamificationAnimation.ref} className="py-16 px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Image - Left side on desktop, second on mobile */}
+            <div className={`flex justify-center lg:justify-start order-2 lg:order-1 scroll-fade-in-delayed ${gamificationAnimation.isVisible ? 'visible' : ''}`}>
+              <img 
+                src={gamificationImage} 
+                alt="Gamification with XP, badges and mascot" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
+            </div>
+
+            {/* Text Content - Right side on desktop, first on mobile */}
+            <div className={`text-center lg:text-left order-1 lg:order-2 scroll-fade-in ${gamificationAnimation.isVisible ? 'visible' : ''}`}>
+              {/* Main Headline */}
+              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
+                Healthy is the new high score
+              </h2>
+
+              {/* Description Text */}
+              <p className="text-lg font-medium text-black leading-relaxed">
+                Every time you log a meal or workout, you earn XP. Keep your streak alive and unlock cool badges. Your mascot will cheer you on!
+              </p>
             </div>
 
           </div>
