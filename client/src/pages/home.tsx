@@ -244,12 +244,13 @@ export default function Home() {
 
       {/* Section 7 - CTA Block */}
       <section ref={ctaAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto text-center">
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Centered Content Stack */}
+          <div className="space-y-8">
             
-            {/* Text Content - Left Side */}
-            <div className={`text-center lg:text-left scroll-fade-in ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+            {/* Headline and Text - Centered at Top */}
+            <div className={`scroll-fade-in ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               {/* Main Headline */}
               <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
                 Ready to Burst with Health?
@@ -261,20 +262,22 @@ export default function Home() {
               </p>
             </div>
 
-            {/* CTA Image with Button - Right Side */}
-            <div className={`flex flex-col items-center lg:items-end space-y-6 scroll-fade-in-delayed ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+            {/* CTA Image - Centered */}
+            <div className={`scroll-fade-in-delayed ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               <img 
                 src={ctaImage} 
                 alt="Health treasure chest with fruits and mascot" 
-                className="w-full max-w-lg h-auto object-contain"
+                className="w-full max-w-lg h-auto object-contain mx-auto"
               />
-              
-              {/* CTA Button - Below Image */}
+            </div>
+            
+            {/* CTA Button - Centered Below Image */}
+            <div className={`scroll-fade-in-stagger ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               <Button 
-                className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                className="text-white px-10 py-4 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
                 style={{ backgroundColor: '#FF6A00' }}
               >
-                🟧 Let's Go!
+                Let's Go!
               </Button>
             </div>
 
