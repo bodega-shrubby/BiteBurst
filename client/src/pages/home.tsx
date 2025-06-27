@@ -9,6 +9,7 @@ import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_17
 
 export default function Home() {
   const aiSectionAnimation = useScrollAnimation();
+  const tapSnapGoAnimation = useScrollAnimation();
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -93,6 +94,37 @@ export default function Home() {
                 alt="AI-powered feedback illustration" 
                 className="w-full max-w-lg h-auto object-contain"
               />
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* Section 3 - Tap, Snap, Go */}
+      <section ref={tapSnapGoAnimation.ref} className="py-16 px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Text Content - Left side */}
+            <div className={`text-center lg:text-left scroll-fade-in ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
+              {/* Main Headline */}
+              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
+                Tap, Snap, Go
+              </h2>
+
+              {/* Description Text */}
+              <p className="text-lg font-medium text-black leading-relaxed">
+                Log what you eat with bubbles, emojis, or a quick photo. Select your activity and get instant feedback on how food helps your body.
+              </p>
+            </div>
+
+            {/* Image Placeholder - Right side */}
+            <div className={`flex justify-center lg:justify-end scroll-fade-in-delayed ${tapSnapGoAnimation.isVisible ? 'visible' : ''}`}>
+              <div className="w-full max-w-lg h-96 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                <p className="text-gray-500 text-lg">Image placeholder - ready for your image</p>
+              </div>
             </div>
 
           </div>
