@@ -291,8 +291,8 @@ html {
 /* Scroll animations */
 .scroll-fade-in {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
 .scroll-fade-in.visible {
@@ -302,8 +302,8 @@ html {
 
 .scroll-fade-in-delayed {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out 0.3s, transform 0.8s ease-out 0.3s;
 }
 
 .scroll-fade-in-delayed.visible {
@@ -313,8 +313,8 @@ html {
 
 .scroll-fade-in-stagger {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease-out 0.4s, transform 0.6s ease-out 0.4s;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out 0.6s, transform 0.8s ease-out 0.6s;
 }
 
 .scroll-fade-in-stagger.visible {
@@ -327,8 +327,8 @@ html {
   .scroll-fade-in,
   .scroll-fade-in-delayed,
   .scroll-fade-in-stagger {
-    transition: none;
-    opacity: 1;
-    transform: none;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

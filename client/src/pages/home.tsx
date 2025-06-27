@@ -72,7 +72,7 @@ export default function Home() {
       </section>
 
       {/* Section 2 - AI-Powered Habits */}
-      <section ref={aiSectionAnimation.ref} className="py-8 sm:py-10 lg:py-12 px-8 bg-white">
+      <section ref={aiSectionAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -105,7 +105,7 @@ export default function Home() {
       </section>
 
       {/* Section 3 - Tap, Snap, Go */}
-      <section ref={tapSnapGoAnimation.ref} className="py-8 sm:py-10 lg:py-12 px-8 bg-white">
+      <section ref={tapSnapGoAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -138,7 +138,7 @@ export default function Home() {
       </section>
 
       {/* Section 4 - Gamification */}
-      <section ref={gamificationAnimation.ref} className="py-8 sm:py-10 lg:py-12 px-8 bg-white">
+      <section ref={gamificationAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
