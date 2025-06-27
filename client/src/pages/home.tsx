@@ -179,10 +179,13 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
             {/* Text Content - Left Side */}
-            <div className={`space-y-6 ${goalsAnimation.isVisible ? 'scroll-fade-in visible' : 'scroll-fade-in'}`}>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight" style={{ color: '#FF6A00' }}>
+            <div className={`text-center lg:text-left scroll-fade-in ${goalsAnimation.isVisible ? 'visible' : ''}`}>
+              {/* Main Headline */}
+              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
                 Pick your goals. BiteBurst adapts.
               </h2>
+
+              {/* Description Text */}
               <p className="text-lg font-medium text-black leading-relaxed">
                 Want more energy? Focus in school? Get stronger? BiteBurst helps you choose your goal and gives you custom feedback every day.
               </p>
