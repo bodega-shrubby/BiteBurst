@@ -9,12 +9,14 @@ import aiIllustrationImage from "@assets/38a70918-95a7-4033-9c54-734dc6b18369_17
 import tapSnapGoImage from "@assets/f4c590ab-4c94-4bfa-b845-e8013e86f062_1751019859501.png";
 import gamificationImage from "@assets/cb62b801-17ce-4eff-81cc-0184f4408c2e_1751020235628.png";
 import goalsImage from "@assets/7f47fccc-5475-4ef3-b504-c6528f68ecd9_1751025843249.png";
+import scienceImage from "@assets/33f72703-fb94-450f-962e-7f181b611668_1751026267607.png";
 
 export default function Home() {
   const aiSectionAnimation = useScrollAnimation();
   const tapSnapGoAnimation = useScrollAnimation();
   const gamificationAnimation = useScrollAnimation();
   const goalsAnimation = useScrollAnimation();
+  const scienceAnimation = useScrollAnimation();
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -198,6 +200,39 @@ export default function Home() {
                 alt="Goals Selection Interface" 
                 className="w-full max-w-lg h-auto object-contain"
               />
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* Section 6 - Science & Fun */}
+      <section ref={scienceAnimation.ref} className="py-6 sm:py-8 lg:py-10 px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Science Image - Left Side */}
+            <div className={`flex justify-center lg:justify-start scroll-fade-in ${scienceAnimation.isVisible ? 'visible' : ''}`}>
+              <img 
+                src={scienceImage} 
+                alt="Science-backed nutrition education" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
+            </div>
+
+            {/* Text Content - Right Side */}
+            <div className={`text-center lg:text-left scroll-fade-in-delayed ${scienceAnimation.isVisible ? 'visible' : ''}`}>
+              {/* Main Headline */}
+              <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
+                Backed by science. Built for fun.
+              </h2>
+
+              {/* Description Text */}
+              <p className="text-lg font-medium text-black leading-relaxed">
+                BiteBurst combines real health science, positive coaching, and playful design to help you build habits that last.
+              </p>
             </div>
 
           </div>
