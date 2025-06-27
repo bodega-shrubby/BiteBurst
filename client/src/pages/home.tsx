@@ -213,17 +213,8 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            {/* Science Image - Left Side */}
-            <div className={`flex justify-center lg:justify-start scroll-fade-in ${scienceAnimation.isVisible ? 'visible' : ''}`}>
-              <img 
-                src={scienceImage} 
-                alt="Science-backed nutrition education" 
-                className="w-full max-w-lg h-auto object-contain"
-              />
-            </div>
-
-            {/* Text Content - Right Side */}
-            <div className={`text-center lg:text-left scroll-fade-in-delayed ${scienceAnimation.isVisible ? 'visible' : ''}`}>
+            {/* Text Content - Right Side on desktop, first on mobile */}
+            <div className={`text-center lg:text-left order-1 lg:order-2 scroll-fade-in ${scienceAnimation.isVisible ? 'visible' : ''}`}>
               {/* Main Headline */}
               <h2 className="mb-6 font-extrabold text-[36px] leading-tight" style={{ color: '#FF6A00' }}>
                 Backed by science. Built for fun.
@@ -233,6 +224,15 @@ export default function Home() {
               <p className="text-lg font-medium text-black leading-relaxed">
                 BiteBurst combines real health science, positive coaching, and playful design to help you build habits that last.
               </p>
+            </div>
+
+            {/* Science Image - Left Side on desktop, second on mobile */}
+            <div className={`flex justify-center lg:justify-start order-2 lg:order-1 scroll-fade-in-delayed ${scienceAnimation.isVisible ? 'visible' : ''}`}>
+              <img 
+                src={scienceImage} 
+                alt="Science-backed nutrition education" 
+                className="w-full max-w-lg h-auto object-contain"
+              />
             </div>
 
           </div>
