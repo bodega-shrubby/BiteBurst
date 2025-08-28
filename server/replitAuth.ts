@@ -14,10 +14,18 @@ if (!process.env.REPLIT_DOMAINS) {
 
 const getOidcConfig = memoize(
   async () => {
-    return await client.discovery(
-      new URL("https://replit.com/oidc"),
-      process.env.REPL_ID!
-    );
+    console.log("Initializing OIDC config with REPL_ID:", process.env.REPL_ID);
+    try {
+      const config = await client.discovery(
+        new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
+        process.env.REPL_ID!
+      );
+      console.log("OIDC config loaded successfully");
+      return config;
+    } catch (error) {
+      console.error("OIDC config error:", error);
+      throw error;
+    }
   },
   { maxAge: 3600 * 1000 }
 );
@@ -27,7 +35,7 @@ export function getSession() {
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
+    createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
@@ -102,14 +110,20 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Use the actual Replit domain, not localhost
+    const domain = process.env.REPLIT_DOMAINS!.split(",")[0];
+    console.log("Login attempt - hostname:", req.hostname, "using domain:", domain);
+    passport.authenticate(`replitauth:${domain}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Use the actual Replit domain, not localhost
+    const domain = process.env.REPLIT_DOMAINS!.split(",")[0];
+    console.log("Callback attempt - hostname:", req.hostname, "using domain:", domain);
+    passport.authenticate(`replitauth:${domain}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
