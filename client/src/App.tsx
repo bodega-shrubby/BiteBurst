@@ -3,9 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
-import Landing from "@/pages/landing";
 import NotFound from "@/pages/not-found";
 
 // Onboarding components
@@ -21,11 +19,9 @@ import ConsentStep from "@/pages/onboarding/ConsentStep";
 import ReviewStep from "@/pages/onboarding/ReviewStep";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
-      <Route path="/" component={isAuthenticated ? Home : Landing} />
+      <Route path="/" component={Home} />
       
       {/* Onboarding Flow */}
       <Route path="/start">

@@ -26,24 +26,20 @@ export default function ReviewStep() {
 
   const createProfileMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/auth/register", {
-        method: "POST",
-        body: {
-          username: profile.displayName,
-          email: profile.email,
-          password: profile.password,
-          name: profile.displayName,
-          ageBracket: profile.ageBracket,
-          goal: profile.goal,
-          avatar: profile.avatar,
-          onboardingCompleted: true
-        }
+      return await apiRequest("/api/auth/register", "POST", {
+        username: profile.displayName,
+        email: profile.email,
+        password: profile.password,
+        name: profile.displayName,
+        ageBracket: profile.ageBracket,
+        goal: profile.goal,
+        avatar: profile.avatar,
+        onboardingCompleted: true
       });
     },
     onSuccess: () => {
       resetProfile();
-      // Redirect to home page after successful registration
-      window.location.href = "/";
+      setLocation("/");
     },
     onError: (error) => {
       console.error("Account creation failed:", error);
