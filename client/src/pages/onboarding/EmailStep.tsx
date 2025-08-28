@@ -30,7 +30,7 @@ export default function EmailStep() {
   const handleNext = () => {
     if (isValid) {
       updateProfile({ email: email.trim() });
-      setLocation("/profile/consent");
+      setLocation("/profile/password");
     }
   };
 

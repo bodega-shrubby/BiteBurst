@@ -14,6 +14,7 @@ import AgeStep from "@/pages/onboarding/AgeStep";
 import GoalStep from "@/pages/onboarding/GoalStep";
 import AvatarStep from "@/pages/onboarding/AvatarStep";
 import EmailStep from "@/pages/onboarding/EmailStep";
+import PasswordStep from "@/pages/onboarding/PasswordStep";
 import ConsentStep from "@/pages/onboarding/ConsentStep";
 import ReviewStep from "@/pages/onboarding/ReviewStep";
 
@@ -56,6 +57,12 @@ function Router() {
       <Route path="/profile/email">
         <OnboardingProvider>
           <EmailStep />
+        </OnboardingProvider>
+      </Route>
+      
+      <Route path="/profile/password">
+        <OnboardingProvider>
+          <PasswordStep />
         </OnboardingProvider>
       </Route>
       

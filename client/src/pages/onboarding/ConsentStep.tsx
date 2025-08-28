@@ -17,7 +17,7 @@ export default function ConsentStep() {
   };
 
   return (
-    <OnboardingLayout step={6} totalSteps={7}>
+    <OnboardingLayout step={7} totalSteps={8}>
       <div className="space-y-8">
         
         {/* Title */}

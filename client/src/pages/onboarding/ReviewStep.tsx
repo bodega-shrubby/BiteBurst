@@ -26,14 +26,16 @@ export default function ReviewStep() {
 
   const createProfileMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/profile/create", {
+      return await apiRequest("/api/auth/register", {
         method: "POST",
         body: {
-          displayName: profile.displayName,
+          username: profile.displayName,
+          email: profile.email,
+          password: profile.password,
+          name: profile.displayName,
           ageBracket: profile.ageBracket,
           goal: profile.goal,
           avatar: profile.avatar,
-          email: profile.email || null,
           onboardingCompleted: true
         }
       });
@@ -43,7 +45,7 @@ export default function ReviewStep() {
       setLocation("/home");
     },
     onError: (error) => {
-      console.error("Profile creation failed:", error);
+      console.error("Account creation failed:", error);
       // Handle error - maybe show a toast or error message
     }
   });
@@ -54,7 +56,7 @@ export default function ReviewStep() {
   };
 
   return (
-    <OnboardingLayout step={7} totalSteps={7} canGoBack={!isCreating}>
+    <OnboardingLayout step={8} totalSteps={8} canGoBack={!isCreating}>
       <div className="space-y-8">
         
         {/* Title */}
@@ -62,7 +64,7 @@ export default function ReviewStep() {
           className="font-extrabold text-3xl leading-tight text-center"
           style={{ color: 'var(--bb-text, #000000)' }}
         >
-          Create your profile
+          Create your account
         </h1>
 
         {/* Profile Summary Card */}
@@ -92,12 +94,15 @@ export default function ReviewStep() {
               <span className="font-medium">{GOAL_LABELS[profile.goal as keyof typeof GOAL_LABELS]}</span>
             </div>
             
-            {profile.email && (
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Email</span>
-                <span className="font-medium text-sm">{profile.email}</span>
-              </div>
-            )}
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">Email</span>
+              <span className="font-medium text-sm">{profile.email}</span>
+            </div>
+            
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">Password</span>
+              <span className="font-medium text-sm">••••••••</span>
+            </div>
           </div>
         </div>
 
@@ -119,7 +124,7 @@ export default function ReviewStep() {
               height: 'var(--tap, 56px)'
             }}
           >
-            {isCreating || createProfileMutation.isPending ? "Creating Profile..." : "Create Profile"}
+            {isCreating || createProfileMutation.isPending ? "Creating Account..." : "Create Account"}
           </Button>
         </div>
 

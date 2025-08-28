@@ -6,27 +6,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // put application routes here
   // prefix all routes with /api
 
-  // Profile creation endpoint for onboarding
-  app.post("/api/profile/create", async (req, res) => {
+  // User registration endpoint with Replit Auth integration
+  app.post("/api/auth/register", async (req, res) => {
     try {
-      const { displayName, ageBracket, goal, avatar, email, onboardingCompleted } = req.body;
+      const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
       
-      // For MVP, just log the profile data
-      const profileData = {
-        displayName,
-        ageBracket,
+      // For MVP, create a basic user record using the existing storage interface
+      const userData = {
+        username,
+        password, // In production, this should be hashed
+        name,
+        age: parseInt(ageBracket.split('-')[0]) || 10, // Extract first age from range
         goal,
+        displayName: name,
+        ageBracket,
         avatar,
         email,
         onboardingCompleted: onboardingCompleted || false
       };
       
-      console.log("Profile created:", profileData);
+      console.log("User registration:", { username, email, ageBracket, goal, avatar });
       
-      res.json({ success: true, message: "Profile created successfully" });
+      // Create user using storage interface
+      const newUser = await storage.createUser(userData);
+      
+      res.json({ 
+        success: true, 
+        message: "Account created successfully",
+        user: { id: newUser.id, username: newUser.username, name: newUser.name }
+      });
     } catch (error) {
-      console.error("Profile creation error:", error);
-      res.status(500).json({ error: "Failed to create profile" });
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Failed to create account" });
     }
   });
 

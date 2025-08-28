@@ -35,8 +35,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   name: true,
+  displayName: true,
+  ageBracket: true,
   age: true,
   goal: true,
+  avatar: true,
+  email: true,
+  onboardingCompleted: true,
 });
 
 export const insertLogSchema = createInsertSchema(logs).pick({

@@ -16,6 +16,7 @@ const STEPS = [
   { path: "/profile/goal", name: "Goal" },
   { path: "/profile/avatar", name: "Avatar" },
   { path: "/profile/email", name: "Email" },
+  { path: "/profile/password", name: "Password" },
   { path: "/profile/consent", name: "Consent" },
   { path: "/profile/review", name: "Review" }
 ];
