@@ -26,7 +26,7 @@ export default function ReviewStep() {
 
   const createProfileMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/profile/create", "POST", {
+      return await apiRequest("POST", "/api/profile/create", {
         username: profile.displayName,
         email: profile.email,
         password: profile.password,
@@ -44,6 +44,7 @@ export default function ReviewStep() {
     },
     onError: (error) => {
       console.error("Account creation failed:", error);
+      setIsCreating(false);
       // Handle error - maybe show a toast or error message
     }
   });
