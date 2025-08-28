@@ -35,15 +35,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         goal,
         avatar,
         email,
-        onboardingCompleted: onboardingCompleted || false
+        onboardingCompleted: onboardingCompleted ? 1 : 0
       };
       
-      console.log("Creating BiteBurst profile:", { username, email, ageBracket, goal, avatar });
+      console.log("Creating BiteBurst profile for:", username);
       
       // Create user using storage interface
       const newUser = await storage.createUser(userData);
       
-      console.log("BiteBurst profile created for user:", userId);
+      console.log("BiteBurst profile created for user:", newUser.id);
       
       res.json({ 
         success: true, 

@@ -81,7 +81,6 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values({
         ...insertUser,
-        id: undefined, // Let database generate UUID
         createdAt: new Date(),
         updatedAt: new Date(),
       })
