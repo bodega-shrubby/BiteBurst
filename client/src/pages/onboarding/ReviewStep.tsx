@@ -26,7 +26,7 @@ export default function ReviewStep() {
 
   const createProfileMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/auth/register", "POST", {
+      return await apiRequest("/api/profile/create", "POST", {
         username: profile.displayName,
         email: profile.email,
         password: profile.password,

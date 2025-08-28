@@ -1,112 +1,64 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import session from "express-session";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Simple session middleware for MVP
-  app.use(session({
-    secret: process.env.SESSION_SECRET!,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
-  }));
+  // Auth middleware
+  await setupAuth(app);
 
-  // Auth routes for BiteBurst
-  app.get('/api/auth/user', async (req: any, res) => {
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      if (req.session.userId) {
-        const user = await storage.getUser(req.session.userId);
-        res.json(user);
-      } else {
-        res.status(401).json({ message: "Not authenticated" });
-      }
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  // User registration endpoint for onboarding (creates BiteBurst profile)
-  app.post("/api/auth/register", async (req: any, res) => {
+  // BiteBurst profile creation endpoint (for onboarding)
+  app.post("/api/profile/create", isAuthenticated, async (req: any, res) => {
     try {
       const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
+      const userId = req.user.claims.sub;
       
-      // Create BiteBurst user profile
-      const userData = {
+      // Update the authenticated user with BiteBurst profile data
+      await storage.upsertUser({
+        replitId: userId,
+        email: email || req.user.claims.email,
+        firstName: req.user.claims.first_name,
+        lastName: req.user.claims.last_name,
+        profileImageUrl: req.user.claims.profile_image_url,
         username,
         password, // In production, this should be hashed
         name,
-        age: parseInt(ageBracket.split('-')[0]) || 10, // Extract first age from range
-        goal,
         displayName: name,
         ageBracket,
+        age: parseInt(ageBracket.split('-')[0]) || 10,
+        goal,
         avatar,
-        email,
         onboardingCompleted: onboardingCompleted || false
-      };
+      });
       
-      console.log("User registration:", { username, email, ageBracket, goal, avatar });
-      
-      // Create user using storage interface
-      const newUser = await storage.createUser(userData);
-      
-      // Set up session
-      req.session.userId = newUser.id;
-      req.session.username = newUser.username;
+      console.log("BiteBurst profile created for user:", userId);
       
       res.json({ 
         success: true, 
-        message: "Account created successfully",
-        user: { id: newUser.id, username: newUser.username, name: newUser.name }
+        message: "Profile created successfully"
       });
     } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ error: "Failed to create account" });
+      console.error("Profile creation error:", error);
+      res.status(500).json({ error: "Failed to create profile" });
     }
-  });
-
-  // Login endpoint
-  app.post("/api/auth/login", async (req: any, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      const user = await storage.getUserByUsername(username);
-      if (!user || user.password !== password) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-      
-      // Set up session
-      req.session.userId = user.id;
-      req.session.username = user.username;
-      
-      res.json({ 
-        success: true, 
-        message: "Logged in successfully",
-        user: { id: user.id, username: user.username, name: user.name }
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ error: "Failed to log in" });
-    }
-  });
-
-  // Logout endpoint
-  app.post("/api/auth/logout", async (req: any, res) => {
-    req.session.destroy((err: any) => {
-      if (err) {
-        return res.status(500).json({ error: "Failed to log out" });
-      }
-      res.json({ success: true, message: "Logged out successfully" });
-    });
   });
 
   // Protected route example
-  app.get("/api/protected", async (req: any, res) => {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    res.json({ message: "This is a protected route", userId: req.session.userId });
+  app.get("/api/protected", isAuthenticated, async (req: any, res) => {
+    const userId = req.user?.claims?.sub;
+    res.json({ message: "This is a protected route", userId });
   });
 
   const httpServer = createServer(app);

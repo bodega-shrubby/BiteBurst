@@ -33,6 +33,8 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Replit Auth specific field for mapping
+  replitId: varchar("replit_id").unique(), // Store Replit user ID separately
   // BiteBurst specific fields
   username: text("username").unique(),
   password: text("password"),

@@ -10,7 +10,8 @@ import { eq } from "drizzle-orm";
 export interface IStorage {
   // User operations
   // (IMPORTANT) these user operations are mandatory for Replit Auth.
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
+  getUserByReplitId(replitId: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   // Other operations
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -21,18 +22,47 @@ export class DatabaseStorage implements IStorage {
   // User operations
   // (IMPORTANT) these user operations are mandatory for Replit Auth.
 
-  async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+  async getUser(id: string): Promise<User | undefined> {
+    // First try to find by replit ID, then by regular ID
+    let user = await this.getUserByReplitId(id);
+    if (!user) {
+      const numericId = parseInt(id);
+      if (!isNaN(numericId)) {
+        const [foundUser] = await db.select().from(users).where(eq(users.id, numericId));
+        user = foundUser;
+      }
+    }
+    return user;
+  }
+
+  async getUserByReplitId(replitId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.replitId, replitId));
     return user;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // For now, just create user since we're using integer IDs
+    // Try to find existing user by replit ID
+    if (userData.replitId) {
+      const existingUser = await this.getUserByReplitId(userData.replitId);
+      if (existingUser) {
+        // Update existing user
+        const [user] = await db
+          .update(users)
+          .set({
+            ...userData,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, existingUser.id))
+          .returning();
+        return user;
+      }
+    }
+    
+    // Create new user
     const [user] = await db
       .insert(users)
       .values({
         ...userData,
-        id: undefined, // Let database generate serial ID
         createdAt: new Date(),
         updatedAt: new Date(),
       })
