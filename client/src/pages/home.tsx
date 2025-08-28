@@ -71,6 +71,7 @@ export default function Home() {
             <Button 
               variant="outline" 
               className="border-2 border-gray-300 text-black hover:bg-gray-50 hover:shadow-md px-8 sm:px-10 py-5 text-lg font-medium rounded-full bg-white transition-all duration-200 min-h-[44px] w-full sm:w-auto"
+              onClick={() => window.location.href = '/api/login'}
             >
               I already have an account
             </Button>
