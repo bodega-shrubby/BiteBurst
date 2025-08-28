@@ -109,8 +109,12 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 
 ## Changelog
 
-Changelog:
-- June 20, 2025. Initial setup
+- August 28, 2025: Completed Replit Auth integration
+  - Implemented full OpenID Connect authentication system
+  - Added proper user upsert logic with email/Replit ID mapping
+  - Fixed onboarding flow: Home → Profile Setup → Replit Auth → Authenticated App
+  - Resolved database schema conflicts and API parameter issues
+- June 20, 2025: Initial setup
 
 ## User Preferences
 

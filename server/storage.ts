@@ -41,7 +41,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Try to find existing user by replit ID
+    // Try to find existing user by replit ID first
     if (userData.replitId) {
       const existingUser = await this.getUserByReplitId(userData.replitId);
       if (existingUser) {
@@ -58,7 +58,24 @@ export class DatabaseStorage implements IStorage {
       }
     }
     
-    // Create new user
+    // If no replit ID match, check for existing email (BiteBurst profile)
+    if (userData.email) {
+      const existingUserByEmail = await db.select().from(users).where(eq(users.email, userData.email));
+      if (existingUserByEmail.length > 0) {
+        // Update existing user with Replit ID mapping
+        const [user] = await db
+          .update(users)
+          .set({
+            ...userData,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, existingUserByEmail[0].id))
+          .returning();
+        return user;
+      }
+    }
+    
+    // Create new user if no existing user found
     const [user] = await db
       .insert(users)
       .values({
