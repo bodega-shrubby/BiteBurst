@@ -20,18 +20,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // BiteBurst profile creation endpoint (for onboarding)
-  app.post("/api/profile/create", isAuthenticated, async (req: any, res) => {
+  app.post("/api/profile/create", async (req: any, res) => {
     try {
       const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
-      const userId = req.user.claims.sub;
       
-      // Update the authenticated user with BiteBurst profile data
-      await storage.upsertUser({
-        replitId: userId,
-        email: email || req.user.claims.email,
-        firstName: req.user.claims.first_name,
-        lastName: req.user.claims.last_name,
-        profileImageUrl: req.user.claims.profile_image_url,
+      // Create BiteBurst profile (this happens before Replit Auth)
+      const userData = {
         username,
         password, // In production, this should be hashed
         name,
@@ -40,8 +34,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         age: parseInt(ageBracket.split('-')[0]) || 10,
         goal,
         avatar,
+        email,
         onboardingCompleted: onboardingCompleted || false
-      });
+      };
+      
+      console.log("Creating BiteBurst profile:", { username, email, ageBracket, goal, avatar });
+      
+      // Create user using storage interface
+      const newUser = await storage.createUser(userData);
       
       console.log("BiteBurst profile created for user:", userId);
       

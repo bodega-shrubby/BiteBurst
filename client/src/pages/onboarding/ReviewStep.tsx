@@ -39,7 +39,8 @@ export default function ReviewStep() {
     },
     onSuccess: () => {
       resetProfile();
-      setLocation("/");
+      // Redirect to Replit Auth login after profile creation
+      window.location.href = "/api/login";
     },
     onError: (error) => {
       console.error("Account creation failed:", error);
