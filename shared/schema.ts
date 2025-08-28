@@ -1,23 +1,53 @@
-import { pgTable, text, serial, integer, timestamp, json } from "drizzle-orm/pg-core";
+import { sql } from 'drizzle-orm';
+import {
+  index,
+  jsonb,
+  pgTable,
+  timestamp,
+  varchar,
+  text,
+  serial,
+  integer,
+  json
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  name: text("name").notNull(),
+  id: serial("id").primaryKey(), // Keep existing serial ID
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  // BiteBurst specific fields
+  username: text("username").unique(),
+  password: text("password"),
+  name: text("name"),
   displayName: text("display_name"),
   ageBracket: text("age_bracket"), // '6-8', '9-11', '12-14'
-  age: integer("age").notNull(),
-  goal: text("goal").notNull(), // 'energy', 'focus', 'strength'
+  age: integer("age"),
+  goal: text("goal"), // 'energy', 'focus', 'strength'
   avatar: text("avatar"), // avatar selection
-  email: text("email"),
   onboardingCompleted: integer("onboarding_completed").notNull().default(0), // boolean as int
   xp: integer("xp").notNull().default(0),
   badges: json("badges").$type<string[]>().notNull().default([]),
   streak: integer("streak").notNull().default(0),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const logs = pgTable("logs", {
@@ -30,6 +60,9 @@ export const logs = pgTable("logs", {
   xpEarned: integer("xp_earned").notNull().default(0),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
+
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -52,6 +85,5 @@ export const insertLogSchema = createInsertSchema(logs).pick({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 export type InsertLog = z.infer<typeof insertLogSchema>;
 export type Log = typeof logs.$inferSelect;

@@ -1,17 +1,30 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  // Auth middleware
+  await setupAuth(app);
 
-  // User registration endpoint with Replit Auth integration
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = parseInt(req.user.claims.sub);
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // User registration endpoint for onboarding (creates BiteBurst profile)
   app.post("/api/auth/register", async (req, res) => {
     try {
       const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
       
-      // For MVP, create a basic user record using the existing storage interface
+      // Create BiteBurst user profile
       const userData = {
         username,
         password, // In production, this should be hashed
@@ -41,10 +54,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  // Protected route example
+  app.get("/api/protected", isAuthenticated, async (req: any, res) => {
+    const userId = req.user?.claims?.sub;
+    // Do something with the user id.
+    res.json({ message: "This is a protected route", userId });
+  });
 
   const httpServer = createServer(app);
-
   return httpServer;
 }
