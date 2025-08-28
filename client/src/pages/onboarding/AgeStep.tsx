@@ -1,0 +1,90 @@
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import OnboardingLayout from "./OnboardingLayout";
+import { useOnboardingContext } from "./OnboardingContext";
+
+const AGE_OPTIONS = [
+  { value: "6-8", label: "6–8", emoji: "🧒" },
+  { value: "9-11", label: "9–11", emoji: "👦" },
+  { value: "12-14", label: "12–14", emoji: "👧" }
+];
+
+export default function AgeStep() {
+  const [, setLocation] = useLocation();
+  const { updateProfile, profile } = useOnboardingContext();
+  const [selectedAge, setSelectedAge] = useState(profile.ageBracket || "");
+
+  const handleAgeSelect = (age: string) => {
+    setSelectedAge(age);
+    // Auto-advance after brief delay to show selection
+    setTimeout(() => {
+      updateProfile({ ageBracket: age });
+      setLocation("/profile/goal");
+    }, 150);
+  };
+
+  return (
+    <OnboardingLayout step={2} totalSteps={7}>
+      <div className="space-y-8">
+        
+        {/* Title */}
+        <h1 
+          className="font-extrabold text-3xl leading-tight"
+          style={{ color: 'var(--bb-text, #000000)' }}
+        >
+          How old are you?
+        </h1>
+
+        {/* Age Selection Chips */}
+        <div className="space-y-4">
+          {AGE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleAgeSelect(option.value)}
+              className={`w-full flex items-center gap-4 px-6 py-4 text-lg font-medium rounded-full border-2 transition-all duration-200 hover:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+                selectedAge === option.value
+                  ? 'text-white border-orange-500'
+                  : 'text-black border-gray-200 hover:border-gray-300'
+              }`}
+              style={{ 
+                minHeight: '56px',
+                backgroundColor: selectedAge === option.value ? 'var(--bb-header, #FF6A00)' : 'white'
+              }}
+            >
+              <span className="text-2xl">{option.emoji}</span>
+              <span className="flex-1 text-left">{option.label}</span>
+              {selectedAge === option.value && (
+                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Manual Next Button (backup) */}
+        {selectedAge && (
+          <div className="pt-4">
+            <Button
+              onClick={() => {
+                updateProfile({ ageBracket: selectedAge });
+                setLocation("/profile/goal");
+              }}
+              className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              style={{ 
+                backgroundColor: 'var(--bb-header, #FF6A00)',
+                height: 'var(--tap, 56px)'
+              }}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+
+      </div>
+    </OnboardingLayout>
+  );
+}

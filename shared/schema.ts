@@ -7,8 +7,13 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
+  displayName: text("display_name"),
+  ageBracket: text("age_bracket"), // '6-8', '9-11', '12-14'
   age: integer("age").notNull(),
   goal: text("goal").notNull(), // 'energy', 'focus', 'strength'
+  avatar: text("avatar"), // avatar selection
+  email: text("email"),
+  onboardingCompleted: integer("onboarding_completed").notNull().default(0), // boolean as int
   xp: integer("xp").notNull().default(0),
   badges: json("badges").$type<string[]>().notNull().default([]),
   streak: integer("streak").notNull().default(0),

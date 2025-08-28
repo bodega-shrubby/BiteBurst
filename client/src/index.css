@@ -4,6 +4,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* BiteBurst Design System Variables */
+:root {
+  --bb-header: #FF6A00;
+  --bb-text: #000000;
+  --bb-card: #FFFFFF;
+  --bb-outline: #E5E5E5;
+  --bb-focus: #FF6A00;
+  --tap: 56px;
+  --radius: 12px;
+}
+
+/* Onboarding animations */
+.step-slide-enter {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.step-slide-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 250ms ease-out;
+}
+
+.step-slide-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.step-slide-exit-active {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 250ms ease-out;
+}
+
 /* Override default font */
 * {
   font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

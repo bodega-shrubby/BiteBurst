@@ -1,0 +1,91 @@
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import OnboardingLayout from "./OnboardingLayout";
+import { useOnboardingContext } from "./OnboardingContext";
+
+export default function ConsentStep() {
+  const [, setLocation] = useLocation();
+  const { updateProfile, profile } = useOnboardingContext();
+  const [hasConsent, setHasConsent] = useState(profile.hasParentConsent || false);
+
+  const handleNext = () => {
+    if (hasConsent) {
+      updateProfile({ hasParentConsent: true });
+      setLocation("/profile/review");
+    }
+  };
+
+  return (
+    <OnboardingLayout step={6} totalSteps={7}>
+      <div className="space-y-8">
+        
+        {/* Title */}
+        <h1 
+          className="font-extrabold text-3xl leading-tight"
+          style={{ color: 'var(--bb-text, #000000)' }}
+        >
+          Almost ready!
+        </h1>
+
+        {/* Consent Section */}
+        <div className="space-y-6">
+          <div className="bg-orange-50 rounded-2xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <input
+                  type="checkbox"
+                  id="consent-checkbox"
+                  checked={hasConsent}
+                  onChange={(e) => setHasConsent(e.target.checked)}
+                  className="w-5 h-5 text-orange-600 border-2 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
+                  style={{ minWidth: '20px', minHeight: '20px' }}
+                />
+              </div>
+              <label 
+                htmlFor="consent-checkbox" 
+                className="text-gray-700 text-lg leading-relaxed cursor-pointer"
+              >
+                <strong>I have permission to create this account.</strong>
+                <br />
+                <span className="text-base">
+                  If you're under 18, make sure a parent or guardian says it's okay to use BiteBurst.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Terms and Privacy */}
+          <div className="text-center text-sm text-gray-500 space-y-2">
+            <p>
+              By continuing, you agree to BiteBurst's{" "}
+              <a href="#" className="text-orange-600 hover:underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-orange-600 hover:underline">
+                Privacy Policy
+              </a>
+            </p>
+          </div>
+        </div>
+
+        {/* Next Button */}
+        <div className="pt-4">
+          <Button
+            onClick={handleNext}
+            disabled={!hasConsent}
+            className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ 
+              backgroundColor: hasConsent ? 'var(--bb-header, #FF6A00)' : '#9CA3AF',
+              height: 'var(--tap, 56px)'
+            }}
+          >
+            Continue
+          </Button>
+        </div>
+
+      </div>
+    </OnboardingLayout>
+  );
+}

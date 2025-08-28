@@ -64,6 +64,7 @@ export default function Home() {
             <Button 
               className="hover:shadow-lg text-white px-8 sm:px-10 py-5 text-lg font-semibold rounded-full transition-all duration-200 min-h-[44px] w-full sm:w-auto"
               style={{ backgroundColor: '#FF6A00' }}
+              onClick={() => window.location.href = '/start'}
             >
               Get Started
             </Button>
@@ -276,6 +277,7 @@ export default function Home() {
               <Button 
                 className="text-white px-8 sm:px-10 py-5 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200 min-h-[44px] w-full sm:w-auto max-w-xs mx-auto"
                 style={{ backgroundColor: '#FF6A00' }}
+                onClick={() => window.location.href = '/start'}
               >
                 Let's Go!
               </Button>
