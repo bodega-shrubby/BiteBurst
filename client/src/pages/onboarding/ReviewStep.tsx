@@ -42,7 +42,8 @@ export default function ReviewStep() {
     },
     onSuccess: () => {
       resetProfile();
-      setLocation("/home");
+      // Redirect to home page after successful registration
+      window.location.href = "/";
     },
     onError: (error) => {
       console.error("Account creation failed:", error);

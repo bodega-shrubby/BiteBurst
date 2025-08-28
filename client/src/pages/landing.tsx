@@ -15,24 +15,16 @@ export default function Landing() {
         
         <div className="space-y-4">
           <Button
-            onClick={() => window.location.href = '/api/login'}
+            onClick={() => window.location.href = '/start'}
             className="w-full text-white font-bold text-lg rounded-full py-6"
             style={{ backgroundColor: '#FF6A00' }}
           >
-            Log In
+            Get Started
           </Button>
           
-          <Button
-            onClick={() => window.location.href = '/start'}
-            variant="outline"
-            className="w-full font-bold text-lg rounded-full py-6 border-2"
-            style={{ 
-              borderColor: '#FF6A00',
-              color: '#FF6A00'
-            }}
-          >
-            Create Account
-          </Button>
+          <p className="text-sm text-gray-500 mt-4">
+            Already have an account? <a href="/login" className="text-orange-600 hover:underline">Log in</a>
+          </p>
         </div>
       </div>
     </div>

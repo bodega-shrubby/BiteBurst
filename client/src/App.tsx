@@ -25,11 +25,7 @@ function Router() {
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <Route path="/" component={Home} />
-      )}
+      <Route path="/" component={isAuthenticated ? Home : Landing} />
       
       {/* Onboarding Flow */}
       <Route path="/start">
