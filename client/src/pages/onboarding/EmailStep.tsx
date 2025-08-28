@@ -9,10 +9,10 @@ export default function EmailStep() {
   const { updateProfile, profile } = useOnboardingContext();
   const [email, setEmail] = useState(profile.email || "");
   const [error, setError] = useState("");
-  const [isValid, setIsValid] = useState(true); // Optional field, so valid by default
+  const [isValid, setIsValid] = useState(false); // Required field, so invalid by default
 
   const validateEmail = (value: string) => {
-    if (!value.trim()) return ""; // Empty is valid (optional)
+    if (!value.trim()) return "Email is required";
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
@@ -34,11 +34,6 @@ export default function EmailStep() {
     }
   };
 
-  const handleSkip = () => {
-    updateProfile({ email: "" });
-    setLocation("/profile/consent");
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && isValid) {
       handleNext();
@@ -54,12 +49,12 @@ export default function EmailStep() {
           className="font-extrabold text-3xl leading-tight"
           style={{ color: 'var(--bb-text, #000000)' }}
         >
-          Add an email? (optional)
+          What's your email?
         </h1>
 
         {/* Description */}
         <p className="text-lg text-gray-600 leading-relaxed">
-          We can send you updates about your progress and new features. You can skip this step.
+          We'll send you updates about your progress and new features.
         </p>
 
         {/* Email Input */}
@@ -75,7 +70,7 @@ export default function EmailStep() {
               style={{ height: '56px' }}
               aria-describedby={error ? "email-error" : undefined}
             />
-            {isValid && email.trim() && (
+            {isValid && (
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,8 +93,8 @@ export default function EmailStep() {
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3 pt-4">
+        {/* Next Button */}
+        <div className="pt-8">
           <Button
             onClick={handleNext}
             disabled={!isValid}
@@ -110,18 +105,6 @@ export default function EmailStep() {
             }}
           >
             Next
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={handleSkip}
-            className="w-full font-bold text-lg rounded-full border-2 transition-all duration-200 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            style={{ 
-              height: 'var(--tap, 56px)',
-              borderColor: 'var(--bb-outline, #E5E5E5)'
-            }}
-          >
-            Skip
           </Button>
         </div>
 
