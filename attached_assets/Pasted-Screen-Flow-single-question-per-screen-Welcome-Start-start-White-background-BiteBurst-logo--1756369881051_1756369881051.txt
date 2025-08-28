@@ -1,0 +1,46 @@
+Screen Flow (single question per screen)
+Welcome / Start (#/start)
+White background.
+BiteBurst logo + small mascot.
+Button: “Get started” (orange). Secondary: “I already have an account”.
+Name (#/profile/name)
+Title: “What’s your name?”
+Text field (large, 56px height). Next button disabled until valid.
+Validation: 2–20 chars, letters/spaces, live error.
+Age bracket (#/profile/age)
+Title: “How old are you?”
+Bubbles (chips) with: 6–8, 9–11, 12–14.
+Tap selects; Next enabled when one is selected.
+Goal (#/profile/goal)
+Title: “Pick your main goal”
+Three big selectable chips with icons: ⚡ Energy, 🧠 Focus, 💪 Strength.
+Avatar (#/profile/avatar)
+Title: “Choose your avatar”
+Grid of 6 circular avatars (include mascot pose). Selected state ring in --bb-header.
+Email (optional) (#/profile/email)
+Title: “Add an email? (optional)”
+Field validation (basic regex). Skip supported.
+Parent consent (#/profile/consent)
+Checkbox: “I have permission to create this account.”
+Require check to continue. (Text link: Privacy / Terms placeholders.)
+Create Profile (#/profile/review)
+Summary card with Name, Age, Goal, Avatar. Create Profile (orange).
+On submit: write to Replit DB under users:{replitUserId}.
+Navigate to #/home (placeholder screen).
+Progress UI
+Thin rounded progress bar at the top (like Duolingo).
+Progress = index / total steps (exclude Welcome).
+Back chevron on all steps except Welcome.
+Controls & Motion
+Buttons:
+Primary: orange bg, white text, height var(--tap), radius var(--radius), bold.
+Secondary: white bg, 1px border --bb-outline, black text.
+Hover/active: subtle elevation; focus ring --bb-focus.
+Chips (bubbles): rounded 999px, min height 56px, large emoji/icon left, selected state with orange fill and white text.
+Transitions:
+Step change: 200–250ms slide/fade.
+Chip tap: 100ms scale 0.98 → 1.
+Accessibility
+All interactive elements have 44×44px minimum touch target.
+Visible focus styles; ARIA labels on icons; aria-current="step" on progress.
+Input labels, helper text, and error text with role="alert" for validation.
