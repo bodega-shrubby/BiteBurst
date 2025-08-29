@@ -4,10 +4,8 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
+  // Fresh Replit Auth setup
   await setupAuth(app);
-
-  // Remove local authentication - only use Replit Auth
 
   // Replit Auth user route
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
