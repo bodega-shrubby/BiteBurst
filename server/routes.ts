@@ -1,10 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { registerKeyValueRoutes } from "./routes/keyValue";
 // Replit Auth completely removed
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // No authentication system active
+  
+  // Register Key-Value database routes
+  registerKeyValueRoutes(app);
 
   // BiteBurst profile creation endpoint (for onboarding)
   app.post("/api/profile/create", async (req: any, res) => {

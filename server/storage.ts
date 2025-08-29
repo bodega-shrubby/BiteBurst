@@ -112,4 +112,9 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Keep PostgreSQL as backup
+export const postgresStorage = new DatabaseStorage();
+
+// Use Key-Value storage as primary
+import { keyValueStorage } from "./storage/keyValueStorage";
+export const storage = keyValueStorage;
