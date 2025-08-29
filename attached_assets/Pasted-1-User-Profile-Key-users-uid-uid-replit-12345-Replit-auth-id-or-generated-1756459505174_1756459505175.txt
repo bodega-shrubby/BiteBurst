@@ -1,0 +1,175 @@
+1) User Profile
+Key: users:{uid}
+{
+  "uid": "replit-12345",           // Replit auth id or generated
+  "displayName": "Ava",
+  "ageBracket": "9-11",            // "6-8" | "9-11" | "12-14"
+  "goal": "energy",                // "energy" | "focus" | "strength"
+  "avatar": "mascot-01",           // id from avatars:catalog
+  "email": "ava@example.com",      // optional (lowercased)
+  "parentConsent": true,
+  "createdAt": 1735412345123,      // ms epoch
+  "updatedAt": 1735412345123,
+  "xp": 0,                         // convenience mirrors stats
+  "streak": 0,                     // convenience mirrors streak
+  "badges": [],                    // convenience mirrors badges
+  "locale": "en-GB",
+  "tz": "Europe/London",
+  "status": "active"               // "active" | "deleted"
+}
+Indexes
+userIndex:email:{email} → { "uid": "replit-12345" }
+Validation
+displayName: 2–20 chars
+ageBracket: enum
+goal: enum
+email: RFC 5322 basic check if present
+parentConsent: required true for account activation (<16)
+2) Onboarding (in-progress)
+Key: onboarding:{uid}
+{
+  "step": 3,                        // current step index
+  "answers": {
+    "displayName": "Ava",
+    "ageBracket": "9-11",
+    "goal": "energy",
+    "avatar": "mascot-01",
+    "email": "ava@example.com",
+    "parentConsent": true
+  },
+  "updatedAt": 1735412000000
+}
+When the user taps Create Profile, you:
+Validate answers
+Write users:{uid}
+Delete onboarding:{uid} (optional but recommended)
+3) Daily Logs (food + activity)
+Key pattern: logs:{uid}:{yyyymmdd}:{logId}
+yyyymmdd lets you pull a day quickly.
+logId is a nanoid/UUID.
+{
+  "id": "log_9e3X",
+  "uid": "replit-12345",
+  "date": "2025-08-28",            // ISO date
+  "ts": 1735415555123,             // ms epoch
+  "type": "food",                  // "food" | "activity"
+  "entryMethod": "photo",          // "emoji" | "text" | "photo"
+  "content": {
+    "emoji": ["🍎","🍞"],
+    "text": "Apple + peanut butter",
+    "photoB64": "data:image/jpeg;base64,..."
+  },
+  "goalContext": "energy",
+  "aiFeedback": "Great choice! Protein + carbs help you power up ⚡",
+  "xpAwarded": 5,
+  "meta": { "device": "mobile" }
+}
+For activity logs, content can have "emoji": ["⚽"] or "text": "Football training 30m".
+4) Stats (cached/aggregated)
+Key: stats:{uid}
+{
+  "uid": "replit-12345",
+  "xp": 125,
+  "streak": 7,
+  "lastLogDate": "2025-08-28",
+  "dailyTotals": {
+    "2025-08-28": { "entries": 3, "xp": 15 },
+    "2025-08-27": { "entries": 2, "xp": 10 }
+  },
+  "updatedAt": 1735415600000
+}
+Update this after each new log so the home screen loads instantly without scanning all keys.
+5) Streak
+Key: streak:{uid}
+{
+  "uid": "replit-12345",
+  "current": 7,
+  "longest": 12,
+  "lastActiveDate": "2025-08-28",
+  "updatedAt": 1735415600000
+}
+On a new log, compare lastActiveDate vs today to continue/reset.
+6) Badges
+Key: badges:{uid}
+{
+  "uid": "replit-12345",
+  "earned": [
+    { "id": "first-log", "name": "First Log!", "ts": 1735400000000 },
+    { "id": "streak-7", "name": "7-Day Streak", "ts": 1735410000000 }
+  ]
+}
+Keep a local catalog in code for rules (e.g., streak-7, xp-100, photo-pro).
+7) Catalogs (seeded once)
+Key: avatars:catalog
+[
+  { "id": "mascot-01", "src": "/assets/mascot-biteburst@512.png", "label": "Zestie" },
+  { "id": "kid-01", "src": "/assets/avatar-kid01.png", "label": "Skater" }
+]
+Key: goals:catalog
+[
+  { "id": "energy",   "label": "Energy ⚡" },
+  { "id": "focus",    "label": "Focus 🧠" },
+  { "id": "strength", "label": "Strength 💪" }
+]
+8) Schema Version
+Key: versions:schema
+{ "current": 1 }
+If you change shapes, bump this and run a small migration script.
+Suggested TypeScript Interfaces (optional)
+type AgeBracket = "6-8" | "9-11" | "12-14";
+type Goal = "energy" | "focus" | "strength";
+type LogType = "food" | "activity";
+type EntryMethod = "emoji" | "text" | "photo";
+
+interface User {
+  uid: string;
+  displayName: string;
+  ageBracket: AgeBracket;
+  goal: Goal;
+  avatar: string;
+  email?: string;
+  parentConsent: boolean;
+  createdAt: number;
+  updatedAt: number;
+  xp: number;
+  streak: number;
+  badges: string[];
+  locale?: string;
+  tz?: string;
+  status: "active" | "deleted";
+}
+
+interface Log {
+  id: string;
+  uid: string;
+  date: string;   // YYYY-MM-DD
+  ts: number;
+  type: LogType;
+  entryMethod: EntryMethod;
+  content: {
+    emoji?: string[];
+    text?: string;
+    photoB64?: string;
+  };
+  goalContext: Goal;
+  aiFeedback?: string;
+  xpAwarded: number;
+  meta?: Record<string, unknown>;
+}
+Helper Functions the Agent Should Implement
+import Database from("@replit/database");
+const db = new Database();
+
+const userKey = (uid) => `users:${uid}`;
+const emailIndexKey = (email) => `userIndex:email:${email.toLowerCase()}`;
+const obKey = (uid) => `onboarding:${uid}`;
+const statsKey = (uid) => `stats:${uid}`;
+const streakKey = (uid) => `streak:${uid}`;
+const badgeKey = (uid) => `badges:${uid}`;
+const logKey = (uid, ymd, id) => `logs:${uid}:${ymd}:${id}`;
+
+export async function saveOnboarding(uid, patch) { /* merge and set obKey */ }
+export async function finalizeProfile(uid) { /* validate, write users:*, create indexes, init stats/streak/badges, delete onboarding */ }
+export async function addLog(uid, log) { /* set logs:uid:ymd:id, update stats & streak, maybe award badges */ }
+export async function getDayLogs(uid, ymd) { /* db.list(`logs:${uid}:${ymd}:`) */ }
+export async function findUserByEmail(email) { /* read userIndex:email: */ }
