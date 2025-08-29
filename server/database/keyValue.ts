@@ -297,21 +297,43 @@ export async function addLog(uid: string, logData: Omit<Log, 'id' | 'uid' | 'dat
 }
 
 export async function getDayLogs(uid: string, ymd: string): Promise<Log[]> {
-  const prefix = `logs:${uid}:${ymd}:`;
-  const keysResult = await db.list(prefix);
-  const keys = keysResult ? Object.keys(keysResult) : [];
-  const logs: Log[] = [];
-  
-  for (const key of keys) {
-    const result = await db.get(key);
-    if (result) {
-      const log = JSON.parse(JSON.stringify(result)) as Log;
-      logs.push(log);
+  try {
+    const prefix = `logs:${uid}:${ymd}:`;
+    const keysResult = await db.list(prefix);
+    
+    // Handle different response formats from Replit Database
+    let keys: string[] = [];
+    
+    if (keysResult && typeof keysResult === 'object') {
+      if ((keysResult as any).ok) {
+        // Wrapped response format
+        const data = (keysResult as any).value;
+        keys = data ? Object.keys(data) : [];
+      } else {
+        // Direct object format
+        keys = Object.keys(keysResult);
+      }
     }
+    
+    const logs: Log[] = [];
+    
+    for (const key of keys) {
+      const result = await db.get(key);
+      if (result) {
+        const data = (result as any).ok ? (result as any).value : result;
+        if (data) {
+          const log = JSON.parse(JSON.stringify(data)) as Log;
+          logs.push(log);
+        }
+      }
+    }
+    
+    // Sort by timestamp
+    return logs.sort((a, b) => a.ts - b.ts);
+  } catch (error) {
+    console.log(`No logs found for ${uid} on ${ymd}`);
+    return [];
   }
-  
-  // Sort by timestamp
-  return logs.sort((a, b) => a.ts - b.ts);
 }
 
 export async function getLog(uid: string, ymd: string, logId: string): Promise<Log | null> {

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { registerKeyValueRoutes } from "./routes/keyValue";
+import { registerDashboardRoutes } from "./routes/dashboard";
 // Replit Auth completely removed
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -9,46 +10,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Key-Value database routes
   registerKeyValueRoutes(app);
+  
+  // Register dashboard routes
+  registerDashboardRoutes(app);
 
-  // BiteBurst profile creation endpoint (for onboarding)
+  // BiteBurst profile creation endpoint (for onboarding) - Updated for Key-Value DB
   app.post("/api/profile/create", async (req: any, res) => {
     try {
       const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
       
-      // Create BiteBurst profile (this happens before Replit Auth)
-      const userData = {
-        username,
-        password, // In production, this should be hashed
-        name,
-        displayName: name,
-        ageBracket,
-        age: parseInt(ageBracket.split('-')[0]) || 10,
-        goal,
-        avatar,
-        email,
-        onboardingCompleted: onboardingCompleted ? 1 : 0
-      };
-      
       console.log("Creating BiteBurst profile for:", username);
       
-      // Check if user already exists by email
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        console.log("User already exists, returning success");
-        return res.json({ 
-          success: true, 
-          message: "Profile already exists"
-        });
-      }
+      // Generate unique user ID
+      const uid = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      // Create user using storage interface
-      const newUser = await storage.createUser(userData);
+      // Save onboarding data first
+      await storage.saveOnboardingData(uid, {
+        displayName: name,
+        ageBracket,
+        goal,
+        avatar: avatar || 'mascot-01',
+        email,
+        parentConsent: true
+      });
       
-      console.log("BiteBurst profile created for user:", newUser.id);
+      // Complete onboarding to create user
+      const user = await storage.completeOnboarding(uid);
+      
+      console.log("BiteBurst profile created for user:", user.replitId);
       
       res.json({ 
         success: true, 
-        message: "Profile created successfully"
+        message: "Profile created successfully",
+        user: {
+          uid: user.replitId,
+          displayName: user.displayName,
+          email: user.email,
+          ageBracket: user.ageBracket,
+          goal: user.goal,
+          avatar: user.avatar
+        }
       });
     } catch (error) {
       console.error("Profile creation error:", error);
