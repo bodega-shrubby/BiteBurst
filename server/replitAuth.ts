@@ -15,15 +15,20 @@ if (!process.env.REPLIT_DOMAINS) {
 const getOidcConfig = memoize(
   async () => {
     console.log("Initializing OIDC config with REPL_ID:", process.env.REPL_ID);
+    
     try {
-      const config = await client.discovery(
-        new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-        process.env.REPL_ID!
-      );
-      console.log("OIDC config loaded successfully");
+      // Try discovery without client ID first
+      const issuerUrl = new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc");
+      console.log("Attempting discovery from:", issuerUrl.href);
+      
+      const config = await client.discovery(issuerUrl, process.env.REPL_ID!);
+      console.log("OIDC discovery successful");
+      console.log("Token endpoint:", config.token_endpoint);
+      console.log("Authorization endpoint:", config.authorization_endpoint);
+      console.log("Issuer:", config.issuer);
       return config;
     } catch (error) {
-      console.error("OIDC config error:", error);
+      console.error("OIDC discovery failed:", error);
       throw error;
     }
   },
@@ -86,10 +91,20 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    try {
+      console.log("OAuth verify callback - tokens received");
+      const user = {};
+      updateUserSession(user, tokens);
+      const claims = tokens.claims();
+      if (claims) {
+        await upsertUser(claims);
+        console.log("User upserted successfully:", claims.sub);
+      }
+      verified(null, user);
+    } catch (error) {
+      console.error("Error in verify callback:", error);
+      verified(error, null);
+    }
   };
 
   for (const domain of process.env
@@ -123,9 +138,29 @@ export async function setupAuth(app: Express) {
     // Use the actual Replit domain, not localhost
     const domain = process.env.REPLIT_DOMAINS!.split(",")[0];
     console.log("Callback attempt - hostname:", req.hostname, "using domain:", domain);
-    passport.authenticate(`replitauth:${domain}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+    console.log("Callback query params:", req.query);
+    
+    passport.authenticate(`replitauth:${domain}`, (err: any, user: any, info: any) => {
+      if (err) {
+        console.error("OAuth callback error:", err);
+        console.error("Error details:", JSON.stringify(err, null, 2));
+        return res.redirect("/api/login?error=oauth_failed");
+      }
+      
+      if (!user) {
+        console.error("OAuth callback - no user returned:", info);
+        return res.redirect("/api/login?error=no_user");
+      }
+      
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Login error:", loginErr);
+          return res.redirect("/api/login?error=login_failed");
+        }
+        
+        console.log("OAuth login successful");
+        return res.redirect("/");
+      });
     })(req, res, next);
   });
 
