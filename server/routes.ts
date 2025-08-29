@@ -1,23 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+// Replit Auth completely removed
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Fresh Replit Auth setup
-  await setupAuth(app);
-
-  // Replit Auth user route
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // No authentication system active
 
   // BiteBurst profile creation endpoint (for onboarding)
   app.post("/api/profile/create", async (req: any, res) => {
@@ -40,6 +27,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Creating BiteBurst profile for:", username);
       
+      // Check if user already exists by email
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        console.log("User already exists, returning success");
+        return res.json({ 
+          success: true, 
+          message: "Profile already exists"
+        });
+      }
+      
       // Create user using storage interface
       const newUser = await storage.createUser(userData);
       
@@ -55,11 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Protected route example
-  app.get("/api/protected", isAuthenticated, async (req: any, res) => {
-    const userId = req.user?.claims?.sub;
-    res.json({ message: "This is a protected route", userId });
-  });
+  // No protected routes - auth removed
 
   const httpServer = createServer(app);
   return httpServer;
