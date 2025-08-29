@@ -47,12 +47,14 @@ export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
-    resave: false,
-    saveUninitialized: true, // Changed to true for OAuth state
+    resave: true, // Enable session resaving for OAuth state
+    saveUninitialized: true, // Enable for OAuth state storage
+    rolling: true, // Reset session expiry on each request
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Disable secure for development
       maxAge: sessionTtl,
+      sameSite: 'lax', // Allow cross-site requests for OAuth
     },
   });
 }
@@ -109,16 +111,19 @@ export async function setupAuth(app: Express) {
 
   for (const domain of process.env
     .REPLIT_DOMAINS!.split(",")) {
+    console.log("Setting up strategy for domain:", domain);
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
         config,
         scope: "openid email profile offline_access",
         callbackURL: `https://${domain}/api/callback`,
+        passReqToCallback: false, // Ensure consistent callback signature
       },
       verify,
     );
     passport.use(strategy);
+    console.log("Strategy registered:", `replitauth:${domain}`);
   }
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
