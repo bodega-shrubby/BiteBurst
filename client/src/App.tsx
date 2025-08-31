@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
+import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
+import { useAuth } from "@/hooks/useAuth";
 
 // Onboarding components
 import { OnboardingProvider } from "@/pages/onboarding/OnboardingContext";
@@ -24,9 +26,8 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
-      <Route path="/dashboard">
-        {() => <div className="p-8 text-center">Dashboard coming soon!</div>}
-      </Route>
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/home" component={Dashboard} />
       
       {/* Onboarding Flow */}
       <Route path="/start">
