@@ -24,6 +24,9 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
+      <Route path="/dashboard">
+        {() => <div className="p-8 text-center">Dashboard coming soon!</div>}
+      </Route>
       
       {/* Onboarding Flow */}
       <Route path="/start">
