@@ -11,12 +11,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
   app.use((req: any, res, next) => {
     const sessionId = req.headers['x-session-id'];
-    if (sessionId && sessions.has(sessionId)) {
-      const session = sessions.get(sessionId);
+    if (sessionId && sessions.has(sessionId as string)) {
+      const session = sessions.get(sessionId as string);
       if (session && Date.now() - session.createdAt.getTime() < 24 * 60 * 60 * 1000) { // 24 hours
         req.user = session;
       } else {
-        sessions.delete(sessionId);
+        sessions.delete(sessionId as string);
       }
     }
     next();
