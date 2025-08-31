@@ -109,6 +109,12 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 
 ## Changelog
 
+- August 30, 2025: **Reverted to PostgreSQL Database**
+  - User requested reversion from Key-Value to PostgreSQL database
+  - Restored original PostgreSQL storage implementation
+  - Removed Key-Value database routes and components
+  - Database schema maintained with Drizzle ORM
+  - Profile creation API restored to PostgreSQL backend
 - August 29, 2025: **Phase 1 Complete - Replit Key-Value Database Implementation**
   - Completely migrated from PostgreSQL to Replit Key-Value Database architecture
   - Implemented comprehensive TypeScript schema matching provided specification
@@ -116,7 +122,7 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
   - Created full API layer with validation and error handling
   - Successfully tested: onboarding, user management, stats, streaks, badges, logging
   - PostgreSQL maintained as backup storage system
-  - **Ready for Phase 2: Frontend Integration**
+  - **Phase 2: Frontend Integration completed**
 - August 28, 2025: Completed Replit Auth integration (later removed per user request)
   - Implemented full OpenID Connect authentication system
   - Added proper user upsert logic with email/Replit ID mapping
