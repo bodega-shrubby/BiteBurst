@@ -13,28 +13,17 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table.
-// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
+// Sessions table removed - authentication disabled
 
-// User storage table.
-// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+// User storage table for BiteBurst profiles
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(), // Keep existing serial ID
+  id: serial("id").primaryKey(),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  // Replit Auth specific field for mapping
-  replitId: varchar("replit_id").unique(), // Store Replit user ID separately
+  // Legacy field - may be repurposed for unique user IDs
+  replitId: varchar("replit_id").unique(),
   // BiteBurst specific fields
   username: text("username").unique(),
   password: text("password"),

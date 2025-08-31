@@ -16,24 +16,20 @@ export default function Login() {
           <p className="text-gray-600 mt-2">Sign in to your BiteBurst account</p>
         </div>
 
-        {/* Replit Auth Button */}
+        {/* Direct to Onboarding */}
         <div className="space-y-4">
           <Button
-            onClick={() => window.location.href = '/api/login'}
+            onClick={() => window.location.href = '/start'}
             className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg"
             style={{ backgroundColor: '#FF6A00' }}
           >
-            Sign in with Replit
+            Get Started with BiteBurst
           </Button>
 
           <div className="text-center">
-            <Button
-              variant="link"
-              onClick={() => window.location.href = '/start'}
-              className="text-orange-600 hover:text-orange-700"
-            >
-              Don't have an account? Get started
-            </Button>
+            <p className="text-gray-600 text-sm">
+              Create your profile and start your healthy eating journey!
+            </p>
           </div>
         </div>
       </div>

@@ -9,7 +9,6 @@ import { eq } from "drizzle-orm";
 // Interface for storage operations
 export interface IStorage {
   // User operations
-  // (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
   getUserByReplitId(replitId: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
@@ -21,8 +20,6 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // User operations
-  // (IMPORTANT) these user operations are mandatory for Replit Auth.
-
   async getUser(id: string): Promise<User | undefined> {
     // First try to find by replit ID, then by regular ID
     let user = await this.getUserByReplitId(id);
