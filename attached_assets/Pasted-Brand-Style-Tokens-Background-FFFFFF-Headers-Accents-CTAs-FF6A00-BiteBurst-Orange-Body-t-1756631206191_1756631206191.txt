@@ -1,0 +1,90 @@
+Brand / Style Tokens
+Background: #FFFFFF
+Headers / Accents / CTAs: #FF6A00 (BiteBurst Orange)
+Body text: #101010
+Muted text: #6B6B6B
+Lines / borders: #EAEAEA
+Success/positive (for streaks): #19C37D
+Blue accent (links/highlights): #1A73E8
+Corner radius: 14px (cards, buttons, chips)
+Min tap target: 56px
+Typography: playful rounded sans (Nunito/Poppins). Section titles in orange, body in black.
+Layout (mobile-first, 390×844 baseline)
+Stacked vertical sections, scrollable. Use a sticky top header and sticky bottom nav.
+Screen Structure (top → bottom)
+1) Sticky Header
+Left: mascot avatar (small) + “Good morning, {displayName}”
+Right: Bell (notifications) and settings icons.
+Sub-row: Today’s date + “Day X of your streak” (fire icon if >0)
+2) Progress Overview (Card)
+Two big meters side-by-side:
+XP: current day’s XP / daily goal (progress bar, shows +XP on tick)
+Streak: current streak (flame icon); tap opens streak detail modal
+Micro-interaction: add gentle bounce when XP increases.
+3) Goal Snapshot (Card)
+Title: “Your goal: {Energy/Focus/Strength}”
+Short, one-line AI tip of the day (“Carb + protein = steady energy ⚡”)
+Chip buttons to switch goal (does not persist until confirm in modal).
+4) Quick Log (Card) — zero friction entry
+“Tap, snap, go!” row with:
+Food chips (🍎 🥦 🍞 🧃) → opens food logger
+Activity chips (⚽ 🧘 🏃 🎯) → opens activity logger
+Camera button (photo upload → base64 → send to AI)
+After a log, show a toast with XP awarded and one-sentence AI feedback.
+5) Today’s Journey (Checklist Card)
+3–5 bite-size tasks, e.g.:
+“Log one fruit” [ ]
+“Move for 15 minutes” [ ]
+“Drink water” [ ]
+Checking a task adds XP and animates the mascot with a cheer.
+6) Badges & Rewards (Card)
+Horizontal scroll of earned badges + locked silhouettes.
+Tap badge → modal with description and “How to earn”.
+7) Leaderboard / Friend Streaks (Card)
+Tabs: Friends | Local | Global (default: Friends)
+Each row: avatar, name, today’s XP, mini streak flame.
+CTA: “Add friends” (opens share/invite modal).
+8) Education Bite (Card)
+Mini carousel: Food facts + Food→Exercise link
+e.g., “Banana + yogurt → great post-practice fuel”.
+One swipeable card; stores “seen” state per day.
+9) CTA Footer Card (optional)
+“Keep your streak alive!” + Log something button (orange).
+10) Sticky Bottom Nav (5 icons)
+Home (active) | Log | Goals | Badges | More
+Large, friendly icons; active uses #FF6A00.
+Data Wiring (read-only first, then write)
+Use the PostgreSQL schema provided earlier.
+Fetch on load (userId in session):
+users: display_name, goal, xp, streak
+streaks: current, longest, last_active
+Today’s logs (count, XP sum)
+badges: earned list for carousel
+Optional: top 10 friends by today’s XP (mock if not built)
+Write paths (called by buttons):
+Quick log endpoints (food/activity/photo) → create logs row, xp_events row, update users.xp, streaks, return {xpDelta, feedback}.
+Checklist completion toggles → same as quick log but without photo.
+Interactions & States
+Loading skeletons for all cards (shimmer).
+Empty states:
+No logs yet → show mascot encouraging message + “Try logging your lunch”.
+No friends → simple invite CTA.
+Error toasts for failed network/AI calls.
+Confetti burst when XP reaches daily target.
+Accessibility: 44×44 tap targets, focus outlines, aria-labels on icons.
+Assets (placeholders ok; I’ll upload final)
+/assets/mascot-biteburst@512.png (small and cheer pose)
+/assets/badges/*.png
+/assets/icons/* (home, log, goals, badges, more, flame, XP)
+Acceptance Criteria
+Visual style matches BiteBurst (white background, orange section titles, black body text, rounded cards).
+All sections render on mobile with smooth 60fps scroll.
+Quick Log flow works end-to-end (UI → API → XP/streak update → UI refresh).
+State persists on refresh (reads again from DB).
+No blocking UI on API calls; optimistic update for XP (+fallback rollback if error).
+Deliverables
+Dashboard route /home (default after onboarding).
+Components for: Header, ProgressOverview, GoalSnapshot, QuickLog, TodayChecklist, BadgesRail, Leaderboard, EducationBite, BottomNav.
+Mock data mode that can run without a server (JSON fixtures) + live mode switched by env flag.
+Note
+Use Duolingo as layout inspiration only; all characters/mascots must be original BiteBurst art and colors.
