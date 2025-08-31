@@ -5,7 +5,7 @@ import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Simple session middleware (in-memory for development)
-  const sessions = new Map<string, { userId: number; username: string; createdAt: Date }>();
+  const sessions = new Map<string, { userId: string; displayName: string; createdAt: Date }>();
   
   // Session middleware
   app.use((req: any, res, next) => {
@@ -34,21 +34,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
       
-      // Create BiteBurst profile
+      // Create BiteBurst profile with new schema
       const userData = {
-        username,
-        password, // In production, this should be hashed
-        name,
         displayName: name,
-        ageBracket,
-        age: parseInt(ageBracket.split('-')[0]) || 10,
-        goal,
-        avatar,
+        ageBracket: ageBracket as '6-8' | '9-11' | '12-14',
+        goal: goal as 'energy' | 'focus' | 'strength',
+        avatarId: avatar,
         email,
-        onboardingCompleted: onboardingCompleted ? 1 : 0
+        parentConsent: true, // Default for onboarding
       };
       
-      console.log("Creating BiteBurst profile for:", username);
+      console.log("Creating BiteBurst profile for:", name);
       
       // Check if user already exists by email
       const existingUser = await storage.getUserByEmail(email);
@@ -70,9 +66,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Profile created successfully",
         user: {
           id: newUser.id,
-          username: newUser.username,
+          displayName: newUser.displayName,
           email: newUser.email,
-          displayName: newUser.displayName
+          ageBracket: newUser.ageBracket,
+          goal: newUser.goal,
+          avatarId: newUser.avatarId
         }
       });
     } catch (error) {
@@ -92,33 +90,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Login attempt for:", username);
       
-      // Find user by username
-      const user = await storage.getUserByUsername(username);
+      // Find user by display name (treating it as username)
+      const user = await storage.getUserByDisplayName(username);
       if (!user) {
         console.log("User not found:", username);
         return res.status(401).json({ error: 'Invalid username or password' });
       }
       
-      // Simple password check (in production, use proper hashing)
-      if (user.password !== password) {
-        console.log("Invalid password for:", username);
-        return res.status(401).json({ error: 'Invalid username or password' });
-      }
-      
-      // Check if onboarding is completed
-      if (!user.onboardingCompleted) {
-        console.log("Onboarding not completed for:", username);
-        return res.status(403).json({ 
-          error: 'Please complete onboarding first',
-          onboardingRequired: true 
-        });
-      }
+      // For now, accept any password (development only)
+      // TODO: Add proper password field and hashing
       
       // Create session
       const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       sessions.set(sessionId, {
         userId: user.id,
-        username: user.username!,
+        displayName: user.displayName,
         createdAt: new Date()
       });
       
@@ -129,15 +115,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sessionId,
         user: {
           id: user.id,
-          username: user.username,
           displayName: user.displayName,
           email: user.email,
           ageBracket: user.ageBracket,
           goal: user.goal,
-          avatar: user.avatar,
+          avatarId: user.avatarId,
           xp: user.xp,
-          streak: user.streak,
-          badges: user.badges
+          streak: user.streak
         }
       });
       
@@ -164,19 +148,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         id: user.id,
-        username: user.username,
         displayName: user.displayName,
         email: user.email,
         ageBracket: user.ageBracket,
         goal: user.goal,
-        avatar: user.avatar,
+        avatarId: user.avatarId,
         xp: user.xp,
-        streak: user.streak,
-        badges: user.badges
+        streak: user.streak
       });
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ error: "Failed to get user data" });
+    }
+  });
+
+  // Get avatars
+  app.get('/api/avatars', async (req: any, res: any) => {
+    try {
+      const avatars = await storage.getAvatars();
+      res.json(avatars);
+    } catch (error) {
+      console.error('Error getting avatars:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  // Get goals
+  app.get('/api/goals', async (req: any, res: any) => {
+    try {
+      const goals = await storage.getGoals();
+      res.json(goals);
+    } catch (error) {
+      console.error('Error getting goals:', error);
+      res.status(500).json({ error: 'Server error' });
     }
   });
 

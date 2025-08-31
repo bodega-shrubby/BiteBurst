@@ -6,66 +6,116 @@ import {
   timestamp,
   varchar,
   text,
-  serial,
   integer,
-  json
+  boolean,
+  date,
+  pgEnum
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Sessions table removed - authentication disabled
+// Create enums to match database
+export const ageBracketEnum = pgEnum('age_bracket', ['6-8', '9-11', '12-14']);
+export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
+export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
+export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
 
-// User storage table for BiteBurst profiles
+// Catalog tables
+export const avatars = pgTable("avatars", {
+  id: text("id").primaryKey(),
+  label: text("label").notNull(),
+  src: text("src").notNull(),
+});
+
+export const goals = pgTable("goals", {
+  id: goalEnum("id").primaryKey(),
+  label: text("label").notNull(),
+});
+
+// Users table with UUID and proper types
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  // Legacy field - may be repurposed for unique user IDs
-  replitId: varchar("replit_id").unique(),
-  // BiteBurst specific fields
-  username: text("username").unique(),
-  password: text("password"),
-  name: text("name"),
-  displayName: text("display_name"),
-  ageBracket: text("age_bracket"), // '6-8', '9-11', '12-14'
-  age: integer("age"),
-  goal: text("goal"), // 'energy', 'focus', 'strength'
-  avatar: text("avatar"), // avatar selection
-  onboardingCompleted: integer("onboarding_completed").notNull().default(0), // boolean as int
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  displayName: text("display_name").notNull(),
+  ageBracket: ageBracketEnum("age_bracket").notNull(),
+  goal: goalEnum("goal").notNull().references(() => goals.id),
+  email: text("email").unique(),
+  parentConsent: boolean("parent_consent").notNull().default(false),
+  avatarId: text("avatar_id").references(() => avatars.id),
+  locale: text("locale").default('en-GB'),
+  tz: text("tz"),
   xp: integer("xp").notNull().default(0),
-  badges: json("badges").$type<string[]>().notNull().default([]),
   streak: integer("streak").notNull().default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  status: text("status").notNull().default('active'),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Logs table with UUID and proper types
 export const logs = pgTable("logs", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  type: text("type").notNull(), // 'food' or 'activity'
-  entryMethod: text("entry_method").notNull(), // 'emoji', 'text', 'photo'
-  content: text("content").notNull(), // food/activity description or base64 image
-  feedback: text("feedback"), // AI generated feedback
-  xpEarned: integer("xp_earned").notNull().default(0),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  logDate: date("log_date").notNull().default(sql`CURRENT_DATE`),
+  ts: timestamp("ts").notNull().defaultNow(),
+  type: logTypeEnum("type").notNull(),
+  entryMethod: entryMethodEnum("entry_method").notNull(),
+  content: jsonb("content"),
+  goalContext: goalEnum("goal_context"),
+  aiFeedback: text("ai_feedback"),
+  xpAwarded: integer("xp_awarded").notNull().default(0),
 });
 
-export type UpsertUser = typeof users.$inferInsert;
-export type User = typeof users.$inferSelect;
+// Streaks table
+export const streaks = pgTable("streaks", {
+  userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  current: integer("current").notNull().default(0),
+  longest: integer("longest").notNull().default(0),
+  lastActive: date("last_active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
+// Badges table
+export const badges = pgTable("badges", {
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  badgeId: text("badge_id").notNull(),
+  awardedAt: timestamp("awarded_at").notNull().defaultNow(),
+}, (table) => ({
+  pk: { name: "badges_pkey", columns: [table.userId, table.badgeId] }
+}));
+
+// XP Events table
+export const xpEvents = pgTable("xp_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  amount: integer("amount").notNull(),
+  reason: text("reason"),
+  refLog: varchar("ref_log").references(() => logs.id),
+  ts: timestamp("ts").notNull().defaultNow(),
+});
+
+// Note: Indexes are created via SQL commands, not in Drizzle schema
+
+// Type exports
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type Log = typeof logs.$inferSelect;
+export type InsertLog = typeof logs.$inferInsert;
+export type Avatar = typeof avatars.$inferSelect;
+export type Goal = typeof goals.$inferSelect;
+export type Streak = typeof streaks.$inferSelect;
+export type Badge = typeof badges.$inferSelect;
+export type XpEvent = typeof xpEvents.$inferSelect;
+
+// Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  name: true,
   displayName: true,
   ageBracket: true,
-  age: true,
   goal: true,
-  avatar: true,
   email: true,
-  onboardingCompleted: true,
+  parentConsent: true,
+  avatarId: true,
+  locale: true,
+  tz: true,
 });
 
 export const insertLogSchema = createInsertSchema(logs).pick({
@@ -73,8 +123,10 @@ export const insertLogSchema = createInsertSchema(logs).pick({
   type: true,
   entryMethod: true,
   content: true,
+  goalContext: true,
+  aiFeedback: true,
+  xpAwarded: true,
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type InsertLog = z.infer<typeof insertLogSchema>;
-export type Log = typeof logs.$inferSelect;
+export type InsertUserType = z.infer<typeof insertUserSchema>;
+export type InsertLogType = z.infer<typeof insertLogSchema>;
