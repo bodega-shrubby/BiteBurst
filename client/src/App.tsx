@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/Dashboard";
 import FoodLog from "@/pages/FoodLog";
+import FoodLogNew from "@/pages/FoodLogNew";
 import Feedback from "@/pages/Feedback";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,7 +31,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/home" component={Dashboard} />
-      <Route path="/food-log" component={FoodLog} />
+      <Route path="/food-log" component={FoodLogNew} />
       <Route path="/feedback" component={Feedback} />
       
       {/* Onboarding Flow */}

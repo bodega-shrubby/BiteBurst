@@ -1,0 +1,79 @@
+{
+  "categories": [
+    {
+      "name": "Fruits",
+      "emojis": [
+        { "emoji": "🍎", "name": "apple", "healthy": true },
+        { "emoji": "🍌", "name": "banana", "healthy": true },
+        { "emoji": "🍊", "name": "orange", "healthy": true },
+        { "emoji": "🍓", "name": "strawberry", "healthy": true },
+        { "emoji": "🫐", "name": "blueberries", "healthy": true },
+        { "emoji": "🍇", "name": "grapes", "healthy": true },
+        { "emoji": "🍑", "name": "cherries", "healthy": true },
+        { "emoji": "🥝", "name": "kiwi", "healthy": true },
+        { "emoji": "🍒", "name": "berries", "healthy": true }
+      ]
+    },
+    {
+      "name": "Vegetables",
+      "emojis": [
+        { "emoji": "🥦", "name": "broccoli", "healthy": true },
+        { "emoji": "🥕", "name": "carrot", "healthy": true },
+        { "emoji": "🌽", "name": "corn", "healthy": true },
+        { "emoji": "🍅", "name": "tomato", "healthy": true },
+        { "emoji": "🥒", "name": "cucumber", "healthy": true },
+        { "emoji": "🥬", "name": "leafy greens", "healthy": true },
+        { "emoji": "🫑", "name": "bell pepper", "healthy": true },
+        { "emoji": "🥔", "name": "potato", "healthy": true }
+      ]
+    },
+    {
+      "name": "Grains & Bread",
+      "emojis": [
+        { "emoji": "🍞", "name": "bread", "healthy": false },
+        { "emoji": "🥖", "name": "baguette", "healthy": false },
+        { "emoji": "🥯", "name": "bagel", "healthy": false },
+        { "emoji": "🍚", "name": "rice bowl", "healthy": true },
+        { "emoji": "🍝", "name": "pasta", "healthy": false },
+        { "emoji": "🥞", "name": "pancakes", "healthy": false },
+        { "emoji": "🧇", "name": "waffle", "healthy": false },
+        { "emoji": "🥣", "name": "cereal bowl", "healthy": false }
+      ]
+    },
+    {
+      "name": "Protein",
+      "emojis": [
+        { "emoji": "🥚", "name": "egg", "healthy": true },
+        { "emoji": "🍖", "name": "meat", "healthy": false },
+        { "emoji": "🍗", "name": "chicken", "healthy": true },
+        { "emoji": "🐟", "name": "fish", "healthy": true },
+        { "emoji": "🫘", "name": "beans", "healthy": true },
+        { "emoji": "🥜", "name": "nuts", "healthy": true },
+        { "emoji": "🧀", "name": "cheese", "healthy": false }
+      ]
+    },
+    {
+      "name": "Dairy & Snacks",
+      "emojis": [
+        { "emoji": "🥛", "name": "milk", "healthy": true },
+        { "emoji": "🧈", "name": "yogurt", "healthy": true },
+        { "emoji": "🍪", "name": "cookie", "healthy": false },
+        { "emoji": "🍰", "name": "cake", "healthy": false },
+        { "emoji": "🍫", "name": "chocolate", "healthy": false },
+        { "emoji": "🍭", "name": "candy", "healthy": false },
+        { "emoji": "🍿", "name": "popcorn", "healthy": false }
+      ]
+    },
+    {
+      "name": "Drinks",
+      "emojis": [
+        { "emoji": "💧", "name": "water", "healthy": true },
+        { "emoji": "🧃", "name": "juice", "healthy": false },
+        { "emoji": "🥤", "name": "soda", "healthy": false },
+        { "emoji": "🫖", "name": "tea", "healthy": true },
+        { "emoji": "☕", "name": "coffee", "healthy": false },
+        { "emoji": "🥤", "name": "smoothie", "healthy": true }
+      ]
+    }
+  ]
+}
