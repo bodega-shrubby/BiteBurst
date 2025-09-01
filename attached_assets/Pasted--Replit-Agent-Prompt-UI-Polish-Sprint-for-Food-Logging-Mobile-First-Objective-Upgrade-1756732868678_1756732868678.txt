@@ -1,0 +1,209 @@
+# Replit Agent Prompt — **UI Polish Sprint** for Food Logging (Mobile-First)
+
+**Objective:** Upgrade the food logging experience to a production-quality, Duolingo-inspired UI that’s fast, touch-friendly, and brand-consistent. Keep routes `/food-log` and `/feedback`. No back-end changes required beyond existing stubs.
+
+---
+
+## Brand & Tokens
+
+Create/ensure a single CSS file `public/css/tokens.css` and import it.
+
+```css
+:root{
+  --bb-orange:#FF7A00; /* brand primary */
+  --bb-orange-600:#ff8d26; /* hover */
+  --bb-orange-200:#ffd5b0; /* disabled bg tint */
+  --bb-black:#111;
+  --bb-gray-900:#1e1e1e;
+  --bb-gray-600:#6b7280;
+  --bb-gray-200:#eee;
+  --bb-surface:#fff;
+  --bb-card-shadow:0 10px 24px rgba(0,0,0,.06);
+  --bb-radius-xl:24px;
+  --bb-radius-lg:16px;
+}
+html{font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif}
+```
+
+---
+
+## Layout (Food Log)
+
+* Use a **single column** with content max-width **420px**, centered; apply `padding:16px` to body; follow a **safe-area inset** (`padding-top: env(safe-area-inset-top)`).
+* Make the **header sticky** with an orange bar and shadow-on-scroll.
+* Replace the three big cards with a tighter, visual hierarchy.
+
+### Header
+
+```html
+<header class="bb-appbar">
+  <button class="bb-back" aria-label="Back">←</button>
+  <h1>Log your meal</h1>
+  <img src="/assets/mascot-orange.svg" alt="" class="bb-mascot"/>
+</header>
+```
+
+**Styles:** 56px height, brand orange background, white text, subtle drop shadow. The back button is 44×44 with focus ring.
+
+### Intro Card
+
+A small helper row with microcopy and a progress dot.
+
+```html
+<p class="bb-helper">Choose how you want to log</p>
+```
+
+### Method Cards (Grid of 3)
+
+* 3 cards in a responsive grid: **Emojis**, **Text**, **Photo**.
+* Each card uses icon + label, large hit area (min 88×88), **card hover/lift**.
+* Active card gets **orange outline** and subtle glow.
+
+```html
+<section class="bb-methods">
+  <button id="optEmoji" class="bb-card-select is-active">
+    <div class="bb-emoji-peek">🍎 🥦 🍞 🧃</div>
+    <span>Emojis</span>
+  </button>
+  <button id="optText" class="bb-card-select">
+    <div class="bb-icon">💬</div>
+    <span>Text</span>
+  </button>
+  <button id="optPhoto" class="bb-card-select">
+    <div class="bb-icon">📷</div>
+    <span>Photo</span>
+  </button>
+</section>
+```
+
+### Panels (One visible at a time)
+
+#### Emoji Panel
+
+* 4‑column grid, 12–20 px gap, rounded tiles, press bounce.
+* Selected tile shows check overlay (small orange dot) + scale.
+* A **selection shelf** appears once ≥1 selected: shows chips + *Clear*.
+
+```html
+<section id="panelEmoji" class="bb-panel">
+  <h2 class="bb-section">Pick food emojis</h2>
+  <div class="bb-emoji-grid" role="listbox" aria-label="Food">
+    <!-- populated from config/food_emojis.json -->
+  </div>
+  <div id="emojiShelf" class="bb-shelf" hidden>
+    <div id="emojiChips" class="bb-chips"></div>
+    <button id="emojiClear" class="bb-link-sm">Clear</button>
+  </div>
+</section>
+```
+
+#### Text Panel
+
+* Larger rounded textarea with **160 char counter** right-aligned.
+* Autofocus when panel opens; debounce and validate for ≥2 chars.
+
+```html
+<section id="panelText" class="bb-panel" hidden>
+  <h2 class="bb-section">Type what you ate</h2>
+  <div class="bb-field">
+    <textarea id="mealText" maxlength="160" placeholder="e.g., apple, yogurt, toast"></textarea>
+    <div class="bb-meta"><span id="charCount">0</span>/160</div>
+  </div>
+  <p class="bb-hint">Tip: keep it simple.</p>
+</section>
+```
+
+#### Photo Panel
+
+* Custom drop zone with dashed orange border, rounded corners, camera emoji.
+* On file select, create **client-side thumbnail** and show preview card.
+
+```html
+<section id="panelPhoto" class="bb-panel" hidden>
+  <h2 class="bb-section">Take or upload a photo</h2>
+  <label class="bb-drop" for="mealPhoto">📸 Tap to choose a photo</label>
+  <input id="mealPhoto" type="file" accept="image/*" capture="environment" hidden />
+  <div id="photoPreview" class="bb-photo" hidden></div>
+  <p class="bb-hint">Photos are not stored on the server in the MVP.</p>
+</section>
+```
+
+### Sticky Action Bar
+
+A floating footer that rises when there is valid input; disabled otherwise.
+
+```html
+<footer class="bb-cta-bar">
+  <button id="btnSubmit" class="bb-cta" disabled>
+    <span>Log meal</span>
+  </button>
+</footer>
+```
+
+---
+
+## CSS Highlights (add to `food-log.css`)
+
+* **Cards**: white background, `border-radius: var(--bb-radius-xl)`, `box-shadow: var(--bb-card-shadow)`, `padding:16px`.
+* **Card select states**: `.is-active{ outline:3px solid var(--bb-orange); box-shadow: 0 0 0 6px rgba(255,122,0,.15); }`
+* **Emoji tiles**: 64×64 min, center content, tap ripple (CSS keyframes scale).
+* **CTA**: big rounded pill (height 56px), bold, transitions; disabled style uses `background: var(--bb-orange-200); color: #fff;`.
+* **Appbar**: sticky, 56px, white icon on orange.
+* Respect **min tap target 44×44** and focus-visible styles for a11y.
+
+---
+
+## Interactions & Micro‑animations
+
+* Button press = scale to 0.98 for 120ms.
+* Emoji select = quick bounce; haptic-friendly JS hook `navigator.vibrate?.(10)` on selection (non-blocking).
+* On successful submit: mascot confetti burst (CSS animation placeholder) before redirect to `/feedback`.
+
+---
+
+## Behavior (JS)
+
+* Keep existing state machine; add:
+
+  * Toggle `.is-active` on method cards.
+  * Show/hide panels.
+  * Enable CTA when `state.content` has value.
+  * Emoji shelf chips are removable; clicking chip removes from selection.
+  * Char counter updates live; enforce plain text (strip emoji in text mode).
+  * Photo compression to ≤1280px long edge and ≤256KB using canvas.
+
+**Validation/Error copy:** inline, small red text under field, never modal.
+
+---
+
+## Accessibility
+
+* Every interactive element keyboard reachable; `:focus-visible` rings.
+* `aria-live="polite"` on selection shelf and preview containers.
+* Sufficient contrast (WCAG AA). Labels on all inputs.
+
+---
+
+## Assets
+
+* Use `/assets/mascot-orange.svg`.
+* Create `/public/config/food_emojis.json` with \~32 items grouped by category; same set as in doc plus a few kid‑friendly adds (berries, yogurt, rice bowl, pasta, beans, water).
+
+---
+
+## Acceptance Criteria
+
+1. Visual hierarchy: compact header, clear method grid, one active panel.
+2. Emoji grid: 4 columns, tactile selection, chips shelf with Clear.
+3. Text panel: autofocus, live counter, validation, no emoji allowed.
+4. Photo panel: styled drop zone + thumbnail preview; no server upload.
+5. Sticky CTA: disabled until valid; hover/press states; success animation then navigate to `/feedback`.
+6. Mobile-first, 420px max width, safe-area insets, Lighthouse a11y ≥ 90.
+
+---
+
+## Out of Scope
+
+* OpenAI hookup (endpoint may remain stubbed), leaderboard, badges.
+
+> Implement iteratively; keep components in `public/components/` for reuse.
