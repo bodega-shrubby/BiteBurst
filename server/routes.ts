@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { registerDashboardRoutes } from "./routes/dashboard";
+import { registerLogRoutes } from "./routes/logs";
+import { registerAIRoutes } from "./routes/ai";
 // Replit Auth completely removed
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -185,8 +187,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Register dashboard routes
+  // Register routes
   registerDashboardRoutes(app, requireAuth);
+  registerLogRoutes(app, requireAuth);
+  registerAIRoutes(app, requireAuth);
 
   const httpServer = createServer(app);
   return httpServer;

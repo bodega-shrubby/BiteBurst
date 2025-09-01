@@ -37,7 +37,7 @@ export interface IStorage {
   
   // Streak operations
   getUserStreak(userId: string): Promise<Streak | undefined>;
-  updateStreak(userId: string, current: number, longest: number): Promise<Streak>;
+  updateStreak(userId: string, updates: Partial<{ current: number; longest: number; lastActive: Date }>): Promise<Streak>;
   
   // Badge operations
   getUserBadges(userId: string): Promise<Badge[]>;
@@ -108,21 +108,21 @@ export class DatabaseStorage implements IStorage {
     return streak || undefined;
   }
 
-  async updateStreak(userId: string, current: number, longest: number): Promise<Streak> {
+  async updateStreak(userId: string, updates: Partial<{ current: number; longest: number; lastActive: Date }>): Promise<Streak> {
     const [streak] = await db
       .insert(streaks)
       .values({
         userId,
-        current,
-        longest,
-        lastActive: new Date().toISOString().split('T')[0],
+        current: updates.current || 0,
+        longest: updates.longest || 0,
+        lastActive: updates.lastActive?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
       })
       .onConflictDoUpdate({
         target: streaks.userId,
         set: {
-          current,
-          longest,
-          lastActive: new Date().toISOString().split('T')[0],
+          current: updates.current || 0,
+          longest: updates.longest || 0,
+          lastActive: updates.lastActive?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
           updatedAt: new Date(),
         },
       })

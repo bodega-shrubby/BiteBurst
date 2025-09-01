@@ -235,13 +235,13 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Camera Button */}
+          {/* Food Log Button */}
           <button 
-            onClick={() => setQuickLogModal({ isOpen: true, type: 'food' })}
+            onClick={() => window.location.href = '/food-log'}
             className="w-full bg-[#FF6A00] text-white rounded-2xl py-4 flex items-center justify-center space-x-2 font-semibold hover:bg-orange-600 transition-colors"
           >
-            <Camera className="w-5 h-5" />
-            <span>Take Photo</span>
+            <span>🍎</span>
+            <span>Log Your Meal</span>
           </button>
         </div>
 

@@ -1,0 +1,35 @@
+Answers for Replit Agent
+1) AI Integration
+Do it now, but behind a flag.
+Implement the real OpenAI call with a simple abstraction and a kill-switch:
+ENV: OPENAI_API_KEY (already available), AI_FEEDBACK_ENABLED=true|false.
+Endpoint: POST /api/ai/feedback.
+If AI_FEEDBACK_ENABLED=false, return a canned message (stub) with the same shape.
+Scope (text-only feedback for MVP): send only emoji/text meal content (no images to OpenAI yet). Keep the interface ready for images later (param is allowed but ignored).
+Request config (server side):
+model: "gpt-4o-mini"
+temperature: 0.7, max tokens ~ 120
+system: “You are BiteBurst, a kid-friendly nutrition coach. Keep outputs 1–2 sentences, positive, age-appropriate (6–14), never judgmental.”
+prompt vars: {age, goal, mealLog} and (optional later) {activityLog}.
+Response shape (always):
+{ "feedback": "string" }
+2) Feedback Screen
+Yes—build it now (minimal).
+We need the full loop to test engagement.
+Route: /feedback (not a modal).
+Shows: mascot reaction, 1–2 sentence feedback, XP awarded, “Log another meal” and “Back to Dashboard”.
+Accept payload via location.state or localStorage (fallback to fetching last log).
+3) Photo Storage
+Base64 client-side only for MVP, no server persistence.
+Accept photo → compress client-side (< 256 KB, long edge ≤ 1280px) → preview only.
+Do not persist to DB; do not send to OpenAI yet.
+If content must be saved, store a tiny thumbnail or a text caption (“user provided photo”) for 24h max—not needed for MVP.
+4) Emoji Catalog
+Start with the provided list, expand to ~32, config-driven.
+Keep a JSON catalog grouped by category (fruits, veg, grains, protein, drinks, treats).
+Allow multi-select; render removable chips; easy to add/remove later without code changes.
+5) Route Integration
+Standalone pages (mobile-first), linked from Dashboard.
+Add /food-log and /feedback to the main router/nav.
+Dashboard primary CTA → /food-log.
+Avoid modal/overlay for MVP (mobile ergonomics, back-stack, and deep-linking are cleaner with routes).
