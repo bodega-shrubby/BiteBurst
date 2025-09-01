@@ -1,0 +1,228 @@
+# Replit Agent Prompt — Build the **Food Logging** Screen (BiteBurst MVP)
+
+**Goal:** Implement the mobile-first Food Logging screen that lets kids (ages 6–14) log a meal in <5 seconds via **emoji**, **text**, or **photo upload**. On submit, save to DB and (future) AI endpoint (stub in place — actual OpenAI call not yet implemented). Follow BiteBurst brand: **white background**, **orange headers**, **black body text**, **sliced orange mascot**.
+
+---
+
+## Tech & Project Setup
+
+* **Frontend:** HTML/CSS/JS (vanilla). Single-page component in `/public/food-log.html` with scoped CSS `/public/css/food-log.css` and JS `/public/js/food-log.js`.
+* **Backend:** Node + Express. Use existing server if present; otherwise create `/server/routes/logs.js` with endpoints below.
+* **DB:** Use existing store (Replit DB or Supabase). Provide a simple data-access module `db.js` with `getUser`, `createLog` helpers.
+* **AI:** (Not yet set up) — Placeholder for POST to `/api/ai/feedback` with payload ({ age, goal, mealLog, activityLog? }). Will eventually return a text response string.
+* **Images:** Convert uploads to **Base64** on client before submit. Preview in UI.
+
+---
+
+## Routes & Endpoints (implement stubs if missing)
+
+* `POST /api/log` → save meal log; request body:
+
+  ```json
+  {
+    "user_id": "string",
+    "type": "food",
+    "entry_method": "emoji|text|photo",
+    "content": "string or base64",
+    "timestamp": "ISO8601"
+  }
+  ```
+
+  Response: `{ id, xpAwarded, streak, badges }`.
+
+* `GET /api/user/:id` → returns `{ id, name, age, goal, XP, badges, streak }`.
+
+* `POST /api/ai/feedback` → returns `{ feedback: "short kid-friendly string" }`.
+
+Implement server validation for payload size (images < 1.5MB), and sanitize text input.
+
+---
+
+## Data Model (align with MVP doc)
+
+* **users**: `{ id, name, age, goal, XP, badges:[], streak }`
+* **logs**: `{ id, user_id, type: 'food'|'activity', entry_method: 'emoji'|'text'|'photo', content: string, feedback?: string, timestamp: ISO8601 }`
+
+---
+
+## Screen Structure (food-log.html)
+
+```html
+<main id="food-log" class="bb-container">
+  <header class="bb-header">
+    <h1 class="bb-title">LOG YOUR MEAL</h1>
+    <img src="/assets/mascot-orange.svg" alt="BiteBurst mascot" class="bb-mascot" />
+  </header>
+
+  <section class="bb-input-options" aria-label="Choose how to log your meal">
+    <button id="emojiOption" class="bb-card" aria-haspopup="dialog">
+      <div class="bb-icon-row" aria-hidden="true">🍎 🥦 🍞 …</div>
+      <span class="bb-label">Emojis</span>
+    </button>
+
+    <button id="textOption" class="bb-card">
+      <div class="bb-icon" aria-hidden="true">💬</div>
+      <span class="bb-label">Text</span>
+    </button>
+
+    <button id="photoOption" class="bb-card">
+      <div class="bb-icon" aria-hidden="true">📷</div>
+      <span class="bb-label">Photo</span>
+    </button>
+  </section>
+
+  <!-- Dynamic input panels (one visible at a time) -->
+  <section id="emojiPanel" class="bb-panel" hidden>
+    <h2 class="sr-only">Pick food emojis</h2>
+    <div class="bb-emoji-grid" role="listbox" aria-label="Food list">
+      <!-- populate from JS with common foods -->
+    </div>
+  </section>
+
+  <section id="textPanel" class="bb-panel" hidden>
+    <label for="mealText" class="bb-field-label">Type what you ate</label>
+    <textarea id="mealText" maxlength="160" placeholder="e.g., apple, yogurt, toast"></textarea>
+    <div class="bb-help">Tip: keep it simple (max 160 chars).</div>
+  </section>
+
+  <section id="photoPanel" class="bb-panel" hidden>
+    <label for="mealPhoto" class="bb-field-label">Take or upload a photo</label>
+    <input id="mealPhoto" type="file" accept="image/*" capture="environment" />
+    <div id="photoPreview" class="bb-photo-preview" aria-live="polite"></div>
+    <div class="bb-help">Images are stored temporarily and converted to Base64 for feedback.</div>
+  </section>
+
+  <section id="preview" class="bb-preview" aria-live="polite" hidden>
+    <h2 class="bb-subtitle">Your selection</h2>
+    <div id="previewContent"></div>
+    <button id="editSelection" class="bb-link">Edit</button>
+  </section>
+
+  <footer class="bb-actions">
+    <button id="submitLog" class="bb-cta" disabled>LOG MEAL</button>
+  </footer>
+</main>
+```
+
+---
+
+## Styling (food-log.css)
+
+* **Base:** white background, generous padding, rounded cards (24px), soft shadows, large tap targets (min 44×44).
+* **Colors:**
+
+  * `--bb-orange: #FF7A00;`
+  * `--bb-black: #111111;`
+  * `--bb-gray: #EFEFEF;`
+  * `--bb-shadow: 0 8px 20px rgba(0,0,0,0.06);`
+* **Typography:** rounded, kid-friendly sans (e.g., system-ui fallback). Title in orange; labels in black.
+* **States:** focus-visible rings, hover lift on cards, disabled CTA with 50% opacity.
+* **Motion:** subtle scale-in on opening panels; bounce on success.
+
+(Agent: implement clean, accessible CSS; no external libs.)
+
+---
+
+## Behavior (food-log.js)
+
+**State:**
+
+```js
+state = {
+  user: { id, age, goal },
+  method: null, // 'emoji' | 'text' | 'photo'
+  content: null, // string or base64
+}
+```
+
+**Init:**
+
+1. Fetch current user `/api/user/:id` (use mock id `demo-user` if missing). Hydrate age/goal.
+2. Wire option buttons to show their panels (hide others) and set `state.method`.
+3. Populate **emoji grid** with \~24 common items (fruit, veg, grains, protein, drinks). Support multi-select; render chips in preview.
+
+**Handlers:**
+
+* `onEmojiSelect(list)` → `state.content = list.join(' ')` → enable CTA.
+* `onTextInput()` → debounce; set `state.content` if length >= 2.
+* `onPhotoChange(file)` → validate type/size (<1.5MB), convert to Base64, render preview image; set `state.content`.
+* `onEdit()` → return focus to the active panel.
+
+**Submit:**
+
+```js
+await POST('/api/log', {
+  user_id: state.user.id,
+  type: 'food',
+  entry_method: state.method,
+  content: state.content,
+  timestamp: new Date().toISOString()
+});
+const { feedback } = await POST('/api/ai/feedback', {
+  age: state.user.age,
+  goal: state.user.goal,
+  mealLog: state.content
+});
+// Navigate to Feedback Screen with query or localStorage payload
+location.href = `/feedback.html?from=food`;
+```
+
+**Error States:**
+
+* Show inline error banners for invalid file, empty text, or network failure.
+* Retry option; keep user input intact.
+
+**Accessibility:**
+
+* All interactive controls keyboard and screen-reader friendly.
+* Use `aria-live` for preview updates and submit success.
+* Provide visible focus styles and sufficient contrast (WCAG AA).
+
+---
+
+## Emoji Catalog (seed list)
+
+* Fruits: 🍎 🍌 🍇 🍓 🍊 🫐 🍉 🍍
+* Veg: 🥦 🥕 🥒 🍅 🥬 🧅
+* Grains: 🍞 🥨 🍚 🍝 🥞
+* Protein: 🍳 🐟 🍗 🥜 🧀 🫘
+* Dairy: 🥛 🧈 🧂 🍦 (limit)
+* Drinks: 💧 🧃 🥤
+
+Allow multi-select and duplicates; show as chips the child can remove.
+
+---
+
+## Acceptance Criteria
+
+1. User can log **via emoji**, **text**, or **photo**; only one method active per log.
+2. **Preview** card updates live and supports edit/remove.
+3. **LOG MEAL** enabled only when content exists; on click it saves, calls AI, and navigates to Feedback.
+4. Client converts photos to **Base64** and limits file size; graceful errors.
+5. Screen is mobile-first, loads fast, passes Lighthouse a11y ≥ 90.
+6. Code is organized, commented, and uses semantic HTML.
+
+---
+
+## QA Checklist
+
+* [ ] Emoji tap toggles selection; long-tap adds quickly.
+* [ ] Text input debounced; max 160 chars; emoji rejected in text input.
+* [ ] Photo preview shows; replacing image updates state and frees memory.
+* [ ] Submit disabled until valid; spinners shown during network calls.
+* [ ] Network failure keeps state and shows retry.
+* [ ] Works offline to the point of queuing the log (optional bonus: localStorage queue).
+
+---
+
+## Telemetry (optional, lightweight)
+
+* Fire `bb_log_started` and `bb_log_submitted` events with `{ method }`.
+* Track time-to-log metric to ensure sub-5-second flow.
+
+---
+
+## Notes
+
+* Keep visuals aligned to the previously provided **Food Logging** mock (Duolingo-inspired). Use the mascot asset placeholder and maintain **white background**, **orange headers**, **black text**, soft rounded cards, and playful micro-animations.
+* Build this as a **standalone page** that can be plugged into the existing router/nav, then link the CTA from Dashboard to this screen.
