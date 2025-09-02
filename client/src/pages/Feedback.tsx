@@ -26,6 +26,56 @@ export default function Feedback() {
   const [animatedXP, setAnimatedXP] = useState(0);
   const [progressPercent, setProgressPercent] = useState(0);
 
+  // Simple leveling system: 100 XP per level
+  const calculateLevel = (totalXP: number) => {
+    const level = Math.floor(totalXP / 100) + 1;
+    const currentLevelXP = totalXP % 100;
+    const nextLevelXP = 100;
+    const progressPercent = (currentLevelXP / nextLevelXP) * 100;
+    
+    return {
+      level,
+      currentLevelXP,
+      nextLevelXP,
+      progressPercent,
+      levelFrom: level,
+      levelTo: level + 1
+    };
+  };
+
+  const startXPAnimation = (targetXP: number) => {
+    if (!user) return;
+    
+    const currentUserXP = user.xp || 0;
+    const newTotalXP = currentUserXP + targetXP;
+    const levelInfo = calculateLevel(newTotalXP);
+    
+    // Animate XP counter
+    const duration = 800;
+    const startTime = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease out curve
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentXP = Math.floor(targetXP * easeOut);
+      
+      setAnimatedXP(currentXP);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Start progress bar animation after XP finishes
+        setTimeout(() => {
+          setProgressPercent(levelInfo.progressPercent);
+        }, 100);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  };
+
   // Get log data from URL params or localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -113,56 +163,6 @@ export default function Feedback() {
 
   const handleBackToDashboard = () => {
     setLocation('/dashboard');
-  };
-
-  // Simple leveling system: 100 XP per level
-  const calculateLevel = (totalXP: number) => {
-    const level = Math.floor(totalXP / 100) + 1;
-    const currentLevelXP = totalXP % 100;
-    const nextLevelXP = 100;
-    const progressPercent = (currentLevelXP / nextLevelXP) * 100;
-    
-    return {
-      level,
-      currentLevelXP,
-      nextLevelXP,
-      progressPercent,
-      levelFrom: level,
-      levelTo: level + 1
-    };
-  };
-
-  const startXPAnimation = (targetXP: number) => {
-    if (!user) return;
-    
-    const currentUserXP = user.xp || 0;
-    const newTotalXP = currentUserXP + targetXP;
-    const levelInfo = calculateLevel(newTotalXP);
-    
-    // Animate XP counter
-    const duration = 800;
-    const startTime = Date.now();
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // Ease out curve
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const currentXP = Math.floor(targetXP * easeOut);
-      
-      setAnimatedXP(currentXP);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        // Start progress bar animation after XP finishes
-        setTimeout(() => {
-          setProgressPercent(levelInfo.progressPercent);
-        }, 100);
-      }
-    };
-    
-    requestAnimationFrame(animate);
   };
 
   if (!logData) {
