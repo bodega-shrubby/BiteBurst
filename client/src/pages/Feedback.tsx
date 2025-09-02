@@ -23,6 +23,8 @@ export default function Feedback() {
   const [logData, setLogData] = useState<LogData | null>(null);
   const [isEntering, setIsEntering] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [animatedXP, setAnimatedXP] = useState(0);
+  const [progressPercent, setProgressPercent] = useState(0);
 
   // Get log data from URL params or localStorage
   useEffect(() => {
@@ -66,6 +68,11 @@ export default function Feedback() {
     // Trigger celebration animation after component mounts
     const celebrationTimer = setTimeout(() => {
       setShowCelebration(true);
+      
+      // Start XP animation after celebration begins
+      if (logData) {
+        startXPAnimation(logData.xpAwarded);
+      }
     }, 200);
     
     return () => clearTimeout(celebrationTimer);
@@ -106,6 +113,56 @@ export default function Feedback() {
 
   const handleBackToDashboard = () => {
     setLocation('/dashboard');
+  };
+
+  // Simple leveling system: 100 XP per level
+  const calculateLevel = (totalXP: number) => {
+    const level = Math.floor(totalXP / 100) + 1;
+    const currentLevelXP = totalXP % 100;
+    const nextLevelXP = 100;
+    const progressPercent = (currentLevelXP / nextLevelXP) * 100;
+    
+    return {
+      level,
+      currentLevelXP,
+      nextLevelXP,
+      progressPercent,
+      levelFrom: level,
+      levelTo: level + 1
+    };
+  };
+
+  const startXPAnimation = (targetXP: number) => {
+    if (!user) return;
+    
+    const currentUserXP = user.xp || 0;
+    const newTotalXP = currentUserXP + targetXP;
+    const levelInfo = calculateLevel(newTotalXP);
+    
+    // Animate XP counter
+    const duration = 800;
+    const startTime = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease out curve
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentXP = Math.floor(targetXP * easeOut);
+      
+      setAnimatedXP(currentXP);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Start progress bar animation after XP finishes
+        setTimeout(() => {
+          setProgressPercent(levelInfo.progressPercent);
+        }, 100);
+      }
+    };
+    
+    requestAnimationFrame(animate);
   };
 
   if (!logData) {
@@ -221,23 +278,41 @@ export default function Feedback() {
           </h2>
         </section>
 
+        {/* XP Award Section */}
+        <section className="bb-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-3xl p-6" aria-live="polite">
+          <div className="text-center mb-4">
+            <div className={`bb-xp-value text-5xl font-bold text-[#FF6A00] mb-2 ${
+              showCelebration ? 'bb-xp-animate' : ''
+            }`}>
+              +{animatedXP} XP
+            </div>
+            <div className="text-gray-600 text-sm">Experience points earned</div>
+          </div>
+          
+          {user && (
+            <>
+              <div className="bb-progress bg-gray-200 h-3 rounded-full mb-3 overflow-hidden">
+                <div 
+                  className="bb-progress-bar h-full bg-gradient-to-r from-[#FF6A00] to-[#FF8A20] rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
+              </div>
+              
+              <div className="bb-level-meta flex justify-between text-sm text-gray-600">
+                <span>Lv {calculateLevel(user.xp || 0).level}</span>
+                <span>Lv {calculateLevel((user.xp || 0) + (logData?.xpAwarded || 0)).level}</span>
+              </div>
+            </>
+          )}
+        </section>
+
         {/* What You Logged */}
-        <Card className="border-2 border-[#FF6A00]">
+        <Card className="border-2 border-[#FF6A00] rounded-3xl">
           <CardContent className="p-6">
             <h3 className="text-center font-medium text-gray-600 mb-4">
               What you logged:
             </h3>
             {renderContent()}
-          </CardContent>
-        </Card>
-
-        {/* XP Awarded */}
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]">
-          <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-[#FF6A00] mb-2">
-              +{logData.xpAwarded} XP
-            </div>
-            <p className="text-gray-600">Experience points earned!</p>
           </CardContent>
         </Card>
 
