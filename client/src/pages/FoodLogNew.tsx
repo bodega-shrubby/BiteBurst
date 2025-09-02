@@ -161,25 +161,14 @@ export default function FoodLog() {
     onSuccess: (data) => {
       triggerHaptic();
       
-      // Add success animation class to mascot
-      const mascot = document.querySelector('.bb-mascot');
-      if (mascot) {
-        mascot.classList.add('bb-success-animation');
-        setTimeout(() => {
-          mascot.classList.remove('bb-success-animation');
-        }, 600);
-      }
-      
-      // Store log data for feedback page and navigate
+      // Store log data for feedback page
       if (data && typeof data === 'object' && 'id' in data) {
         localStorage.setItem('lastLogData', JSON.stringify(data));
       }
       
-      // Navigate to feedback page with log data
-      setTimeout(() => {
-        const feedbackUrl = `/feedback?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || 0}`;
-        setLocation(feedbackUrl);
-      }, 300);
+      // Navigate immediately to success page for confetti animation
+      const successUrl = `/success?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || 0}`;
+      setLocation(successUrl);
     },
     onError: (error: any) => {
       toast({
