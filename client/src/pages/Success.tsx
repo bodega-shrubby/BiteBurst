@@ -22,36 +22,42 @@ export default function Success() {
   }, [setLocation]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center p-8">
       <div className="text-center">
-        <div className="relative inline-block">
+        <div className="relative inline-block mb-8">
           <img 
             src={mascotImage} 
             alt="BiteBurst Mascot" 
             className="bb-mascot bb-success-animation mx-auto"
-            style={{ width: '120px', height: '120px' }}
+            style={{ width: '200px', height: '200px' }}
           />
-          {/* Additional confetti particles */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl animate-bounce">
-            🎉
-          </div>
-          <div className="absolute top-0 left-0 transform -translate-x-2 -translate-y-2 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>
+          {/* Star confetti particles */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 text-3xl animate-bounce">
             ✨
           </div>
-          <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 text-xl animate-pulse" style={{ animationDelay: '1s' }}>
-            🎊
+          <div className="absolute top-4 left-0 transform -translate-x-4 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>
+            ✨
           </div>
-          <div className="absolute bottom-0 left-1/4 transform -translate-y-2 text-lg animate-bounce" style={{ animationDelay: '0.3s' }}>
-            🌟
+          <div className="absolute top-4 right-0 transform translate-x-4 text-2xl animate-pulse" style={{ animationDelay: '1s' }}>
+            ✨
           </div>
-          <div className="absolute bottom-0 right-1/4 transform -translate-y-2 text-lg animate-bounce" style={{ animationDelay: '0.8s' }}>
-            💫
+          <div className="absolute bottom-4 left-1/4 transform -translate-x-2 text-xl animate-bounce" style={{ animationDelay: '0.3s' }}>
+            ✨
+          </div>
+          <div className="absolute bottom-4 right-1/4 transform translate-x-2 text-xl animate-bounce" style={{ animationDelay: '0.8s' }}>
+            ✨
+          </div>
+          <div className="absolute top-1/2 left-0 transform -translate-x-6 -translate-y-1/2 text-lg animate-pulse" style={{ animationDelay: '1.2s' }}>
+            ✨
+          </div>
+          <div className="absolute top-1/2 right-0 transform translate-x-6 -translate-y-1/2 text-lg animate-pulse" style={{ animationDelay: '0.7s' }}>
+            ✨
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-[#FF7A00] mt-6">
+        <h1 className="text-3xl font-bold text-[#FF7A00] mb-4">
           Great job!
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 text-lg">
           Your meal has been logged
         </p>
       </div>
