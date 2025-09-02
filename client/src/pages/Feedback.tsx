@@ -194,11 +194,11 @@ export default function Feedback() {
             <img 
               src={mascotImage} 
               alt="BiteBurst mascot celebrating" 
-              className={`bb-mascot w-32 h-32 mx-auto rounded-full border-4 border-[#FF6A00] ${
+              className={`bb-mascot w-32 h-32 mx-auto ${
                 showCelebration ? 'bb-mascot-bounce' : ''
               }`}
             />
-            {/* CSS Confetti Particles */}
+            {/* Star Confetti Particles */}
             <div 
               className={`bb-confetti absolute inset-0 pointer-events-none ${
                 showCelebration ? 'bb-confetti-active' : ''
@@ -206,11 +206,11 @@ export default function Feedback() {
               aria-hidden="true"
             >
               <div className="bb-confetti-particle bb-confetti-1">✨</div>
-              <div className="bb-confetti-particle bb-confetti-2">🎉</div>
+              <div className="bb-confetti-particle bb-confetti-2">✨</div>
               <div className="bb-confetti-particle bb-confetti-3">✨</div>
-              <div className="bb-confetti-particle bb-confetti-4">🎊</div>
+              <div className="bb-confetti-particle bb-confetti-4">✨</div>
               <div className="bb-confetti-particle bb-confetti-5">✨</div>
-              <div className="bb-confetti-particle bb-confetti-6">🌟</div>
+              <div className="bb-confetti-particle bb-confetti-6">✨</div>
             </div>
           </div>
           
