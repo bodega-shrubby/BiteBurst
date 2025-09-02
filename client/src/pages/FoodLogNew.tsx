@@ -271,18 +271,9 @@ export default function FoodLog() {
   };
 
   const handleSubmit = () => {
-    console.log('Submit button clicked', { 
-      hasValidContent: hasValidContent(), 
-      isPending: submitMutation.isPending,
-      state 
-    });
-    
     if (hasValidContent()) {
       triggerHaptic();
-      console.log('Starting mutation...');
       submitMutation.mutate();
-    } else {
-      console.log('Submit blocked - no valid content');
     }
   };
 

@@ -24,12 +24,30 @@ export default function Success() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center">
-        <img 
-          src={mascotImage} 
-          alt="BiteBurst Mascot" 
-          className="bb-mascot bb-success-animation mx-auto"
-          style={{ width: '120px', height: '120px' }}
-        />
+        <div className="relative inline-block">
+          <img 
+            src={mascotImage} 
+            alt="BiteBurst Mascot" 
+            className="bb-mascot bb-success-animation mx-auto"
+            style={{ width: '120px', height: '120px' }}
+          />
+          {/* Additional confetti particles */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl animate-bounce">
+            🎉
+          </div>
+          <div className="absolute top-0 left-0 transform -translate-x-2 -translate-y-2 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>
+            ✨
+          </div>
+          <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 text-xl animate-pulse" style={{ animationDelay: '1s' }}>
+            🎊
+          </div>
+          <div className="absolute bottom-0 left-1/4 transform -translate-y-2 text-lg animate-bounce" style={{ animationDelay: '0.3s' }}>
+            🌟
+          </div>
+          <div className="absolute bottom-0 right-1/4 transform -translate-y-2 text-lg animate-bounce" style={{ animationDelay: '0.8s' }}>
+            💫
+          </div>
+        </div>
         <h1 className="text-2xl font-bold text-[#FF7A00] mt-6">
           Great job!
         </h1>
