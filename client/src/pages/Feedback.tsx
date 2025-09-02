@@ -20,7 +20,7 @@ export default function Feedback() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [logData, setLogData] = useState<LogData | null>(null);
-  const [isEntering, setIsEntering] = useState(true);
+  const [isEntering, setIsEntering] = useState(false);
 
   // Get log data from URL params or localStorage
   useEffect(() => {
@@ -59,12 +59,10 @@ export default function Feedback() {
       });
     }
     
-    // Fade in after component mounts
-    const fadeTimer = setTimeout(() => {
-      setIsEntering(false);
-    }, 100);
+    console.log('Feedback page mounted with logData:', logData);
     
-    return () => clearTimeout(fadeTimer);
+    // Component is visible immediately - no fade needed
+    // The fade-in effect was causing the disappearing issue
   }, []);
 
   // Fetch AI feedback if not already present
@@ -159,9 +157,7 @@ export default function Feedback() {
   };
 
   return (
-    <div className={`min-h-screen bg-white transition-opacity duration-500 ${
-      isEntering ? 'opacity-0' : 'opacity-100'
-    }`}>
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="sticky top-0 bg-[#FF6A00] text-white p-4 flex items-center justify-between z-10">
         <Button
