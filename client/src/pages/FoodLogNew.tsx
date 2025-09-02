@@ -112,20 +112,16 @@ export default function FoodLog() {
 
   // Check if current state has valid content
   const hasValidContent = () => {
-    const result = (() => {
-      switch (state.method) {
-        case 'emoji':
-          return state.selectedEmojis.length > 0;
-        case 'text':
-          return state.textInput.trim().length >= 2;
-        case 'photo':
-          return state.photoFile !== null;
-        default:
-          return false;
-      }
-    })();
-    console.log('hasValidContent check:', { method: state.method, result, state });
-    return result;
+    switch (state.method) {
+      case 'emoji':
+        return state.selectedEmojis.length > 0;
+      case 'text':
+        return state.textInput.trim().length >= 2;
+      case 'photo':
+        return state.photoFile !== null;
+      default:
+        return false;
+    }
   };
 
   // Submit mutation
@@ -161,7 +157,6 @@ export default function FoodLog() {
       });
     },
     onSuccess: (data) => {
-      console.log('Mutation success:', data);
       triggerHaptic();
       
       // Add success animation class to mascot
@@ -181,12 +176,10 @@ export default function FoodLog() {
       // Navigate to feedback page with log data
       setTimeout(() => {
         const feedbackUrl = `/feedback?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || 0}`;
-        console.log('Navigating to:', feedbackUrl);
         setLocation(feedbackUrl);
       }, 300);
     },
     onError: (error: any) => {
-      console.error('Mutation error:', error);
       toast({
         title: "Oops!",
         description: error.message || "Something went wrong. Try again!",
@@ -287,13 +280,9 @@ export default function FoodLog() {
   };
 
   const handleSubmit = () => {
-    console.log('Submit button clicked', { hasValidContent: hasValidContent(), state });
     if (hasValidContent()) {
       triggerHaptic();
-      console.log('Starting mutation with state:', state);
       submitMutation.mutate();
-    } else {
-      console.log('Submit blocked - no valid content');
     }
   };
 
