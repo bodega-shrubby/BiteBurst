@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
+import '../styles/tokens.css';
 
 interface LogData {
   id: string;
@@ -21,6 +22,7 @@ export default function Feedback() {
   const { user } = useAuth();
   const [logData, setLogData] = useState<LogData | null>(null);
   const [isEntering, setIsEntering] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Get log data from URL params or localStorage
   useEffect(() => {
@@ -61,8 +63,12 @@ export default function Feedback() {
     
     console.log('Feedback page mounted with logData:', logData);
     
-    // Component is visible immediately - no fade needed
-    // The fade-in effect was causing the disappearing issue
+    // Trigger celebration animation after component mounts
+    const celebrationTimer = setTimeout(() => {
+      setShowCelebration(true);
+    }, 200);
+    
+    return () => clearTimeout(celebrationTimer);
   }, []);
 
   // Fetch AI feedback if not already present
@@ -181,24 +187,39 @@ export default function Feedback() {
         <div className="w-8" /> {/* Spacer for centering */}
       </header>
 
-      <div className="p-4 space-y-6">
-        {/* Mascot Reaction */}
-        <div className="text-center space-y-4">
-          <div className="relative inline-block">
+      <div className="p-4 space-y-6 max-w-[420px] mx-auto">
+        {/* Hero Celebration Section */}
+        <section className="bb-hero text-center space-y-6">
+          <div className="bb-mascot-wrap relative inline-block">
             <img 
               src={mascotImage} 
-              alt="Happy BiteBurst mascot" 
-              className="w-24 h-24 mx-auto rounded-full border-4 border-[#FF6A00] animate-pulse"
+              alt="BiteBurst mascot celebrating" 
+              className={`bb-mascot w-32 h-32 mx-auto rounded-full border-4 border-[#FF6A00] ${
+                showCelebration ? 'bb-mascot-bounce' : ''
+              }`}
             />
-            <div className="absolute -top-2 -right-2 text-2xl animate-bounce">
-              ✨
+            {/* CSS Confetti Particles */}
+            <div 
+              className={`bb-confetti absolute inset-0 pointer-events-none ${
+                showCelebration ? 'bb-confetti-active' : ''
+              }`} 
+              aria-hidden="true"
+            >
+              <div className="bb-confetti-particle bb-confetti-1">✨</div>
+              <div className="bb-confetti-particle bb-confetti-2">🎉</div>
+              <div className="bb-confetti-particle bb-confetti-3">✨</div>
+              <div className="bb-confetti-particle bb-confetti-4">🎊</div>
+              <div className="bb-confetti-particle bb-confetti-5">✨</div>
+              <div className="bb-confetti-particle bb-confetti-6">🌟</div>
             </div>
           </div>
           
-          <h2 className="text-xl font-bold text-gray-800">
+          <h2 className={`bb-h1 text-3xl font-bold text-gray-800 ${
+            showCelebration ? 'bb-slide-in' : 'opacity-0'
+          }`}>
             Awesome meal choice!
           </h2>
-        </div>
+        </section>
 
         {/* What You Logged */}
         <Card className="border-2 border-[#FF6A00]">

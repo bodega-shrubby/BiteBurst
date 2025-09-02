@@ -1,0 +1,202 @@
+# Replit Agent Prompt — Build the **Feedback** Screen (BiteBurst MVP)
+
+**Goal:** Create a delightful, mobile‑first Feedback screen that appears after a meal log. It should celebrate the action (mascot animation + confetti), display XP earned with a progress bar toward next level, show what the child logged, render a short AI feedback bubble, and surface streak/badge wins. Provide two CTAs: **Log Another Meal** and **Back to Dashboard**.
+
+Keep the visual language consistent with the Food Log polish: white background, orange headers, black text, soft rounded cards, 420px max content width.
+
+---
+
+## Tech & Files
+
+* **Routes:** `/feedback` (standalone page)
+* **Files:**
+
+  * `public/feedback.html`
+  * `public/css/feedback.css`
+  * `public/js/feedback.js`
+  * Reuse `public/css/tokens.css` brand variables
+* **Data sources:**
+
+  * Prefer `history.state` or `localStorage['lastLog']` to populate the page. Fallback: `GET /api/user/:id` and fetch the latest log.
+  * AI feedback may come from `/api/ai/feedback` or stub (flag controlled). The page must gracefully render even if AI is disabled.
+
+---
+
+## Page Structure (`feedback.html`)
+
+```html
+<main id="bb-feedback" class="bb-container">
+  <!-- Sticky orange app bar -->
+  <header class="bb-appbar">
+    <button class="bb-back" aria-label="Back">←</button>
+    <h1>Great job!</h1>
+    <img src="/assets/mascot-orange.svg" alt="" class="bb-mascot-head" />
+  </header>
+
+  <!-- Hero celebration -->
+  <section class="bb-hero">
+    <div class="bb-mascot-wrap">
+      <img src="/assets/mascot-orange.svg" alt="BiteBurst mascot celebrating" class="bb-mascot"/>
+      <div class="bb-confetti" aria-hidden="true"></div>
+    </div>
+    <h2 class="bb-h1">Awesome meal choice!</h2>
+  </section>
+
+  <!-- XP Award card -->
+  <section class="bb-card xp" aria-live="polite">
+    <div class="bb-xp-row">
+      <div class="bb-xp-value" id="xpValue">+0 XP</div>
+      <div class="bb-xp-sub">Experience points earned</div>
+    </div>
+    <div class="bb-progress">
+      <div class="bb-progress-bar" id="xpBar" style="width:0%"></div>
+    </div>
+    <div class="bb-level-meta">
+      <span id="levelFrom">Lv 1</span>
+      <span id="levelTo">Lv 2</span>
+    </div>
+  </section>
+
+  <!-- What you logged -->
+  <section class="bb-card logged">
+    <h3 class="bb-sub">What you logged</h3>
+    <div id="loggedPreview" class="bb-preview"></div>
+  </section>
+
+  <!-- AI feedback bubble -->
+  <section class="bb-card coach" aria-live="polite">
+    <div class="bb-coach-head">
+      <span id="goalIcon" class="bb-goal">⚡</span>
+      <span class="bb-coach-title">Your nutrition coach says</span>
+    </div>
+    <div class="bb-bubble" id="coachText">Loading tip…</div>
+  </section>
+
+  <!-- Streak & badge surfaces (conditional) -->
+  <section id="bb-rewards" class="bb-rewards" hidden>
+    <div id="streakCard" class="bb-pill" hidden>🔥 <span id="streakDays">0</span>-day streak!</div>
+    <div id="badgeCard" class="bb-pill" hidden>🏅 <span id="badgeName">New badge</span> unlocked!</div>
+  </section>
+
+  <!-- CTAs -->
+  <footer class="bb-actions">
+    <button id="ctaAgain" class="bb-cta">↻ Log another meal</button>
+    <button id="ctaHome" class="bb-ghost">🏠 Back to dashboard</button>
+  </footer>
+</main>
+```
+
+---
+
+## Styling (`feedback.css`)
+
+Use tokens from `tokens.css`.
+
+* **Layout:** center content, `max-width: 420px`, `padding: 16px`, safe-area insets. Sticky appbar (56px), white text on orange, subtle shadow.
+* **Hero:** mascot container with gentle **bounce** keyframes; `.bb-confetti` uses CSS-only particles emitted for 1.2s on load.
+* **Cards:** `background:#fff`, `border-radius:24px`, `box-shadow: var(--bb-card-shadow)`, internal padding 16–20px.
+* **XP value:** large, bold, orange `font-size: clamp(28px, 6vw, 36px)`; add count‑up animation. Progress bar has rounded track and animated fill (600ms ease).
+* **Bubble:** rounded speech bubble with small tail pointing to a mini mascot or goal icon; typewriter effect for first render (optional).
+* **Pills:** small rounded badges for streak and badge unlocks with orange outline.
+* **Buttons:** primary pill (height 56px) and secondary outline. Press/bounce states and focus-visible rings.
+
+Provide keyframes:
+
+* `@keyframes bb-bounceIn`, `bb-confetti-pop`, `bb-press`, `bb-type` (width/opacity steps for the bubble).
+
+---
+
+## Behavior (`feedback.js`)
+
+### Config & flags
+
+```js
+const AI_FEEDBACK_ENABLED = (window.__env?.AI_FEEDBACK_ENABLED ?? false);
+```
+
+### Expected state payload (from Food Log)
+
+```js
+// either via history.state or localStorage
+{
+  user: { id, age, goal, XP, level },
+  log: { id, type:'food', entry_method:'emoji|text|photo', content, timestamp },
+  award: { xp: number, newXP: number, levelFrom: number, levelTo: number, streak?: number, badge?: string },
+  feedback?: string // optional precomputed text
+}
+```
+
+### Init flow
+
+1. **Load state** from `history.state` or `localStorage['lastLog']`. Validate shape.
+2. **Render mascot celebration** (add class to trigger confetti and bounce).
+3. **Animate XP:** count up `+0 → +xp` and animate progress bar from levelFrom→levelTo with percentage computed from `newXP` and threshold.
+4. **Render logged preview:**
+
+   * If emoji: display big emojis as chips
+   * If text: text pill(s)
+   * If photo: thumbnail (already compressed client-side)
+5. **Coach feedback:**
+
+   * If `payload.feedback` exists → display with typewriter.
+   * Else if `AI_FEEDBACK_ENABLED` → `POST /api/ai/feedback` with `{ age, goal, mealLog: log.content }` then display response (guard against slow/failure).
+   * Else → show stub (e.g., “Great pick for your ⚡ energy today!”).
+6. **Rewards:** if `award.streak≥2` show streak pill; if `award.badge` show badge pill (name).
+7. **CTAs:**
+
+   * **Log another meal:** `location.href='/food-log'`
+   * **Back to dashboard:** `location.href='/'` (or `/dashboard` if exists)
+
+### Helpers
+
+* `countUp(el, to, ms)` linear count animation.
+* `typeWriter(el, text, speed)` show text in 1–2s.
+* `calcProgress(newXP)` returns `{ pct, levelFrom, levelTo }` based on a simple leveling curve (e.g., 0–100 XP per level for MVP; keep constants in JS for now).
+
+### Error handling
+
+* If missing state, fetch `GET /api/user/:id` and the latest log; fallback to neutral rendering.
+* Always keep the page interactive even if AI or network fails; show friendly retry link for the coach bubble.
+
+### Accessibility
+
+* `aria-live="polite"` on XP card and coach bubble.
+* Labels and roles for interactive elements; keyboard focus order logical; 44×44 min tap targets.
+* Sufficient color contrast (WCAG AA). Reduce motion preference honored (`prefers-reduced-motion: reduce`).
+
+---
+
+## Sample local payload for development
+
+Place in `localStorage['lastLog']` during dev to test:
+
+```json
+{
+  "user": { "id": "demo-user", "age": 11, "goal": "Focus", "XP": 240, "level": 2 },
+  "log": { "id":"abc123", "type":"food", "entry_method":"emoji", "content":"🍎 🥛", "timestamp":"2025-09-02T09:21:00Z" },
+  "award": { "xp": 20, "newXP": 260, "levelFrom": 2, "levelTo": 3, "streak": 3, "badge": "Fruit Fighter" },
+  "feedback": "Apples give your brain quick energy for class!"
+}
+```
+
+---
+
+## Acceptance Criteria
+
+1. **Celebration:** mascot bounce + confetti on load; headline “Awesome meal choice!”.
+2. **XP:** animated `+XP` count and progress bar with from→to labels; respects a simple leveling curve.
+3. **Logged preview:** accurately reflects the entry method (emoji/text/photo) in a pretty card.
+4. **Coach bubble:** renders AI or stub feedback within 2s; typewriter effect; includes goal icon (⚡/🧠/💪) based on user goal.
+5. **Rewards:** streak/badge pills appear conditionally and are announced to screen readers.
+6. **CTAs:** prominent orange “Log another meal”, outline “Back to dashboard”, both responsive.
+7. **A11y & perf:** mobile‑first, Lighthouse a11y ≥ 90; honors `prefers-reduced-motion`.
+
+---
+
+## Out of Scope (for now)
+
+* Server-side badge logic beyond the provided `award` payload
+* Social sharing
+* Sound effects (can be added later)
+
+> Keep components generic and reusable (`public/components/`), and match the style tokens established in the Food Log polish sprint.
