@@ -21,18 +21,41 @@ export default function Feedback() {
   const { user } = useAuth();
   const [logData, setLogData] = useState<LogData | null>(null);
 
-  // Try to get log data from localStorage first, then fallback to API
+  // Get log data from URL params or localStorage
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const logId = params.get('logId');
+    const xp = parseInt(params.get('xp') || '0');
+    
+    // Try localStorage first
     const storedData = localStorage.getItem('lastLogData');
     if (storedData) {
       try {
         const data = JSON.parse(storedData);
         setLogData(data);
-        // Clear stored data after use
         localStorage.removeItem('lastLogData');
+        return;
       } catch (error) {
         console.error('Error parsing stored log data:', error);
       }
+    }
+    
+    // Fallback to URL params if available
+    if (logId && logId !== 'temp') {
+      setLogData({
+        id: logId,
+        xpAwarded: xp,
+        content: { emojis: ['🍎'] }, // placeholder
+        entryMethod: 'emoji'
+      });
+    } else {
+      // Default fallback
+      setLogData({
+        id: 'temp',
+        xpAwarded: xp || 10,
+        content: { emojis: ['🍎'] },
+        entryMethod: 'emoji'
+      });
     }
   }, []);
 

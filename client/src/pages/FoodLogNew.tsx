@@ -112,16 +112,20 @@ export default function FoodLog() {
 
   // Check if current state has valid content
   const hasValidContent = () => {
-    switch (state.method) {
-      case 'emoji':
-        return state.selectedEmojis.length > 0;
-      case 'text':
-        return state.textInput.trim().length >= 2;
-      case 'photo':
-        return state.photoFile !== null;
-      default:
-        return false;
-    }
+    const result = (() => {
+      switch (state.method) {
+        case 'emoji':
+          return state.selectedEmojis.length > 0;
+        case 'text':
+          return state.textInput.trim().length >= 2;
+        case 'photo':
+          return state.photoFile !== null;
+        default:
+          return false;
+      }
+    })();
+    console.log('hasValidContent check:', { method: state.method, result, state });
+    return result;
   };
 
   // Submit mutation
@@ -157,6 +161,7 @@ export default function FoodLog() {
       });
     },
     onSuccess: (data) => {
+      console.log('Mutation success:', data);
       triggerHaptic();
       
       // Add success animation class to mascot
@@ -168,16 +173,20 @@ export default function FoodLog() {
         }, 600);
       }
       
+      // Store log data for feedback page and navigate
+      if (data && typeof data === 'object' && 'id' in data) {
+        localStorage.setItem('lastLogData', JSON.stringify(data));
+      }
+      
       // Navigate to feedback page with log data
       setTimeout(() => {
-        if (data && typeof data === 'object' && 'id' in data) {
-          setLocation(`/feedback?logId=${data.id}&xp=${(data as any).xpAwarded || 0}`);
-        } else {
-          setLocation('/feedback');
-        }
+        const feedbackUrl = `/feedback?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || 0}`;
+        console.log('Navigating to:', feedbackUrl);
+        setLocation(feedbackUrl);
       }, 300);
     },
     onError: (error: any) => {
+      console.error('Mutation error:', error);
       toast({
         title: "Oops!",
         description: error.message || "Something went wrong. Try again!",
@@ -278,9 +287,13 @@ export default function FoodLog() {
   };
 
   const handleSubmit = () => {
+    console.log('Submit button clicked', { hasValidContent: hasValidContent(), state });
     if (hasValidContent()) {
       triggerHaptic();
+      console.log('Starting mutation with state:', state);
       submitMutation.mutate();
+    } else {
+      console.log('Submit blocked - no valid content');
     }
   };
 
