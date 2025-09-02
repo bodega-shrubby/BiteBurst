@@ -23,71 +23,6 @@ export default function Feedback() {
   const [logData, setLogData] = useState<LogData | null>(null);
   const [isEntering, setIsEntering] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [animatedXP, setAnimatedXP] = useState(0);
-  const [progressPercent, setProgressPercent] = useState(0);
-
-  // Simple leveling system: 100 XP per level
-  const calculateLevel = (totalXP: number) => {
-    const level = Math.floor(totalXP / 100) + 1;
-    const currentLevelXP = totalXP % 100;
-    const nextLevelXP = 100;
-    const progressPercent = (currentLevelXP / nextLevelXP) * 100;
-    
-    return {
-      level,
-      currentLevelXP,
-      nextLevelXP,
-      progressPercent,
-      levelFrom: level,
-      levelTo: level + 1
-    };
-  };
-
-  const startXPAnimation = (targetXP: number) => {
-    console.log('startXPAnimation called with targetXP:', targetXP, 'user:', user);
-    
-    // Reset animated XP to 0 first
-    setAnimatedXP(0);
-    
-    if (!user) {
-      console.log('No user found, using fallback animation');
-      // Simple fallback - just set the target XP directly after a delay
-      setTimeout(() => {
-        setAnimatedXP(targetXP);
-        setProgressPercent(50);
-      }, 300);
-      return;
-    }
-    
-    const currentUserXP = user.xp || 0;
-    const newTotalXP = currentUserXP + targetXP;
-    const levelInfo = calculateLevel(newTotalXP);
-    
-    console.log('Level info:', levelInfo);
-    
-    // Use a simpler animation approach with useState and setTimeout
-    let currentValue = 0;
-    const increment = Math.ceil(targetXP / 20); // 20 steps
-    const stepDuration = 800 / 20; // Total 800ms divided by steps
-    
-    const animateStep = () => {
-      currentValue = Math.min(currentValue + increment, targetXP);
-      console.log('Step animation - currentValue:', currentValue);
-      setAnimatedXP(currentValue);
-      
-      if (currentValue < targetXP) {
-        setTimeout(animateStep, stepDuration);
-      } else {
-        // Start progress bar animation after XP finishes
-        setTimeout(() => {
-          setProgressPercent(levelInfo.progressPercent);
-        }, 100);
-      }
-    };
-    
-    // Start the step animation after a small delay
-    setTimeout(animateStep, 100);
-  };
 
   // Get log data from URL params or localStorage
   useEffect(() => {
@@ -133,20 +68,7 @@ export default function Feedback() {
       setShowCelebration(true);
     }, 200);
     
-    // Start XP animation separately after a longer delay to ensure component is fully rendered
-    const xpTimer = setTimeout(() => {
-      if (logData) {
-        console.log('Starting XP animation with:', logData.xpAwarded);
-        startXPAnimation(logData.xpAwarded);
-      } else {
-        console.log('No logData available for XP animation');
-      }
-    }, 1000);
-    
-    return () => {
-      clearTimeout(celebrationTimer);
-      clearTimeout(xpTimer);
-    };
+    return () => clearTimeout(celebrationTimer);
   }, []);
 
   // Fetch AI feedback if not already present
@@ -299,41 +221,23 @@ export default function Feedback() {
           </h2>
         </section>
 
-        {/* XP Award Section */}
-        <section className="bb-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-3xl p-6" aria-live="polite">
-          <div className="text-center mb-4">
-            <div className={`bb-xp-value text-5xl font-bold text-[#FF6A00] mb-2 ${
-              showCelebration ? 'bb-xp-animate' : ''
-            }`}>
-              +{animatedXP} XP
-            </div>
-            <div className="text-gray-600 text-sm">Experience points earned</div>
-          </div>
-          
-          {user && (
-            <>
-              <div className="bb-progress bg-gray-200 h-3 rounded-full mb-3 overflow-hidden">
-                <div 
-                  className="bb-progress-bar h-full bg-gradient-to-r from-[#FF6A00] to-[#FF8A20] rounded-full transition-all duration-700 ease-out"
-                  style={{ width: `${progressPercent}%` }}
-                ></div>
-              </div>
-              
-              <div className="bb-level-meta flex justify-between text-sm text-gray-600">
-                <span>Lv {calculateLevel(user.xp || 0).level}</span>
-                <span>Lv {calculateLevel((user.xp || 0) + (logData?.xpAwarded || 0)).level}</span>
-              </div>
-            </>
-          )}
-        </section>
-
         {/* What You Logged */}
-        <Card className="border-2 border-[#FF6A00] rounded-3xl">
+        <Card className="border-2 border-[#FF6A00]">
           <CardContent className="p-6">
             <h3 className="text-center font-medium text-gray-600 mb-4">
               What you logged:
             </h3>
             {renderContent()}
+          </CardContent>
+        </Card>
+
+        {/* XP Awarded */}
+        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]">
+          <CardContent className="p-6 text-center">
+            <div className="text-3xl font-bold text-[#FF6A00] mb-2">
+              +{logData.xpAwarded} XP
+            </div>
+            <p className="text-gray-600">Experience points earned!</p>
           </CardContent>
         </Card>
 

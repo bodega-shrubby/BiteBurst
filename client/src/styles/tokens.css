@@ -579,42 +579,11 @@ html {
   }
 }
 
-/* XP Animation Styles */
-.bb-xp-value {
-  font-size: clamp(2.5rem, 8vw, 3.5rem);
-  line-height: 1.1;
-}
-
-.bb-xp-animate {
-  animation: bb-xp-pulse 0.8s ease-out both;
-}
-
-.bb-progress-bar {
-  transform-origin: left;
-  will-change: width;
-}
-
-/* Additional XP Keyframes */
-@keyframes bb-xp-pulse {
-  0% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .bb-mascot-bounce,
   .bb-slide-in,
-  .bb-confetti-active .bb-confetti-particle,
-  .bb-xp-animate {
+  .bb-confetti-active .bb-confetti-particle {
     animation: none;
   }
   
@@ -628,17 +597,8 @@ html {
     transform: translateY(0);
   }
   
-  .bb-xp-animate {
-    opacity: 1;
-    transform: scale(1);
-  }
-  
   .bb-confetti-active .bb-confetti-particle {
     display: none;
-  }
-  
-  .bb-progress-bar {
-    transition: none;
   }
 }
 
