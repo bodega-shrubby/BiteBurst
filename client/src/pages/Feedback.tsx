@@ -44,11 +44,41 @@ export default function Feedback() {
   };
 
   const startXPAnimation = (targetXP: number) => {
-    if (!user) return;
+    console.log('startXPAnimation called with targetXP:', targetXP, 'user:', user);
+    
+    if (!user) {
+      console.log('No user found, using fallback animation');
+      // Fallback animation without user data
+      const duration = 800;
+      const startTime = Date.now();
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentXP = Math.floor(targetXP * easeOut);
+        
+        setAnimatedXP(currentXP);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // Set a default progress percentage
+          setTimeout(() => {
+            setProgressPercent(50);
+          }, 100);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+      return;
+    }
     
     const currentUserXP = user.xp || 0;
     const newTotalXP = currentUserXP + targetXP;
     const levelInfo = calculateLevel(newTotalXP);
+    
+    console.log('Level info:', levelInfo);
     
     // Animate XP counter
     const duration = 800;
@@ -121,7 +151,10 @@ export default function Feedback() {
       
       // Start XP animation after celebration begins
       if (logData) {
+        console.log('Starting XP animation with:', logData.xpAwarded);
         startXPAnimation(logData.xpAwarded);
+      } else {
+        console.log('No logData available for XP animation');
       }
     }, 200);
     
