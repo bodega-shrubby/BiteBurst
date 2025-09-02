@@ -58,6 +58,7 @@ export default function Feedback() {
         const easeOut = 1 - Math.pow(1 - progress, 3);
         const currentXP = Math.floor(targetXP * easeOut);
         
+        console.log('Animation progress:', progress, 'currentXP:', currentXP);
         setAnimatedXP(currentXP);
         
         if (progress < 1) {
@@ -91,6 +92,7 @@ export default function Feedback() {
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const currentXP = Math.floor(targetXP * easeOut);
       
+      console.log('Full animation progress:', progress, 'currentXP:', currentXP);
       setAnimatedXP(currentXP);
       
       if (progress < 1) {
@@ -148,17 +150,22 @@ export default function Feedback() {
     // Trigger celebration animation after component mounts
     const celebrationTimer = setTimeout(() => {
       setShowCelebration(true);
-      
-      // Start XP animation after celebration begins
+    }, 200);
+    
+    // Start XP animation separately after a longer delay to ensure component is fully rendered
+    const xpTimer = setTimeout(() => {
       if (logData) {
         console.log('Starting XP animation with:', logData.xpAwarded);
         startXPAnimation(logData.xpAwarded);
       } else {
         console.log('No logData available for XP animation');
       }
-    }, 200);
+    }, 800);
     
-    return () => clearTimeout(celebrationTimer);
+    return () => {
+      clearTimeout(celebrationTimer);
+      clearTimeout(xpTimer);
+    };
   }, []);
 
   // Fetch AI feedback if not already present
