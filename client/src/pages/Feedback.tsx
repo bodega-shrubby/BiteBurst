@@ -46,32 +46,16 @@ export default function Feedback() {
   const startXPAnimation = (targetXP: number) => {
     console.log('startXPAnimation called with targetXP:', targetXP, 'user:', user);
     
+    // Reset animated XP to 0 first
+    setAnimatedXP(0);
+    
     if (!user) {
       console.log('No user found, using fallback animation');
-      // Fallback animation without user data
-      const duration = 800;
-      const startTime = Date.now();
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentXP = Math.floor(targetXP * easeOut);
-        
-        console.log('Animation progress:', progress, 'currentXP:', currentXP);
-        setAnimatedXP(currentXP);
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // Set a default progress percentage
-          setTimeout(() => {
-            setProgressPercent(50);
-          }, 100);
-        }
-      };
-      
-      requestAnimationFrame(animate);
+      // Simple fallback - just set the target XP directly after a delay
+      setTimeout(() => {
+        setAnimatedXP(targetXP);
+        setProgressPercent(50);
+      }, 300);
       return;
     }
     
@@ -81,22 +65,18 @@ export default function Feedback() {
     
     console.log('Level info:', levelInfo);
     
-    // Animate XP counter
-    const duration = 800;
-    const startTime = Date.now();
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+    // Use a simpler animation approach with useState and setTimeout
+    let currentValue = 0;
+    const increment = Math.ceil(targetXP / 20); // 20 steps
+    const stepDuration = 800 / 20; // Total 800ms divided by steps
+    
+    const animateStep = () => {
+      currentValue = Math.min(currentValue + increment, targetXP);
+      console.log('Step animation - currentValue:', currentValue);
+      setAnimatedXP(currentValue);
       
-      // Ease out curve
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const currentXP = Math.floor(targetXP * easeOut);
-      
-      console.log('Full animation progress:', progress, 'currentXP:', currentXP);
-      setAnimatedXP(currentXP);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
+      if (currentValue < targetXP) {
+        setTimeout(animateStep, stepDuration);
       } else {
         // Start progress bar animation after XP finishes
         setTimeout(() => {
@@ -105,7 +85,8 @@ export default function Feedback() {
       }
     };
     
-    requestAnimationFrame(animate);
+    // Start the step animation after a small delay
+    setTimeout(animateStep, 100);
   };
 
   // Get log data from URL params or localStorage
@@ -160,7 +141,7 @@ export default function Feedback() {
       } else {
         console.log('No logData available for XP animation');
       }
-    }, 800);
+    }, 1000);
     
     return () => {
       clearTimeout(celebrationTimer);
