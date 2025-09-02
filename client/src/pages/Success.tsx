@@ -16,7 +16,7 @@ export default function Success() {
     const timer = setTimeout(() => {
       const feedbackUrl = `/feedback?logId=${logId || 'temp'}&xp=${xp || '0'}`;
       setLocation(feedbackUrl);
-    }, 1000); // 1 second to enjoy the animation
+    }, 5000); // 5 seconds to enjoy the animation
 
     return () => clearTimeout(timer);
   }, [setLocation]);
