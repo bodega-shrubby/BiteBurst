@@ -59,6 +59,7 @@ html {
 .bb-mascot {
   width: 32px;
   height: 32px;
+  position: relative;
 }
 
 .bb-helper {
@@ -398,14 +399,91 @@ html {
   padding-bottom: calc(100px + env(safe-area-inset-bottom));
 }
 
-/* Success animation */
+/* Success animation - Confetti Burst */
 @keyframes confetti {
-  0% { transform: scale(1) rotate(0deg); opacity: 1; }
-  100% { transform: scale(1.2) rotate(360deg); opacity: 0; }
+  0% { 
+    transform: scale(1) rotate(0deg); 
+    opacity: 1; 
+  }
+  25% { 
+    transform: scale(1.1) rotate(90deg); 
+    opacity: 0.8; 
+  }
+  50% { 
+    transform: scale(1.2) rotate(180deg); 
+    opacity: 0.6; 
+  }
+  75% { 
+    transform: scale(1.3) rotate(270deg); 
+    opacity: 0.4; 
+  }
+  100% { 
+    transform: scale(1.4) rotate(360deg); 
+    opacity: 0; 
+  }
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+  25% {
+    transform: scale(1.15);
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 122, 0, 0.4));
+  }
+  50% {
+    transform: scale(1.25);
+    filter: brightness(1.4) drop-shadow(0 0 20px rgba(255, 122, 0, 0.6));
+  }
+  75% {
+    transform: scale(1.35);
+    filter: brightness(1.6) drop-shadow(0 0 30px rgba(255, 122, 0, 0.8));
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
 }
 
 .bb-success-animation {
-  animation: confetti 0.6s ease-out;
+  animation: confetti-burst 0.6s ease-out;
+}
+
+/* Confetti particles effect */
+.bb-mascot::after {
+  content: "🎉✨🎊";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+.bb-mascot.bb-success-animation::after {
+  animation: confetti-particles 0.6s ease-out;
+}
+
+@keyframes confetti-particles {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-20px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px) scale(0.8);
+  }
 }
 
 /* Error states */

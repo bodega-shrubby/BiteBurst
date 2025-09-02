@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
@@ -100,15 +100,17 @@ export default function FoodLog() {
     }
   }, [state.method]);
 
-  // Flatten all emojis from config
-  const allEmojis = foodEmojis.categories.flatMap(category => 
-    category.emojis.map(item => ({
-      emoji: item.emoji,
-      name: item.name,
-      healthy: item.healthy,
-      category: category.name
-    }))
-  );
+  // Flatten all emojis from config, excluding already selected ones
+  const allEmojis = useMemo(() => 
+    foodEmojis.categories.flatMap(category => 
+      category.emojis.map(item => ({
+        emoji: item.emoji,
+        name: item.name,
+        healthy: item.healthy,
+        category: category.name
+      }))
+    ).filter(item => !state.selectedEmojis.includes(item.emoji))
+  , [state.selectedEmojis]);
 
   // Check if current state has valid content
   const hasValidContent = () => {
