@@ -20,6 +20,7 @@ export default function Feedback() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [logData, setLogData] = useState<LogData | null>(null);
+  const [isEntering, setIsEntering] = useState(true);
 
   // Get log data from URL params or localStorage
   useEffect(() => {
@@ -57,6 +58,13 @@ export default function Feedback() {
         entryMethod: 'emoji'
       });
     }
+    
+    // Fade in after component mounts
+    const fadeTimer = setTimeout(() => {
+      setIsEntering(false);
+    }, 100);
+    
+    return () => clearTimeout(fadeTimer);
   }, []);
 
   // Fetch AI feedback if not already present
@@ -151,7 +159,9 @@ export default function Feedback() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white transition-opacity duration-500 ${
+      isEntering ? 'opacity-0' : 'opacity-100'
+    }`}>
       {/* Header */}
       <header className="sticky top-0 bg-[#FF6A00] text-white p-4 flex items-center justify-between z-10">
         <Button

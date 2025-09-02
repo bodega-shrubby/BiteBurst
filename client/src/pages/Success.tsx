@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
 import '../styles/tokens.css';
 
 export default function Success() {
   const [, setLocation] = useLocation();
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     // Get log data from URL params
@@ -12,17 +13,29 @@ export default function Success() {
     const logId = params.get('logId');
     const xp = params.get('xp');
     
-    // Redirect to feedback page after animation completes
-    const timer = setTimeout(() => {
+    // Start fade out transition before redirect
+    const fadeTimer = setTimeout(() => {
+      setIsExiting(true);
+    }, 4500); // Start fade at 4.5s
+    
+    // Redirect to feedback page after fade completes
+    const redirectTimer = setTimeout(() => {
       const feedbackUrl = `/feedback?logId=${logId || 'temp'}&xp=${xp || '0'}`;
       setLocation(feedbackUrl);
-    }, 5000); // 5 seconds to enjoy the animation
+    }, 5000); // Complete redirect at 5s
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(redirectTimer);
+    };
   }, [setLocation]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-8">
+    <div 
+      className={`min-h-screen bg-white flex items-center justify-center p-8 transition-opacity duration-500 ${
+        isExiting ? 'opacity-0' : 'opacity-100'
+      }`}
+    >
       <div className="text-center">
         <div className="relative inline-block mb-8">
           <img 
