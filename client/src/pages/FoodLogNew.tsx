@@ -145,7 +145,7 @@ export default function FoodLog() {
           break;
       }
 
-      return await apiRequest(`/api/logs`, {
+      return await apiRequest('/api/logs', {
         method: 'POST',
         body: {
           userId: user.id,
@@ -170,7 +170,11 @@ export default function FoodLog() {
       
       // Navigate to feedback page with log data
       setTimeout(() => {
-        setLocation(`/feedback?logId=${(data as any).id}&xp=${(data as any).xpAwarded}`);
+        if (data && typeof data === 'object' && 'id' in data) {
+          setLocation(`/feedback?logId=${data.id}&xp=${(data as any).xpAwarded || 0}`);
+        } else {
+          setLocation('/feedback');
+        }
       }, 300);
     },
     onError: (error: any) => {
