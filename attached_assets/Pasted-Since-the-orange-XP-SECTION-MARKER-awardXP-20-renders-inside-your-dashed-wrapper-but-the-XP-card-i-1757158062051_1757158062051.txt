@@ -1,0 +1,58 @@
+Since the orange XP SECTION MARKER (awardXP=20) renders inside your dashed wrapper but the XP card itself doesn’t show, your React conditions are fine. The problem is CSS: the <Card className="bb-card xp ..."> element is being hidden by a rule attached to the xp class (likely display:none, opacity:0, visibility:hidden, or a responsive hidden md:block style). That’s why you see the wrapper’s dashed box (min-height from the debug wrapper) but no gradient XP card inside it.
+Why I’m confident it’s CSS
+The wrapper and marker render → not a render/logic issue.
+awardXP=20 is numeric on-screen → not a type/coercion issue.
+Only the block with class="... xp ..." is missing → points straight to a class-level visibility rule.
+This pattern is common when devs hide the XP card by default and plan to reveal it with an “active/visible” class that never gets added.
+Quick fix (rename + force visible)
+1) Stop using the generic xp class on the card. Rename it to a namespaced class that won’t collide.
+Feedback.tsx
+<Card
+  className="bb-card bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]"
+>
+  <CardContent className="p-6 text-center">
+    {/* ... unchanged ... */}
+  </CardContent>
+</Card>
+2) Make sure CSS doesn’t hide it by default. Remove any global .xp { ... } rules or replace them with safe, explicit ones.
+tokens.css (or your global CSS)
+/* REMOVE any global `.xp { display:none }` / `.xp { opacity:0 }` etc. */
+
+/* Provide explicit styles for the renamed class */
+.bb-xp-card {
+  display: block;          /* ensure it takes space */
+  opacity: 1;              /* visible by default */
+  transform: none;         /* no off-screen transforms */
+}
+
+/* If you want an enter animation, gate with a new class you control */
+.bb-xp-card.is-visible {
+  opacity: 1;
+  transform: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+3) (Optional) Toggle a visible class when starting the animation.
+const [xpCardVisible, setXpCardVisible] = useState(false);
+
+useEffect(() => {
+  if (!user || !logData) return;
+  setXpCardVisible(true); // reveal card immediately
+  // ... then run your 1500ms timeout + animation + mutate ...
+}, [user, logData]);
+
+<Card
+  className={clsx(
+    "bb-card bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]",
+    xpCardVisible && "is-visible"
+  )}
+>
+  {/* ... */}
+</Card>
+Sanity checks (30 seconds)
+In DevTools Elements → select the XP card node and look at Styles → Computed. You’ll likely see a rule setting display:none, visibility:hidden, opacity:0, or a breakpoint hidden utility coming from .xp.
+Search your CSS for .xp and remove/rename any “hide by default” rules.
+Bonus: ensure the bar is visible when it is shown
+.bb-progress { height: 12px; background: rgba(0,0,0,.08); border-radius: 9999px; overflow: hidden; }
+.bb-progress-bar { height: 100%; width: 0; transition: width .6s ease; background: #FF6A00; }
+TL;DR
+Your XP card is rendering but hidden by a CSS rule tied to the xp class. Rename that class (e.g., bb-xp-card), remove the “hidden by default” rule, and optionally add a clear is-visible toggler. After that, the card and its animation will appear under the marker exactly where the dashed placeholder is now.
