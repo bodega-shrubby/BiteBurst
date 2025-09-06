@@ -1,0 +1,48 @@
+Answers for Replit Agent
+1) User XP Storage
+Persist to the database (minimal), with a safe frontend fallback.
+Reason: streaks/badges/leaderboards will need server-truth. Keeping it now avoids rework.
+Add these fields to users (or equivalent):
+total_xp INT NOT NULL DEFAULT 0
+level INT NOT NULL DEFAULT 1
+streak INT NOT NULL DEFAULT 0
+last_log_at TIMESTAMP NULL
+Add endpoint (idempotent and auth-protected):
+POST /api/user/:id/xp
+Body: { delta_xp: number, reason: "food_log" }
+Server:
+Recompute total_xp = total_xp + delta_xp
+Derive level from total_xp using the same curve as the client
+Update streak based on date gap rules (same-day no change; +1 if last_log_at is “yesterday”; else reset to 1)
+Return: { total_xp, level, streak, badge?: string }
+Frontend fallback (MVP resilience): If the POST fails, complete the animation locally and queue the write to retry (localStorage queue). This keeps UX smooth.
+If you want to avoid a migration now, you can add only total_xp and compute level on the fly—but creating level now helps with analytics.
+2) Level Labels & Visual Style
+Use “Lv 1, Lv 2” short labels to keep it compact and gamey. Visual treatment:
+Typography: bold, friendly rounded sans (same as app), size ~14–16px.
+Chip style: small rounded pill with a subtle orange outline:
+border: 1px solid var(--bb-orange); border-radius: 999px; padding: 2px 8px;
+Placement: under the progress bar: Lv N (left) → Lv N+1 (right).
+Optional icon: tiny ⭐ before the level number is okay, but keep it clean for readability.
+If later you prefer “Level 3”, we can swap the formatter; keep an internal util:
+function formatLevel(n, style='short'){ return style==='long' ? `Level ${n}` : `Lv ${n}`; }
+3) Celebration Integration
+Use the existing confetti system, but fire it through the new XP module’s hooks.
+Keep one confetti system to avoid duplicate particles and performance hits.
+The XP module should expose callbacks/events:
+onLevelUp(level) → call existing confetti.emit('levelup') (or whatever wrapper you have)
+Add a small bar pop CSS class (.bb-pop) locally for emphasis (it’s lightweight and separate from confetti).
+If the existing confetti isn’t available (dev/offline), the hook should no-op gracefully.
+Single Prompt Block for the Agent (copy-paste)
+Implement with these decisions:
+Wire POST /api/user/:id/xp and persist { total_xp, level, streak }. Return JSON for the Feedback page to render.
+Feedback page uses “Lv N” labels in pills under the progress bar.
+Level-up triggers the existing confetti via a hook; keep the bar’s .bb-pop micro-animation local.
+Acceptance:
+After logging a meal, the feedback screen:
+Animates +XP count-up,
+Fills the bar (handles multi-level),
+Shows Lv N→Lv N+1 pills,
+Calls /api/user/:id/xp, updates UI with server values,
+Fires confetti only on actual level increases,
+Falls back to local animation if the POST fails; queues write for later.

@@ -1,0 +1,175 @@
+Replit Agent Task — Animated XP System (BiteBurst)
+Goal: Implement a reusable XP animation system for the Feedback screen that:
+counts up +XP numerically,
+animates the progress bar from current to new XP,
+handles multi-level ups, streak/badge announcements,
+respects prefers-reduced-motion,
+and exposes a tiny API: animateXP(awardPayload).
+Files to create/modify
+public/js/xp.js (new) — all XP logic + animations live here
+public/css/feedback.css — add progress bar styles (IDs/classes below)
+public/feedback.html — must contain the following IDs:
+#xpValue (text like “+0 XP”),
+#xpBar (progress fill div inside a track),
+#levelFrom, #levelTo (labels),
+#streakCard, #badgeCard (optional rewards),
+wrapper section .bb-card.xp has aria-live="polite".
+Do not change page layout: just wire up the animation.
+Leveling curve (simple & tweakable)
+Levels are 0-indexed internally; UI shows 1-indexed (“Lv 1, Lv 2…”).
+XP needed to complete level L:
+XP_TO_NEXT(L) = 100 + L * 25
+Total XP at start of level L:
+XP_AT_LEVEL_START(L) = sum_{i=0..L-1} XP_TO_NEXT(i)
+Provide helpers to compute:
+current level for total XP
+XP progress within current level
+percent fill for progress bar
+JS implementation (public/js/xp.js)
+Public API
+export function animateXP({ 
+  root = document,          // allow scoping
+  fromTotalXP,              // user total xp before award (number)
+  awardXP,                  // xp gained (number)
+  onLevelUp = () => {},     // callback(levelNumber)
+  onDone = () => {}         // callback({newTotalXP, newLevel})
+}) { /* implement below */ }
+Utilities
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function xpToNext(level){ return 100 + level * 25; }
+
+function levelFromTotal(totalXP){
+  let lvl = 0, remaining = totalXP;
+  while (remaining >= xpToNext(lvl)) { remaining -= xpToNext(lvl); lvl++; }
+  return { level: lvl, into: remaining, need: xpToNext(lvl) };
+}
+
+function percentInLevel(totalXP){
+  const { level, into, need } = levelFromTotal(totalXP);
+  return { level, pct: Math.max(0, Math.min(1, need ? into / need : 1)) };
+}
+
+function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+function rafAnimate(durationMs, step){
+  const dur = Math.max(0, durationMs);
+  if (dur === 0 || prefersReduced){ step(1); return Promise.resolve(); }
+  return new Promise(res=>{
+    const t0 = performance.now();
+    const frame = (now)=>{
+      const t = Math.min(1, (now - t0) / dur);
+      step(easeOutCubic(t));
+      if (t < 1) requestAnimationFrame(frame); else res();
+    };
+    requestAnimationFrame(frame);
+  });
+}
+DOM helpers (query once, fall back safely)
+function hooks(root){
+  return {
+    xpValue: root.querySelector('#xpValue'),
+    xpBar: root.querySelector('#xpBar'),
+    levelFrom: root.querySelector('#levelFrom'),
+    levelTo: root.querySelector('#levelTo'),
+    streakCard: root.querySelector('#streakCard'),
+    badgeCard: root.querySelector('#badgeCard'),
+  };
+}
+Core animation
+export async function animateXP({ root=document, fromTotalXP, awardXP, onLevelUp=()=>{}, onDone=()=>{} }){
+  const h = hooks(root);
+  const start = Math.max(0, fromTotalXP|0);
+  const gain  = Math.max(0, awardXP|0);
+  const end   = start + gain;
+
+  // 1) Count-up “+XP” text (0 -> gain)
+  if (h.xpValue){
+    await rafAnimate(600, t=>{
+      const v = Math.round(gain * t);
+      h.xpValue.textContent = `+${v} XP`;
+    });
+  }
+
+  // 2) Animate bar across possible multiple levels
+  let cursor = start;
+  while (cursor < end){
+    const { level, into, need } = levelFromTotal(cursor);
+    const toHere = Math.min(end, cursor + (need - into)); // how much to complete this level
+
+    // set labels (UI is 1-indexed)
+    if (h.levelFrom) h.levelFrom.textContent = `Lv ${level+1}`;
+    if (h.levelTo)   h.levelTo.textContent   = `Lv ${level+2}`;
+
+    // initial pct at start of segment
+    const fromPct = percentInLevel(cursor).pct;
+    const toPct   = percentInLevel(toHere).pct;
+
+    await rafAnimate(800, t=>{
+      const p = fromPct + (toPct - fromPct) * t;
+      if (h.xpBar) h.xpBar.style.width = `${p * 100}%`;
+    });
+
+    cursor = toHere;
+
+    // Level-up celebration if we exactly hit the boundary and still have XP left
+    if (cursor < end){
+      onLevelUp(level + 2); // new visible level
+      // small pop animation class on bar or mascot (CSS-controlled)
+      h.xpBar?.classList.add('bb-pop');
+      setTimeout(()=>h.xpBar?.classList.remove('bb-pop'), 300);
+    }
+  }
+
+  onDone({ newTotalXP: end, newLevel: levelFromTotal(end).level + 1 });
+}
+Example usage in feedback.js
+import { animateXP } from './xp.js';
+
+const payload = JSON.parse(localStorage.getItem('lastLog') || '{}'); 
+// expect payload.user.XP (total before), payload.award.xp (gain)
+
+animateXP({
+  root: document,
+  fromTotalXP: payload.user?.XP ?? 0,
+  awardXP: payload.award?.xp ?? 0,
+  onLevelUp: (lv)=> {
+    // optional: fire confetti, show “Level Up!” toast
+    document.querySelector('.bb-hero')?.classList.add('bb-levelup');
+  },
+  onDone: ({newTotalXP, newLevel})=>{
+    // persist, update UI or call server if needed
+    // e.g., POST /api/user/xp { totalXP: newTotalXP }
+  }
+});
+CSS you must ensure exists (feedback.css)
+.bb-card.xp { position: relative; overflow: hidden; }
+.bb-progress { width:100%; height:10px; background: var(--bb-gray-200); border-radius: 999px; overflow: hidden; }
+.bb-progress-bar { height:100%; width:0%; background: var(--bb-orange); border-radius: 999px; transition: width .2s linear; }
+.bb-pop { animation: bb-pop .3s ease; }
+@keyframes bb-pop { 0%{transform:scale(1)} 40%{transform:scale(1.04)} 100%{transform:scale(1)} }
+Keep #xpValue in large, bold orange type.
+If prefers-reduced-motion: reduce, rafAnimate jumps to end state.
+Edge cases to handle
+awardXP = 0 → render static state, no animation.
+Large awards spanning multiple levels (e.g., +500 XP) → loop must step through each level boundary smoothly.
+Bar never overfills 100% between levels.
+Missing DOM nodes → no errors (checks already included).
+Works if feedback page is refreshed (no state? gracefully skip).
+Acceptance criteria
+animateXP() counts from +0 → +awardXP in ~0.6s.
+Progress bar animates from current → new position. If a level boundary is crossed, it fills to 100%, fires onLevelUp, then continues from 0% toward the remainder.
+Labels update correctly (Lv N → Lv N+1).
+Honors prefers-reduced-motion.
+No jank at 60fps on mobile (throttle repaint work).
+Clean, framework-free JS (no libs).
+Dev test harness (temporary)
+In feedback.js, if no real payload exists, seed:
+const demo = {
+  user:  { XP: 240 },
+  award: { xp: 120 } // should level up once with the given curve
+};
+localStorage.setItem('lastLog', JSON.stringify(demo));
+Reload the page and verify: count-up, bar fill, level-up pop, continue fill.
+If anything fails, log diagnostics:
+console.table({ start: fromTotalXP, gain: awardXP, end, ...levelFromTotal(end) });
