@@ -50,43 +50,8 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
         xpAwarded
       });
 
-      // Update user XP
-      if (user) {
-        await storage.updateUser(validatedData.userId, {
-          xp: user.xp + xpAwarded
-        });
-
-        // Update streak if it's a new day
-        const today = new Date().toISOString().split('T')[0];
-        const existingStreak = await storage.getUserStreak(validatedData.userId);
-        
-        if (existingStreak) {
-          const lastActiveDate = existingStreak.lastActive ? new Date(existingStreak.lastActive).toISOString().split('T')[0] : null;
-          
-          if (lastActiveDate !== today) {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toISOString().split('T')[0];
-            
-            const newCurrent = lastActiveDate === yesterdayStr 
-              ? existingStreak.current + 1 
-              : 1;
-            
-            await storage.updateStreak(validatedData.userId, {
-              current: newCurrent,
-              longest: Math.max(existingStreak.longest, newCurrent),
-              lastActive: new Date()
-            });
-          }
-        } else {
-          // Create initial streak
-          await storage.updateStreak(validatedData.userId, {
-            current: 1,
-            longest: 1,
-            lastActive: new Date()
-          });
-        }
-      }
+      // Note: XP and streak updates are now handled by the dedicated XP endpoint
+      // called from the frontend after the log is created
 
       // Note: XP events could be tracked but not required for MVP
 
