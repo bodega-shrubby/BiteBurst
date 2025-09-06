@@ -1,0 +1,67 @@
+What’s actually going wrong
+One of these is applied to .bb-xp-card (or inherited via a base card class):
+display: none / visibility: hidden / opacity: 0
+max-height: 0 with overflow: hidden (common “accordion/collapse” pattern)
+a responsive utility like hidden md:block that hides it at your breakpoint
+position: absolute off-screen or a parent with overflow-hidden and zero height
+That’s why your dashed debug wrapper has empty space but the gradient/orange bordered card is missing.
+Fix it now (2-step sledgehammer)
+1) Override any hiding with inline styles (for proof).
+Replace your <Card> with a plain <div> and force visibility:
+<div
+  className="bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]"
+  style={{
+    display: 'block',
+    visibility: 'visible',
+    opacity: 1,
+    position: 'relative',
+    zIndex: 10,
+    maxHeight: 'none',
+    height: 'auto'
+  }}
+  aria-live="polite"
+>
+  <div className="p-6 text-center">
+    <div ref={xpValueRef} className="text-3xl font-bold text-[#FF6A00] mb-2">
+      +{awardXP} XP
+    </div>
+    <p className="text-gray-600 mb-4">Experience points earned!</p>
+
+    <div className="bb-progress">
+      <div ref={xpBarRef} className="bb-progress-bar" style={{ width: '0%' }} />
+    </div>
+
+    <div className="bb-level-pills">
+      <span ref={levelFromRef} className="bb-level-pill">
+        {formatLevel(levelFromTotal(currentTotalXP).level + 1)}
+      </span>
+      <span ref={levelToRef} className="bb-level-pill">
+        {formatLevel(levelFromTotal(currentTotalXP).level + 2)}
+      </span>
+    </div>
+  </div>
+</div>
+If this shows up, you’ve confirmed it’s purely CSS (not render logic).
+2) Make the permanent CSS fix.
+Search your styles for any rules targeting these and remove/rename them:
+.bb-xp-card { ... }
+.bb-card { ... } (if you used this earlier)
+.xp { ... }
+collapse/accordion rules like .bb-section .bb-card:not(.is-visible) { max-height:0; overflow:hidden }
+utilities added with @layer that define .xp or hide cards by default
+Then keep a simple, safe baseline:
+/* tokens.css */
+.bb-xp-card { display: block; opacity: 1; visibility: visible; }
+.bb-progress { height: 12px; background: rgba(0,0,0,.08); border-radius: 9999px; overflow: hidden; }
+.bb-progress-bar { height: 100%; width: 0; transition: width .6s ease; background: #FF6A00; }
+10-second confirmation
+Open DevTools → select .bb-xp-card → Computed:
+display should be block
+opacity should be 1
+visibility should be visible
+max-height should be none (or not set)
+offsetHeight should be > 0
+If any of those show none/0/hidden, the Matched CSS Rules panel will show you exactly which stylesheet/selector is hiding it—remove/override that rule.
+Extra notes
+Keeping style={{ width: '0%' }} on .bb-progress-bar is fine; it won’t hide the text. The missing entire card means a container-level hide/collapse.
+If you reintroduce animations, use an opt-in class (e.g., is-visible) rather than “hidden by default”. That avoids this pitfall.

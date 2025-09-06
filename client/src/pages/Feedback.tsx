@@ -364,8 +364,20 @@ export default function Feedback() {
         </Card>
 
         {/* Animated XP System */}
-        <Card className="bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]" aria-live="polite">
-          <CardContent className="p-6 text-center">
+        <div
+          className="bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-lg"
+          style={{
+            display: 'block',
+            visibility: 'visible',
+            opacity: 1,
+            position: 'relative',
+            zIndex: 10,
+            maxHeight: 'none',
+            height: 'auto'
+          }}
+          aria-live="polite"
+        >
+          <div className="p-6 text-center">
             {/* XP Count Display */}
             <div ref={xpValueRef} className="text-3xl font-bold text-[#FF6A00] mb-2">
               +{awardXP} XP
@@ -386,8 +398,8 @@ export default function Feedback() {
                 {formatLevel(levelFromTotal(currentTotalXP).level + 2)}
               </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* AI Feedback */}
         <Card>

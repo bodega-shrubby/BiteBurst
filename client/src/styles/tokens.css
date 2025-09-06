@@ -701,8 +701,8 @@ html {
   outline-offset: 2px;
 }
 
-/* Live region styling */
-[aria-live] {
+/* Live region styling for screen readers - but NOT for our XP card */
+[aria-live]:not(.bb-xp-card) {
   position: absolute;
   left: -10000px;
   width: 1px;
