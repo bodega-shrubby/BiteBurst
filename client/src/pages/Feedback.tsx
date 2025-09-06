@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
-import { animateXP, levelFromTotal, formatLevel } from '@/utils/xpAnimation';
+import { animateXP, levelFromTotal, percentInLevel, formatLevel } from '@/utils/xpAnimation';
 import { apiRequest } from '@/lib/queryClient';
 import '../styles/tokens.css';
 
@@ -56,9 +56,17 @@ export default function Feedback() {
     }
   });
 
-  // Start XP animation
+  // Start XP animation with fallback handling
   const startXPAnimation = async (fromTotalXP: number, awardXP: number) => {
     try {
+      // Diagnostics for debugging
+      console.table({ 
+        start: fromTotalXP, 
+        gain: awardXP, 
+        end: fromTotalXP + awardXP, 
+        ...levelFromTotal(fromTotalXP + awardXP) 
+      });
+      
       await animateXP({
         fromTotalXP,
         awardXP,
@@ -79,6 +87,14 @@ export default function Feedback() {
       });
     } catch (error) {
       console.error('XP animation failed:', error);
+      // Fallback: show static final state
+      if (xpValueRef.current) {
+        xpValueRef.current.textContent = `+${awardXP} XP`;
+      }
+      if (xpBarRef.current) {
+        const { pct } = percentInLevel(fromTotalXP + awardXP);
+        xpBarRef.current.style.width = `${pct * 100}%`;
+      }
       setXpAnimationComplete(true);
     }
   };
@@ -121,6 +137,18 @@ export default function Feedback() {
     }
     
     console.log('Feedback page mounted with logData:', logData);
+    
+    // Development test harness for XP animation
+    if (process.env.NODE_ENV === 'development' && !storedData && !logId) {
+      const demo = {
+        id: 'demo',
+        xpAwarded: 120, // Should level up once with curve 100 + L * 25
+        content: { emojis: ['🍎', '🥬'] },
+        entryMethod: 'emoji'
+      };
+      console.log('Using demo XP data for testing:', demo);
+      setLogData(demo);
+    }
   }, []);
 
   // Start animations when user and logData are ready
