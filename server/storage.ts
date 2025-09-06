@@ -42,6 +42,10 @@ export interface IStorage {
   // Badge operations
   getUserBadges(userId: string): Promise<Badge[]>;
   awardBadge(userId: string, badgeId: string): Promise<Badge>;
+  
+  // XP operations
+  updateUserXP(userId: string, updates: { totalXp: number; level: number; streak: number; lastLogAt: Date }): Promise<User>;
+  logXPEvent(event: { userId: string; amount: number; reason: string; refLog?: string }): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -64,7 +68,7 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: Partial<InsertUser>): Promise<User> {
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values(insertUser as any)
       .returning();
     return user;
   }
@@ -89,7 +93,7 @@ export class DatabaseStorage implements IStorage {
   async createLog(insertLog: Partial<InsertLog>): Promise<Log> {
     const [log] = await db
       .insert(logs)
-      .values(insertLog)
+      .values(insertLog as any)
       .returning();
     return log;
   }
@@ -145,6 +149,34 @@ export class DatabaseStorage implements IStorage {
       .onConflictDoNothing()
       .returning();
     return badge;
+  }
+
+  async updateUserXP(userId: string, updates: { totalXp: number; level: number; streak: number; lastLogAt: Date }): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        totalXp: updates.totalXp,
+        level: updates.level,
+        streak: updates.streak,
+        lastLogAt: updates.lastLogAt,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async logXPEvent(event: { userId: string; amount: number; reason: string; refLog?: string }): Promise<any> {
+    const [xpEvent] = await db
+      .insert(xpEvents)
+      .values({
+        userId: event.userId,
+        amount: event.amount,
+        reason: event.reason,
+        refLog: event.refLog,
+      })
+      .returning();
+    return xpEvent;
   }
 }
 

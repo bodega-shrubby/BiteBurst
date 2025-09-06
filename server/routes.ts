@@ -123,7 +123,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ageBracket: user.ageBracket,
           goal: user.goal,
           avatarId: user.avatarId,
-          xp: user.xp,
+          totalXp: user.totalXp || 0,
+          level: user.level || 1,
           streak: user.streak
         }
       });
@@ -156,12 +157,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ageBracket: user.ageBracket,
         goal: user.goal,
         avatarId: user.avatarId,
-        xp: user.xp,
+        totalXp: user.totalXp || 0,
+        level: user.level || 1,
         streak: user.streak
       });
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ error: "Failed to get user data" });
+    }
+  });
+
+  // XP update endpoint
+  app.post("/api/user/:id/xp", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.params.id;
+      const { delta_xp, reason } = req.body;
+      
+      // Validate request
+      if (!delta_xp || typeof delta_xp !== 'number') {
+        return res.status(400).json({ error: 'delta_xp is required and must be a number' });
+      }
+      
+      // Only allow users to update their own XP
+      if (req.user.userId !== userId) {
+        return res.status(403).json({ error: 'Cannot update XP for other users' });
+      }
+      
+      // Get current user data
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Calculate new totals
+      const newTotalXp = Math.max(0, (user.totalXp || 0) + delta_xp);
+      
+      // Calculate new level using the same curve as frontend (100 + L * 25)
+      let newLevel = 1;
+      let remaining = newTotalXp;
+      while (remaining >= (100 + (newLevel - 1) * 25)) {
+        remaining -= (100 + (newLevel - 1) * 25);
+        newLevel++;
+      }
+      
+      // Update streak based on date gap rules
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      let newStreak = user.streak || 0;
+      
+      if (user.lastLogAt) {
+        const lastLogDate = new Date(user.lastLogAt).toISOString().split('T')[0];
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        if (lastLogDate === today) {
+          // Same day - no change to streak
+        } else if (lastLogDate === yesterday) {
+          // Yesterday - increment streak
+          newStreak += 1;
+        } else {
+          // Gap - reset streak to 1
+          newStreak = 1;
+        }
+      } else {
+        // First log ever
+        newStreak = 1;
+      }
+      
+      // Check for badge eligibility (simple example)
+      let badge = undefined;
+      if (newLevel > (user.level || 1)) {
+        badge = `level_${newLevel}`;
+      } else if (newStreak >= 7 && newStreak % 7 === 0) {
+        badge = `streak_${newStreak}`;
+      }
+      
+      // Update user in database
+      await storage.updateUserXP(userId, {
+        totalXp: newTotalXp,
+        level: newLevel,
+        streak: newStreak,
+        lastLogAt: now
+      });
+      
+      // Log XP event for audit trail
+      await storage.logXPEvent({
+        userId,
+        amount: delta_xp,
+        reason: reason || 'unknown'
+      });
+      
+      res.json({
+        total_xp: newTotalXp,
+        level: newLevel,
+        streak: newStreak,
+        badge
+      });
+      
+    } catch (error) {
+      console.error("XP update error:", error);
+      res.status(500).json({ error: "Failed to update XP" });
     }
   });
 
