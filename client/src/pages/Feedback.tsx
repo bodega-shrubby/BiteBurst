@@ -364,7 +364,7 @@ export default function Feedback() {
         </Card>
 
         {/* Animated XP System */}
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]" aria-live="polite">
+        <Card className="bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]" aria-live="polite">
           <CardContent className="p-6 text-center">
             {/* XP Count Display */}
             <div ref={xpValueRef} className="text-3xl font-bold text-[#FF6A00] mb-2">

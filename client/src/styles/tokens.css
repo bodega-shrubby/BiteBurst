@@ -711,7 +711,10 @@ html {
 }
 
 /* XP Progress Bar Styles */
-.bb-card.xp {
+.bb-xp-card {
+  display: block;
+  opacity: 1;
+  transform: none;
   position: relative;
   overflow: hidden;
 }
