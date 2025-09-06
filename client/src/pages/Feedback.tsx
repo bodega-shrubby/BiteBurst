@@ -358,30 +358,42 @@ export default function Feedback() {
         </Card>
 
         {/* Animated XP System */}
-        <Card className="bb-card xp bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]" aria-live="polite">
-          <CardContent className="p-6 text-center">
-            {/* XP Count Display */}
-            <div ref={xpValueRef} id="xpValue" className="text-3xl font-bold text-[#FF6A00] mb-2">
-              +0 XP
-            </div>
-            <p className="text-gray-600 mb-4">Experience points earned!</p>
-            
-            {/* Progress Bar */}
-            <div className="bb-progress">
-              <div ref={xpBarRef} id="xpBar" className="bb-progress-bar"></div>
-            </div>
-            
-            {/* Level Pills */}
-            <div className="bb-level-pills">
-              <span ref={levelFromRef} id="levelFrom" className="bb-level-pill">
-                {user ? formatLevel(levelFromTotal((user as any).totalXp || 0).level + 1) : 'Lv 1'}
-              </span>
-              <span ref={levelToRef} id="levelTo" className="bb-level-pill">
-                {user ? formatLevel(levelFromTotal((user as any).totalXp || 0).level + 2) : 'Lv 2'}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <section
+          data-test="xp-section-wrapper"
+          style={{ outline: '2px dashed #f97316', minHeight: 120 }}
+          className="relative block !visible !opacity-100 !z-50"
+        >
+          {/* TEMP marker to confirm render */}
+          <div style={{ border: '3px solid #f97316', padding: 8, marginBottom: 12 }}>
+            XP SECTION MARKER (awardXP={awardXP})
+          </div>
+
+          {/* DO NOT gate the section; only gate the animation start */}
+          <Card className="bb-card xp bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]" aria-live="polite">
+            <CardContent className="p-6 text-center">
+              {/* XP Count Display */}
+              <div ref={xpValueRef} id="xpValue" className="text-3xl font-bold text-[#FF6A00] mb-2">
+                +0 XP
+              </div>
+              <p className="text-gray-600 mb-4">Experience points earned!</p>
+              
+              {/* Progress Bar */}
+              <div className="bb-progress">
+                <div ref={xpBarRef} id="xpBar" className="bb-progress-bar"></div>
+              </div>
+              
+              {/* Level Pills */}
+              <div className="bb-level-pills">
+                <span ref={levelFromRef} id="levelFrom" className="bb-level-pill">
+                  {formatLevel(levelFromTotal(currentTotalXP).level + 1)}
+                </span>
+                <span ref={levelToRef} id="levelTo" className="bb-level-pill">
+                  {formatLevel(levelFromTotal(currentTotalXP).level + 2)}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
         {/* AI Feedback */}
         <Card>
