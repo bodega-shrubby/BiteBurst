@@ -36,6 +36,19 @@ export default function Feedback() {
   
   const queryClient = useQueryClient();
 
+  // Type coercion - prevent string vs number pitfalls
+  const rawAwardXP = (logData as any)?.xpAwarded ?? 0;
+  const awardXP = Number(rawAwardXP);
+  const currentTotalXP = Number((user as any)?.totalXp ?? 0);
+
+  console.table({
+    rawAwardXP,
+    awardXP,
+    currentTotalXP,
+    hasUser: !!user,
+    hasLogData: !!logData,
+  });
+
   // XP update mutation
   const xpUpdateMutation = useMutation({
     mutationFn: async ({ userId, deltaXp, reason }: { userId: string; deltaXp: number; reason: string }) => {

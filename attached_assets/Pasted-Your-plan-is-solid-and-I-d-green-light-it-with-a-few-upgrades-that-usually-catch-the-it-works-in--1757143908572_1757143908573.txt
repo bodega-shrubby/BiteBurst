@@ -1,0 +1,64 @@
+Your plan is solid and I’d green-light it — with a few upgrades that usually catch the “it works in console but the block is invisible” class of bugs.
+What to add/change (ranked)
+Coerce types once, up top (prevents silent falsey conditions)
+// Feedback.tsx – near top
+const rawAwardXP = (logData as any)?.xpAwarded ?? 0;
+const awardXP = Number(rawAwardXP);
+const currentTotalXP = Number((user as any)?.totalXp ?? 0);
+…and base every condition on awardXP (not logData.xpAwarded). This removes the “string '15'” vs number pitfall.
+Render the XP card unconditionally; only gate the animation
+<section data-test="xp-section-wrapper" className="relative block !visible !opacity-100 !z-50" style={{minHeight:120}}>
+  <div style={{border:'3px solid #f97316',padding:8,marginBottom:12}}>XP MARKER (awardXP={awardXP})</div>
+  {/* XP card as-is */}
+</section>
+If this marker doesn’t show in Elements → it’s still a conditional render issue above this block.
+StrictMode / double-effect guard + invalidate after animation
+const hasAnimatedRef = useRef(false);
+
+useEffect(() => {
+  if (!user || !logData || hasAnimatedRef.current) return;
+
+  const t = setTimeout(async () => {
+    try {
+      if (awardXP > 0) await startXPAnimation(currentTotalXP, awardXP);
+      if ((user as any)?.id && awardXP > 0) {
+        await xpUpdateMutation.mutateAsync({ userId: String((user as any).id), deltaXp: awardXP, reason: 'food_log' });
+        // invalidate AFTER the animation to avoid remount flicker
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      }
+      hasAnimatedRef.current = true;
+      setXpAnimationComplete(true);
+    } catch (e) {
+      console.error('XP flow error', e);
+    }
+  }, 1500);
+
+  return () => clearTimeout(t);
+  // awardXP/currentTotalXP derive from user/logData
+}, [user, logData]);
+Pass refs into the animation util (don’t let the util own them)
+If xpAnimation.ts holds its own refs, it may animate nothing. Prefer:
+await startXPAnimation({
+  fromTotalXp: currentTotalXP,
+  gain: awardXP,
+  refs: { xpValueRef, xpBarRef, levelFromRef, levelToRef }
+});
+…and use those passed refs inside the util. This removes hidden ref aliasing.
+CSS sanity (most common “invisible but present” cause)
+Make sure the progress bar has height/visibility regardless of theme:
+/* tokens.css (or local CSS module) */
+.bb-progress { height: 12px; background: rgba(0,0,0,0.08); border-radius: 9999px; overflow: hidden; }
+.bb-progress-bar { height: 100%; width: 0; transition: width .6s ease; background: #FF6A00; }
+Then, in DevTools → Computed: verify the XP card and .bb-progress don’t have display:none, opacity:0, visibility:hidden, max-h-0, or are gated by hidden md:block at your screen size.
+Parent clipping
+If a parent wraps sections with overflow-hidden or transition heights, the XP card can be there but clipped. Temporarily add style={{minHeight:120}} on the wrapper and remove overflow-hidden on parents to confirm.
+Remove keys that cause remounting
+If you’ve got key={user.totalXp} anywhere around the XP card, drop it—re-fetch + key change will unmount the section mid-render.
+“Do this now” mini-diff (drop-in)
+Add the type coercion block (#1).
+Wrap the card with the XP MARKER wrapper (#2).
+Swap your effect to the StrictMode-safe version (#3).
+Ensure CSS snippet (#5) exists and loads.
+If the marker appears but the animation still doesn’t: it’s CSS/overflow/z-index (fix #5/#6).
+If the marker doesn’t appear: it’s conditional gating above the section (fix #1/#2/#7).
+Your plan already covers the rest; these are the sharp edges I see most in React apps. Proceed with your diagnostic approach including the wrapper/console.table—and use the sequence above as your triage ladder.

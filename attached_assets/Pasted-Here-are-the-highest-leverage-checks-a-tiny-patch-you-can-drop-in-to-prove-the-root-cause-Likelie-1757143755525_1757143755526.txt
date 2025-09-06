@@ -1,0 +1,117 @@
+Here are the highest-leverage checks + a tiny patch you can drop in to prove the root cause:
+Likeliest root causes (ranked)
+Conditional render gating
+Look for conditions wrapping the XP card (or the whole feedback body), e.g.:
+if (!user || !logData) return null;
+// or
+{deltaXp > 0 && <XPCard/>}
+// or
+{xpAnimationComplete && <XPCard/>}
+Because you changed the JSON flow, logData.xpAwarded might be a string ("15") and a strict numeric check (> 0) evaluates false after a coercion mistake.
+👉 Fix: coerce types once near the top of the component.
+const awardXP = Number(logData?.xpAwarded ?? 0);
+Then use awardXP > 0 in all conditions.
+Responsive / utility classes hiding it
+Search for hidden, sr-only, opacity-0, pointer-events-none, max-h-0, invisible, or breakpoint combos like hidden md:block on:
+the XP card wrapper (<Card className="bb-card xp ...">)
+any parent containers
+On smaller screens, hidden md:block = hidden.
+Parent overflow/height clipping
+If a parent uses overflow-hidden, max-h-0, or a transition height trick, the XP card can be rendered but not visible. In DevTools → select the XP card and check Computed → display, visibility, opacity, height. If the card’s height is 0, give the container a min-height while testing.
+State flip / StrictMode double render
+If you gate with xpAnimationComplete or showXp, ensure it’s set to true on mount after awardXP is resolved. In React 18 dev, effects run twice; if your success path sets then unsets the flag, the card never appears.
+Ref mismatch
+Make sure the refs you pass to animateXP are the same refs you assign to DOM nodes. If the util file imports its own refs, it can animate nothing. Your snippet shows ref={xpValueRef} etc. Ensure startXPAnimation receives those refs from the component (not creating new ones internally).
+Key-based remount
+If you use key={user.totalXp} or similar on the XP card/container, a user update will unmount the card right before/while rendering—so it “disappears.” Remove the key from containers around the XP section.
+Mutation invalidation timing
+invalidateQueries(['/api/auth/me']) can re-fetch and re-render the page while the animation is mid-flight and nuke the Section. Trigger invalidation after the animation completes (or stash animation state in a ref that survives).
+JS error in siblings
+A runtime error in a sibling component above XP can short-circuit render. Check the console for red stacktraces on the feedback page.
+Drop-in “prove it” patch (minimal + safe)
+Paste this around your XP card in Feedback.tsx. It forces visibility, coerces types, and logs any hidden conditions.
+// Near top of Feedback component:
+const rawAwardXP = (logData as any)?.xpAwarded ?? 0;
+const awardXP = Number(rawAwardXP);
+const currentTotalXP = Number((user as any)?.totalXp ?? 0);
+
+console.table({
+  rawAwardXP,
+  awardXP,
+  currentTotalXP,
+  hasUser: !!user,
+  hasLogData: !!logData,
+});
+
+// --- Around your XP card JSX:
+<section
+  data-test="xp-section-wrapper"
+  style={{ outline: '2px dashed #f97316', minHeight: 120 }}
+  className="relative block !visible !opacity-100 !z-50"
+>
+  {/* TEMP marker to confirm render */}
+  <div style={{ border: '3px solid #f97316', padding: 8, marginBottom: 12 }}>
+    XP SECTION MARKER (awardXP={awardXP})
+  </div>
+
+  {/* DO NOT gate the section; only gate the animation start */}
+  <Card className="bb-card xp bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]">
+    <CardContent className="p-6 text-center">
+      <div ref={xpValueRef} id="xpValue" className="text-3xl font-bold text-[#FF6A00] mb-2">
+        +0 XP
+      </div>
+      <p className="text-gray-600 mb-4">Experience points earned!</p>
+
+      <div className="bb-progress">
+        <div ref={xpBarRef} id="xpBar" className="bb-progress-bar"></div>
+      </div>
+
+      <div className="bb-level-pills">
+        <span ref={levelFromRef} id="levelFrom" className="bb-level-pill">
+          {formatLevel(levelFromTotal(currentTotalXP).level + 1)}
+        </span>
+        <span ref={levelToRef} id="levelTo" className="bb-level-pill">
+          {formatLevel(levelFromTotal(currentTotalXP).level + 2)}
+        </span>
+      </div>
+    </CardContent>
+  </Card>
+</section>
+Then adjust the effect so animation is gated only by the numeric award:
+useEffect(() => {
+  if (!user || !logData || xpAnimationComplete) return;
+
+  // Start after initial celebration
+  const t = setTimeout(async () => {
+    try {
+      if (awardXP > 0) {
+        await startXPAnimation(currentTotalXP, awardXP);
+      }
+
+      if ((user as any).id && awardXP > 0) {
+        // Option A: update server AFTER animation to avoid remount flicker
+        await xpUpdateMutation.mutateAsync({
+          userId: String((user as any).id),
+          deltaXp: awardXP,
+          reason: 'food_log',
+        });
+      }
+
+      // mark complete after everything
+      setXpAnimationComplete(true);
+    } catch (e) {
+      console.error('XP flow error', e);
+    }
+  }, 1500);
+
+  return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, logData]); // note: awardXP/currentTotalXP derived from these
+Quick “hunt list” (run these 60-second checks)
+Cmd/Ctrl+F in Feedback.tsx: search hidden, opacity-0, invisible, sr-only, max-h-0, pointer-events-none, md:block.
+Verify no return null before the XP card.
+In DevTools Elements: do you see data-test="xp-section-wrapper"?
+No → conditional gating (fix coercion/flag).
+Yes but not visible → CSS/overflow/z-index (fix classes/parent container).
+Remove any key={...} props on the XP container.
+Temporarily comment out invalidateQueries({ queryKey: ['/api/auth/me'] }) and test.
