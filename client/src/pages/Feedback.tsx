@@ -28,6 +28,9 @@ export default function Feedback() {
   const [xpAnimationComplete, setXpAnimationComplete] = useState(false);
   const [levelUpOccurred, setLevelUpOccurred] = useState(false);
   
+  // StrictMode safe guard
+  const hasAnimatedRef = useRef(false);
+  
   // Refs for XP animation elements
   const xpValueRef = useRef<HTMLDivElement>(null);
   const xpBarRef = useRef<HTMLDivElement>(null);
@@ -165,37 +168,40 @@ export default function Feedback() {
 
   // Start animations when user and logData are ready
   useEffect(() => {
-    if (!user || !logData || xpAnimationComplete) return;
-    
-    const startAnimations = async () => {
-      // Initial celebration animation
-      const celebrationTimer = setTimeout(() => {
+    if (!user || !logData || hasAnimatedRef.current) return;
+
+    const t = setTimeout(async () => {
+      try {
+        // Initial celebration animation
         setShowCelebration(true);
-      }, 200);
-      
-      // Wait for initial celebration, then start XP animation
-      setTimeout(async () => {
-        const currentTotalXP = (user as any).totalXp || 0;
-        const awardXP = logData.xpAwarded || 0;
         
-        // Start XP animation
-        await startXPAnimation(currentTotalXP, awardXP);
-        
-        // Update XP on server
-        if (user.id && awardXP > 0) {
-          xpUpdateMutation.mutate({
-            userId: String(user.id),
-            deltaXp: awardXP,
-            reason: 'food_log'
-          });
+        // Start XP animation if we have award points
+        if (awardXP > 0) {
+          await startXPAnimation(currentTotalXP, awardXP);
         }
-      }, 1500); // Wait for mascot celebration to complete
-      
-      return () => clearTimeout(celebrationTimer);
-    };
-    
-    startAnimations();
-  }, [user, logData, xpAnimationComplete]);
+        
+        // Update XP on server after animation completes
+        if ((user as any)?.id && awardXP > 0) {
+          await xpUpdateMutation.mutateAsync({
+            userId: String((user as any).id),
+            deltaXp: awardXP,
+            reason: 'food_log',
+          });
+          // invalidate AFTER the animation to avoid remount flicker
+          queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+        }
+        
+        // mark complete after everything
+        hasAnimatedRef.current = true;
+        setXpAnimationComplete(true);
+      } catch (e) {
+        console.error('XP flow error', e);
+      }
+    }, 1500);
+
+    return () => clearTimeout(t);
+    // awardXP/currentTotalXP derive from user/logData
+  }, [user, logData]);
 
   // Fetch AI feedback if not already present
   const { data: feedbackData, isLoading: feedbackLoading } = useQuery({
