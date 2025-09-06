@@ -41,8 +41,7 @@ export default function Feedback() {
     mutationFn: async ({ userId, deltaXp, reason }: { userId: string; deltaXp: number; reason: string }) => {
       return apiRequest(`/api/user/${userId}/xp`, {
         method: 'POST',
-        body: JSON.stringify({ delta_xp: deltaXp, reason }),
-        headers: { 'Content-Type': 'application/json' }
+        body: { delta_xp: deltaXp, reason }
       });
     },
     onSuccess: (data) => {
