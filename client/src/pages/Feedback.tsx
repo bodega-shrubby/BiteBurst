@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
+import { animateXP, levelFromTotal, formatLevel } from '@/utils/xpAnimation';
+import { apiRequest } from '@/lib/queryClient';
 import '../styles/tokens.css';
 
 interface LogData {
@@ -23,6 +25,63 @@ export default function Feedback() {
   const [logData, setLogData] = useState<LogData | null>(null);
   const [isEntering, setIsEntering] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [xpAnimationComplete, setXpAnimationComplete] = useState(false);
+  const [levelUpOccurred, setLevelUpOccurred] = useState(false);
+  
+  // Refs for XP animation elements
+  const xpValueRef = useRef<HTMLDivElement>(null);
+  const xpBarRef = useRef<HTMLDivElement>(null);
+  const levelFromRef = useRef<HTMLSpanElement>(null);
+  const levelToRef = useRef<HTMLSpanElement>(null);
+  
+  const queryClient = useQueryClient();
+
+  // XP update mutation
+  const xpUpdateMutation = useMutation({
+    mutationFn: async ({ userId, deltaXp, reason }: { userId: string; deltaXp: number; reason: string }) => {
+      return apiRequest(`/api/user/${userId}/xp`, {
+        method: 'POST',
+        body: JSON.stringify({ delta_xp: deltaXp, reason }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: (data) => {
+      console.log('XP updated successfully:', data);
+      // Invalidate user data to refresh with new XP/level
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+    },
+    onError: (error) => {
+      console.error('XP update failed:', error);
+      // Could show a toast here about fallback mode
+    }
+  });
+
+  // Start XP animation
+  const startXPAnimation = async (fromTotalXP: number, awardXP: number) => {
+    try {
+      await animateXP({
+        fromTotalXP,
+        awardXP,
+        xpValueRef,
+        xpBarRef,
+        levelFromRef,
+        levelToRef,
+        onLevelUp: (newLevel) => {
+          console.log('Level up to:', newLevel);
+          setLevelUpOccurred(true);
+          // Trigger confetti for level up
+          setShowCelebration(true);
+        },
+        onDone: ({ newTotalXP, newLevel }) => {
+          console.log('XP animation complete:', { newTotalXP, newLevel });
+          setXpAnimationComplete(true);
+        }
+      });
+    } catch (error) {
+      console.error('XP animation failed:', error);
+      setXpAnimationComplete(true);
+    }
+  };
 
   // Get log data from URL params or localStorage
   useEffect(() => {
@@ -62,14 +121,41 @@ export default function Feedback() {
     }
     
     console.log('Feedback page mounted with logData:', logData);
-    
-    // Trigger celebration animation after component mounts
-    const celebrationTimer = setTimeout(() => {
-      setShowCelebration(true);
-    }, 200);
-    
-    return () => clearTimeout(celebrationTimer);
   }, []);
+
+  // Start animations when user and logData are ready
+  useEffect(() => {
+    if (!user || !logData || xpAnimationComplete) return;
+    
+    const startAnimations = async () => {
+      // Initial celebration animation
+      const celebrationTimer = setTimeout(() => {
+        setShowCelebration(true);
+      }, 200);
+      
+      // Wait for initial celebration, then start XP animation
+      setTimeout(async () => {
+        const currentTotalXP = (user as any).totalXp || 0;
+        const awardXP = logData.xpAwarded || 0;
+        
+        // Start XP animation
+        await startXPAnimation(currentTotalXP, awardXP);
+        
+        // Update XP on server
+        if (user.id && awardXP > 0) {
+          xpUpdateMutation.mutate({
+            userId: String(user.id),
+            deltaXp: awardXP,
+            reason: 'food_log'
+          });
+        }
+      }, 1500); // Wait for mascot celebration to complete
+      
+      return () => clearTimeout(celebrationTimer);
+    };
+    
+    startAnimations();
+  }, [user, logData, xpAnimationComplete]);
 
   // Fetch AI feedback if not already present
   const { data: feedbackData, isLoading: feedbackLoading } = useQuery({
@@ -231,13 +317,29 @@ export default function Feedback() {
           </CardContent>
         </Card>
 
-        {/* XP Awarded */}
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]">
+        {/* Animated XP System */}
+        <Card className="bb-card xp bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]" aria-live="polite">
           <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-[#FF6A00] mb-2">
-              +{logData.xpAwarded} XP
+            {/* XP Count Display */}
+            <div ref={xpValueRef} id="xpValue" className="text-3xl font-bold text-[#FF6A00] mb-2">
+              +0 XP
             </div>
-            <p className="text-gray-600">Experience points earned!</p>
+            <p className="text-gray-600 mb-4">Experience points earned!</p>
+            
+            {/* Progress Bar */}
+            <div className="bb-progress">
+              <div ref={xpBarRef} id="xpBar" className="bb-progress-bar"></div>
+            </div>
+            
+            {/* Level Pills */}
+            <div className="bb-level-pills">
+              <span ref={levelFromRef} id="levelFrom" className="bb-level-pill">
+                {user ? formatLevel(levelFromTotal((user as any).totalXp || 0).level + 1) : 'Lv 1'}
+              </span>
+              <span ref={levelToRef} id="levelTo" className="bb-level-pill">
+                {user ? formatLevel(levelFromTotal((user as any).totalXp || 0).level + 2) : 'Lv 2'}
+              </span>
+            </div>
           </CardContent>
         </Card>
 
