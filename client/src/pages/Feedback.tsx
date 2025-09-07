@@ -168,6 +168,35 @@ export default function Feedback() {
     }
   }, []);
 
+  // Fetch AI feedback if not already present - MOVED BEFORE EARLY RETURN
+  const { data: feedbackData, isLoading: feedbackLoading } = useQuery({
+    queryKey: ['/api/ai/feedback', logData?.id],
+    enabled: !!logData && !logData.feedback,
+    queryFn: async () => {
+      if (!logData || !user) return null;
+      
+      const response = await fetch('/api/ai/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': localStorage.getItem('sessionId') || '',
+        },
+        body: JSON.stringify({
+          age: user.ageBracket,
+          goal: user.goal,
+          mealLog: logData.content,
+          logId: logData.id,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get feedback');
+      }
+      
+      return response.json();
+    },
+  });
+
   // Start animations when user and logData are ready
   useEffect(() => {
     if (!user || !logData || hasAnimatedRef.current) return;
@@ -205,34 +234,38 @@ export default function Feedback() {
     // awardXP/currentTotalXP derive from user/logData
   }, [user, logData]);
 
-  // Fetch AI feedback if not already present
-  const { data: feedbackData, isLoading: feedbackLoading } = useQuery({
-    queryKey: ['/api/ai/feedback', logData?.id],
-    enabled: !!logData && !logData.feedback,
-    queryFn: async () => {
-      if (!logData || !user) return null;
+  // Typewriter effect for feedback - MOVED BEFORE EARLY RETURN
+  useEffect(() => {
+    const feedback = logData?.feedback || feedbackData?.feedback;
+    const isLoading = feedbackLoading && !logData?.feedback;
+    
+    if (feedback && feedback !== typewriterText && !isLoading) {
+      setIsTyping(true);
+      setTypewriterText('');
       
-      const response = await fetch('/api/ai/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-session-id': localStorage.getItem('sessionId') || '',
-        },
-        body: JSON.stringify({
-          age: user.ageBracket,
-          goal: user.goal,
-          mealLog: logData.content,
-          logId: logData.id,
-        }),
-      });
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       
-      if (!response.ok) {
-        throw new Error('Failed to get feedback');
+      if (prefersReducedMotion) {
+        // No animation for users who prefer reduced motion
+        setTypewriterText(feedback);
+        setIsTyping(false);
+        return;
       }
       
-      return response.json();
-    },
-  });
+      let index = 0;
+      const timer = setInterval(() => {
+        if (index < feedback.length) {
+          setTypewriterText(feedback.slice(0, index + 1));
+          index++;
+        } else {
+          setIsTyping(false);
+          clearInterval(timer);
+        }
+      }, 30); // Adjust speed as needed
+      
+      return () => clearInterval(timer);
+    }
+  }, [feedbackData?.feedback, logData?.feedback, feedbackLoading, typewriterText]);
 
   const handleLogAnother = () => {
     setLocation('/food-log');
@@ -277,35 +310,6 @@ export default function Feedback() {
     }
   };
 
-  // Typewriter effect for feedback
-  useEffect(() => {
-    if (feedback && feedback !== typewriterText && !isLoading) {
-      setIsTyping(true);
-      setTypewriterText('');
-      
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
-      if (prefersReducedMotion) {
-        // No animation for users who prefer reduced motion
-        setTypewriterText(feedback);
-        setIsTyping(false);
-        return;
-      }
-      
-      let index = 0;
-      const timer = setInterval(() => {
-        if (index < feedback.length) {
-          setTypewriterText(feedback.slice(0, index + 1));
-          index++;
-        } else {
-          setIsTyping(false);
-          clearInterval(timer);
-        }
-      }, 30); // Adjust speed as needed
-      
-      return () => clearInterval(timer);
-    }
-  }, [feedback, isLoading]);
 
   const renderContent = () => {
     if (logData.entryMethod === 'emoji' && logData.content?.emojis) {
