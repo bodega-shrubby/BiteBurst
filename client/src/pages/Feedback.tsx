@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
+import nutritionCoachMascot from '@assets/generated_images/Sporty_nutrition_coach_mascot_f383d6cf.png';
 import { animateXP, levelFromTotal, percentInLevel, formatLevel } from '@/utils/xpAnimation';
 import { apiRequest } from '@/lib/queryClient';
 import '../styles/tokens.css';
@@ -511,8 +512,19 @@ export default function Feedback() {
             </div>
           </div>
           
-          {/* Speech Bubble */}
-          <div className="bb-speech-bubble">
+          {/* Coach Mascot and Speech Bubble */}
+          <div className="flex items-start gap-4 justify-center">
+            {/* Nutrition Coach Mascot */}
+            <div className="flex-shrink-0">
+              <img 
+                src={nutritionCoachMascot} 
+                alt="Nutrition coach mascot"
+                className="w-20 h-24 object-contain"
+              />
+            </div>
+            
+            {/* Speech Bubble */}
+            <div className="bb-speech-bubble flex-1 max-w-sm">
             <h3 className="font-bold text-gray-800 mb-4 text-center text-lg">
               Your nutrition coach says:
             </h3>
@@ -536,6 +548,7 @@ export default function Feedback() {
                 Keep up the great work! Every healthy choice helps you grow stronger and smarter.
               </p>
             )}
+            </div>
           </div>
         </div>
 
