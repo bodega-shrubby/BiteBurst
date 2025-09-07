@@ -100,7 +100,7 @@ export default function FoodLog() {
     }
   }, [state.method]);
 
-  // Flatten all emojis from config, excluding already selected ones
+  // Flatten all emojis from config
   const allEmojis = useMemo(() => 
     foodEmojis.categories.flatMap(category => 
       category.emojis.map(item => ({
@@ -109,8 +109,8 @@ export default function FoodLog() {
         healthy: item.healthy,
         category: category.name
       }))
-    ).filter(item => !state.selectedEmojis.includes(item.emoji))
-  , [state.selectedEmojis]);
+    )
+  , []);
 
   // Check if current state has valid content
   const hasValidContent = () => {
