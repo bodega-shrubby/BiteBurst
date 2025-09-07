@@ -513,13 +513,13 @@ export default function Feedback() {
           </div>
           
           {/* Coach Mascot and Speech Bubble */}
-          <div className="flex items-start gap-4 justify-center">
+          <div className="flex items-start gap-2 justify-center">
             {/* Nutrition Coach Mascot */}
             <div className="flex-shrink-0">
               <img 
                 src={nutritionCoachMascot} 
                 alt="Nutrition coach mascot"
-                className="w-20 h-24 object-contain"
+                className="w-28 h-36 object-contain"
               />
             </div>
             
