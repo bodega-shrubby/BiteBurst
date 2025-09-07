@@ -944,6 +944,40 @@ html {
   }
 }
 
+/* Enhanced Button States for Phase 6 */
+.bb-enhanced-button {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.bb-enhanced-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.bb-enhanced-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.bb-enhanced-button:focus-visible {
+  outline: 3px solid rgba(255, 106, 0, 0.5);
+  outline-offset: 2px;
+}
+
+/* Enhanced Card Styling for Phase 6 */
+.bb-enhanced-card {
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bb-enhanced-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
+}
+
 /* Motion Preference Support */
 @media (prefers-reduced-motion: reduce) {
   .bb-emoji-chip,
@@ -958,5 +992,16 @@ html {
   .bb-typewriter {
     animation: none;
     width: 100%;
+  }
+  
+  .bb-enhanced-button,
+  .bb-enhanced-card {
+    transition: none;
+    transform: none;
+  }
+  
+  .bb-enhanced-button:hover,
+  .bb-enhanced-card:hover {
+    transform: none;
   }
 }

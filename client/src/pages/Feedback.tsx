@@ -436,7 +436,7 @@ export default function Feedback() {
         </section>
 
         {/* What You Logged */}
-        <div className="bb-content-card bg-white border-2 border-[#FF6A00] rounded-2xl shadow-xl p-8">
+        <div className="bb-content-card bg-white border-2 border-[#FF6A00] rounded-3xl shadow-2xl p-8" style={{ borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
           <h3 className="text-center text-xl font-bold text-gray-800 mb-6 tracking-wide">
             What you logged:
           </h3>
@@ -445,7 +445,7 @@ export default function Feedback() {
 
         {/* Animated XP System */}
         <div
-          className="bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-lg"
+          className="bb-xp-card bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-[#FF6A00]"
           style={{
             display: 'block',
             visibility: 'visible',
@@ -453,7 +453,9 @@ export default function Feedback() {
             position: 'relative',
             zIndex: 10,
             maxHeight: 'none',
-            height: 'auto'
+            height: 'auto',
+            borderRadius: '24px',
+            boxShadow: '0 20px 40px -12px rgba(255, 106, 0, 0.25)'
           }}
           aria-live="polite"
         >
@@ -541,7 +543,7 @@ export default function Feedback() {
         <div className="space-y-3 pt-4 flex flex-col items-center">
           <Button
             onClick={handleLogAnother}
-            className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+            className="bb-enhanced-button max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
             style={{ borderRadius: '13px' }}
           >
             <RotateCcw size={20} className="mr-2" />
@@ -551,7 +553,7 @@ export default function Feedback() {
           <Button
             onClick={handleBackToDashboard}
             variant="outline"
-            className="max-w-[366px] w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
+            className="bb-enhanced-button max-w-[366px] w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
             style={{ borderRadius: '13px' }}
           >
             <Home size={20} className="mr-2" />
