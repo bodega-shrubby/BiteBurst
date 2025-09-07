@@ -786,20 +786,7 @@ html {
 /* Enhanced Content Display Styles */
 .bb-emoji-chip {
   position: relative;
-  animation: bb-emoji-float 3s ease-in-out infinite;
-}
-
-.bb-emoji-chip:nth-child(2n) {
-  animation-delay: 0.5s;
-}
-
-.bb-emoji-chip:nth-child(3n) {
-  animation-delay: 1s;
-}
-
-@keyframes bb-emoji-float {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-4px) scale(1.02); }
+  /* Removed floating animation - keeping chips static */
 }
 
 .bb-text-pill {
