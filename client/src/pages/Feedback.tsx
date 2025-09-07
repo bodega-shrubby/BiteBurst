@@ -29,6 +29,9 @@ export default function Feedback() {
   const [levelUpOccurred, setLevelUpOccurred] = useState(false);
   const [typewriterText, setTypewriterText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showStreakPill, setShowStreakPill] = useState(false);
+  const [showBadgePill, setShowBadgePill] = useState(false);
+  const [newBadges, setNewBadges] = useState<string[]>([]);
   
   // StrictMode safe guard
   const hasAnimatedRef = useRef(false);
@@ -221,6 +224,17 @@ export default function Feedback() {
           // invalidate AFTER the animation to avoid remount flicker
           queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
         }
+        
+        // Show gamification features after XP animation
+        setTimeout(() => {
+          // Show streak pill if streak >= 2
+          if ((user as any)?.streak >= 2) {
+            setShowStreakPill(true);
+          }
+          
+          // TODO: Check for new badges and show badge pill
+          // This would require checking if badges were awarded during this session
+        }, 800);
         
         // mark complete after everything
         hasAnimatedRef.current = true;
@@ -466,6 +480,25 @@ export default function Feedback() {
             </div>
           </div>
         </div>
+
+        {/* Gamification Pills */}
+        {showStreakPill && (user as any)?.streak >= 2 && (
+          <div className="flex justify-center" role="status" aria-live="polite">
+            <div className="bb-streak-pill">
+              <span className="text-xl">🔥</span>
+              <span>{(user as any)?.streak}-day streak!</span>
+            </div>
+          </div>
+        )}
+
+        {showBadgePill && newBadges.length > 0 && (
+          <div className="flex justify-center" role="status" aria-live="assertive">
+            <div className="bb-badge-pill">
+              <span className="text-xl">🏅</span>
+              <span>{newBadges[0]} unlocked!</span>
+            </div>
+          </div>
+        )}
 
         {/* AI Feedback with Speech Bubble */}
         <div className="bb-coach-section">

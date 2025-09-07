@@ -896,12 +896,62 @@ html {
   to { width: 100%; }
 }
 
+/* Gamification Pills */
+.bb-streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  animation: bb-pill-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin: 12px auto;
+  text-align: center;
+}
+
+.bb-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+  color: #8b4513;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  animation: bb-pill-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin: 12px auto;
+  text-align: center;
+}
+
+@keyframes bb-pill-bounce {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
 /* Motion Preference Support */
 @media (prefers-reduced-motion: reduce) {
   .bb-emoji-chip,
   .bb-text-pill,
   .bb-photo-placeholder,
-  .bb-goal-icon {
+  .bb-goal-icon,
+  .bb-streak-pill,
+  .bb-badge-pill {
     animation: none;
   }
   
