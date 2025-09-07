@@ -60,17 +60,18 @@ export default function Home() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col gap-4 justify-center items-center">
             <Button 
-              className="hover:shadow-lg text-white px-8 sm:px-10 py-5 text-lg font-semibold rounded-full transition-all duration-200 min-h-[44px] w-full sm:w-auto"
-              style={{ backgroundColor: '#FF6A00' }}
+              className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+              style={{ borderRadius: '13px' }}
               onClick={() => window.location.href = '/start'}
             >
               Get Started
             </Button>
             <Button 
               variant="outline" 
-              className="border-2 border-gray-300 text-black hover:bg-gray-50 hover:shadow-md px-8 sm:px-10 py-5 text-lg font-medium rounded-full bg-white transition-all duration-200 min-h-[44px] w-full sm:w-auto"
+              className="max-w-[366px] w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
+              style={{ borderRadius: '13px' }}
               onClick={() => window.location.href = '/login'}
             >
               I already have an account
@@ -274,10 +275,10 @@ export default function Home() {
             </div>
             
             {/* CTA Button - Centered Below Image */}
-            <div className={`-mt-6 scroll-fade-in-stagger ${ctaAnimation.isVisible ? 'visible' : ''}`}>
+            <div className={`-mt-6 scroll-fade-in-stagger flex justify-center ${ctaAnimation.isVisible ? 'visible' : ''}`}>
               <Button 
-                className="text-white px-8 sm:px-10 py-5 text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200 min-h-[44px] w-full sm:w-auto max-w-xs mx-auto"
-                style={{ backgroundColor: '#FF6A00' }}
+                className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+                style={{ borderRadius: '13px' }}
                 onClick={() => window.location.href = '/start'}
               >
                 Let's Go!
