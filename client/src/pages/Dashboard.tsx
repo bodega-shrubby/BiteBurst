@@ -236,13 +236,16 @@ export default function Dashboard() {
           </div>
 
           {/* Food Log Button */}
-          <button 
-            onClick={() => window.location.href = '/food-log'}
-            className="w-full bg-[#FF6A00] text-white rounded-2xl py-4 flex items-center justify-center space-x-2 font-semibold hover:bg-orange-600 transition-colors"
-          >
-            <span>🍎</span>
-            <span>Log Your Meal</span>
-          </button>
+          <div className="flex justify-center">
+            <button 
+              onClick={() => window.location.href = '/food-log'}
+              className="max-w-[366px] w-full bg-[#FF6A00] text-white h-12 flex items-center justify-center space-x-2 font-bold uppercase tracking-wider hover:bg-[#E55A00] transition-colors"
+              style={{ borderRadius: '13px' }}
+            >
+              <span>🍎</span>
+              <span>Log Your Meal</span>
+            </button>
+          </div>
         </div>
 
         {/* Today's Journey Card */}

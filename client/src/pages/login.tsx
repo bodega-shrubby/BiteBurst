@@ -125,20 +125,23 @@ export default function Login() {
               />
             </div>
             
-            <Button 
-              type="submit" 
-              className="w-full bg-orange-500 hover:bg-orange-600"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing In...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
+            <div className="flex justify-center">
+              <Button 
+                type="submit" 
+                className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+                style={{ borderRadius: '13px' }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </div>
           </form>
           
           <div className="mt-6 text-center">

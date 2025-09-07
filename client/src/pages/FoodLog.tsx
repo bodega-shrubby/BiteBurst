@@ -494,11 +494,12 @@ export default function FoodLog() {
         )}
 
         {/* Submit Button */}
-        <div className="sticky bottom-4 pt-4">
+        <div className="sticky bottom-4 pt-4 flex justify-center">
           <Button
             onClick={submitLog}
             disabled={!hasContent || logMutation.isPending}
-            className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white py-4 text-lg font-bold rounded-xl disabled:opacity-50"
+            className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider disabled:opacity-50"
+            style={{ borderRadius: '13px' }}
           >
             {logMutation.isPending ? 'SAVING...' : 'LOG MEAL'}
           </Button>
