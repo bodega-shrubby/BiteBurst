@@ -27,6 +27,8 @@ export default function Feedback() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [xpAnimationComplete, setXpAnimationComplete] = useState(false);
   const [levelUpOccurred, setLevelUpOccurred] = useState(false);
+  const [typewriterText, setTypewriterText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   
   // StrictMode safe guard
   const hasAnimatedRef = useRef(false);
@@ -261,6 +263,50 @@ export default function Feedback() {
   const feedback = logData.feedback || feedbackData?.feedback;
   const isLoading = feedbackLoading && !logData.feedback;
 
+  // Goal icon helper function
+  const getGoalIcon = (goal: string) => {
+    switch (goal) {
+      case 'energy':
+        return { icon: '⚡', class: 'bb-goal-energy' };
+      case 'focus':
+        return { icon: '🧠', class: 'bb-goal-focus' };
+      case 'strength':
+        return { icon: '💪', class: 'bb-goal-strength' };
+      default:
+        return { icon: '⚡', class: 'bb-goal-energy' };
+    }
+  };
+
+  // Typewriter effect for feedback
+  useEffect(() => {
+    if (feedback && feedback !== typewriterText && !isLoading) {
+      setIsTyping(true);
+      setTypewriterText('');
+      
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      if (prefersReducedMotion) {
+        // No animation for users who prefer reduced motion
+        setTypewriterText(feedback);
+        setIsTyping(false);
+        return;
+      }
+      
+      let index = 0;
+      const timer = setInterval(() => {
+        if (index < feedback.length) {
+          setTypewriterText(feedback.slice(0, index + 1));
+          index++;
+        } else {
+          setIsTyping(false);
+          clearInterval(timer);
+        }
+      }, 30); // Adjust speed as needed
+      
+      return () => clearInterval(timer);
+    }
+  }, [feedback, isLoading]);
+
   const renderContent = () => {
     if (logData.entryMethod === 'emoji' && logData.content?.emojis) {
       return (
@@ -417,29 +463,42 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* AI Feedback */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-medium text-gray-800 mb-3 text-center">
+        {/* AI Feedback with Speech Bubble */}
+        <div className="bb-coach-section">
+          {/* Goal Icon */}
+          <div className="flex justify-center mb-4">
+            <div className={`bb-goal-icon ${getGoalIcon((user as any)?.goal).class}`}>
+              {getGoalIcon((user as any)?.goal).icon}
+            </div>
+          </div>
+          
+          {/* Speech Bubble */}
+          <div className="bb-speech-bubble">
+            <h3 className="font-bold text-gray-800 mb-4 text-center text-lg">
               Your nutrition coach says:
             </h3>
             
             {isLoading ? (
               <div className="text-center text-gray-500 py-4">
                 <div className="animate-spin w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-2"></div>
-                Getting your personalized feedback...
+                <p className="text-sm">Getting your personalized feedback...</p>
               </div>
             ) : feedback ? (
-              <p className="text-base text-gray-700 text-center leading-relaxed">
-                {feedback}
-              </p>
+              <div className="relative">
+                <p className={`text-base text-gray-700 leading-relaxed ${isTyping ? 'bb-typewriter' : ''}`}>
+                  {typewriterText || feedback}
+                </p>
+                {isTyping && (
+                  <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
+                )}
+              </div>
             ) : (
-              <p className="text-base text-gray-700 text-center leading-relaxed">
+              <p className="text-base text-gray-700 leading-relaxed">
                 Keep up the great work! Every healthy choice helps you grow stronger and smarter.
               </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <div className="space-y-3 pt-4">
