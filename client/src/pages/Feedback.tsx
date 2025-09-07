@@ -505,10 +505,11 @@ export default function Feedback() {
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3 pt-4">
+        <div className="space-y-3 pt-4 flex flex-col items-center">
           <Button
             onClick={handleLogAnother}
-            className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white py-4 text-lg font-bold rounded-xl"
+            className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+            style={{ borderRadius: '13px' }}
           >
             <RotateCcw size={20} className="mr-2" />
             LOG ANOTHER MEAL
@@ -517,7 +518,8 @@ export default function Feedback() {
           <Button
             onClick={handleBackToDashboard}
             variant="outline"
-            className="w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 py-4 text-lg font-medium rounded-xl"
+            className="max-w-[366px] w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
+            style={{ borderRadius: '13px' }}
           >
             <Home size={20} className="mr-2" />
             BACK TO DASHBOARD
