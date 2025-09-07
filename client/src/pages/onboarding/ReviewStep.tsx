@@ -113,15 +113,12 @@ export default function ReviewStep() {
         </div>
 
         {/* Create Profile Button */}
-        <div className="pt-4">
+        <div className="pt-4 flex justify-center">
           <Button
             onClick={handleCreateProfile}
             disabled={isCreating || createProfileMutation.isPending}
-            className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ 
-              backgroundColor: 'var(--bb-header, #FF6A00)',
-              height: 'var(--tap, 56px)'
-            }}
+            className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ borderRadius: '13px' }}
           >
             {isCreating || createProfileMutation.isPending ? "Creating Account..." : "Create Account"}
           </Button>

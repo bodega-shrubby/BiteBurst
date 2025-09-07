@@ -113,14 +113,14 @@ export default function AvatarStep() {
         </div>
 
         {/* Next Button */}
-        <div className="pt-4">
+        <div className="pt-4 flex justify-center">
           <Button
             onClick={handleNext}
             disabled={!selectedAvatar}
-            className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="max-w-[366px] w-full text-white h-12 text-base font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ 
-              backgroundColor: selectedAvatar ? 'var(--bb-header, #FF6A00)' : '#9CA3AF',
-              height: 'var(--tap, 56px)'
+              backgroundColor: selectedAvatar ? '#FF6A00' : '#9CA3AF',
+              borderRadius: '13px'
             }}
           >
             Next

@@ -48,14 +48,11 @@ export default function WelcomeStep() {
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-4 pt-8">
+        <div className="space-y-4 pt-8 flex flex-col items-center">
           <Button
             onClick={handleGetStarted}
-            className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-            style={{ 
-              backgroundColor: 'var(--bb-header, #FF6A00)',
-              height: 'var(--tap, 56px)'
-            }}
+            className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+            style={{ borderRadius: '13px' }}
           >
             Get Started
           </Button>
@@ -63,11 +60,8 @@ export default function WelcomeStep() {
           <Button
             variant="outline"
             onClick={handleSignIn}
-            className="w-full font-bold text-lg rounded-full border-2 transition-all duration-200 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            style={{ 
-              height: 'var(--tap, 56px)',
-              borderColor: 'var(--bb-outline, #E5E5E5)'
-            }}
+            className="max-w-[366px] w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
+            style={{ borderRadius: '13px' }}
           >
             I already have an account
           </Button>

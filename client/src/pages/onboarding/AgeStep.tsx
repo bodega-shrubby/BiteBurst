@@ -67,17 +67,14 @@ export default function AgeStep() {
 
         {/* Manual Next Button (backup) */}
         {selectedAge && (
-          <div className="pt-4">
+          <div className="pt-4 flex justify-center">
             <Button
               onClick={() => {
                 updateProfile({ ageBracket: selectedAge });
                 setLocation("/profile/goal");
               }}
-              className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-              style={{ 
-                backgroundColor: 'var(--bb-header, #FF6A00)',
-                height: 'var(--tap, 56px)'
-              }}
+              className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+              style={{ borderRadius: '13px' }}
             >
               Next
             </Button>
