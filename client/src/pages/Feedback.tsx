@@ -264,11 +264,14 @@ export default function Feedback() {
   const renderContent = () => {
     if (logData.entryMethod === 'emoji' && logData.content?.emojis) {
       return (
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div className="flex flex-wrap gap-3 justify-center">
           {logData.content.emojis.map((emoji: string, index: number) => (
-            <Badge key={index} variant="secondary" className="text-lg px-3 py-1">
-              {emoji}
-            </Badge>
+            <div 
+              key={index} 
+              className="bb-emoji-chip bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-transform duration-200"
+            >
+              <span className="text-4xl block mb-2">{emoji}</span>
+            </div>
           ))}
         </div>
       );
@@ -276,17 +279,32 @@ export default function Feedback() {
     
     if (logData.entryMethod === 'text' && logData.content?.description) {
       return (
-        <p className="text-base text-center text-gray-700">
-          "{logData.content.description}"
-        </p>
+        <div className="bb-text-pill bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-200 rounded-2xl px-8 py-6 shadow-md mx-auto max-w-sm">
+          <div className="text-2xl mb-2 text-center">📝</div>
+          <p className="text-lg font-medium text-slate-800 text-center leading-relaxed">
+            "{logData.content.description}"
+          </p>
+        </div>
       );
     }
     
     if (logData.entryMethod === 'photo') {
       return (
-        <div className="text-center">
-          <div className="text-4xl mb-2">📷</div>
-          <p className="text-gray-600">Photo logged successfully!</p>
+        <div className="bb-photo-preview text-center">
+          {logData.content?.photoUrl ? (
+            <div className="inline-block">
+              <img 
+                src={logData.content.photoUrl} 
+                alt="Logged meal photo" 
+                className="w-32 h-32 object-cover rounded-2xl shadow-lg border-2 border-[#FF6A00] mx-auto mb-3"
+              />
+            </div>
+          ) : (
+            <div className="bb-photo-placeholder bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-2xl w-32 h-32 mx-auto mb-3 flex items-center justify-center shadow-lg">
+              <span className="text-4xl">📷</span>
+            </div>
+          )}
+          <p className="text-base font-medium text-gray-700">Photo logged successfully!</p>
         </div>
       );
     }
@@ -354,14 +372,12 @@ export default function Feedback() {
         </section>
 
         {/* What You Logged */}
-        <Card className="border-2 border-[#FF6A00]">
-          <CardContent className="p-6">
-            <h3 className="text-center font-medium text-gray-600 mb-4">
-              What you logged:
-            </h3>
-            {renderContent()}
-          </CardContent>
-        </Card>
+        <div className="bb-content-card bg-white border-2 border-[#FF6A00] rounded-2xl shadow-xl p-8">
+          <h3 className="text-center text-xl font-bold text-gray-800 mb-6 tracking-wide">
+            What you logged:
+          </h3>
+          {renderContent()}
+        </div>
 
         {/* Animated XP System */}
         <div

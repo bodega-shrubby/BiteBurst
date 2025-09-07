@@ -782,3 +782,144 @@ html {
   text-align: center;
   margin: 16px 0;
 }
+
+/* Enhanced Content Display Styles */
+.bb-emoji-chip {
+  position: relative;
+  animation: bb-emoji-float 3s ease-in-out infinite;
+}
+
+.bb-emoji-chip:nth-child(2n) {
+  animation-delay: 0.5s;
+}
+
+.bb-emoji-chip:nth-child(3n) {
+  animation-delay: 1s;
+}
+
+@keyframes bb-emoji-float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+
+.bb-text-pill {
+  position: relative;
+  animation: bb-text-pulse 2s ease-in-out infinite;
+}
+
+@keyframes bb-text-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  50% { transform: scale(1.01); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+}
+
+.bb-photo-preview {
+  position: relative;
+}
+
+.bb-photo-placeholder {
+  animation: bb-photo-breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes bb-photo-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.03); opacity: 1; }
+}
+
+/* Speech Bubble Styles */
+.bb-speech-bubble {
+  position: relative;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  margin-top: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.bb-speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 24px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid #e2e8f0;
+}
+
+.bb-speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 26px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #f8fafc;
+}
+
+.bb-goal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: 3px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: bb-goal-pulse 2s ease-in-out infinite;
+  margin-bottom: 16px;
+}
+
+.bb-goal-energy {
+  background: linear-gradient(135deg, #fef3c7, #fde047);
+  border-color: #eab308;
+  color: #a16207;
+}
+
+.bb-goal-focus {
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  border-color: #6366f1;
+  color: #4338ca;
+}
+
+.bb-goal-strength {
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  border-color: #ec4899;
+  color: #be185d;
+}
+
+@keyframes bb-goal-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Typewriter Effect */
+.bb-typewriter {
+  overflow: hidden;
+  white-space: pre-wrap;
+  animation: bb-typing 3s steps(40, end) forwards;
+}
+
+@keyframes bb-typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Motion Preference Support */
+@media (prefers-reduced-motion: reduce) {
+  .bb-emoji-chip,
+  .bb-text-pill,
+  .bb-photo-placeholder,
+  .bb-goal-icon {
+    animation: none;
+  }
+  
+  .bb-typewriter {
+    animation: none;
+    width: 100%;
+  }
+}
