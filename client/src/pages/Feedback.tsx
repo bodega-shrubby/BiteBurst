@@ -68,6 +68,26 @@ export default function Feedback() {
     },
     onSuccess: (data) => {
       console.log('XP updated successfully:', data);
+      
+      // Handle new streak response format
+      if (data.streak_changed) {
+        // Check localStorage guard to prevent multiple displays
+        const today = new Date().toISOString().split('T')[0];
+        const lastStreakShown = localStorage.getItem('streakShownOn');
+        
+        if (lastStreakShown !== today) {
+          // Show streak pill and set localStorage guard
+          setShowStreakPill(true);
+          localStorage.setItem('streakShownOn', today);
+        }
+      }
+      
+      // Handle milestone badge if awarded
+      if (data.badge_awarded) {
+        setNewBadges([data.badge_awarded.name]);
+        setShowBadgePill(true);
+      }
+      
       // Invalidate user data to refresh with new XP/level
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     },
@@ -222,20 +242,8 @@ export default function Feedback() {
             deltaXp: awardXP,
             reason: 'food_log',
           });
-          // invalidate AFTER the animation to avoid remount flicker
-          queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+          // Note: XP mutation onSuccess handler now manages streak/badge pills
         }
-        
-        // Show gamification features after XP animation
-        setTimeout(() => {
-          // Show streak pill if streak >= 2
-          if ((user as any)?.streak >= 2) {
-            setShowStreakPill(true);
-          }
-          
-          // TODO: Check for new badges and show badge pill
-          // This would require checking if badges were awarded during this session
-        }, 800);
         
         // mark complete after everything
         hasAnimatedRef.current = true;
@@ -485,11 +493,11 @@ export default function Feedback() {
         </div>
 
         {/* Gamification Pills */}
-        {showStreakPill && (user as any)?.streak >= 2 && (
+        {showStreakPill && (
           <div className="flex justify-center" role="status" aria-live="polite">
             <div className="bb-streak-pill">
               <span className="text-xl">🔥</span>
-              <span>{(user as any)?.streak}-day streak!</span>
+              <span>{(user as any)?.streak || 1}-day streak!</span>
             </div>
           </div>
         )}
