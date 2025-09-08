@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF6347" stroke="#FF4500" stroke-width="2"/>
+  <circle cx="32" cy="32" r="24" fill="#FF8A80" stroke="#FF5722" stroke-width="1"/>
+  <text x="32" y="38" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#8B0000">🔥</text>
+  <text x="32" y="52" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#8B0000" font-weight="bold">3 Days</text>
+</svg>

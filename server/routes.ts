@@ -7,6 +7,7 @@ import { registerAIRoutes } from "./routes/ai";
 import { registerDevRoutes } from "./routes/dev";
 import { registerDailySummaryRoutes } from "./routes/dailySummary";
 import { registerDailySummaryV2Routes } from "./routes/dailySummaryV2";
+import { registerBadgeRoutes } from "./routes/badges";
 import { updateStreak, getCurrentTime } from "./utils/streakTracker";
 // Replit Auth completely removed
 
@@ -284,6 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAIRoutes(app, requireAuth);
   registerDailySummaryRoutes(app, requireAuth);
   registerDailySummaryV2Routes(app, requireAuth);
+  registerBadgeRoutes(app, requireAuth);
   registerDevRoutes(app); // Development testing routes
 
   const httpServer = createServer(app);

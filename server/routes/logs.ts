@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { z } from "zod";
+import { buildBadgeContext, evaluateBadges } from "../lib/badges";
 
 const createLogSchema = z.object({
   userId: z.string(),
@@ -74,12 +75,34 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
 
       // Note: XP events could be tracked but not required for MVP
 
+      // Evaluate badges after successful log creation
+      let badgeAwarded = null;
+      try {
+        const badgeContext = await buildBadgeContext(validatedData.userId);
+        const newBadges = await evaluateBadges(badgeContext);
+        
+        // Return first badge if any were awarded (UI will handle celebration)
+        if (newBadges.length > 0) {
+          badgeAwarded = {
+            code: newBadges[0].code,
+            name: newBadges[0].name,
+            description: newBadges[0].description,
+            category: newBadges[0].category,
+            rarity: newBadges[0].rarity
+          };
+        }
+      } catch (badgeError) {
+        console.error('Badge evaluation error:', badgeError);
+        // Don't fail the log creation if badge evaluation fails
+      }
+
       res.json({
         id: logEntry.id,
         xpAwarded,
         feedback: null, // Will be populated by AI endpoint
         content: validatedData.content,
-        entryMethod: validatedData.entryMethod
+        entryMethod: validatedData.entryMethod,
+        badge_awarded: badgeAwarded
       });
 
     } catch (error) {

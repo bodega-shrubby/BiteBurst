@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+  <circle cx="32" cy="32" r="24" fill="#C8E6C9" stroke="#4CAF50" stroke-width="1"/>
+  <text x="32" y="38" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#1B5E20">⚡</text>
+  <text x="32" y="52" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#1B5E20" font-weight="bold">Combo</text>
+</svg>

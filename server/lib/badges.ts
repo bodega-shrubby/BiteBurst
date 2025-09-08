@@ -29,6 +29,7 @@ export interface BadgeAward {
   description: string;
   category: string;
   tier: number;
+  threshold: number;
   rarity: string;
 }
 
@@ -76,6 +77,7 @@ async function getBadgeDetails(badgeCode: string): Promise<BadgeAward | null> {
     description: badge.description,
     category: badge.category,
     tier: badge.tier,
+    threshold: badge.threshold,
     rarity: badge.rarity
   };
 }
@@ -300,6 +302,7 @@ export async function getAllBadges(): Promise<BadgeAward[]> {
     description: badge.description,
     category: badge.category,
     tier: badge.tier,
+    threshold: badge.threshold,
     rarity: badge.rarity
   }));
 }

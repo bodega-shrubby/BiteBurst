@@ -121,8 +121,8 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
       const userBadges = await storage.getUserBadges(userId);
       
       const earnedBadges = userBadges.map((ub: any) => ({
-        code: ub.badgeId,
-        name: ub.badgeId.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase()),
+        code: ub.badgeCode,
+        name: ub.badgeCode.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase()),
         description: `You earned this badge!`
       }));
       
@@ -131,7 +131,7 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
         { code: 'STREAK_7', name: 'One Week Streak', description: 'Log for 7 days in a row' },
         { code: 'STREAK_30', name: 'One Month Streak', description: 'Log for 30 days in a row' },
         { code: 'COMBO_MASTER', name: 'Combo Master', description: 'Log food and activity on the same day 10 times' }
-      ].filter((badge: any) => !userBadges.some((ub: any) => ub.badgeId === badge.code));
+      ].filter((badge: any) => !userBadges.some((ub: any) => ub.badgeCode === badge.code));
       
       // Format recent logs for display
       const recentLogs = todaysLogs

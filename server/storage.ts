@@ -139,13 +139,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(badges)
       .where(eq(badges.userId, userId))
-      .orderBy(desc(badges.awardedAt));
+      .orderBy(desc(badges.earnedAt));
   }
 
-  async awardBadge(userId: string, badgeId: string): Promise<Badge> {
+  async awardBadge(userId: string, badgeCode: string): Promise<Badge> {
     const [badge] = await db
       .insert(badges)
-      .values({ userId, badgeId })
+      .values({ userId, badgeCode })
       .onConflictDoNothing()
       .returning();
     return badge;
