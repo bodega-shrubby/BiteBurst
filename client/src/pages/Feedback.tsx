@@ -504,55 +504,97 @@ export default function Feedback() {
         )}
 
         {/* AI Feedback with Speech Bubble */}
-        <div className="bb-coach-section" style={{ 
-          border: '1px dashed #9747FF',
+        <div style={{ 
+          position: 'relative',
+          width: '100%',
+          maxWidth: '430px',
+          height: 'auto',
+          margin: '0 auto',
+          border: '2px solid #E5E5E5',
           borderRadius: '5px',
           padding: '16px',
           boxSizing: 'border-box'
         }}>
-          {/* Goal Icon */}
-          <div className="flex justify-center mb-4">
-            <div className={`bb-goal-icon ${getGoalIcon((user as any)?.goal).class}`}>
-              {getGoalIcon((user as any)?.goal).icon}
-            </div>
-          </div>
-          
-          {/* Coach Mascot and Speech Bubble */}
-          <div className="flex items-start gap-2 justify-center">
+          {/* Content Layout */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            padding: '0px',
+            gap: '10px',
+            width: '100%'
+          }}>
             {/* Nutrition Coach Mascot */}
-            <div className="flex-shrink-0">
+            <div style={{ 
+              flex: 'none',
+              order: 0 
+            }}>
               <img 
                 src={nutritionCoachMascot} 
                 alt="Nutrition coach mascot"
-                className="w-28 h-36 object-contain"
+                style={{
+                  width: '80px',
+                  height: '100px',
+                  objectFit: 'contain'
+                }}
               />
             </div>
             
-            {/* Speech Bubble */}
-            <div className="bb-speech-bubble flex-1 max-w-sm">
-            <h3 className="font-bold text-gray-800 mb-4 text-center text-lg">
-              Your nutrition coach says:
-            </h3>
-            
-            {isLoading ? (
-              <div className="text-center text-gray-500 py-4">
-                <div className="animate-spin w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-2"></div>
-                <p className="text-sm">Getting your personalized feedback...</p>
-              </div>
-            ) : feedback ? (
-              <div className="relative">
-                <p className={`text-base text-gray-700 leading-relaxed ${isTyping ? 'bb-typewriter' : ''}`}>
-                  {typewriterText || feedback}
+            {/* Speech Content */}
+            <div style={{
+              flex: '1',
+              order: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: '8px'
+            }}>
+              {/* Header */}
+              <h3 style={{
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: '600',
+                fontSize: '16px',
+                lineHeight: '20px',
+                color: '#4B4B4B',
+                margin: '0 0 8px 0'
+              }}>
+                Your nutrition coach says:
+              </h3>
+              
+              {/* Feedback Content */}
+              {isLoading ? (
+                <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                  <div className="animate-spin w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p style={{ fontSize: '14px', color: '#666' }}>Getting your personalized feedback...</p>
+                </div>
+              ) : feedback ? (
+                <div style={{ position: 'relative' }}>
+                  <p style={{
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    fontSize: '16px',
+                    lineHeight: '22px',
+                    color: '#4B4B4B',
+                    letterSpacing: '0.01em',
+                    margin: 0
+                  }} className={isTyping ? 'bb-typewriter' : ''}>
+                    {typewriterText || feedback}
+                  </p>
+                  {isTyping && (
+                    <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
+                  )}
+                </div>
+              ) : (
+                <p style={{
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  fontSize: '16px',
+                  lineHeight: '22px',
+                  color: '#4B4B4B',
+                  letterSpacing: '0.01em',
+                  margin: 0
+                }}>
+                  Keep up the great work! Every healthy choice helps you grow stronger and smarter.
                 </p>
-                {isTyping && (
-                  <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
-                )}
-              </div>
-            ) : (
-              <p className="text-base text-gray-700 leading-relaxed">
-                Keep up the great work! Every healthy choice helps you grow stronger and smarter.
-              </p>
-            )}
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,564 @@
+/* Type=Translate the Sentence, Answered=False */
+
+position: absolute;
+width: 430px;
+height: 190px;
+left: 16px;
+top: 16px;
+
+
+
+/* Frame 57 */
+
+position: absolute;
+width: 254px;
+height: 98px;
+left: 152px;
+top: 52px;
+
+
+
+/* Rectangle 30 */
+
+position: absolute;
+left: -17px;
+right: 0px;
+top: 0px;
+bottom: 0px;
+
+border: 2px solid #E5E5E5;
+
+
+/* Frame 59 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+flex-wrap: wrap;
+align-items: center;
+align-content: flex-start;
+padding: 0px;
+gap: 10px 4px;
+
+position: absolute;
+width: 223px;
+height: 64px;
+left: 15px;
+top: 17px;
+
+
+
+/* Frame 58 */
+
+width: 33px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icons */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 8px;
+
+position: absolute;
+width: 26.73px;
+height: 19.8px;
+left: 0px;
+top: 0px;
+
+
+
+/* Volume */
+
+width: 26.73px;
+height: 19.8px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Group 15 */
+
+position: absolute;
+width: 26.73px;
+height: 19.5px;
+left: 0px;
+top: 0px;
+
+
+
+/* Rectangle 21 */
+
+position: absolute;
+width: 10px;
+height: 10px;
+left: 0px;
+top: 4px;
+
+background: #1CB0F6;
+border-radius: 3px;
+
+
+/* Vector 32 */
+
+position: absolute;
+width: 10.5px;
+height: 19.5px;
+left: 1.5px;
+top: 0px;
+
+background: #1CB0F6;
+border-radius: 1px;
+
+
+/* Ellipse 21 */
+
+position: absolute;
+width: 7.1px;
+height: 4.87px;
+left: 12.7px;
+top: 5.35px;
+
+border: 2px solid #1CB0F6;
+transform: rotate(-60deg);
+
+
+/* Ellipse 22 */
+
+position: absolute;
+width: 14.41px;
+height: 9.88px;
+left: 10.97px;
+top: 0.52px;
+
+border: 2px solid #1CB0F6;
+transform: rotate(-60deg);
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 72px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* word */
+
+width: 72px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 72px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 10px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* word */
+
+width: 10px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 10px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 20px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* word */
+
+width: 20px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 20px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 86px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 4;
+flex-grow: 0;
+
+
+/* word */
+
+width: 86px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 86px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 31px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 5;
+flex-grow: 0;
+
+
+/* word */
+
+width: 31px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 31px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 16px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 6;
+flex-grow: 0;
+
+
+/* word */
+
+width: 16px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 16px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Question Word */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3px;
+
+width: 78px;
+height: 27px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 7;
+flex-grow: 0;
+
+
+/* word */
+
+width: 78px;
+height: 24px;
+
+/* Primary */
+font-family: 'DIN 2014 Rounded VF';
+font-style: normal;
+font-weight: 400;
+font-size: 20px;
+line-height: 24px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.03em;
+
+color: #4B4B4B;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector 49 */
+
+width: 78px;
+height: 0px;
+
+border: 2px dashed #AFAFAF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* IMG_0302 1 */
+
+position: absolute;
+width: 134px;
+height: 186px;
+left: 0px;
+top: 0px;
+
+background: url(IMG_0302.png);
