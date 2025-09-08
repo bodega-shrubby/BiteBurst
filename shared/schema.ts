@@ -78,13 +78,27 @@ export const streaks = pgTable("streaks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// Badges table
+// Badge Catalog table (seeded, read-only)
+export const badgeCatalog = pgTable("badge_catalog", {
+  code: varchar("code").primaryKey(),
+  name: varchar("name").notNull(),
+  description: text("description").notNull(),
+  category: varchar("category").notNull(),
+  tier: integer("tier").notNull(), // 1=bronze, 2=silver, 3=gold
+  threshold: integer("threshold").notNull(),
+  icon: varchar("icon").notNull(),
+  rarity: varchar("rarity").notNull(),
+  active: boolean("active").notNull().default(true),
+});
+
+// User Badges (earned badges tracking) - UUID to match users table
 export const badges = pgTable("badges", {
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-  badgeId: text("badge_id").notNull(),
-  awardedAt: timestamp("awarded_at").notNull().defaultNow(),
+  badgeCode: varchar("badge_code").notNull().references(() => badgeCatalog.code),
+  earnedAt: timestamp("earned_at").notNull().defaultNow(),
+  progress: integer("progress").default(0), // Current progress toward threshold
 }, (table) => ({
-  pk: { name: "badges_pkey", columns: [table.userId, table.badgeId] }
+  pk: { name: "badges_pkey", columns: [table.userId, table.badgeCode] }
 }));
 
 // XP Events table
@@ -107,6 +121,7 @@ export type InsertLog = typeof logs.$inferInsert;
 export type Avatar = typeof avatars.$inferSelect;
 export type Goal = typeof goals.$inferSelect;
 export type Streak = typeof streaks.$inferSelect;
+export type BadgeCatalogItem = typeof badgeCatalog.$inferSelect;
 export type Badge = typeof badges.$inferSelect;
 export type XpEvent = typeof xpEvents.$inferSelect;
 

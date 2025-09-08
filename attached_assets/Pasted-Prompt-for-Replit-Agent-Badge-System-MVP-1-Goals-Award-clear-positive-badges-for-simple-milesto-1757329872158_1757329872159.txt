@@ -1,0 +1,222 @@
+Prompt for Replit Agent: Badge System (MVP)
+1) Goals
+Award clear, positive badges for simple milestones.
+Server-source-of-truth with lightweight client UI.
+Show earned vs. locked badges on Home (“Badges & Rewards”) and Profile/Progress screens.
+Trigger celebration on new unlock (confetti + mini toast).
+2) Data Model
+Tables
+badges (seeded, read-only)
+code (PK, string) — e.g., "FIRST_FOOD"
+name (string) — e.g., "First Food Log"
+description (string) — short kid-friendly line
+category (enum: streak|food|activity|combo|lifetime)
+tier (int, 1..3) — bronze=1, silver=2, gold=3 (for future sets)
+threshold (int) — count needed (e.g., 3, 7, 10)
+icon (string) — asset id (e.g., badge_fruit_bronze)
+rarity (enum: common|uncommon|rare) — for UI flair
+active (bool)
+user_badges
+user_id (FK)
+badge_code (FK)
+earned_at (ISO timestamp)
+progress (int, optional — current count toward threshold)
+(If you already have a meta JSON per user, progress can live there.)
+3) Badge Set (seed this)
+[
+  {
+    "code":"FIRST_FOOD",
+    "name":"First Food Log",
+    "description":"Your first healthy step! 🍎",
+    "category":"food","tier":1,"threshold":1,
+    "icon":"badge_first_food","rarity":"common","active":true
+  },
+  {
+    "code":"FIRST_ACTIVITY",
+    "name":"First Activity Log",
+    "description":"Way to move your body! ⚽",
+    "category":"activity","tier":1,"threshold":1,
+    "icon":"badge_first_activity","rarity":"common","active":true
+  },
+  {
+    "code":"STREAK_3",
+    "name":"3-Day Streak",
+    "description":"Three days in a row! 🔥",
+    "category":"streak","tier":1,"threshold":3,
+    "icon":"badge_streak_3","rarity":"common","active":true
+  },
+  {
+    "code":"STREAK_7",
+    "name":"One-Week Streak",
+    "description":"One whole week! 🌟",
+    "category":"streak","tier":2,"threshold":7,
+    "icon":"badge_streak_7","rarity":"uncommon","active":true
+  },
+  {
+    "code":"STREAK_14",
+    "name":"Two-Week Streak",
+    "description":"Two weeks strong! 💪",
+    "category":"streak","tier":2,"threshold":14,
+    "icon":"badge_streak_14","rarity":"uncommon","active":true
+  },
+  {
+    "code":"STREAK_30",
+    "name":"30-Day Streak",
+    "description":"Legend status! 🏆",
+    "category":"streak","tier":3,"threshold":30,
+    "icon":"badge_streak_30","rarity":"rare","active":true
+  },
+  {
+    "code":"FOOD_VARIETY_5",
+    "name":"Fruit Fighter",
+    "description":"Logged 5 different fruits! 🍓",
+    "category":"food","tier":2,"threshold":5,
+    "icon":"badge_fruit_variety","rarity":"uncommon","active":true
+  },
+  {
+    "code":"ACTIVITY_10",
+    "name":"Move Maker",
+    "description":"10 activities logged! 🏃",
+    "category":"activity","tier":2,"threshold":10,
+    "icon":"badge_activity_10","rarity":"uncommon","active":true
+  },
+  {
+    "code":"COMBO_DAY",
+    "name":"Fuel + Move",
+    "description":"Logged food and activity today! ⚡",
+    "category":"combo","tier":1,"threshold":1,
+    "icon":"badge_combo_day","rarity":"common","active":true
+  },
+  {
+    "code":"WATER_7",
+    "name":"Water Warrior",
+    "description":"Drank water 7 days! 💧",
+    "category":"lifetime","tier":1,"threshold":7,
+    "icon":"badge_water_7","rarity":"common","active":true
+  }
+]
+Assets: use placeholder SVG/PNG names above; store under public/assets/badges/….
+4) Server Logic
+Create server/lib/badges.ts (or .js) with:
+type BadgeCheckContext = {
+  userId: string;
+  nowISO: string;
+  today: string;         // local day string YYYY-MM-DD
+  lastLogAt?: string;
+  streakDays: number;
+  // counters available from DB:
+  totals: {
+    foodsToday: number;
+    activitiesTotal: number;
+    fruitsDistinctTotal: number;  // e.g., distinct fruit emojis
+    waterDays: number;            // days with water logged
+    comboToday: boolean;
+  }
+};
+
+export async function evaluateBadges(ctx: BadgeCheckContext): Promise<Array<{code:string}>> {
+  const newlyEarned:string[] = [];
+
+  // Helper: award if not already owned
+  async function tryAward(code:string){
+    const has = await userAlreadyHasBadge(ctx.userId, code);
+    if (!has) newlyEarned.push(code);
+  }
+
+  // FIRST_FOOD
+  if (ctx.totals.foodsToday >= 1) await tryAward('FIRST_FOOD');
+
+  // FIRST_ACTIVITY
+  if (ctx.totals.activitiesTotal >= 1) await tryAward('FIRST_ACTIVITY');
+
+  // STREAK milestones
+  for (const d of [3,7,14,30]) {
+    if (ctx.streakDays === d) await tryAward(`STREAK_${d}`);
+  }
+
+  // FOOD_VARIETY_5 (distinct fruits across lifetime)
+  if (ctx.totals.fruitsDistinctTotal >= 5) await tryAward('FOOD_VARIETY_5');
+
+  // ACTIVITY_10 (lifetime activity count)
+  if (ctx.totals.activitiesTotal >= 10) await tryAward('ACTIVITY_10');
+
+  // COMBO_DAY (food + activity on same local day)
+  if (ctx.totals.comboToday) await tryAward('COMBO_DAY');
+
+  // WATER_7 (7 distinct days with water logged)
+  if (ctx.totals.waterDays >= 7) await tryAward('WATER_7');
+
+  return newlyEarned.map(code => ({ code }));
+}
+When to evaluate
+After every successful log (food/activity) and after streak update.
+On award:
+Insert into user_badges.
+Return badge_awarded payload to client.
+Endpoint
+Extend /api/log and /api/user/:id/streak responses to include
+{ "badge_awarded": { "code":"...", "name":"..." } | null }
+Add GET /api/user/:id/badges → list of earned badges.
+Add GET /api/badges → catalog (for locked states).
+5) Client Behavior (Home / Progress + Feedback)
+On Feedback screen:
+If badge_awarded exists:
+Show badge pill (“🏅 {name} unlocked!”).
+Trigger confetti and a small toast.
+Add to “Badges & Rewards” shelf immediately.
+Badges shelf component:
+Data:
+GET /api/badges (all) + GET /api/user/:id/badges (earned).
+Render:
+Earned: full-color icon + label.
+Locked: greyed icon frame + small lock + hint (“Log food & activity same day”).
+Tap badge → modal:
+Title, description, “How to earn,” date earned (if any).
+Copy (kid-friendly)
+FIRST_FOOD: “Your first healthy step! 🍎”
+STREAK_7: “One week strong! 🌟”
+COMBO_DAY: “Fuel + Move = Power! ⚡”
+6) Progress Tracking (optional but helpful)
+For threshold badges, surface progress (e.g., “3/7 days”) in the modal.
+API can return progress with threshold for each badge to enable a small progress bar.
+GET /api/user/:id/badges response shape
+{
+  "earned": [
+    {"code":"FIRST_FOOD","earned_at":"2025-09-08T09:32:00Z"}
+  ],
+  "progress": [
+    {"code":"STREAK_7","current":4,"threshold":7}
+  ]
+}
+7) Edge Cases & Rules
+Award once per badge; never duplicate.
+Timezone aware (use user’s TZ for “today”).
+If multiple badges qualify on one action, return all in an array; UI can queue toasts.
+For streak resets, do not retract previously earned streak badges.
+Ensure idempotency on retries (e.g., network retries don’t double-award).
+8) Analytics (lightweight)
+Fire events:
+badge_unlocked { code, category, tier }
+badge_viewed { code }
+badge_progress { code, current, threshold } (optional)
+9) Acceptance Criteria
+Server evaluates badges on each log/streak update and returns any newly unlocked badges.
+Home/Progress shows earned vs locked badges using the catalog.
+Feedback screen surfaces new unlocks with a celebratory pill + confetti.
+No duplicate awards; timezone logic correct; works offline-resilient (UI still renders shelf with cached state).
+10) Seed & Assets
+Seed the 10 badges above into badges table (migration or JSON import).
+Add placeholder assets at:
+/public/assets/badges/
+  badge_first_food.svg
+  badge_first_activity.svg
+  badge_streak_3.svg
+  badge_streak_7.svg
+  badge_streak_14.svg
+  badge_streak_30.svg
+  badge_fruit_variety.svg
+  badge_activity_10.svg
+  badge_combo_day.svg
+  badge_water_7.svg
+Provide a simple fallback icon if an asset is missing.
+This framework gives you meaningful early wins (firsts, streaks, combo) and simple lifetime goals (variety, count, water), all driven by server logic and presented in a delightful, kid-friendly UI.
