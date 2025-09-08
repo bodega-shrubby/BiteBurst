@@ -318,6 +318,44 @@ export default function DashboardV2() {
           }}
         />
 
+        {/* Leaderboard Feature Card */}
+        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <span className="text-3xl">🏆</span>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Weekly Champions</h3>
+                <p className="text-sm text-gray-700">Compete with friends worldwide</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => window.location.href = '/leaderboard'}
+              className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 shadow-md"
+            >
+              View League
+            </button>
+          </div>
+          
+          <div className="bg-white/60 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Your league:</span>
+              <div className="flex items-center space-x-1">
+                <span>🥉</span>
+                <span className="font-semibold text-orange-700">Bronze League</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">This week's XP:</span>
+              <span className="font-bold text-gray-900">{dailySummary.xp_today} XP</span>
+            </div>
+            
+            <div className="text-center pt-2 text-xs text-gray-600">
+              🎯 Top 10 advance to Silver League
+            </div>
+          </div>
+        </div>
+
         {/* Recent Logs */}
         <RecentLogsList logs={dailySummary.recent_logs} />
       </main>
