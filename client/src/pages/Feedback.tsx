@@ -509,7 +509,7 @@ export default function Feedback() {
           alignItems: 'flex-start',
           gap: '12px',
           margin: '24px auto 0',
-          maxWidth: '420px',
+          maxWidth: '500px',
           width: '100%'
         }}>
           {/* Nutrition Coach Mascot */}
@@ -520,8 +520,8 @@ export default function Feedback() {
               src={nutritionCoachMascot} 
               alt="Nutrition coach mascot"
               style={{
-                width: '80px',
-                height: '100px',
+                width: '120px',
+                height: '150px',
                 objectFit: 'contain'
               }}
             />
@@ -530,69 +530,62 @@ export default function Feedback() {
           {/* Speech Bubble */}
           <div style={{
             position: 'relative',
-            backgroundColor: '#2d3748',
-            color: 'white',
+            backgroundColor: 'white',
+            border: '2px solid #e2e8f0',
             borderRadius: '20px',
             padding: '16px 20px',
             flex: '1',
-            minHeight: '80px',
+            minWidth: '280px',
+            minHeight: '100px',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
           }}>
             {/* Speech bubble pointer */}
             <div style={{
               position: 'absolute',
-              left: '-8px',
-              top: '20px',
+              left: '-10px',
+              top: '30px',
               width: '0',
               height: '0',
-              borderTop: '8px solid transparent',
-              borderBottom: '8px solid transparent',
-              borderRight: '8px solid #2d3748'
+              borderTop: '10px solid transparent',
+              borderBottom: '10px solid transparent',
+              borderRight: '10px solid white'
+            }}></div>
+            <div style={{
+              position: 'absolute',
+              left: '-12px',
+              top: '28px',
+              width: '0',
+              height: '0',
+              borderTop: '12px solid transparent',
+              borderBottom: '12px solid transparent',
+              borderRight: '12px solid #e2e8f0'
             }}></div>
             
             {/* Content */}
             <div>
-              <h3 style={{
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-                fontWeight: '600',
-                fontSize: '14px',
-                lineHeight: '18px',
-                color: '#a0aec0',
-                margin: '0 0 8px 0'
-              }}>
+              <h3 className="font-bold text-gray-800 mb-3 text-lg">
                 Your nutrition coach says:
               </h3>
               
               {isLoading ? (
-                <div style={{ textAlign: 'center', padding: '8px 0' }}>
-                  <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
-                  <p style={{ fontSize: '12px', color: '#a0aec0' }}>Getting your feedback...</p>
+                <div className="text-center text-gray-500 py-4">
+                  <div className="animate-spin w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-sm">Getting your personalized feedback...</p>
                 </div>
               ) : feedback ? (
-                <div style={{ position: 'relative' }}>
-                  <p style={{
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                    fontSize: '16px',
-                    lineHeight: '22px',
-                    color: 'white',
-                    margin: 0
-                  }} className={isTyping ? 'bb-typewriter' : ''}>
+                <div className="relative">
+                  <p className={`text-base text-gray-700 leading-relaxed ${isTyping ? 'bb-typewriter' : ''}`}>
                     {typewriterText || feedback}
                   </p>
                   {isTyping && (
-                    <span className="inline-block w-0.5 h-5 bg-white ml-0.5 animate-pulse"></span>
+                    <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
                   )}
                 </div>
               ) : (
-                <p style={{
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
-                  fontSize: '16px',
-                  lineHeight: '22px',
-                  color: 'white',
-                  margin: 0
-                }}>
+                <p className="text-base text-gray-700 leading-relaxed">
                   Keep up the great work! Every healthy choice helps you grow stronger and smarter.
                 </p>
               )}
