@@ -166,12 +166,16 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   const weekStartStr = weekStart.toISOString().split('T')[0];
   
   // Get user info
+  console.log('Looking for user with ID:', userId);
   const [user] = await db
     .select()
     .from(users)
     .where(eq(users.id, userId));
   
+  console.log('Found user:', user);
+  
   if (!user) {
+    console.error('User not found with ID:', userId);
     throw new Error('User not found');
   }
   
