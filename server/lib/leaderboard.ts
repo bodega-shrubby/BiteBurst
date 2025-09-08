@@ -195,7 +195,7 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   }
   
   // Check if user opted out
-  if (user.leaderboardOptOut) {
+  if (user!.leaderboardOptOut) {
     return {
       week: {
         start: weekStartStr,
@@ -211,7 +211,7 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
     };
   }
   
-  const userTier = tier || user.leagueTier || 'bronze';
+  const userTier = tier || user!.leagueTier || 'bronze';
   const leagueConfig = getLeagueConfig(userTier);
   
   // Get league board members
