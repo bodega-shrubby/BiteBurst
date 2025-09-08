@@ -22,8 +22,8 @@ export function registerBadgeRoutes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Only allow users to access their own badges
-      if (req.user.userId !== userId) {
+      // Only allow users to access their own badges (fix: use req.user.id instead of userId)
+      if (req.user.id !== userId) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       
@@ -41,8 +41,8 @@ export function registerBadgeRoutes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Only allow users to evaluate their own badges
-      if (req.user.userId !== userId) {
+      // Only allow users to evaluate their own badges (fix: use req.user.id instead of userId)
+      if (req.user.id !== userId) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       
