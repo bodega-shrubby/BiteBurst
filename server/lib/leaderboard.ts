@@ -171,10 +171,11 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   
   let user;
   try {
-    [user] = await db
+    const result = await db
       .select()
       .from(users)
       .where(eq(users.id, userId));
+    user = result[0];
     
     console.log('🔍 LEADERBOARD QUERY - Database returned:', user);
     
