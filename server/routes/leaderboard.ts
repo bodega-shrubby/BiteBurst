@@ -15,7 +15,7 @@ export function registerLeaderboardRoutes(app: Express, requireAuth: any) {
   // GET /api/leaderboard/league - Get league data and rankings
   app.get('/api/leaderboard/league', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userId;
       const tier = req.query.tier as string; // Optional tier override
       
       const leaderboardData = await buildLeaderboard(userId, tier);
@@ -30,7 +30,7 @@ export function registerLeaderboardRoutes(app: Express, requireAuth: any) {
   // POST /api/leaderboard/opt-in - Update user's leaderboard preference
   app.post('/api/leaderboard/opt-in', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userId;
       const validatedData = optOutSchema.parse(req.body);
       
       await updateOptOut(userId, validatedData.opt_out);
