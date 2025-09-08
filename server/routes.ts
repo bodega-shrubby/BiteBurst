@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { registerDashboardRoutes } from "./routes/dashboard";
 import { registerLogRoutes } from "./routes/logs";
 import { registerAIRoutes } from "./routes/ai";
+import { updateStreak, getCurrentTime } from "./utils/streakTracker";
 // Replit Auth completely removed
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -201,42 +202,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newLevel++;
       }
       
-      // Update streak based on date gap rules
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      let newStreak = user.streak || 0;
+      // Update streak using timezone-aware utility
+      const now = getCurrentTime();
+      const streakResult = updateStreak(
+        userId,
+        user.streak || 0,
+        user.streak || 0, // Using current streak as longest for simplicity, could add separate field
+        user.lastLogAt,
+        now,
+        user.tz
+      );
       
-      if (user.lastLogAt) {
-        const lastLogDate = new Date(user.lastLogAt).toISOString().split('T')[0];
-        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        
-        if (lastLogDate === today) {
-          // Same day - no change to streak
-        } else if (lastLogDate === yesterday) {
-          // Yesterday - increment streak
-          newStreak += 1;
-        } else {
-          // Gap - reset streak to 1
-          newStreak = 1;
-        }
-      } else {
-        // First log ever
-        newStreak = 1;
-      }
-      
-      // Check for badge eligibility (simple example)
+      // Check for level-based badge eligibility
       let badge = undefined;
       if (newLevel > (user.level || 1)) {
         badge = `level_${newLevel}`;
-      } else if (newStreak >= 7 && newStreak % 7 === 0) {
-        badge = `streak_${newStreak}`;
+      } else if (streakResult.badge_awarded) {
+        // Use milestone streak badge from utility
+        badge = streakResult.badge_awarded.code;
       }
       
       // Update user in database
       await storage.updateUserXP(userId, {
         totalXp: newTotalXp,
         level: newLevel,
-        streak: newStreak,
+        streak: streakResult.streak_days,
         lastLogAt: now
       });
       
@@ -250,8 +240,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         total_xp: newTotalXp,
         level: newLevel,
-        streak: newStreak,
-        badge
+        streak_days: streakResult.streak_days,
+        streak_changed: streakResult.streak_changed,
+        longest_streak: streakResult.longest_streak,
+        badge_awarded: streakResult.badge_awarded,
+        badge // Keep legacy badge for level-ups
       });
       
     } catch (error) {
