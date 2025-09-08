@@ -11,6 +11,7 @@ import QuickLogGrid from "@/components/dashboard/QuickLogGrid";
 import TodaysJourney from "@/components/dashboard/TodaysJourney";
 import BadgesShelf from "@/components/dashboard/BadgesShelf";
 import RecentLogsList from "@/components/dashboard/RecentLogsList";
+import BottomNavigation from "@/components/BottomNavigation";
 
 interface DailySummaryV2 {
   xp_today: number;
@@ -287,6 +288,9 @@ export default function DashboardV2() {
         {/* Recent Logs */}
         <RecentLogsList logs={dailySummary.recent_logs} />
       </main>
+
+      {/* Bottom Navigation */}
+      <BottomNavigation />
 
       {/* Celebrations */}
       {showConfetti && <Confetti />}
