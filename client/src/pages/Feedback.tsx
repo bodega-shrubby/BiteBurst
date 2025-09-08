@@ -507,9 +507,9 @@ export default function Feedback() {
         <div style={{ 
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '12px',
+          gap: '4px',
           margin: '24px auto 0',
-          maxWidth: '500px',
+          maxWidth: '420px',
           width: '100%'
         }}>
           {/* Nutrition Coach Mascot */}
@@ -520,8 +520,8 @@ export default function Feedback() {
               src={nutritionCoachMascot} 
               alt="Nutrition coach mascot"
               style={{
-                width: '120px',
-                height: '150px',
+                width: '100px',
+                height: '125px',
                 objectFit: 'contain'
               }}
             />
@@ -535,7 +535,6 @@ export default function Feedback() {
             borderRadius: '20px',
             padding: '16px 20px',
             flex: '1',
-            minWidth: '280px',
             minHeight: '100px',
             display: 'flex',
             flexDirection: 'column',
