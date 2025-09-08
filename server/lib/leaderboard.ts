@@ -5,7 +5,7 @@
 
 import { db } from "../db";
 import { users, xpEvents, leagueBoards, leaderboardCache } from "@shared/schema";
-import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
+import { eq, and, sql, desc, gte, lte, inArray } from "drizzle-orm";
 
 export interface WeekInfo {
   start: string; // YYYY-MM-DD
@@ -125,7 +125,12 @@ export async function getLeagueBoard(weekStart: string, tier: string): Promise<s
   
   if (!board) return null;
   
-  return board.members as string[];
+  // Parse JSON string to actual array if needed
+  const members = board.members;
+  if (typeof members === 'string') {
+    return JSON.parse(members);
+  }
+  return members as string[];
 }
 
 /**
@@ -241,11 +246,11 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   }
   
   // Get user data for all members
-  console.log('🔍 memberIds before query:', memberIds);
+  console.log('🔍 memberIds before query:', memberIds, 'type:', typeof memberIds);
   const memberUsers = await db
     .select()
     .from(users)
-    .where(sql`${users.id} = ANY(${memberIds}::uuid[])`);
+    .where(inArray(users.id, memberIds));
   
   // Calculate weekly XP for all members
   const membersWithXP = await Promise.all(
