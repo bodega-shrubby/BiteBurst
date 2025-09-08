@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
-import nutritionCoachMascot from '@assets/generated_images/Final_nutrition_coach_mascot_250c2f91.png';
+import nutritionCoachMascot from '@assets/generated_images/Playful_child-friendly_nutrition_mascot_d2b662fe.png';
 import { animateXP, levelFromTotal, percentInLevel, formatLevel } from '@/utils/xpAnimation';
 import { apiRequest } from '@/lib/queryClient';
 import '../styles/tokens.css';
@@ -520,8 +520,8 @@ export default function Feedback() {
               src={nutritionCoachMascot} 
               alt="Nutrition coach mascot"
               style={{
-                width: '100px',
-                height: '125px',
+                width: '200px',
+                height: '250px',
                 objectFit: 'contain'
               }}
             />
