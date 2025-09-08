@@ -1,0 +1,70 @@
+Login attempt for: neeta
+Login successful for user: bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e
+2:16:14 PM [express] POST /api/auth/login 200 in 202ms :: {"success":true,"sessionId":"session_17573…
+2:16:15 PM [express] GET /api/badges 304 in 40ms :: [{"code":"FIRST_FOOD","name":"First Food Log","d…
+2:16:15 PM [express] GET /api/auth/me 304 in 178ms :: {"id":"bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e","…
+DEBUG - req.user object: {
+  "userId": "bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e",
+  "displayName": "neeta",
+  "createdAt": "2025-09-08T14:16:14.797Z"
+}
+DEBUG - userId from params: bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e
+DEBUG - userIdFromAuth: bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e
+2:16:15 PM [express] GET /api/user/bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e/daily-summary 304 in 165ms :…
+2:16:15 PM [express] GET /api/user/bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e/badges 304 in 422ms :: {"ear…
+2:16:17 PM [express] GET /api/auth/me 304 in 39ms :: {"id":"bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e","d…
+🏆 LEADERBOARD ROUTE - req.user: {
+  "userId": "bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e",
+  "displayName": "neeta",
+  "createdAt": "2025-09-08T14:16:14.797Z"
+}
+🏆 LEADERBOARD ROUTE - extracted userId: bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e
+🔍 LEADERBOARD QUERY - Looking for user with ID: bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e
+🔍 LEADERBOARD QUERY - userId type: string
+🔍 LEADERBOARD QUERY - Database returned: {
+  id: 'bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e',
+  displayName: 'neeta',
+  ageBracket: '12-14',
+  goal: 'focus',
+  email: 'ninety-spindly0i@icloud.com',
+  parentConsent: false,
+  avatarId: 'mascot-01',
+  locale: 'en-GB',
+  tz: null,
+  totalXp: 990,
+  level: 7,
+  streak: 3,
+  lastLogAt: 2025-09-08T12:15:09.971Z,
+  status: 'active',
+  createdAt: 2025-08-31T08:50:08.679Z,
+  updatedAt: 2025-09-08T12:15:09.992Z,
+  leaderboardOptOut: false,
+  leagueTier: 'bronze',
+  isMock: false
+}
+✅ Found user successfully: neeta
+Error fetching leaderboard: error: op ANY/ALL (array) requires array on right side
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async buildLeaderboard (/home/runner/workspace/server/lib/leaderboard.ts:244:23)
+    at async <anonymous> (/home/runner/workspace/server/routes/leaderboard.ts:23:31) {
+  length: 121,
+  severity: 'ERROR',
+  code: '42809',
+  detail: undefined,
+  hint: undefined,
+  position: '273',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_oper.c',
+  line: '814',
+  routine: 'make_scalar_array_op'
+}
+2:16:17 PM [express] GET /api/leaderboard/league 500 in 279ms :: {"error":"Failed to fetch leaderboa…

@@ -241,10 +241,11 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   }
   
   // Get user data for all members
+  console.log('🔍 memberIds before query:', memberIds);
   const memberUsers = await db
     .select()
     .from(users)
-    .where(sql`${users.id} = ANY(${memberIds})`);
+    .where(sql`${users.id} = ANY(${memberIds}::uuid[])`);
   
   // Calculate weekly XP for all members
   const membersWithXP = await Promise.all(
