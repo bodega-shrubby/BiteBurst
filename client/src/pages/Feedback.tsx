@@ -504,7 +504,12 @@ export default function Feedback() {
         )}
 
         {/* AI Feedback with Speech Bubble */}
-        <div className="bb-coach-section">
+        <div className="bb-coach-section" style={{ 
+          border: '1px dashed #9747FF',
+          borderRadius: '5px',
+          padding: '16px',
+          boxSizing: 'border-box'
+        }}>
           {/* Goal Icon */}
           <div className="flex justify-center mb-4">
             <div className={`bb-goal-icon ${getGoalIcon((user as any)?.goal).class}`}>
