@@ -196,7 +196,13 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   const leagueConfig = getLeagueConfig(userTier);
   
   // Get league board members
-  const memberIds = await getLeagueBoard(weekStartStr, userTier);
+  let memberIds = await getLeagueBoard(weekStartStr, userTier);
+  
+  // If user is not in any league board yet, add them to Bronze league
+  if (!memberIds || !memberIds.includes(userId)) {
+    await ensureUserInLeague(userId, userTier, weekStartStr);
+    memberIds = await getLeagueBoard(weekStartStr, userTier);
+  }
   
   if (!memberIds || memberIds.length === 0) {
     // No league board exists yet, create empty response
@@ -270,6 +276,41 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
     me,
     user_opted_out: false,
   };
+}
+
+/**
+ * Ensure user is added to appropriate league board
+ */
+export async function ensureUserInLeague(userId: string, tier: string, weekStart: string): Promise<void> {
+  // Check if league board exists for this week/tier
+  const [existingBoard] = await db
+    .select()
+    .from(leagueBoards)
+    .where(
+      and(
+        eq(leagueBoards.weekStart, weekStart),
+        eq(leagueBoards.leagueTier, tier)
+      )
+    );
+
+  if (existingBoard) {
+    // Add user to existing board if not already there
+    const currentMembers = existingBoard.members as string[];
+    if (!currentMembers.includes(userId)) {
+      const updatedMembers = [...currentMembers, userId];
+      await db
+        .update(leagueBoards)
+        .set({ members: updatedMembers })
+        .where(eq(leagueBoards.id, existingBoard.id));
+    }
+  } else {
+    // Create new league board with this user
+    await db.insert(leagueBoards).values({
+      weekStart,
+      leagueTier: tier,
+      members: [userId],
+    });
+  }
 }
 
 /**
