@@ -15,7 +15,9 @@ export function registerLeaderboardRoutes(app: Express, requireAuth: any) {
   // GET /api/leaderboard/league - Get league data and rankings
   app.get('/api/leaderboard/league', requireAuth, async (req: any, res) => {
     try {
+      console.log('🏆 LEADERBOARD ROUTE - req.user:', JSON.stringify(req.user, null, 2));
       const userId = req.user.userId;
+      console.log('🏆 LEADERBOARD ROUTE - extracted userId:', userId);
       const tier = req.query.tier as string; // Optional tier override
       
       const leaderboardData = await buildLeaderboard(userId, tier);

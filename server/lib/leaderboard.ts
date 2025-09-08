@@ -166,17 +166,31 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   const weekStartStr = weekStart.toISOString().split('T')[0];
   
   // Get user info
-  console.log('Looking for user with ID:', userId);
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId));
+  console.log('🔍 LEADERBOARD QUERY - Looking for user with ID:', userId);
+  console.log('🔍 LEADERBOARD QUERY - userId type:', typeof userId);
   
-  console.log('Found user:', user);
-  
-  if (!user) {
-    console.error('User not found with ID:', userId);
-    throw new Error('User not found');
+  let user;
+  try {
+    [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    console.log('🔍 LEADERBOARD QUERY - Database returned:', user);
+    
+    if (!user) {
+      console.error('❌ User not found with ID:', userId);
+      // Let's also try a broader search to see if user exists with different ID
+      const allUsers = await db.select({ id: users.id, displayName: users.displayName }).from(users).limit(5);
+      console.error('❌ Sample users in DB:', allUsers);
+      throw new Error('User not found');
+    }
+    
+    console.log('✅ Found user successfully:', user.displayName);
+    
+  } catch (dbError) {
+    console.error('💥 Database query error:', dbError);
+    throw dbError;
   }
   
   // Check if user opted out
