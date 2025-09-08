@@ -145,12 +145,17 @@ export default function Feedback() {
     const params = new URLSearchParams(window.location.search);
     const logId = params.get('logId');
     const xp = parseInt(params.get('xp') || '0');
+    const type = params.get('type') || 'food'; // Get log type
     
     // Try localStorage first
     const storedData = localStorage.getItem('lastLogData');
     if (storedData) {
       try {
         const data = JSON.parse(storedData);
+        // Add type info if not present
+        if (!data.type) {
+          data.type = type;
+        }
         setLogData(data);
         localStorage.removeItem('lastLogData');
         return;
@@ -164,16 +169,18 @@ export default function Feedback() {
       setLogData({
         id: logId,
         xpAwarded: xp,
-        content: { emojis: ['🍎'] }, // placeholder
-        entryMethod: 'emoji'
+        content: type === 'activity' ? { emojis: ['⚽'] } : { emojis: ['🍎'] }, // placeholder
+        entryMethod: 'emoji',
+        type: type
       });
     } else {
       // Default fallback
       setLogData({
         id: 'temp',
         xpAwarded: xp || 10,
-        content: { emojis: ['🍎'] },
-        entryMethod: 'emoji'
+        content: type === 'activity' ? { emojis: ['⚽'] } : { emojis: ['🍎'] },
+        entryMethod: 'emoji',
+        type: type
       });
     }
     
@@ -291,7 +298,8 @@ export default function Feedback() {
   }, [feedbackData?.feedback, logData?.feedback, feedbackLoading, typewriterText]);
 
   const handleLogAnother = () => {
-    setLocation('/food-log');
+    const logType = (logData as any)?.type || 'food';
+    setLocation(logType === 'activity' ? '/activity-log' : '/food-log');
   };
 
   const handleBackToDashboard = () => {
@@ -335,28 +343,66 @@ export default function Feedback() {
 
 
   const renderContent = () => {
+    const isActivity = (logData as any)?.type === 'activity';
+    
     if (logData.entryMethod === 'emoji' && logData.content?.emojis) {
       return (
-        <div className="flex flex-wrap gap-3 justify-center">
-          {logData.content.emojis.map((emoji: string, index: number) => (
-            <div 
-              key={index} 
-              className="bb-emoji-chip bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-transform duration-200"
-            >
-              <span className="text-4xl block mb-2">{emoji}</span>
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {logData.content.emojis.map((emoji: string, index: number) => (
+              <div 
+                key={index} 
+                className="bb-emoji-chip bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-[#FF6A00] rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-transform duration-200"
+              >
+                <span className="text-4xl block mb-2">{emoji}</span>
+              </div>
+            ))}
+          </div>
+          {/* Show activity details if available */}
+          {isActivity && (
+            <div className="flex justify-center gap-4 text-sm text-gray-600">
+              {(logData as any).durationMin && (
+                <span className="bg-gray-100 px-3 py-1 rounded-full">
+                  ⏱️ {(logData as any).durationMin} min
+                </span>
+              )}
+              {(logData as any).mood && (
+                <span className="bg-gray-100 px-3 py-1 rounded-full">
+                  {(logData as any).mood === 'happy' ? '😃 Felt great' : 
+                   (logData as any).mood === 'ok' ? '😐 Okay' : '😴 Tired'}
+                </span>
+              )}
             </div>
-          ))}
+          )}
         </div>
       );
     }
     
     if (logData.entryMethod === 'text' && logData.content?.description) {
       return (
-        <div className="bb-text-pill bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-200 rounded-2xl px-8 py-6 shadow-md mx-auto max-w-sm">
-          <div className="text-2xl mb-2 text-center">📝</div>
-          <p className="text-lg font-medium text-slate-800 text-center leading-relaxed">
-            "{logData.content.description}"
-          </p>
+        <div className="space-y-4">
+          <div className="bb-text-pill bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-200 rounded-2xl px-8 py-6 shadow-md mx-auto max-w-sm">
+            <div className="text-2xl mb-2 text-center">{isActivity ? '🏃' : '📝'}</div>
+            <p className="text-lg font-medium text-slate-800 text-center leading-relaxed">
+              "{logData.content.description}"
+            </p>
+          </div>
+          {/* Show activity details if available */}
+          {isActivity && (
+            <div className="flex justify-center gap-4 text-sm text-gray-600">
+              {(logData as any).durationMin && (
+                <span className="bg-gray-100 px-3 py-1 rounded-full">
+                  ⏱️ {(logData as any).durationMin} min
+                </span>
+              )}
+              {(logData as any).mood && (
+                <span className="bg-gray-100 px-3 py-1 rounded-full">
+                  {(logData as any).mood === 'happy' ? '😃 Felt great' : 
+                   (logData as any).mood === 'ok' ? '😐 Okay' : '😴 Tired'}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       );
     }
@@ -440,7 +486,7 @@ export default function Feedback() {
           <h2 className={`bb-h1 text-3xl font-bold text-gray-800 ${
             showCelebration ? 'bb-slide-in' : 'opacity-0'
           }`}>
-            Awesome meal choice!
+            {(logData as any)?.type === 'activity' ? 'Fantastic way to keep active!' : 'Awesome meal choice!'}
           </h2>
         </section>
 
@@ -608,7 +654,7 @@ export default function Feedback() {
             style={{ borderRadius: '13px' }}
           >
             <RotateCcw size={20} className="mr-2" />
-            LOG ANOTHER MEAL
+            {(logData as any)?.type === 'activity' ? 'LOG ANOTHER ACTIVITY' : 'LOG ANOTHER MEAL'}
           </Button>
           
           <Button

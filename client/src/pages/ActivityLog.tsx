@@ -110,7 +110,9 @@ export default function ActivityLog() {
       const logData = {
         id: response.id,
         type: 'activity',
-        content: { description: state.activityLabel },
+        content: state.method === 'emoji' 
+          ? { emojis: [ACTIVITY_OPTIONS.find(opt => opt.key === state.activity)?.emoji || '🏃'] }
+          : { description: state.activityLabel },
         entryMethod: state.method,
         xpAwarded: response.xpAwarded,
         durationMin: state.duration,
@@ -119,8 +121,8 @@ export default function ActivityLog() {
       
       localStorage.setItem('lastLogData', JSON.stringify(logData));
       
-      // Navigate to feedback screen
-      setLocation(`/feedback?logId=${response.id}&xp=${response.xpAwarded}`);
+      // Navigate to success screen
+      setLocation(`/success?logId=${response.id}&xp=${response.xpAwarded}&type=activity`);
     },
     onError: (error) => {
       console.error('Activity log error:', error);

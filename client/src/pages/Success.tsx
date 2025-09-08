@@ -6,12 +6,17 @@ import '../styles/tokens.css';
 export default function Success() {
   const [, setLocation] = useLocation();
   const [isExiting, setIsExiting] = useState(false);
+  
+  // Get type from URL params
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get('type') || 'food';
 
   useEffect(() => {
     // Get log data from URL params
     const params = new URLSearchParams(window.location.search);
     const logId = params.get('logId');
     const xp = params.get('xp');
+    const type = params.get('type'); // 'activity' or defaults to 'food'
     
     // Start fade out transition before redirect
     const fadeTimer = setTimeout(() => {
@@ -20,7 +25,7 @@ export default function Success() {
     
     // Redirect to feedback page after fade completes
     const redirectTimer = setTimeout(() => {
-      const feedbackUrl = `/feedback?logId=${logId || 'temp'}&xp=${xp || '0'}`;
+      const feedbackUrl = `/feedback?logId=${logId || 'temp'}&xp=${xp || '0'}&type=${type || 'food'}`;
       setLocation(feedbackUrl);
     }, 5000); // Complete redirect at 5s
 
@@ -71,7 +76,7 @@ export default function Success() {
           Great job!
         </h1>
         <p className="text-gray-600 text-lg">
-          Your meal has been logged
+          Your {type === 'activity' ? 'activity' : 'meal'} has been logged
         </p>
       </div>
     </div>
