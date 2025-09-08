@@ -8,6 +8,7 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/Dashboard";
 import FoodLog from "@/pages/FoodLog";
 import FoodLogNew from "@/pages/FoodLogNew";
+import ActivityLog from "@/pages/ActivityLog";
 import Success from "@/pages/Success";
 import Feedback from "@/pages/Feedback";
 import NotFound from "@/pages/not-found";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/home" component={Dashboard} />
       <Route path="/food-log" component={FoodLogNew} />
+      <Route path="/activity-log" component={ActivityLog} />
       <Route path="/success" component={Success} />
       <Route path="/feedback" component={Feedback} />
       

@@ -1,0 +1,164 @@
+Architecture: Yes, implement /activity-log as a React route/component (matching Food Log patterns). Keep QuickLogModal, but make its buttons navigate to /activity-log?activity=….
+Activity set: Use 8–10 options + “Other” (not only 7). Default row shows 6, with a “More” expander.
+⚽ Soccer, 🏃 Running, 🧘 Yoga/Stretch, 🎯 Practice/Drills, 🚴 Biking, 🕺 Dance, 🏊 Swimming, 🧗 Climb/Playground, 🏀 Basketball, 🥾 Walk/Hike, ➕ Other (text)
+Mood: 😃 / 😐 / 😴 for feedback & analytics only — no XP penalty/boost.
+Duration: Quick picks 5 / 15 / 30 / 60 + optional Custom (5–120 min).
+XP rules (MVP):
+5m = +10, 15m = +15, 30m = +20, 60m = +30.
+Daily combo bonus +10 when at least one food and one activity log exist the same local day (awarded once/day).
+DB / API: Reuse logs table; include duration_min and mood for activity entries. Server provides /api/user/:id/daily-summary to detect combo + return today’s food/activity strings for combined AI feedback.
+Feedback: Keep one Feedback screen. If both logs exist today, combine into a single AI message (and show bonus XP note).
+UX/UI upgrades from your screenshots
+Make it playful, not form-like: 64×64 emoji tiles with bounce; selected = orange outline + glow.
+Hierarchy: Header (orange bar + exercising mascot) → Activity grid → Duration chips → Mood → Preview → sticky CTA.
+Sticky CTA: “LOG ACTIVITY” pill rises (enabled) when activity + duration picked.
+A11y: 44×44 tap targets, :focus-visible, aria-live on preview.
+Micro-interactions: subtle press scale; confetti on submit; keep to one confetti system app-wide.
+Copy-paste prompt for Replit Agent (React)
+Title: Build /activity-log React route with combined-feedback + XP rules
+Goal: A delightful, mobile-first Activity Logging screen in React that logs an activity in <5s, awards XP, and triggers combined AI feedback when both food + activity exist today.
+Files & Routing
+Create src/routes/ActivityLog.tsx (or pages/ActivityLog.tsx) and add route /activity-log in the existing router (match Food Log routing patterns).
+Keep QuickLogModal but change its buttons to navigate('/activity-log?activity=run|yoga|...').
+UI structure (TSX sketch)
+export default function ActivityLog() {
+  // pull user, router, query, etc.
+  // state: activity, activityLabel, duration, mood, method, customText
+
+  return (
+    <main className="bb-container">
+      <AppBar title="LOG YOUR ACTIVITY" mascot="exercise" />
+      
+      <Section title="Pick your activity">
+        <EmojiGrid
+          options={[
+            {key:'soccer',    label:'Soccer',     emoji:'⚽'},
+            {key:'run',       label:'Running',    emoji:'🏃'},
+            {key:'yoga',      label:'Yoga',       emoji:'🧘'},
+            {key:'drills',    label:'Practice',   emoji:'🎯'},
+            {key:'bike',      label:'Biking',     emoji:'🚴'},
+            {key:'dance',     label:'Dance',      emoji:'🕺'},
+            {key:'swim',      label:'Swimming',   emoji:'🏊'},
+            {key:'climb',     label:'Climb/Play', emoji:'🧗'},
+            {key:'basket',    label:'Basketball', emoji:'🏀'},
+            {key:'walk',      label:'Walk/Hike',  emoji:'🥾'},
+            {key:'other',     label:'Other',      emoji:'➕', other: true}
+          ]}
+          defaultVisible={6} // show 6, reveal rest on “More”
+          onSelect={(opt)=> setState(s=>({...s, activity: opt.key, activityLabel: opt.label, method: opt.other ? 'text':'emoji'}))}
+          selectedKey={state.activity}
+        />
+        {state.activity==='other' && (
+          <TextField
+            label="Type your activity"
+            maxLength={32}
+            onChange={(v)=> setState(s=>({...s, activityLabel: v}))}
+          />
+        )}
+      </Section>
+
+      <Section title="How long?">
+        <ChipRow
+          options={[5,15,30,60].map(m=>({key:String(m), label:`${m} min`}))}
+          extra={<CustomMinutes onSet={(m)=> setState(s=>({...s, duration:m}))} min={5} max={120} />}
+          selectedKey={String(state.duration)}
+          onSelect={(opt)=> setState(s=>({...s, duration:Number(opt.key)}))}
+        />
+      </Section>
+
+      <Section title="How did it feel? (optional)">
+        <ChipRow
+          options={[
+            {key:'happy', label:'Felt great', emoji:'😃'},
+            {key:'ok',    label:'Okay',       emoji:'😐'},
+            {key:'tired', label:'Tired',      emoji:'😴'}
+          ]}
+          selectedKey={state.mood ?? undefined}
+          onSelect={(opt)=> setState(s=>({...s, mood: opt.key}))}
+          allowDeselect
+        />
+      </Section>
+
+      <PreviewCard
+        items={[
+          {label:'Activity', value: state.activityLabel || '—'},
+          {label:'Duration', value: state.duration ? `${state.duration} min` : '—'},
+          {label:'Mood',     value: state.mood ? ({happy:'😃',ok:'😐',tired:'😴'} as any)[state.mood] : '—'}
+        ]}
+      />
+
+      <StickyCTA
+        disabled={!(state.activityLabel && state.duration)}
+        onClick={handleSubmit}
+        label="LOG ACTIVITY"
+      />
+    </main>
+  );
+}
+Logic
+function computeActivityXP(min:number){
+  if (min >= 60) return 30;
+  if (min >= 30) return 20;
+  if (min >= 15) return 15;
+  return 10;
+}
+
+async function handleSubmit(){
+  // 1) Save activity log
+  await POST('/api/log', {
+    user_id: user.id,
+    type: 'activity',
+    entry_method: state.method, // 'emoji'|'text'
+    content: state.activityLabel,
+    duration_min: state.duration,
+    mood: state.mood, // 'happy'|'ok'|'tired' | null
+    timestamp: new Date().toISOString()
+  });
+
+  // 2) Ask server if combo bonus applies + get today's food/activity strings
+  const daily = await POST(`/api/user/${user.id}/daily-summary`);
+  // { has_food, has_activity, bonus_awarded, todays_food, todays_activity }
+
+  // 3) Build AI request (combined when available)
+  const aiReq = {
+    age: user.age,
+    goal: user.goal,
+    mealLog: daily.todays_food || null,
+    activityLog: `${state.activityLabel} ${state.duration}m${state.mood ? ` (${state.mood})` : ''}`
+  };
+  const { feedback } = await POST('/api/ai/feedback', aiReq);
+
+  // 4) XP + bonus
+  const xp = computeActivityXP(state.duration);
+  const bonus = daily.bonus_awarded ? 10 : 0;
+
+  // 5) Persist XP then navigate to Feedback
+  await POST(`/api/user/${user.id}/xp`, { delta_xp: xp + bonus, reason: 'activity_log' });
+
+  navigate('/feedback', { state: {
+    user,
+    log: { type:'activity', content: state.activityLabel, duration_min: state.duration, mood: state.mood },
+    award: { xp, bonus, /* server can also return new totals */ },
+    feedback
+  }});
+}
+Styling
+Reuse tokens (orange, shadows, radii).
+420px max content width, generous 16px padding, sticky app bar and sticky CTA.
+Emoji tiles: 64×64, rounded 16–24px, lift on hover/press; .is-active { outline: 3px solid var(--bb-orange); box-shadow: 0 0 0 6px rgba(255,122,0,.15); }
+Accessibility
+All chips ≥44×44, keyboard focus, aria-pressed for toggles.
+Preview uses aria-live="polite" for changes.
+Respect prefers-reduced-motion.
+Server endpoints to rely on
+POST /api/log (accepts duration_min, mood)
+POST /api/user/:id/daily-summary → { has_food, has_activity, bonus_awarded, todays_food, todays_activity }
+POST /api/user/:id/xp → persists XP delta (module already in use)
+POST /api/ai/feedback → returns { feedback: string } (combined when both logs exist)
+Acceptance criteria
+Selecting activity + duration enables CTA; mood optional.
+Submits log, computes XP by duration, applies +10 daily combo bonus if applicable.
+Feedback screen shows one combined message when both logs exist today.
+Mobile-first, fast, and a11y ≥ 90.
+Short response you can send back to the Agent (re: React choice)
+✅ Yes—please implement /activity-log as a React component/route to match our Food Log architecture. Expand the activity set to 8–10 options (+ “Other”), keep mood for feedback only (no XP effects), and use duration-based XP with a +10 daily combo bonus when both food + activity are logged. Reuse the logs table with duration_min and mood fields. QuickLogModal should route to /activity-log?activity=…. Feedback should combine food + activity into one AI message when both exist on the same day.

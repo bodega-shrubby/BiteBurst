@@ -223,27 +223,41 @@ export default function Dashboard() {
           <div className="mb-4">
             <p className="text-sm font-medium text-gray-700 mb-2">Activity</p>
             <div className="flex space-x-2">
-              {['⚽', '🧘', '🏃', '🎯'].map((emoji, index) => (
+              {[
+                { emoji: '⚽', activity: 'soccer' },
+                { emoji: '🧘', activity: 'yoga' },
+                { emoji: '🏃', activity: 'run' },
+                { emoji: '🎯', activity: 'drills' }
+              ].map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => setQuickLogModal({ isOpen: true, type: 'activity', emoji })}
+                  onClick={() => window.location.href = `/activity-log?activity=${item.activity}`}
                   className="w-14 h-14 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-center text-2xl hover:bg-orange-50 hover:border-orange-200 transition-colors"
                 >
-                  {emoji}
+                  {item.emoji}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Food Log Button */}
-          <div className="flex justify-center">
+          {/* Logging Buttons */}
+          <div className="flex flex-col space-y-3">
             <button 
               onClick={() => window.location.href = '/food-log'}
-              className="max-w-[366px] w-full bg-[#FF6A00] text-white h-12 flex items-center justify-center space-x-2 font-bold uppercase tracking-wider hover:bg-[#E55A00] transition-colors"
+              className="max-w-[366px] w-full bg-[#FF6A00] text-white h-12 flex items-center justify-center space-x-2 font-bold uppercase tracking-wider hover:bg-[#E55A00] transition-colors mx-auto"
               style={{ borderRadius: '13px' }}
             >
               <span>🍎</span>
               <span>Log Your Meal</span>
+            </button>
+            
+            <button 
+              onClick={() => window.location.href = '/activity-log'}
+              className="max-w-[366px] w-full bg-white text-[#FF6A00] border-2 border-[#FF6A00] h-12 flex items-center justify-center space-x-2 font-bold uppercase tracking-wider hover:bg-orange-50 transition-colors mx-auto"
+              style={{ borderRadius: '13px' }}
+            >
+              <span>⚽</span>
+              <span>Log Activity</span>
             </button>
           </div>
         </div>

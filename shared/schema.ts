@@ -64,6 +64,8 @@ export const logs = pgTable("logs", {
   goalContext: goalEnum("goal_context"),
   aiFeedback: text("ai_feedback"),
   xpAwarded: integer("xp_awarded").notNull().default(0),
+  durationMin: integer("duration_min"), // For activity logs: duration in minutes
+  mood: varchar("mood", { length: 10 }), // For activity logs: 'happy', 'ok', 'tired'
 });
 
 // Streaks table
@@ -128,6 +130,8 @@ export const insertLogSchema = createInsertSchema(logs).pick({
   goalContext: true,
   aiFeedback: true,
   xpAwarded: true,
+  durationMin: true,
+  mood: true,
 });
 
 export type InsertUserType = z.infer<typeof insertUserSchema>;

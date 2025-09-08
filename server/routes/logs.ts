@@ -8,6 +8,8 @@ const createLogSchema = z.object({
   entryMethod: z.enum(['emoji', 'text', 'photo']),
   content: z.any(), // JSON content
   timestamp: z.string().optional(),
+  durationMin: z.number().optional(), // For activity logs
+  mood: z.enum(['happy', 'ok', 'tired']).optional(), // For activity logs
 });
 
 export function registerLogRoutes(app: Express, requireAuth: any) {
@@ -34,7 +36,22 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
           xpAwarded += healthyCount * 5; // +5 XP per healthy emoji
         }
       }
-      if (validatedData.type === 'activity') xpAwarded = 20;
+      
+      if (validatedData.type === 'activity') {
+        // Duration-based XP for activities
+        const duration = validatedData.durationMin || 0;
+        if (duration >= 60) {
+          xpAwarded = 30;
+        } else if (duration >= 30) {
+          xpAwarded = 20;
+        } else if (duration >= 15) {
+          xpAwarded = 15;
+        } else if (duration >= 5) {
+          xpAwarded = 10;
+        } else {
+          xpAwarded = 10; // Default for activities without duration
+        }
+      }
 
       // Get user's current goal for context
       const user = await storage.getUser(validatedData.userId);
@@ -47,7 +64,9 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
         entryMethod: validatedData.entryMethod,
         content: validatedData.content,
         goalContext,
-        xpAwarded
+        xpAwarded,
+        durationMin: validatedData.durationMin,
+        mood: validatedData.mood
       });
 
       // Note: XP and streak updates are now handled by the dedicated XP endpoint
