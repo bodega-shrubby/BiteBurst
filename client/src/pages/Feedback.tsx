@@ -505,67 +505,70 @@ export default function Feedback() {
 
         {/* AI Feedback with Speech Bubble */}
         <div style={{ 
-          position: 'relative',
-          width: '100%',
-          maxWidth: '430px',
-          height: 'auto',
-          margin: '0 auto',
-          border: '2px solid #E5E5E5',
-          borderRadius: '5px',
-          padding: '16px',
-          boxSizing: 'border-box'
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          margin: '24px auto 0',
+          maxWidth: '420px',
+          width: '100%'
         }}>
-          {/* Content Layout */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'flex-start',
-            padding: '0px',
-            gap: '10px',
-            width: '100%'
+          {/* Nutrition Coach Mascot */}
+          <div style={{ 
+            flexShrink: 0
           }}>
-            {/* Nutrition Coach Mascot */}
-            <div style={{ 
-              flex: 'none',
-              order: 0 
-            }}>
-              <img 
-                src={nutritionCoachMascot} 
-                alt="Nutrition coach mascot"
-                style={{
-                  width: '80px',
-                  height: '100px',
-                  objectFit: 'contain'
-                }}
-              />
-            </div>
-            
-            {/* Speech Content */}
+            <img 
+              src={nutritionCoachMascot} 
+              alt="Nutrition coach mascot"
+              style={{
+                width: '80px',
+                height: '100px',
+                objectFit: 'contain'
+              }}
+            />
+          </div>
+          
+          {/* Speech Bubble */}
+          <div style={{
+            position: 'relative',
+            backgroundColor: '#2d3748',
+            color: 'white',
+            borderRadius: '20px',
+            padding: '16px 20px',
+            flex: '1',
+            minHeight: '80px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}>
+            {/* Speech bubble pointer */}
             <div style={{
-              flex: '1',
-              order: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: '8px'
-            }}>
-              {/* Header */}
+              position: 'absolute',
+              left: '-8px',
+              top: '20px',
+              width: '0',
+              height: '0',
+              borderTop: '8px solid transparent',
+              borderBottom: '8px solid transparent',
+              borderRight: '8px solid #2d3748'
+            }}></div>
+            
+            {/* Content */}
+            <div>
               <h3 style={{
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 fontWeight: '600',
-                fontSize: '16px',
-                lineHeight: '20px',
-                color: '#4B4B4B',
+                fontSize: '14px',
+                lineHeight: '18px',
+                color: '#a0aec0',
                 margin: '0 0 8px 0'
               }}>
                 Your nutrition coach says:
               </h3>
               
-              {/* Feedback Content */}
               {isLoading ? (
-                <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                  <div className="animate-spin w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-2"></div>
-                  <p style={{ fontSize: '14px', color: '#666' }}>Getting your personalized feedback...</p>
+                <div style={{ textAlign: 'center', padding: '8px 0' }}>
+                  <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p style={{ fontSize: '12px', color: '#a0aec0' }}>Getting your feedback...</p>
                 </div>
               ) : feedback ? (
                 <div style={{ position: 'relative' }}>
@@ -573,14 +576,13 @@ export default function Feedback() {
                     fontFamily: 'system-ui, -apple-system, sans-serif',
                     fontSize: '16px',
                     lineHeight: '22px',
-                    color: '#4B4B4B',
-                    letterSpacing: '0.01em',
+                    color: 'white',
                     margin: 0
                   }} className={isTyping ? 'bb-typewriter' : ''}>
                     {typewriterText || feedback}
                   </p>
                   {isTyping && (
-                    <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
+                    <span className="inline-block w-0.5 h-5 bg-white ml-0.5 animate-pulse"></span>
                   )}
                 </div>
               ) : (
@@ -588,8 +590,7 @@ export default function Feedback() {
                   fontFamily: 'system-ui, -apple-system, sans-serif',
                   fontSize: '16px',
                   lineHeight: '22px',
-                  color: '#4B4B4B',
-                  letterSpacing: '0.01em',
+                  color: 'white',
                   margin: 0
                 }}>
                   Keep up the great work! Every healthy choice helps you grow stronger and smarter.
