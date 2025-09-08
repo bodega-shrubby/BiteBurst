@@ -26,6 +26,9 @@ export default function ReviewStep() {
 
   const createProfileMutation = useMutation({
     mutationFn: async () => {
+      // Capture user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
       return await apiRequest("POST", "/api/profile/create", {
         username: profile.displayName,
         email: profile.email,
@@ -34,6 +37,7 @@ export default function ReviewStep() {
         ageBracket: profile.ageBracket,
         goal: profile.goal,
         avatar: profile.avatar,
+        timezone,
         onboardingCompleted: true
       });
     },

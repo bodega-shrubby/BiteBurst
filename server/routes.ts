@@ -35,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // BiteBurst profile creation endpoint (for onboarding)
   app.post("/api/profile/create", async (req: any, res) => {
     try {
-      const { username, email, password, name, ageBracket, goal, avatar, onboardingCompleted } = req.body;
+      const { username, email, password, name, ageBracket, goal, avatar, timezone, onboardingCompleted } = req.body;
       
       // Create BiteBurst profile with new schema
       const userData = {
@@ -44,6 +44,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         goal: goal as 'energy' | 'focus' | 'strength',
         avatarId: avatar,
         email,
+        tz: timezone, // Store user timezone for streak calculations
         parentConsent: true, // Default for onboarding
       };
       
