@@ -50,6 +50,10 @@ export const users = pgTable("users", {
   status: text("status").notNull().default('active'),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  // Leaderboard fields
+  leaderboardOptOut: boolean("leaderboard_opt_out").notNull().default(false),
+  leagueTier: text("league_tier").notNull().default("bronze"),
+  isMock: boolean("is_mock").notNull().default(false),
 });
 
 // Logs table with UUID and proper types
@@ -111,6 +115,27 @@ export const xpEvents = pgTable("xp_events", {
   ts: timestamp("ts").notNull().defaultNow(),
 });
 
+// League Boards table for weekly groupings
+export const leagueBoards = pgTable("league_boards", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  weekStart: date("week_start").notNull(),
+  leagueTier: text("league_tier").notNull(),
+  members: jsonb("members").notNull(), // array of user_ids in rank order
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Leaderboard Cache table for performance
+export const leaderboardCache = pgTable("leaderboard_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  metric: text("metric").notNull(), // 'xp_week'
+  leagueTier: text("league_tier").notNull(),
+  weekStart: date("week_start").notNull(),
+  payload: jsonb("payload").notNull(),
+  computedAt: timestamp("computed_at").notNull().defaultNow(),
+}, (table) => ({
+  unique: { name: "leaderboard_cache_unique", columns: [table.metric, table.leagueTier, table.weekStart] }
+}));
+
 // Note: Indexes are created via SQL commands, not in Drizzle schema
 
 // Type exports
@@ -124,6 +149,9 @@ export type Streak = typeof streaks.$inferSelect;
 export type BadgeCatalogItem = typeof badgeCatalog.$inferSelect;
 export type Badge = typeof badges.$inferSelect;
 export type XpEvent = typeof xpEvents.$inferSelect;
+export type LeagueBoard = typeof leagueBoards.$inferSelect;
+export type InsertLeagueBoard = typeof leagueBoards.$inferInsert;
+export type LeaderboardCache = typeof leaderboardCache.$inferSelect;
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({

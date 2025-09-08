@@ -30,11 +30,11 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
       isActive: location === '/goals'
     },
     {
-      id: 'badges',
-      label: 'Badges',
+      id: 'champs',
+      label: 'Champs',
       icon: '🏆',
-      path: '/badges', // Future badges gallery page
-      isActive: location === '/badges'
+      path: '/leaderboard',
+      isActive: location === '/leaderboard'
     },
     {
       id: 'more',

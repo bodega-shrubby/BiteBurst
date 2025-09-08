@@ -12,6 +12,7 @@ import FoodLogNew from "@/pages/FoodLogNew";
 import ActivityLog from "@/pages/ActivityLog";
 import Success from "@/pages/Success";
 import Feedback from "@/pages/Feedback";
+import Leaderboard from "@/pages/Leaderboard";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/activity-log" component={ActivityLog} />
       <Route path="/success" component={Success} />
       <Route path="/feedback" component={Feedback} />
+      <Route path="/leaderboard" component={Leaderboard} />
       
       {/* Onboarding Flow */}
       <Route path="/start">

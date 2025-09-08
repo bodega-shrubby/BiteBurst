@@ -1,0 +1,129 @@
+Replit Agent Task — Build “Healthy Champs: Leagues” Leaderboard (MVP)
+Goal
+Create a weekly, league-based leaderboard that:
+Auto-groups ~30 kids into a league each week.
+Ranks by XP (This Week) (primary) with a Promotion Zone and “just below” area like Duolingo.
+Uses mock avatars (emoji/initials) and privacy-safe names (first name + last initial, or alias).
+Includes a countdown to week end and a league badge row at the top (Bronze → Silver → Gold).
+Is opt-out (hidden from boards when disabled).
+This is a prototype: accuracy > novelty. Keep the system deterministic, simple, and easy to demo.
+UX / Screen (Route: /leaderboard)
+Layout (mobile-first, max width 420px):
+League Header Card (sticky)
+Left: league badge (Bronze/Silver/Gold).
+Title: Bronze League
+Subtext: Top 10 advance to the next league
+Countdown: 6d 15h 3m (live)
+Badge row placeholders (as in the reference image).
+List
+Ranks #1–#30 with:
+Avatar (emoji/initials tile)
+Name (“Ava P.”)
+Right-aligned metric: 50 XP
+Promotion Zone banner between ranks 10 & 11 (green text with ↑ arrows).
+Demotion warning (for higher leagues only, below the threshold—yellow/orange).
+Highlight current user row; auto-scroll into view on load.
+Footer Bar (sticky)
+Small tabs or icons (placeholder) to mirror a bottom nav if needed (fake/inactive OK for MVP).
+Micro-interactions:
+Subtle bounce on row tap (no profile page; show a tiny popover with “XP this week” + “current streak”).
+Confetti only when user crosses into promotion zone during the session (respect reduced motion).
+Accessibility:
+Rows ≥44×44, focus-visible rings, semantic list, aria-live="polite" for countdown & rank changes.
+Leagues & Rules (MVP)
+Leagues: Bronze → Silver → Gold (3 tiers). Seed everyone into Bronze in Week 1.
+Board size: 30 users per league board (±2 tolerance if needed).
+Ranking metric: XP earned this week (sum of XP events in the current week window).
+Promotion/Demotion thresholds:
+Bronze: Top 10 promote to Silver. No demotions.
+Silver: Top 10 promote to Gold; bottom 10 demote to Bronze.
+Gold: Top 3 get a “Champ” ribbon; bottom 10 demote to Silver.
+Opt-out: If leaderboard_opt_out = true, user is excluded from grouping and results (show banner “You’re hidden…”).
+Tie-breakers: (1) higher current streak, (2) earlier time reaching score, (3) lower user_id.
+Week window: Monday 00:00 → Sunday 23:59 in user’s timezone (fallback UTC).
+Data Model (add/confirm)
+users
+id, display_name, avatar_seed, total_xp, streak_days, last_log_at, leaderboard_opt_out, league_tier ('bronze'|'silver'|'gold')
+xp_events (already used by XP)
+id, user_id, delta_xp, reason, created_at
+league_boards (weekly groups)
+id
+week_start (date)
+league_tier ('bronze'|'silver'|'gold')
+members (json array of user_ids in rank seed order)
+leaderboard_cache (optional; speed)
+metric ('xp_week'), league_tier, week_start, payload (json), computed_at
+Server Logic
+Weekly cron (or manual task for demo)
+Close previous week:
+For each board, compute final ranks & apply promotions/demotions by thresholds.
+Update users.league_tier.
+Open new week:
+Partition users (by league_tier & opt_out=false) into chunks of ~30.
+Write league_boards with members arrays.
+(For the demo, create a script scripts/seedLeagues.ts to do both steps and seed with mock users.)
+API Endpoints
+GET /api/leaderboard/league
+Query: week=current|YYYY-MM-DD (default current), tier? (default = user’s current tier)
+Response:
+{
+  "week": { "start": "2025-09-08", "end": "2025-09-14", "seconds_remaining": 532389 },
+  "league": { "tier": "bronze", "name": "Bronze League", "promote_count": 10, "demote_count": 0 },
+  "promotion_zone_rank": 10,
+  "demotion_zone_rank": null,
+  "members": [
+    { "rank": 1, "user_id": "u01", "name": "Ava P.", "avatar": "🟦AP", "xp_week": 120, "streak": 6 },
+    { "rank": 2, "user_id": "u02", "name": "Leo K.", "avatar": "🟧LK", "xp_week": 115, "streak": 2 }
+    // ... up to ~30
+  ],
+  "me": { "rank": 11, "user_id": "me", "xp_week": 35, "streak": 3 },
+  "user_opted_out": false
+}
+POST /api/leaderboard/opt-in
+Body: { "opt_out": false } // or true
+(Optional) GET /api/leaderboard/my-history
+Return last 4 weeks: tier, final rank, promoted/demoted boolean (for future).
+Ranking calculation: sum xp_events.delta_xp within week window for each members user; apply tie-breakers; return sorted rows.
+React Implementation
+Files
+src/routes/Leaderboard.tsx
+src/components/leaderboard/LeagueHeader.tsx
+src/components/leaderboard/PromotionBanner.tsx
+src/components/leaderboard/RankRow.tsx
+src/utils/avatar.ts (emoji tile + initials, deterministic by seed)
+src/utils/countdown.ts (seconds → 6d 15h 3m)
+Behavior
+On mount: fetch GET /api/leaderboard/league.
+Render header (badge, title, subtext, countdown using seconds_remaining, update every 1s).
+Render rows; inject a green “PROMOTION ZONE” divider between ranks 10/11 (or tier-config).
+Highlight “me” row; scrollIntoView with smooth behavior after render.
+If me.rank crosses the promotion threshold since last render (keep previous in state), trigger tiny confetti (respect prefers-reduced-motion).
+Styling
+Match the shared screenshot’s vibe:
+White surface, light grey separators, black text, orange accents.
+Rows: avatar (40–48px), name left, XP right.
+Promotion text: green PROMOTION ZONE with ▲ icons.
+League badge row (top) as static placeholders; only the current league badge is filled.
+Seed / Demo Data
+Create 30–60 mock users with varied XP and streaks, randomized but stable (avatar_seed based on user id).
+Place the current user at rank ~10–14 to show the promotion boundary story.
+Seed script should:
+Insert mock xp_events for the current week.
+Build league_boards for Bronze (all users) for Week 1.
+Copy (kid-friendly)
+Header subtext: Top 10 advance to the next league
+Promotion banner: ▲ PROMOTION ZONE ▲
+Demotion banner (Silver/Gold only): ▼ DANGER ZONE ▼
+Me footer (optional toast): +20 XP to reach the promotion zone!
+Acceptance Criteria (QA)
+Header shows league name, promotion rule, and live countdown.
+List displays ~30 users, ranked by XP (this week) with tie-breakers applied.
+Promotion Zone divider appears at the correct rank; me row is highlighted and auto-scrolled.
+Confetti appears once when crossing into promotion zone during the session (respects reduced motion).
+Opt-out users are excluded and see a clear “You’re hidden from the board” message.
+Week window is timezone-aware; scores match xp_events sums.
+UI matches the reference vibe, is responsive, and meets a11y basics (≥90).
+Notes / Constraints
+Prototype first: If weekly cron isn’t ready, include a ?demo=true flag to fabricate grouping & scores from seeded data.
+Keep all logic server-truth for ranking and thresholds; client is read-only + animations.
+Please implement the route, server endpoints, and seed script as above.

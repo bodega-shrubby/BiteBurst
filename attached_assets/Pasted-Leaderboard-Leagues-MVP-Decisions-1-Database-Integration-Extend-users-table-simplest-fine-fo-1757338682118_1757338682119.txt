@@ -1,0 +1,54 @@
+Leaderboard (Leagues) — MVP Decisions
+1) Database Integration
+Extend users table (simplest & fine for MVP):
+leaderboard_opt_out BOOLEAN DEFAULT false
+league_tier ENUM('bronze','silver','gold') DEFAULT 'bronze'
+(Optional later: move to a user_profile table; not needed now.)
+2) User Onboarding
+Auto-enroll everyone into Bronze on first rollout.
+Keep opt-out toggle in Profile (“Show me on Leaderboard”).
+If opted out, exclude from boards and show the “You’re hidden” banner on the screen.
+3) Mock Data Strategy (for demo)
+Hybrid: keep your real users + autogenerate 20–40 demo users per league for a lively board.
+Store generated users in DB with is_mock=true so we can filter later.
+Seed XP events for the current “week” so ranks look realistic.
+4) Weekly Reset Logic
+Manual admin trigger for demo (endpoint or script): /admin/leaderboards/rollover.
+Applies promotions/demotions and reseeds boards for the new week.
+Add a simple cron later; not required for investor demo.
+Week window = Mon 00:00 → Sun 23:59 (see Timezone below).
+5) Navigation Integration
+Add a bottom-nav item: “🏆 Champs”.
+Also add a feature card on Dashboard (“You’re close to promotion! → View leaderboard”).
+Deep link: /leaderboard.
+6) Real-time & Refresh
+Polling refresh every 30–60s, plus pull-to-refresh button.
+No WebSockets for MVP.
+Gate confetti: fire once when the user crosses the promotion threshold during the session; respect prefers-reduced-motion.
+7) XP Calculation (weekly)
+Use existing xp_events with date filtering by week window.
+Cache results for 60s per metric/scope/league_tier to keep UI snappy.
+Tie-breakers: (1) higher streak_days, (2) earlier timestamp reaching score, (3) lower user_id.
+8) Timezone Handling
+Use existing user timezone if present; else fallback to a server default (e.g., America/Los_Angeles or UTC—pick one and document it).
+All “week” boundaries and countdowns use that timezone.
+Quick implementation notes (for Agent)
+New columns (example SQL)
+ALTER TABLE users
+  ADD COLUMN leaderboard_opt_out BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD COLUMN league_tier TEXT NOT NULL DEFAULT 'bronze';
+Rollover (admin) flow
+Close week: compute final ranks within each league board; apply promotions/demotions by thresholds.
+Open new week: partition eligible users (~30 per board) and write league_boards.
+Clear leaderboard caches.
+GET /api/leaderboard/league (unchanged)
+Returns: week{start,end,seconds_remaining}, league{tier,name,promote_count,demote_count}, promotion_zone_rank, members[], me, user_opted_out.
+Caching
+Cache payload in leaderboard_cache keyed by {tier, week_start}; invalidate on rollover or mock reseed.
+Acceptance checklist
+Users appear in Bronze by default; opt-out respected.
+Board size ≈30 with realistic mock peers.
+Manual rollover endpoint reseeds ranks and updates tiers.
+Polling refresh updates ranks & countdown; cached between polls.
+Weekly XP sums match xp_events in the user’s timezone.
+Bottom-nav + dashboard card navigate to /leaderboard.
