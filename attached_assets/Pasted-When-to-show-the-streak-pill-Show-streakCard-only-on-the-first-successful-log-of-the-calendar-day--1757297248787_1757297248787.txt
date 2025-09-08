@@ -1,0 +1,96 @@
+When to show the streak pill
+Show #streakCard only on the first successful log of the calendar day (in the user’s timezone) if the streak increases.
+Server-side rule (recommended)
+Keep streak_days INT, longest_streak INT, last_log_at TIMESTAMP.
+On new log:
+Convert timestamps to the user’s timezone (from profile; fallback to server TZ).
+If sameCalendarDay(today, last_log_at) → streak unchanged (don’t show).
+Else if today == last_log_at + 1 day → streak_days += 1 (show).
+Else → streak_days = 1 (do not show a “streak!” pill—optionally show “Streak restarted” microcopy later).
+Update longest_streak = max(longest_streak, streak_days).
+Return to client:
+{ "streak_days": 4, "streak_changed": true, "badge_awarded": null }
+Client-side gate (so it doesn’t pop multiple times in a day)
+Only reveal the pill if streak_changed === true.
+Also guard with local storage:
+localStorage['streakShownOn'] = YYYY-MM-DD.
+If it matches today, keep it hidden even if the page reloads.
+Display thresholds (copy)
+For any streak ≥2: show the pill (e.g., “🔥 2-day streak!”).
+Add celebratory copy at “milestones”: 3, 5, 7, 14, 30:
+3 → “You’re on a roll! 🔥 3-day streak!”
+7 → “One whole week! 🌟 7-day streak!”
+14 → “Two weeks strong! 💪 14-day streak!”
+30 → “Legend status! 🏆 30-day streak!”
+When to show the badge pill
+Show #badgeCard only when a brand-new badge is awarded by the server on this log.
+Server decides the badge logic and returns:
+{ "badge_awarded": { "code": "WEEK_STREAK_7", "name": "One-Week Streak" } }
+Client behavior
+If present, unhide #badgeCard and set #badgeName to the returned name.
+If both streak and badge happen together (e.g., day 7), show both pills; put the badge pill first.
+Do you need a separate screen?
+No for MVP.
+Keep streak/badge as informational pills on the Feedback screen. Later you can add:
+“Achievements” screen (grid of badges + streak history).
+Tap on pill → open a small modal with “How streaks work” and milestones. For MVP, keep pills non-interactive.
+Minimal client hook (drop-in)
+function revealRewards({ streak_days, streak_changed, badge_awarded }) {
+  const rewards = document.getElementById('bb-rewards');
+  const streakCard = document.getElementById('streakCard');
+  const badgeCard  = document.getElementById('badgeCard');
+
+  let shown = false;
+
+  // Guard: only once per day
+  const today = new Date().toISOString().slice(0,10);
+  const lastShown = localStorage.getItem('streakShownOn');
+
+  if (streak_changed && streak_days >= 2 && lastShown !== today) {
+    document.getElementById('streakDays').textContent = String(streak_days);
+    streakCard.hidden = false; shown = true;
+    localStorage.setItem('streakShownOn', today);
+  }
+
+  if (badge_awarded?.name) {
+    document.getElementById('badgeName').textContent = badge_awarded.name;
+    badgeCard.hidden = false; shown = true;
+  }
+
+  rewards.hidden = !shown;
+}
+Server-side pseudocode (timezone-aware)
+function updateStreak({ user, now, userTz }) {
+  const today = toCalendarDate(now, userTz);           // YYYY-MM-DD in tz
+  const last  = user.last_log_at ? toCalendarDate(user.last_log_at, userTz) : null;
+
+  let streak_changed = false;
+  if (!last) {
+    user.streak_days = 1;
+  } else if (isSameDay(today, last)) {
+    // no change
+  } else if (isNextDay(today, last)) {
+    user.streak_days += 1;
+    streak_changed = true;
+  } else {
+    user.streak_days = 1; // reset
+  }
+
+  user.longest_streak = Math.max(user.longest_streak || 1, user.streak_days);
+  user.last_log_at = now;
+
+  const badge_awarded = maybeAwardBadge(user); // returns {code, name} or null
+  return { streak_days: user.streak_days, streak_changed, badge_awarded };
+}
+Copy guideline (friendly + brief)
+Streak pill (default): 🔥 {n}-day streak!
+Milestone variants:
+3: 🔥 3-day streak—amazing!
+7: 🌟 One-week streak—keep going!
+14: 💪 14-day streak—strong!
+30: 🏆 30-day streak—legend!
+Summary
+Show on Feedback screen only (no new screen).
+Show streak pill once per day only when the streak increments.
+Show badge pill only when a new badge is awarded by the server.
+Keep logic server-driven, with client guards to prevent duplicate pops.
