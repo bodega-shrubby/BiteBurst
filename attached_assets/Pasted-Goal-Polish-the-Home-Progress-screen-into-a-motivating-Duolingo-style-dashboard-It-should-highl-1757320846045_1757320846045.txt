@@ -1,0 +1,53 @@
+Goal: Polish the Home / Progress screen into a motivating, Duolingo-style dashboard. It should highlight XP, streaks, daily goals, badges, and quick logging in a fun, kid-friendly way.
+Improvements Needed
+Header
+Keep greeting (“Good morning, Neeta”) but add a playful mascot animation (wave, jump, sparkle).
+Ensure date + streak pill are aligned and styled consistently.
+Streak pill should be a highlighted chip (🔥 Day 1 of your streak).
+Progress Section
+Replace plain circle with a progress ring that animates as XP grows (e.g., “155 XP Today / Goal: 80”).
+Show daily goal completion bar (“Goal 80 XP reached!”).
+Confetti animation when goal is met.
+Keep “Best Streak” but show as a small trophy icon + number.
+Your Goal Section
+Keep text (“Focus: Sharpen your mind with brain-boosting foods”).
+Add a mascot illustration or icon representing the goal.
+Use a colored background card (light orange or yellow) to make it stand out.
+Quick Log
+Group into two rows: Food and Activity.
+Use larger emoji cards (64×64, bounce on tap).
+Add labels under each emoji (e.g., “Apple”, “Soccer”).
+Buttons:
+🍎 Log Your Meal (primary orange pill).
+⚽ Log Activity (secondary outline button).
+Today’s Journey
+Show as a checklist card with XP rewards:
+Log one fruit → +10 XP
+Move for 15 minutes → +20 XP
+Drink water → +5 XP
+Completed items should animate with a strike-through + green tick.
+Progress bar at the bottom (“2/3 tasks completed”).
+Badges & Rewards
+Replace placeholders with badge icons (earned vs locked).
+Earned badges = colorful + mascot cheering.
+Locked badges = greyed out with a lock icon.
+Horizontal scroll shelf for multiple badges.
+Tapping a badge opens a small modal: “You unlocked this by [condition].”
+UX & Styling
+Mobile-first: max 420px width, 16px padding, rounded cards with shadows.
+Colors: white background, orange headers, black body text, grey for secondary.
+Animations: confetti for XP/streaks, bounce on emoji tap, smooth progress bar fill.
+Accessibility: 44×44 min tap targets, focus-visible, aria-live for progress updates.
+Data & API Integration
+Pull user state from GET /api/user/:id → { XP, level, streak, badges[] }.
+Pull daily logs & XP goal from GET /api/user/:id/daily-summary.
+Checklist items should map to log milestones (e.g., fruit logged, activity duration).
+Badges shelf should use real badge data from the DB.
+Acceptance Criteria
+XP progress ring + daily goal bar animate as XP is earned.
+Streak pill updates daily and milestone streaks trigger confetti.
+Quick Log emojis are tappable, bounce, and route to /food-log or /activity-log.
+Today’s Journey checklist tracks completion and shows earned XP.
+Badges shelf shows earned vs locked badges with interactive modals.
+Screen feels playful, polished, and consistent with FoodLog/ActivityLog screens.
+⚡ In short: turn the Home screen into a motivational hub where kids instantly see their XP progress, streak, tasks, and badges — while making logging food/activity just one tap away.

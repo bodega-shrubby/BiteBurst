@@ -1,0 +1,88 @@
+What to keep (good calls)
+Animated mascot + highlighted streak pill.
+Progress ring for today’s XP vs today’s goal with a celebration on goal reach.
+Larger, tappable Quick Log tiles (Food / Activity).
+Today’s Journey checklist.
+Badges shelf with earned vs locked.
+Mobile-first, a11y, reduced-motion support.
+Amendments & Improvements (do these)
+1) Scope & semantics
+Progress ring = today’s XP / today’s goal (not lifetime XP). Show lifetime XP + Level as small text under the ring.
+Celebrations (confetti, big mascot) fire only on daily goal completion or new badge unlock—avoid overuse.
+2) Server-driven truth (move logic off client)
+Milestone detection, combo bonus, and streak logic must be server-side to prevent drift/cheating.
+Replace the client condition(logs…) functions with a single summary payload.
+GET /api/user/:id/daily-summary (final shape)
+{
+  "xp_today": 155,
+  "xp_goal": 80,
+  "streak_days": 3,
+  "best_streak": 7,
+  "has_food_today": true,
+  "has_activity_today": true,
+  "milestones": [
+    {"id":"fruit1","title":"Log one fruit","reward":10,"completed":true},
+    {"id":"activity15","title":"Move for 15 minutes","reward":20,"completed":false},
+    {"id":"water","title":"Drink water","reward":5,"completed":true}
+  ],
+  "badges": {
+    "earned": [{"code":"FIRST_FOOD","name":"First Food Log"}],
+    "locked":  [{"code":"STREAK_7","name":"One-Week Streak"}]
+  },
+  "recent_logs": [
+    {"id":"a1","type":"food","summary":"🍎 Apple","ts":"2025-09-08T09:10:00Z"},
+    {"id":"b2","type":"activity","summary":"⚽ Soccer 30m (😐)","ts":"2025-09-08T17:20:00Z"}
+  ]
+}
+Use user timezone when computing “today”.
+3) Milestones (final MVP set)
+fruit1 — Log one fruit (emoji or text match) → +10 XP
+activity15 — Accumulate ≥15 min activity today → +20 XP
+water — Log water today → +5 XP
+(Stretch, not now) focus_food based on user goal.
+4) Badges (wire to your framework)
+Use the seeded badges you defined (e.g., FIRST_FOOD, FIRST_ACTIVITY, STREAK_3/7/14/30, COMBO_DAY…).
+Dashboard shows a horizontal shelf; tap → modal with description + “How to earn”.
+If badge_awarded appears in any response this session, show a one-time toast + micro confetti here too.
+5) Quick Log UX
+64×64 tiles, labels (“Apple”, “Soccer”), press bounce.
+Taps route to /food-log or /activity-log with query preselects (don’t duplicate log UI in dashboard).
+CTA buttons beneath rows: primary 🍎 Log Your Meal, secondary ⚽ Log Activity.
+6) Empty & loading states
+Skeletons for ring, checklist, badges.
+If no badges yet → friendly empty copy (“Unlock your first badge by logging today ✨”).
+If no logs today → show “Try one of these quick actions” with two large CTAs.
+7) Performance & a11y
+Respect prefers-reduced-motion; ring should jump to value.
+44×44 min targets, :focus-visible, aria-live="polite" on ring value and checklist updates.
+Avoid heavy shadows/filters; cache daily-summary for the session to reduce flicker.
+Component checklist (React)
+MascotAvatar (props: state: 'idle'|'goalReached'|'badgeUnlocked')
+StreakPill (“🔥 Day N”), click opens streak info modal (later).
+XPDayRing (props: xpToday, xpGoal, lifetimeXP, level)
+QuickLogGrid (food/emojis row, activity/emojis row, routes on tap)
+TodaysJourney (renders server milestones[], includes small progress bar completed/total)
+BadgesShelf (earned vs locked + modal)
+RecentLogsList (last 3–5 entries)
+Visual & copy tweaks
+Use clear microcopy under ring:
+Not met: “155/80 XP today”
+Met: “Goal reached! 🎉”
+Streak pill copy: “🔥 4-day streak”
+Checklist item format: “Move for 15 minutes +20 XP”
+Badge modal: “You earned this by logging food and activity on the same day.”
+Acceptance criteria (QA list)
+Ring animates to xp_today/xp_goal; confetti fires only when crossing the goal threshold (once/day).
+Streak pill shows current streak and uses user timezone.
+Quick Log tiles route correctly with preselects; buttons are accessible and 44×44+.
+“Today’s Journey” reflects server milestones[] and animates completed items (check + strike-through).
+Badges shelf shows real earned vs locked; modal opens with title/description; new unlock shows toast + micro confetti.
+Recent logs list shows 3–5 latest with emoji/label/time.
+All animations honor prefers-reduced-motion. Lighthouse a11y ≥ 90.
+Short task handoff to the Agent (copy-paste)
+Implement Dashboard/Progress v2 (React)
+Add GET /api/user/:id/daily-summary (payload above). Make summary server-driven and timezone-aware.
+Build/upgrade components: MascotAvatar, StreakPill, XPDayRing, QuickLogGrid, TodaysJourney, BadgesShelf, RecentLogsList.
+Wire Quick Log tiles to /food-log and /activity-log with query preselects.
+Add skeletons + empty states; respect reduced motion.
+Gate confetti to goal reached and badge unlocked events only.

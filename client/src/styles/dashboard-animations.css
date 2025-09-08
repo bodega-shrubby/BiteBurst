@@ -1,0 +1,141 @@
+/* Dashboard Animation Styles */
+
+/* Mascot Animations */
+@keyframes mascot-idle {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-2px) scale(1.02); }
+}
+
+@keyframes mascot-goal-celebration {
+  0% { transform: translateY(0px) scale(1); }
+  20% { transform: translateY(-8px) scale(1.1); }
+  40% { transform: translateY(0px) scale(1.05); }
+  60% { transform: translateY(-4px) scale(1.08); }
+  80% { transform: translateY(0px) scale(1.02); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+@keyframes mascot-badge-celebration {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-5deg) scale(1.1); }
+  50% { transform: rotate(5deg) scale(1.15); }
+  75% { transform: rotate(-3deg) scale(1.08); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.mascot-idle {
+  animation: mascot-idle 3s ease-in-out infinite;
+}
+
+.mascot-goal-celebration {
+  animation: mascot-goal-celebration 1.5s ease-out;
+}
+
+.mascot-badge-celebration {
+  animation: mascot-badge-celebration 1s ease-out;
+}
+
+/* Confetti Animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.confetti-particle {
+  position: absolute;
+  animation: confetti-fall 3s linear infinite;
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.confetti-particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.confetti-particle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+.confetti-particle:nth-child(3) { left: 30%; animation-delay: 1s; }
+.confetti-particle:nth-child(4) { left: 40%; animation-delay: 0.3s; }
+.confetti-particle:nth-child(5) { left: 50%; animation-delay: 0.8s; }
+.confetti-particle:nth-child(6) { left: 60%; animation-delay: 0.2s; }
+.confetti-particle:nth-child(7) { left: 70%; animation-delay: 0.7s; }
+.confetti-particle:nth-child(8) { left: 80%; animation-delay: 0.4s; }
+.confetti-particle:nth-child(9) { left: 90%; animation-delay: 0.9s; }
+
+/* Tile Bounce Animation */
+@keyframes tile-bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.tile-bounce {
+  animation: tile-bounce 0.15s ease-in-out;
+}
+
+/* Progress Ring Animation */
+@keyframes progress-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 106, 0, 0.3)); }
+  50% { filter: drop-shadow(0 0 16px rgba(255, 106, 0, 0.5)); }
+}
+
+.progress-glow {
+  animation: progress-glow 2s ease-in-out infinite;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .mascot-idle,
+  .mascot-goal-celebration,
+  .mascot-badge-celebration,
+  .confetti-particle,
+  .tile-bounce,
+  .progress-glow {
+    animation: none;
+  }
+  
+  .transition-all,
+  .transition-transform,
+  .transition-colors {
+    transition: none;
+  }
+}
+
+/* Focus Indicators */
+.focus-visible\:ring-2:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 106, 0, 0.5);
+}
+
+/* Toast Animation for Badges */
+@keyframes toast-slide-in {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: toast-slide-out 0.3s ease-in;
+}
