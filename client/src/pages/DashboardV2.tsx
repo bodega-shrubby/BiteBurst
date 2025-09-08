@@ -123,6 +123,33 @@ export default function DashboardV2() {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
+  // Fetch real badge data
+  const { data: badgeData } = useQuery({
+    queryKey: ['/api/user', user?.id, 'badges'],
+    queryFn: async () => {
+      if (!user?.id) throw new Error('No user ID');
+      const response = await fetch(`/api/user/${user.id}/badges`, {
+        credentials: 'include',
+        headers: {
+          'x-session-id': localStorage.getItem('sessionId') || ''
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch badges');
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  // Get all badge catalog for locked badges
+  const { data: badgeCatalog } = useQuery({
+    queryKey: ['/api/badges'],
+    queryFn: async () => {
+      const response = await fetch('/api/badges');
+      if (!response.ok) throw new Error('Failed to fetch badge catalog');
+      return response.json();
+    },
+  });
+
   // Handle goal completion celebration
   useEffect(() => {
     if (dailySummary && !hasGoalCelebrated) {
@@ -276,8 +303,14 @@ export default function DashboardV2() {
 
         {/* Badges Shelf */}
         <BadgesShelf
-          earnedBadges={dailySummary.badges.earned}
-          lockedBadges={dailySummary.badges.locked}
+          earnedBadges={badgeData?.earned?.map((badge: any) => ({
+            code: badge.code,
+            name: badgeCatalog?.find((b: any) => b.code === badge.code)?.name || badge.code,
+            description: badgeCatalog?.find((b: any) => b.code === badge.code)?.description || ''
+          })) || []}
+          lockedBadges={badgeCatalog?.filter((badge: any) => 
+            !badgeData?.earned?.some((earned: any) => earned.code === badge.code)
+          ) || []}
           onBadgeUnlock={(badge) => {
             setMascotState('badgeUnlocked');
             setBadgeToast({ badge, visible: true });

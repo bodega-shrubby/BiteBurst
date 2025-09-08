@@ -18,6 +18,13 @@ interface LogData {
   feedback?: string;
   content: any;
   entryMethod: string;
+  badge_awarded?: {
+    code: string;
+    name: string;
+    description: string;
+    category: string;
+    rarity: string;
+  };
 }
 
 export default function Feedback() {
@@ -236,6 +243,13 @@ export default function Feedback() {
       try {
         // Initial celebration animation
         setShowCelebration(true);
+        
+        // Check for badge award from log creation
+        if (logData.badge_awarded) {
+          setNewBadges([logData.badge_awarded.name]);
+          setShowBadgePill(true);
+          console.log('Badge earned:', logData.badge_awarded);
+        }
         
         // Start XP animation if we have award points
         if (awardXP > 0) {
