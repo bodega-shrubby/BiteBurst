@@ -1,0 +1,34 @@
+[
+  {
+    "id": "healthy-snacks",
+    "title": "Healthy Snacks",
+    "icon": "🍎",
+    "xp": 25,
+    "state": "unlocked",
+    "pathIndex": 0
+  },
+  {
+    "id": "hydration-heroes",
+    "title": "Hydration Heroes", 
+    "icon": "💧",
+    "xp": 25,
+    "state": "locked",
+    "pathIndex": 1
+  },
+  {
+    "id": "move-groove",
+    "title": "Move & Groove",
+    "icon": "⚽",
+    "xp": 30,
+    "state": "locked", 
+    "pathIndex": 2
+  },
+  {
+    "id": "focus-power-ups",
+    "title": "Focus Power-Ups",
+    "icon": "🧠",
+    "xp": 30,
+    "state": "locked",
+    "pathIndex": 3
+  }
+]
