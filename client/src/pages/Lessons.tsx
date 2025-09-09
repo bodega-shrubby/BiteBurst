@@ -42,7 +42,7 @@ export default function Lessons() {
 
   // Mobile-centered layout
   const containerWidth = 360; // Mobile-friendly width
-  const startY = 100; // Start position
+  const startY = 50; // Start position - reduced gap
   const lessonGap = 140; // Space between lessons
   const starGap = 70; // Space for star badges
 
