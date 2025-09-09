@@ -23,6 +23,13 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
       isActive: location.includes('/log')
     },
     {
+      id: 'lessons',
+      label: 'Track',
+      icon: '🗺️',
+      path: '/lessons',
+      isActive: location === '/lessons' || location.startsWith('/lesson/')
+    },
+    {
       id: 'achievements',
       label: 'Achievements',
       icon: '🏅',
@@ -35,13 +42,6 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
       icon: '🏆',
       path: '/leaderboard',
       isActive: location === '/leaderboard'
-    },
-    {
-      id: 'more',
-      label: 'More',
-      icon: '⋯',
-      path: '/profile', // Future profile/settings page
-      isActive: location === '/profile' || location === '/settings'
     }
   ];
   
