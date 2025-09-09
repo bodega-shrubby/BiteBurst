@@ -155,6 +155,12 @@ export default function Lessons() {
             const t = index / (lessons.length - 1);
             const spinePoint = sampleSpinePoint(t, lessons.length);
             
+            // Convert SVG coordinates to container coordinates
+            // SVG is positioned at 'calc(50% - 60px)' from left, so we need to offset accordingly
+            const containerWidth = 384; // max-w-md = 24rem = 384px
+            const svgOffsetX = (containerWidth / 2) - 60; // Match SVG positioning
+            const finalX = svgOffsetX + spinePoint.x;
+            
             return (
               <div
                 key={lesson.id}
@@ -162,7 +168,7 @@ export default function Lessons() {
                 style={{ scrollSnapAlign: 'center' }}
               >
                 <PathNode
-                  x={spinePoint.x}
+                  x={finalX}
                   y={spinePoint.y + 80} // Reduced offset for tighter spacing
                   icon={lesson.icon}
                   title={lesson.title}

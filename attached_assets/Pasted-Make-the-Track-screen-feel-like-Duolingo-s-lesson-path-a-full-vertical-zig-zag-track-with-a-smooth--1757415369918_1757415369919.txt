@@ -1,0 +1,142 @@
+Make the Track screen feel like Duolingo’s lesson path: a full vertical zig-zag track with a smooth SVG path, 8 visible lesson nodes (1 unlocked “START”, 2–3 soon nodes, the rest locked), correct alignment, and playful micro-interactions. What you built is close, but the path is misaligned and the screen feels empty. Let’s ship a polished MVP.
+Problems to Fix (from current screenshots)
+Path misalignment & fade: the curvy line isn’t centered between nodes and is too light.
+Sparse content: only 3 nodes appear; top and bottom feel empty.
+Banner card missing affordances: progress card needs icon + CTA hint.
+Inconsistent spacing: nodes don’t alternate left/right in a steady rhythm.
+Touch target sizes: ensure 56–64px min with 8px focus ring.
+Scroll/jump: content height doesn’t fill tall devices; path ends oddly.
+Fix all of the above.
+Deliverables
+A production-ready React screen at /track (or the existing route) that includes:
+Header with title + subtitle (already present) and a progress summary card.
+A curved SVG path centered between nodes, spanning the full scroll height.
+8 nodes (for MVP Week 1): 1 unlocked “START” + 7 upcoming (some locked), alternating left/right, vertically spaced.
+Proper states: unlocked, locked, completed, current.
+Smooth entrance + hover/tap animations.
+Accessibility: keyboard focus, aria labels, reduced-motion support.
+Tech & Files
+Stack: React + TypeScript + CSS (or Tailwind) used elsewhere. Do not introduce new UI libs.
+Create/modify:
+src/routes/Track.tsx (or your existing component)
+src/components/PathCanvas.tsx (new, renders SVG path)
+src/components/LessonNode.tsx (node pill)
+src/styles/track.css (or Tailwind classes inline)
+Keep design tokens consistent with BiteBurst:
+Orange #FF7A00, black #111, gray #EEF1F4 / shadows rgba(0,0,0,.08).
+Node ring glow uses soft green for completed, purple for current.
+Data Model (mocked)
+Use a static Week 1 list for now (can wire later):
+type LessonState = 'locked' | 'current' | 'unlocked' | 'completed';
+
+type Lesson = {
+  id: string;
+  title: string;
+  icon: '🍎' | '💧' | '🥦' | '🥪' | '⚽' | '🧠' | '😴' | '🏆';
+  state: LessonState;
+  progress?: number; // 0..1
+};
+
+const week1Lessons: Lesson[] = [
+  { id: 'L1', title: 'Healthy Snacks',   icon: '🍎', state: 'current'   },
+  { id: 'L2', title: 'Hydration Heroes', icon: '💧', state: 'unlocked'  },
+  { id: 'L3', title: 'Veggie Victory',   icon: '🥦', state: 'locked'    },
+  { id: 'L4', title: 'Smart Sandwiches', icon: '🥪', state: 'locked'    },
+  { id: 'L5', title: 'Move & Groove',    icon: '⚽', state: 'locked'    },
+  { id: 'L6', title: 'Brain Boosters',   icon: '🧠', state: 'locked'    },
+  { id: 'L7', title: 'Sleep Stars',      icon: '😴', state: 'locked'    },
+  { id: 'L8', title: 'Weekly Wrap-Up',   icon: '🏆', state: 'locked'    },
+];
+Compute progress from completed count.
+Layout Spec
+Container: fixed center column, max-width: 420px (mobile-first), padding: 16px, position: relative.
+Progress Card: rounded 16px, subtle shadow; copy:
+0 of 8 lessons complete (dynamic) and a subtitle hint: Tap “Healthy Snacks” to start!
+Track Area:
+Make a tall scrollable column; minimum height so that all 8 nodes fit with breathing room.
+Use ~120px vertical spacing between nodes.
+Nodes alternate left/right (left: 24px / right: 24px) with the path centered between them.
+Reserve 80px top padding before the first node and 160px bottom padding after the last node so the path ends gracefully above the tabbar.
+Path Rendering (exact)
+Implement a dedicated PathCanvas that receives node anchor points and draws a smooth centerline:
+type Point = { x: number; y: number };
+
+function makeSmoothPath(points: Point[]): string {
+  // Use cubic Beziers between midpoints for smoothness
+  if (points.length < 2) return '';
+  const d = [`M ${points[0].x} ${points[0].y}`];
+  for (let i = 1; i < points.length; i++) {
+    const p0 = points[i - 1];
+    const p1 = points[i];
+    const cx = (p0.x + p1.x) / 2;
+    d.push(`C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`);
+  }
+  return d.join(' ');
+}
+Anchor calculation:
+For each node i (0..7), y = startY + i * 120.
+Path x should be midway between left and right nodes with a gentle sway:
+x = centerX + Math.sin(i * 0.9) * 14 (small ±14px drift so it feels alive).
+Do NOT anchor the path to node centers; it’s a centerline between them.
+SVG:
+Width = container width, Height = total track height.
+stroke: #E2E6EB (a bit darker than now), stroke-width: 8, stroke-linecap: round, fill: none.
+Add a faint trailing highlight overlay: same path with stroke-width: 12 + stroke: rgba(255,122,0,0.08).
+Node Component (exact)
+<LessonNode lesson={...} side={'left'|'right'} y={number} />
+Visual spec:
+Size: 72px circle (outer) with inner 56px circle, soft shadow.
+State styles:
+current: purple ring #8B5CF6, “START” pill below (rounded 9999, 12px text), subtle bounce on mount.
+unlocked: white ring, label under title; on tap -> scale 0.98 then route to /lesson/:id.
+completed: green ring #16A34A, tiny star badge top-right.
+locked: gray fill #CBD5E1, lock icon in center, cursor: default.
+A11y:
+role="button" for tappable states, aria-label="Start Healthy Snacks lesson" etc.
+Focus ring: 2px #FF7A00 with outline-offset: 3px.
+Positioning:
+.node {
+  position: absolute;
+  width: 72px; height: 72px;
+}
+.node.left  { left: 24px;  transform: translateY(var(--y)); }
+.node.right { right: 24px; transform: translateY(var(--y)); }
+(Or set top: y if you prefer; just be consistent.)
+Alternating & Spacing Logic
+Compute side = i % 2 === 0 ? 'left' : 'right'.
+startY = 120 (below the progress card), gap = 120.
+For extra polish at large screens, slightly increase gap after every 3rd node: i % 3 === 0 ? gap + 10 : gap.
+Progress Summary
+Compute: completed = lessons.filter(l => l.state==='completed').length.
+Card text: X of 8 lessons complete.
+Small linear progress bar under the text (height: 6px, rounded, orange fill).
+If completed === 0, show hint: Tap "Healthy Snacks" to start your journey!.
+If completed > 0, hint becomes: Great! Keep going to unlock new lessons!.
+Interactions & Animations
+Entrance: nodes slide/fade from their side (duration: 240ms, stagger 40ms).
+Tap (unlocked/current): scale to 0.98 on pointer down, back on up.
+Reduced motion: respect prefers-reduced-motion (disable transforms).
+Empty Space & Scroll
+Ensure the SVG height equals the nodes region height.
+Add padding-bottom: 140px so the last node doesn’t get hidden by the tab bar.
+Always render all 8 nodes. Locked ones are visible but disabled.
+Acceptance Criteria
+8 nodes render with alternating sides; first is current with “START” pill.
+Curved path is centered between nodes and spans top→bottom smoothly.
+Progress card shows X of 8, with a working progress bar and smart hint.
+Tapping an unlocked/current node routes to /lesson/:id (stub OK).
+Locked nodes are visible, non-interactive.
+Screen passes a11y basics: focusable tappables, labels, 44px+ targets.
+No empty feel: top and bottom have adequate spacing; no path truncation.
+Works at 360–430px widths; looks good at 640–812px heights.
+QA Checklist
+Resize browser to iPhone SE and iPhone 14 Pro Max emulations.
+Keyboard-tab through nodes; focus ring visible and not clipped.
+Toggle prefers-reduced-motion and verify animations respect it.
+Scroll to bottom: last node is fully visible above the nav bar; path ends cleanly.
+Lighthouse a11y ≥ 90.
+Nice-to-Have (if time)
+Tiny animated sparkle on current node (CSS keyframes).
+Confetti burst when a lesson becomes completed (use existing confetti utility if available).
+Show a small star marker midway between some nodes, using the lighter gray “bonus” dot from the mock.
+Please commit changes in a single PR titled “Track Screen – Duolingo-style path & nodes” with short comments where you compute anchors, so we can tweak spacing easily.
