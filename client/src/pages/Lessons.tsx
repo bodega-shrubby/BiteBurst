@@ -171,6 +171,9 @@ export default function Lessons() {
               // Determine position for zigzag pattern - start winding from first lesson
               const position = index % 2 === 0 ? 'left' : 'right';
               
+              // Star position follows the path - positioned after the lesson that just completed
+              const starPosition = index % 2 === 1 ? 'left' : 'right';
+              
               const showStar = (index + 1) % 3 === 0 && index < nodes.length - 1;
               
               return (
@@ -189,7 +192,10 @@ export default function Lessons() {
                   
                   {/* Star milestone after every 3 lessons */}
                   {showStar && (
-                    <div className="flex justify-center">
+                    <div className={`
+                      flex w-full
+                      ${starPosition === 'left' ? 'justify-start ml-12' : 'justify-end mr-12'}
+                    `}>
                       <div className="w-12 h-12 rounded-full bg-gray-200 border-4 border-gray-300 flex items-center justify-center shadow-lg">
                         <span className="text-gray-400 text-lg">★</span>
                       </div>

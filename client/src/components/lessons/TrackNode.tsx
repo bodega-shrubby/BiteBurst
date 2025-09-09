@@ -23,8 +23,8 @@ export default function TrackNode({ node, onClick, isGlowing = false, position }
   return (
     <div className={`
       relative flex flex-col items-center w-24
-      ${position === 'left' ? 'self-start ml-8' : 
-        position === 'right' ? 'self-end mr-8' : 
+      ${position === 'left' ? 'self-start ml-16' : 
+        position === 'right' ? 'self-end mr-16' : 
         'self-center'}
     `}>
       <button
