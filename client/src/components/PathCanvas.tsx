@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-type NodePosition = { x: number; y: number; side: 'left' | 'right' };
+type NodePosition = { x: number; y: number; side: 'left' | 'right' | 'center' };
 
 interface PathCanvasProps {
   nodePositions: NodePosition[];
@@ -8,30 +8,22 @@ interface PathCanvasProps {
   height: number;
 }
 
-function makeZigZagPath(positions: NodePosition[]): string {
-  // Create zig-zag path connecting actual node centers
+function makeStraightPath(positions: NodePosition[]): string {
+  // Create straight vertical path connecting centered nodes
   if (positions.length < 2) return '';
   
   const d = [`M ${positions[0].x} ${positions[0].y}`];
   
   for (let i = 1; i < positions.length; i++) {
-    const prev = positions[i - 1];
     const curr = positions[i];
-    
-    // Add smooth curves between nodes for zig-zag effect
-    const midY = (prev.y + curr.y) / 2;
-    d.push(`C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`);
+    d.push(`L ${curr.x} ${curr.y}`);
   }
-  
-  // Ensure path ends exactly at the last node
-  const lastPos = positions[positions.length - 1];
-  d.push(`L ${lastPos.x} ${lastPos.y}`);
   
   return d.join(' ');
 }
 
 export default function PathCanvas({ nodePositions, containerWidth, height }: PathCanvasProps) {
-  const pathData = useMemo(() => makeZigZagPath(nodePositions), [nodePositions]);
+  const pathData = useMemo(() => makeStraightPath(nodePositions), [nodePositions]);
 
   return (
     <svg
@@ -51,7 +43,7 @@ export default function PathCanvas({ nodePositions, containerWidth, height }: Pa
         fill="none"
       />
       
-      {/* Main zig-zag path */}
+      {/* Main straight path */}
       <path
         d={pathData}
         stroke="#E2E6EB"

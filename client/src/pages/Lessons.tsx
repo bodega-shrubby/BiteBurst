@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import BottomNavigation from '@/components/BottomNavigation';
 import PathCanvas from '@/components/PathCanvas';
 import LessonNode, { type Lesson } from '@/components/LessonNode';
+import StarMilestone from '@/components/StarMilestone';
 import { week1Lessons } from '@/data/week1-lessons';
 
 export default function Lessons() {
@@ -39,27 +40,41 @@ export default function Lessons() {
   const completed = lessons.filter(l => l.state === 'completed').length;
   const progressPercent = (completed / lessons.length) * 100;
 
-  // Responsive layout calculations
-  const containerWidth = 320; // Reduced for better mobile fit
-  const leftNodeX = 20 + 36; // 20px from edge + 36px to center of 72px node
-  const rightNodeX = containerWidth - 20 - 36; // 20px from edge + 36px to center
+  // Centered straight-line layout calculations
+  const containerWidth = 384; // Standard mobile width
+  const centerX = containerWidth / 2; // All nodes centered
   const startY = 120; // Below progress card
   const nodeGap = 120; // Vertical spacing between nodes
+  const starGap = 60; // Gap before/after star milestones
   const topPadding = 80;
   const bottomPadding = 160;
 
-  // Calculate node positions for zig-zag path
-  const nodePositions = useMemo(() => {
-    return lessons.map((_, i) => {
-      const side: 'left' | 'right' = i % 2 === 0 ? 'left' : 'right';
-      const x = side === 'left' ? leftNodeX : rightNodeX;
-      const y = startY + i * nodeGap;
-      return { x, y, side };
+  // Calculate all positions (lessons + star milestones)
+  const allPositions = useMemo(() => {
+    const positions: Array<{ x: number; y: number; type: 'lesson' | 'star'; index: number }> = [];
+    let currentY = startY;
+    
+    lessons.forEach((_, i) => {
+      positions.push({ x: centerX, y: currentY, type: 'lesson', index: i });
+      currentY += nodeGap;
+      
+      // Add star milestone after lessons 3, 6, and 8
+      if (i === 2 || i === 5 || i === 7) {
+        currentY += starGap;
+        positions.push({ x: centerX, y: currentY, type: 'star', index: positions.length });
+        currentY += starGap;
+      }
     });
-  }, [lessons.length, leftNodeX, rightNodeX]);
+    
+    return positions;
+  }, [lessons.length, centerX]);
 
-  // Calculate total height
-  const totalHeight = topPadding + startY + (lessons.length - 1) * nodeGap + bottomPadding;
+  // Extract just lesson and star positions for path
+  const pathPositions = allPositions.map(pos => ({ x: pos.x, y: pos.y, side: 'center' as const }));
+
+  // Calculate total height including star milestones
+  const lastPosition = allPositions[allPositions.length - 1];
+  const totalHeight = topPadding + lastPosition.y + bottomPadding;
 
   // Handle node click
   const handleLessonClick = (lesson: Lesson) => {
@@ -119,7 +134,7 @@ export default function Lessons() {
 
       {/* Track Container */}
       <main className="relative">
-        <div className="max-w-xs mx-auto px-3 relative" style={{ width: '100%', maxWidth: '320px' }}>
+        <div className="max-w-sm mx-auto px-4 relative" style={{ width: '100%', maxWidth: '384px' }}>
           
           {/* Progress Card */}
           <div className="mt-4 mb-8">
@@ -153,25 +168,38 @@ export default function Lessons() {
           >
             {/* Path Canvas */}
             <PathCanvas 
-              nodePositions={nodePositions}
+              nodePositions={pathPositions}
               containerWidth={containerWidth}
               height={totalHeight}
             />
 
-            {/* Lesson Nodes */}
-            {lessons.map((lesson, index) => {
-              const position = nodePositions[index];
-              
-              return (
-                <LessonNode
-                  key={lesson.id}
-                  lesson={lesson}
-                  side={position.side}
-                  y={position.y}
-                  index={index}
-                  onClick={() => handleLessonClick(lesson)}
-                />
-              );
+            {/* All Nodes (Lessons + Stars) */}
+            {allPositions.map((position) => {
+              if (position.type === 'lesson') {
+                const lesson = lessons[position.index];
+                return (
+                  <LessonNode
+                    key={lesson.id}
+                    lesson={lesson}
+                    side='center'
+                    y={position.y}
+                    index={position.index}
+                    onClick={() => handleLessonClick(lesson)}
+                  />
+                );
+              } else {
+                // Star milestone
+                const completedLessons = position.index <= 3 ? 3 : position.index <= 6 ? 6 : 8;
+                const isUnlocked = completed >= completedLessons;
+                return (
+                  <StarMilestone
+                    key={`star-${position.index}`}
+                    y={position.y}
+                    index={position.index}
+                    isUnlocked={isUnlocked}
+                  />
+                );
+              }
             })}
           </div>
         </div>

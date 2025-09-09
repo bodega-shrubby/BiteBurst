@@ -13,7 +13,7 @@ export type Lesson = {
 
 interface LessonNodeProps {
   lesson: Lesson;
-  side: 'left' | 'right';
+  side: 'left' | 'right' | 'center';
   y: number;
   index: number;
   onClick?: () => void;
@@ -60,18 +60,18 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
   };
 
   // Compute styles based on state
-  const ringColor = isCompleted ? '#16A34A' : isCurrent ? '#8B5CF6' : '#FFFFFF';
-  const ringBorder = isLocked ? '#CBD5E1' : isCompleted ? '#16A34A' : isCurrent ? '#8B5CF6' : '#E5E7EB';
-  const bgColor = isLocked ? '#CBD5E1' : '#FFFFFF';
+  const ringColor = isCompleted ? '#16A34A' : isCurrent ? '#3B82F6' : '#FFFFFF';
+  const ringBorder = isLocked ? '#CBD5E1' : isCompleted ? '#16A34A' : isCurrent ? '#3B82F6' : '#E5E7EB';
+  const bgColor = isLocked ? '#CBD5E1' : isCurrent ? '#3B82F6' : '#FFFFFF';
 
   const nodeClasses = `
     absolute w-[72px] h-[72px] rounded-full transition-all duration-300
     ${isInteractive ? 'cursor-pointer' : 'cursor-default'}
     ${isPressed && !prefersReducedMotion ? 'scale-[0.98]' : 'scale-100'}
     ${showEntrance && !prefersReducedMotion ? 'opacity-100 translate-y-0' : !prefersReducedMotion ? 'opacity-0 translate-y-4' : 'opacity-100'}
-    ${side === 'left' ? 'left-5' : 'right-5'}
+    ${side === 'left' ? 'left-5' : side === 'right' ? 'right-5' : 'left-1/2 transform -translate-x-1/2'}
     ${isInteractive ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2' : ''}
-    ${isCurrent && !prefersReducedMotion ? 'animate-pulse' : ''}
+    
   `;
 
   const ariaLabel = `${lesson.title}, ${lesson.state}${isCurrent ? ', start lesson' : isInteractive ? ', open lesson' : ''}`;
@@ -102,11 +102,11 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
         tabIndex={isInteractive ? 0 : -1}
       >
         {/* Inner circle with content */}
-        <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center m-1 relative">
+        <div className={`w-14 h-14 rounded-full flex items-center justify-center m-1 relative ${isCurrent ? 'bg-blue-500' : 'bg-white'}`}>
           {isLocked ? (
             <Lock className="w-6 h-6 text-gray-400" />
           ) : (
-            <span className="text-2xl" role="img" aria-hidden="true">
+            <span className={`text-2xl ${isCurrent ? 'text-white' : ''}`} role="img" aria-hidden="true">
               {lesson.icon}
             </span>
           )}
@@ -123,7 +123,7 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
       {/* START pill for current lesson */}
       {isCurrent && (
         <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-          <div className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
             START
           </div>
         </div>
