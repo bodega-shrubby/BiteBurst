@@ -132,12 +132,12 @@ export default function Lessons() {
 
       {/* Track Container */}
       <main className="relative">
-        {/* Mascot on the left */}
-        <div className="hidden sm:block absolute left-4 top-32 z-10">
+        {/* Mascot on the left - mobile first */}
+        <div className="absolute left-2 top-24 z-10">
           <img 
             src={mascotImage} 
             alt="BiteBurst Teacher Mascot" 
-            className="w-20 h-20 object-contain"
+            className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
           />
         </div>
 
