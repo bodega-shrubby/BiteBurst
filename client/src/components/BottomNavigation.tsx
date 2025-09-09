@@ -23,11 +23,11 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
       isActive: location.includes('/log')
     },
     {
-      id: 'goals',
-      label: 'Goals',
-      icon: '🎯',
-      path: '/goals', // Future goals management page
-      isActive: location === '/goals'
+      id: 'achievements',
+      label: 'Achievements',
+      icon: '🏅',
+      path: '/achievements',
+      isActive: location === '/achievements'
     },
     {
       id: 'champs',
