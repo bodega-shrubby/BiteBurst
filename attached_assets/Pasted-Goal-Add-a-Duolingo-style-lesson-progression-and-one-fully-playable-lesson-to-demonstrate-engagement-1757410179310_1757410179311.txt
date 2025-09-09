@@ -1,0 +1,113 @@
+Goal
+Add a Duolingo-style lesson progression and one fully playable lesson to demonstrate engagement + gamification. Keep it lightweight, mobile-first, and consistent with BiteBurst (white bg, orange headers, black body, friendly mascot).
+Routes
+/lessons — Lesson Path (progression map)
+/lesson/demo — Demo Lesson (Intro → Quiz → Success → Complete)
+After completion, return to /lessons with XP/streak updated.
+Tech
+React (same patterns as existing routes), headless components + scoped CSS.
+Reuse existing XP/streak APIs; if missing, stub and clearly mark TODOs.
+No external UI frameworks.
+1) Lesson Path ( /lessons )
+UI
+Header: “Healthy Habits: Week 1”
+Vertical path with 4 nodes (mock), each a rounded card with icon + label:
+🍎 Healthy Snacks (unlocked, Start button → /lesson/demo)
+💧 Hydration Heroes (locked)
+⚽ Move & Groove (locked)
+🧠 Focus Power-Ups (locked)
+Each node shows:
+Small XP chip (e.g., “+25 XP”)
+Lock/Unlock state
+Progress ring (0/1, 1/1) for completion
+Floating mascot bubble top-right (waves on first visit).
+Data Model (client JSON for MVP)
+type LessonNode = {
+  id: string; title: string; icon: string; xp: number;
+  state: 'locked'|'unlocked'|'complete';
+  pathIndex: number;
+};
+Seed 4 nodes in src/data/lessonTrack.json. On demo completion, mark node 1 complete and unlock node 2.
+Behavior
+Tapping an unlocked node opens its lesson (only node 1 playable).
+After demo completes, update local state (localStorage) and re-render path with:
+Node 1: completed check + full ring
+Node 2: unlocked with subtle glow
+A11y
+Nodes are buttons; 44×44 min targets; focus-visible rings; ARIA labels.
+2) Demo Lesson ( /lesson/demo )
+Flow (4 screens inside one route)
+Intro
+Card: “Healthy Snacks” (Lesson 1 of 4)
+Mascot + short subtitle: “Pick the best snack to power your day.”
+Button: Start (+25 XP)
+Quiz (single step; Duolingo-style token chooser)
+Prompt: “Which of these is a healthy snack?”
+Options (pills with emoji + word):
+🍎 Apple (correct)
+🍫 Chocolate bar
+🥨 Pretzel
+User taps → immediate feedback:
+Correct → card lights green, bounce animation.
+Incorrect → shake + micro-hint: “Try one with fiber.”
+Success Strip
+Appears at bottom like Duolingo: “Nice! 🍎 Apples give long-lasting energy.”
+Button: Continue
+Lesson Complete
+Large illustration (mascot + celebratory pose).
+Stats tiles:
+Total XP: +25
+Good: 100%
+Speedy: show elapsed time (optional stopwatch)
+Primary CTA: Claim XP → posts XP + streak → navigates back to /lessons?justCompleted=demo.
+State & API
+type LessonRun = { startedAt: number; finishedAt?: number; correct: boolean };
+On Start: record startedAt.
+On Claim XP:
+POST /api/xp/award { userId, amount: 25, reason: 'lesson_demo' }
+POST /api/streak/tick { userId, date: today } (or reuse existing tick)
+If APIs missing, create stubs that resolve and update local UI, then TODO to wire later.
+Animations
+Quiz correct: pill bounce (keyframes) + sparkle burst near pill.
+Complete screen: confetti (respect prefers-reduced-motion → fade only).
+Path unlock: newly unlocked node glow for 1.2s.
+Error/Offline
+If XP award fails, show non-blocking toast: “Saved locally; will sync later.” Keep “Claim XP” idempotent by disabling after success.
+A11y
+Quiz pills are radio buttons (role group) with ARIA feedback on correctness.
+Success/Complete announce via aria-live="polite".
+Components & Files
+src/routes/Lessons.tsx            // path screen
+src/routes/LessonDemo.tsx         // orchestrates 4 steps
+src/components/lessons/TrackNode.tsx
+src/components/lessons/ProgressRing.tsx
+src/components/lessons/QuizPills.tsx
+src/components/lessons/SuccessStrip.tsx
+src/components/lessons/Confetti.tsx
+src/data/lessonTrack.json
+src/styles/lessons.css            // scoped styles, mobile-first
+Styling (BiteBurst)
+Colors: orange headers (#FF7A00), black text (#111), gray chips (#EFEFEF), soft shadows, rounded-2xl cards.
+Maintain tap target ≥ 44×44; use :focus-visible outlines.
+Keep layout within 420px container.
+Copy (kid-friendly)
+Intro: “Pick the snack that powers you up!”
+Correct: “Nice! Apples give long-lasting energy.”
+Complete: “Lesson complete! You earned +25 XP.”
+Navigation & Persistence
+Add “Lessons” to the bottom nav as Track (map icon).
+Use localStorage['bb-lesson-track'] to persist node states for the demo.
+On returning from /lesson/demo with ?justCompleted=demo, show:
+Mascot pop + confetti burst once
+Node 2 glow; scroll into view; then remove query param from history.
+Acceptance Criteria
+/lessons renders 4 nodes; node 1 is playable; others locked.
+/lesson/demo runs Intro → Quiz → Success → Complete with smooth transitions.
+Claim XP updates XP/streak (stub or real), marks node 1 complete, unlocks node 2, returns to /lessons.
+Confetti + glow appear once after completion; respects reduced motion.
+All interactive elements keyboard + screen reader friendly; no console errors.
+Stretch (only if time remains)
+Add a second quiz step (hydration) but keep the flow single-question for MVP.
+Add “Try again” state for wrong answer (no penalty).
+Show tiny progress bar at top of lesson (1/1).
+Please implement exactly as specified, wiring to real XP/streak endpoints if present and falling back to local stubs otherwise.
