@@ -69,7 +69,7 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
     ${isInteractive ? 'cursor-pointer' : 'cursor-default'}
     ${isPressed && !prefersReducedMotion ? 'scale-[0.98]' : 'scale-100'}
     ${showEntrance && !prefersReducedMotion ? 'opacity-100 translate-y-0' : !prefersReducedMotion ? 'opacity-0 translate-y-4' : 'opacity-100'}
-    ${side === 'left' ? 'left-6' : 'right-6'}
+    ${side === 'left' ? 'left-5' : 'right-5'}
     ${isInteractive ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2' : ''}
     ${isCurrent && !prefersReducedMotion ? 'animate-pulse' : ''}
   `;

@@ -40,9 +40,9 @@ export default function Lessons() {
   const progressPercent = (completed / lessons.length) * 100;
 
   // Responsive layout calculations
-  const containerWidth = 384; // max-w-sm = 24rem = 384px (mobile-friendly)
-  const leftNodeX = 24 + 36; // 24px from edge + 36px to center of 72px node
-  const rightNodeX = containerWidth - 24 - 36; // 24px from edge + 36px to center
+  const containerWidth = 320; // Reduced for better mobile fit
+  const leftNodeX = 20 + 36; // 20px from edge + 36px to center of 72px node
+  const rightNodeX = containerWidth - 20 - 36; // 20px from edge + 36px to center
   const startY = 120; // Below progress card
   const nodeGap = 120; // Vertical spacing between nodes
   const topPadding = 80;
@@ -119,7 +119,7 @@ export default function Lessons() {
 
       {/* Track Container */}
       <main className="relative">
-        <div className="max-w-sm mx-auto px-4 relative" style={{ width: '100%', maxWidth: '384px' }}>
+        <div className="max-w-xs mx-auto px-3 relative" style={{ width: '100%', maxWidth: '320px' }}>
           
           {/* Progress Card */}
           <div className="mt-4 mb-8">

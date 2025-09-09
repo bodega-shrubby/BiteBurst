@@ -23,6 +23,10 @@ function makeZigZagPath(positions: NodePosition[]): string {
     d.push(`C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`);
   }
   
+  // Ensure path ends exactly at the last node
+  const lastPos = positions[positions.length - 1];
+  d.push(`L ${lastPos.x} ${lastPos.y}`);
+  
   return d.join(' ');
 }
 
