@@ -19,8 +19,23 @@ interface StickersTabProps {
 
 export default function StickersTab({ isActive }: StickersTabProps) {
   const { user } = useAuth();
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  // Get persisted filter from sessionStorage or default to 'All'
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('achievements-filter') || 'All';
+    }
+    return 'All';
+  });
   const [selectedBadge, setSelectedBadge] = useState<BadgeVM | null>(null);
+  const [highlightedBadge, setHighlightedBadge] = useState<string | null>(null);
+
+  // Persist filter selection
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('achievements-filter', category);
+    }
+  };
 
   // Fetch badge catalog
   const { data: catalog = [] } = useQuery<BadgeCatalog[]>({
@@ -83,12 +98,17 @@ export default function StickersTab({ isActive }: StickersTabProps) {
         earnedCount={earnedCount}
         totalCount={totalCount}
         badges={badges}
+        onHighlightBadge={(badgeCode) => {
+          setHighlightedBadge(badgeCode);
+          // Clear highlight after 1.5 seconds
+          setTimeout(() => setHighlightedBadge(null), 1500);
+        }}
       />
       
       {/* Badge Filters */}
       <BadgeFilters
         selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
+        onCategoryChange={handleCategoryChange}
       />
 
       {/* Badge Grid */}
@@ -109,6 +129,7 @@ export default function StickersTab({ isActive }: StickersTabProps) {
               key={badge.code}
               badge={badge}
               onClick={() => setSelectedBadge(badge)}
+              isHighlighted={highlightedBadge === badge.code}
             />
           ))}
         </div>

@@ -1,13 +1,18 @@
 import { ChevronRight } from 'lucide-react';
 import { getNextUnlocks, getProgressPercentage, getBadgeIcon, type BadgeVM } from '@/utils/badges';
 
+interface HighlightCallback {
+  (badgeCode: string): void;
+}
+
 interface ProgressStripProps {
   earnedCount: number;
   totalCount: number;
   badges: BadgeVM[];
+  onHighlightBadge?: HighlightCallback;
 }
 
-export default function ProgressStrip({ earnedCount, totalCount, badges }: ProgressStripProps) {
+export default function ProgressStrip({ earnedCount, totalCount, badges, onHighlightBadge }: ProgressStripProps) {
   const progressPercentage = totalCount > 0 ? (earnedCount / totalCount) * 100 : 0;
   const nextUnlocks = getNextUnlocks(badges);
 
@@ -42,11 +47,15 @@ export default function ProgressStrip({ earnedCount, totalCount, badges }: Progr
               return (
                 <button
                   key={badge.code}
-                  className="flex-shrink-0 flex items-center space-x-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
+                  className="flex-shrink-0 flex items-center space-x-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm hover:bg-orange-50 hover:border-orange-200 transition-colors cursor-pointer"
                   onClick={() => {
-                    // Scroll to badge in grid (simple approach)
+                    // Scroll to badge in grid and highlight it
                     const element = document.querySelector(`[data-badge-code="${badge.code}"]`);
-                    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      // Trigger highlight effect
+                      onHighlightBadge?.(badge.code);
+                    }
                   }}
                 >
                   <span className="text-lg">{getBadgeIcon(badge).split('💎')[0]}</span>
