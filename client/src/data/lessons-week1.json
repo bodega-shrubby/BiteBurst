@@ -1,0 +1,10 @@
+[
+  {"id":"snacks","title":"Healthy\nSnacks","icon":"🍎","xp":25,"state":"unlocked","order":1},
+  {"id":"hydration","title":"Hydration\nHeroes","icon":"💧","xp":25,"state":"locked","order":2},
+  {"id":"move","title":"Move &\nGroove","icon":"⚽","xp":25,"state":"locked","order":3},
+  {"id":"focus","title":"Focus\nBoosters","icon":"🧠","xp":25,"state":"locked","order":4},
+  {"id":"veggies","title":"Veggie\nVictory","icon":"🥦","xp":25,"state":"locked","order":5},
+  {"id":"carbs","title":"Smart\nCarbs","icon":"🍞","xp":25,"state":"locked","order":6},
+  {"id":"protein","title":"Protein\nPower","icon":"🍗","xp":25,"state":"locked","order":7},
+  {"id":"colors","title":"Colorful\nPlate","icon":"🌈","xp":25,"state":"locked","order":8}
+]

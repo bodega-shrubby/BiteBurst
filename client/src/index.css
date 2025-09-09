@@ -14,6 +14,13 @@
   --bb-focus: #FF6A00;
   --tap: 56px;
   --radius: 12px;
+  
+  /* Duolingo-style Lesson Track Colors */
+  --bb-orange: #FF7A00;
+  --bb-green: #2AC769;
+  --bb-purple: #8B5CF6;
+  --bb-gray: #EDEFF3;
+  --bb-shadow: 0 10px 24px rgba(0,0,0,.08);
 }
 
 /* Onboarding animations */
@@ -93,6 +100,19 @@
   20%, 40%, 60%, 80% { transform: translateX(3px); }
 }
 
+/* Duolingo-style Lesson Track Animations */
+@keyframes popIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,122,0,.45); }
+  80% { box-shadow: 0 0 0 16px rgba(255,122,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,122,0,0); }
+}
+
 .animate-confetti-fall {
   animation: confetti-fall 3s linear forwards;
 }
@@ -122,6 +142,28 @@
 
 .animate-float-delayed {
   animation: float-delayed 3s ease-in-out infinite 1.5s;
+}
+
+/* Lesson Track Node States */
+.lesson-node {
+  transition: all 0.3s ease;
+}
+
+.lesson-node.complete { 
+  background: linear-gradient(180deg, #32D27A, #20B36A); 
+}
+
+.lesson-node.unlocked { 
+  background: linear-gradient(180deg, #9D7BFF, #7A57F3); 
+}
+
+.lesson-node.locked { 
+  background: #D7DCE4; 
+  filter: saturate(0.2); 
+}
+
+.lesson-node.unlocked.newly-unlocked { 
+  animation: popIn 0.5s ease-out, glowPulse 1.2s ease-out 2; 
 }
 
 .star-sparkle {
