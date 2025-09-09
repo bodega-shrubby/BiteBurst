@@ -57,7 +57,7 @@ export default function PersonalRecordsTab({ isActive }: PersonalRecordsTabProps
       value: records.longestStreak,
       subtitle: 'consecutive days',
       gradient: 'from-gray-800 via-gray-700 to-gray-600',
-      iconComponent: <Flame className="w-8 h-8 text-orange-400" />
+      iconComponent: <Flame className="w-8 h-8 text-orange-300" />
     },
     {
       id: 'dailyXpBest',
@@ -66,7 +66,7 @@ export default function PersonalRecordsTab({ isActive }: PersonalRecordsTabProps
       value: records.dailyXpBest,
       subtitle: 'XP in one day',
       gradient: 'from-slate-800 via-slate-700 to-slate-600',
-      iconComponent: <Trophy className="w-8 h-8 text-yellow-400" />
+      iconComponent: <Trophy className="w-8 h-8 text-yellow-300" />
     }
   ];
 
