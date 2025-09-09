@@ -115,7 +115,7 @@ export default function PersonalRecordsTab({ isActive }: PersonalRecordsTabProps
             }}
           >
             {/* Background decorative elements */}
-            <div className="absolute top-4 right-4 opacity-20 text-6xl">
+            <div className="absolute top-4 right-4 opacity-40 text-6xl">
               {tile.icon}
             </div>
             
