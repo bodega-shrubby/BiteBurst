@@ -2,109 +2,93 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import BottomNavigation from '@/components/BottomNavigation';
-import TrackNode, { type LessonNode } from '@/components/lessons/TrackNode';
-import lessonTrackData from '@/data/lessonTrack.json';
+import CurvySpine, { sampleSpinePoint } from '@/components/lessons/CurvySpine';
+import PathNode, { type LessonNodeData, type NodeState } from '@/components/lessons/PathNode';
+import lessonsWeek1Data from '@/data/lessons-week1.json';
 
 export default function Lessons() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
-  const [nodes, setNodes] = useState<LessonNode[]>(lessonTrackData as LessonNode[]);
-  const [showMascotBubble, setShowMascotBubble] = useState(false);
-  const [glowingNode, setGlowingNode] = useState<string | null>(null);
+  const [lessons, setLessons] = useState<LessonNodeData[]>(lessonsWeek1Data as LessonNodeData[]);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set(['snacks'])); // First lesson unlocked
+  const [newlyUnlockedId, setNewlyUnlockedId] = useState<string | null>(null);
 
-  // Check for completion celebration
+  // Load saved progress from localStorage
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const justCompleted = urlParams.get('justCompleted');
-    
-    if (justCompleted === 'demo') {
-      // Get current progress from localStorage
-      const savedProgress = localStorage.getItem('bb-lesson-track');
-      let currentProgress: Record<string, string> = {};
-      
-      if (savedProgress) {
-        try {
-          currentProgress = JSON.parse(savedProgress);
-        } catch (e) {
-          console.warn('Failed to parse lesson progress:', e);
-        }
-      }
-
-      // Mark first lesson as complete and unlock second
-      currentProgress['healthy-snacks'] = 'complete';
-      currentProgress['hydration-heroes'] = 'unlocked';
-      
-      localStorage.setItem('bb-lesson-track', JSON.stringify(currentProgress));
-      
-      // Update nodes state
-      const updatedNodes = lessonTrackData.map((node: any) => ({
-        ...node,
-        state: currentProgress[node.id] || node.state
-      })) as LessonNode[];
-      
-      setNodes(updatedNodes);
-      
-      // Show celebration effects
-      setGlowingNode('hydration-heroes');
-      
-      // Check for reduced motion preference
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
-      if (!prefersReducedMotion) {
-        // Scroll to newly unlocked node
-        setTimeout(() => {
-          const nodeElement = document.querySelector('[data-node-id="hydration-heroes"]');
-          if (nodeElement) {
-            nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }, 500);
-      }
-      
-      // Clear celebration effects and URL params
-      setTimeout(() => {
-        setGlowingNode(null);
-        window.history.replaceState({}, '', '/lessons');
-      }, prefersReducedMotion ? 1000 : 2000);
-    }
-  }, []);
-
-  // Load saved progress on mount
-  useEffect(() => {
-    const savedProgress = localStorage.getItem('bb-lesson-track');
+    const savedProgress = localStorage.getItem('bb_week1_progress');
     if (savedProgress) {
       try {
-        const currentProgress = JSON.parse(savedProgress);
-        const updatedNodes = lessonTrackData.map((node: any) => ({
-          ...node,
-          state: currentProgress[node.id] || node.state
-        })) as LessonNode[];
-        setNodes(updatedNodes);
+        const progress = JSON.parse(savedProgress);
+        setCompletedIds(new Set(progress.completed || []));
+        setUnlockedIds(new Set(progress.unlocked || ['snacks']));
       } catch (e) {
         console.warn('Failed to parse lesson progress:', e);
       }
     }
   }, []);
 
-  // Show mascot bubble on first visit
+  // Save progress to localStorage whenever state changes
   useEffect(() => {
-    const hasSeenLessons = localStorage.getItem('bb-lessons-visited');
-    if (!hasSeenLessons) {
-      setShowMascotBubble(true);
-      localStorage.setItem('bb-lessons-visited', 'true');
-      
-      // Hide bubble after 3 seconds
-      setTimeout(() => {
-        setShowMascotBubble(false);
-      }, 3000);
-    }
-  }, []);
+    const progress = {
+      completed: Array.from(completedIds),
+      unlocked: Array.from(unlockedIds)
+    };
+    localStorage.setItem('bb_week1_progress', JSON.stringify(progress));
+  }, [completedIds, unlockedIds]);
 
-  const handleNodeClick = (node: LessonNode) => {
-    if (node.state === 'unlocked' && node.id === 'healthy-snacks') {
+  // Handle lesson completion from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const justCompleted = urlParams.get('completed');
+    
+    if (justCompleted && lessons.find(l => l.id === justCompleted)) {
+      // Mark lesson as complete
+      setCompletedIds(prev => new Set([...Array.from(prev), justCompleted]));
+      
+      // Find and unlock next lesson
+      const currentIndex = lessons.findIndex(l => l.id === justCompleted);
+      if (currentIndex >= 0 && currentIndex < lessons.length - 1) {
+        const nextLesson = lessons[currentIndex + 1];
+        setUnlockedIds(prev => new Set([...Array.from(prev), nextLesson.id]));
+        setNewlyUnlockedId(nextLesson.id);
+        
+        // Clear newly unlocked state after animations complete
+        setTimeout(() => setNewlyUnlockedId(null), 2500);
+        
+        // Scroll to newly unlocked lesson
+        setTimeout(() => {
+          const element = document.querySelector(`[data-lesson-id="${nextLesson.id}"]`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 500);
+      }
+      
+      // Clear URL params
+      window.history.replaceState({}, '', '/lessons');
+    }
+  }, [lessons]);
+
+  // Calculate current lesson states
+  const lessonsWithState = lessons.map(lesson => ({
+    ...lesson,
+    state: completedIds.has(lesson.id) ? 'complete' as NodeState :
+           unlockedIds.has(lesson.id) ? 'unlocked' as NodeState :
+           'locked' as NodeState
+  }));
+
+  // Calculate progress for spine animation (0 to 1)
+  const progress = completedIds.size / lessons.length;
+
+  // Handle lesson node click
+  const handleLessonClick = (lesson: LessonNodeData) => {
+    if (lesson.state === 'unlocked') {
+      // For MVP, all lessons route to the demo
       setLocation('/lesson/demo');
-    } else if (node.state === 'unlocked') {
-      // TODO: Navigate to other lessons when implemented
-      console.log(`Lesson ${node.id} clicked - not yet implemented`);
+    } else if (lesson.state === 'locked') {
+      // Show tooltip feedback (handled by PathNode component)
+      console.log('Lesson locked - finish earlier lessons first');
     }
   };
 
@@ -132,87 +116,91 @@ export default function Lessons() {
     );
   }
 
+  const containerHeight = Math.max(1400, lessons.length * 160 + 400);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-20 p-4">
+      <header className="sticky top-0 bg-white border-b border-gray-200 z-30 px-6 py-4">
         <div className="max-w-md mx-auto">
-          <div className="relative">
-            <h1 className="text-2xl font-bold text-orange-600 text-center">
+          <div className="text-center space-y-1">
+            <h1 className="text-xl font-bold text-gray-900">
               Healthy Habits: Week 1
             </h1>
-            <p className="text-gray-600 text-sm text-center mt-1">
+            <p className="text-sm text-gray-600">
               Learn the basics of healthy eating and movement
             </p>
-            
-            {/* Floating mascot with bubble */}
-            {showMascotBubble && (
-              <div className="absolute top-0 right-0 flex items-start space-x-2 animate-in slide-in-from-right duration-500">
-                <div className="bg-orange-100 border border-orange-300 rounded-2xl px-3 py-2 shadow-lg max-w-32">
-                  <div className="text-xs text-orange-800 font-medium">
-                    Welcome! Start your first lesson! 👋
-                  </div>
-                  {/* Speech bubble tail */}
-                  <div className="absolute top-3 -right-1 w-2 h-2 bg-orange-100 border-r border-b border-orange-300 transform rotate-45" />
-                </div>
-                <div className="text-2xl animate-bounce">🍊</div>
-              </div>
-            )}
           </div>
         </div>
       </header>
 
-      {/* Lesson Path */}
-      <main className="p-6 pb-24">
+      {/* Lesson Track */}
+      <main 
+        className="relative px-6"
+        style={{ 
+          minHeight: containerHeight,
+          scrollSnapType: 'y proximity'
+        }}
+      >
         <div className="max-w-md mx-auto relative">
-          {/* Lesson nodes with star milestones */}
-          <div className="relative flex flex-col space-y-4 pt-4">
-            {nodes.map((node, index) => {
-              // Determine position for zigzag pattern - start winding from first lesson
-              const position = index % 2 === 0 ? 'left' : 'right';
-              
-              // Star position follows the path - positioned after the lesson that just completed
-              const starPosition = index % 2 === 1 ? 'left' : 'right';
-              
-              const showStar = (index + 1) % 3 === 0 && index < nodes.length - 1;
-              
-              return (
-                <div key={`${node.id}-group`} className="flex flex-col items-center space-y-4">
-                  <div 
-                    data-node-id={node.id}
-                    className="relative w-full"
-                  >
-                    <TrackNode
-                      node={node}
-                      onClick={() => handleNodeClick(node)}
-                      isGlowing={glowingNode === node.id}
-                      position={position}
-                    />
-                  </div>
-                  
-                  {/* Star milestone after every 3 lessons */}
-                  {showStar && (
-                    <div className={`
-                      flex w-full
-                      ${starPosition === 'left' ? 'justify-start ml-12' : 'justify-end mr-12'}
-                    `}>
-                      <div className="w-12 h-12 rounded-full bg-gray-200 border-4 border-gray-300 flex items-center justify-center shadow-lg">
-                        <span className="text-gray-400 text-lg">★</span>
-                      </div>
-                    </div>
-                  )}
+          {/* S-Curve Spine */}
+          <CurvySpine 
+            progress={progress} 
+            nodeCount={lessons.length}
+          />
+
+          {/* Lesson Nodes */}
+          {lessonsWithState.map((lesson, index) => {
+            // Calculate position along S-curve
+            const t = index / (lessons.length - 1);
+            const spinePoint = sampleSpinePoint(t, lessons.length);
+            
+            return (
+              <div
+                key={lesson.id}
+                data-lesson-id={lesson.id}
+                style={{ scrollSnapAlign: 'center' }}
+              >
+                <PathNode
+                  x={spinePoint.x}
+                  y={spinePoint.y + 120} // Offset for header
+                  icon={lesson.icon}
+                  title={lesson.title}
+                  state={lesson.state}
+                  order={lesson.order}
+                  onClick={() => handleLessonClick(lesson)}
+                  isNewlyUnlocked={newlyUnlockedId === lesson.id}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Progress Footer */}
+        <div 
+          className="sticky bottom-24 left-0 right-0 pt-8 pb-4"
+          style={{ top: 'auto' }}
+        >
+          <div className="max-w-md mx-auto text-center">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg border border-gray-200">
+              <div className="text-sm font-semibold text-gray-900">
+                {completedIds.size} of {lessons.length} lessons complete
+              </div>
+              {completedIds.size === 0 && (
+                <div className="text-xs text-gray-500 mt-1">
+                  Tap "Healthy Snacks" to start your journey!
                 </div>
-              );
-            })}
-          </div>
-          
-          {/* Progress summary */}
-          <div className="mt-16 text-center space-y-2">
-            <div className="text-sm text-gray-600">
-              {nodes.filter(n => n.state === 'complete').length} of {nodes.length} lessons complete
-            </div>
-            <div className="text-xs text-gray-500">
-              Keep going to unlock new lessons!
+              )}
+              {completedIds.size > 0 && completedIds.size < lessons.length && (
+                <div className="text-xs text-gray-500 mt-1">
+                  Keep going to unlock new lessons!
+                </div>
+              )}
+              {completedIds.size === lessons.length && (
+                <div className="text-xs text-green-600 mt-1 font-medium">
+                  Week 1 complete! Amazing progress! 🎉
+                </div>
+              )}
             </div>
           </div>
         </div>
