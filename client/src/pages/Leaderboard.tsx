@@ -245,7 +245,7 @@ export default function Leaderboard() {
     }
   }, [leaderboardData?.me]);
 
-  if (isLoading) {
+  if (isLoading || !leaderboardData) {
     return (
       <div className="min-h-screen bg-white">
         <div className="sticky top-0 bg-white border-b border-gray-200 z-20 p-4">
@@ -283,7 +283,7 @@ export default function Leaderboard() {
     );
   }
 
-  if (error || !leaderboardData) {
+  if (error) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center space-y-4 max-w-md">
