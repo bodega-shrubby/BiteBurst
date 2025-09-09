@@ -130,12 +130,11 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
       )}
 
       {/* Lesson title */}
-      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center w-20">
-        <div className="text-sm font-medium text-gray-900 text-center leading-tight">
+      <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
+        <div className="text-sm font-medium text-gray-900 whitespace-nowrap">
           {lesson.title}
         </div>
       </div>
-
     </div>
   );
 }

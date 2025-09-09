@@ -117,8 +117,8 @@ export default function Lessons() {
       </header>
 
       {/* Track Container */}
-      <main className="relative overflow-hidden">
-        <div className="max-w-md mx-auto px-4 relative overflow-hidden" style={{ maxWidth: '420px' }}>
+      <main className="relative">
+        <div className="max-w-md mx-auto px-4 relative" style={{ maxWidth: '420px' }}>
           
           {/* Progress Card */}
           <div className="mt-4 mb-8">
@@ -143,7 +143,7 @@ export default function Lessons() {
 
           {/* Track Area */}
           <div 
-            className="relative overflow-hidden"
+            className="relative"
             style={{ 
               height: totalHeight,
               paddingTop: topPadding,
