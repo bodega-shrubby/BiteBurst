@@ -19,17 +19,34 @@ export default function Achievements() {
     const justUnlocked = urlParams.get('justUnlocked');
     
     if (justUnlocked) {
-      setShowCelebration(true);
-      setShowConfetti(true);
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       
       // Ensure we're on the Stickers tab to see the celebration
       setActiveTab('stickers');
       
-      // Remove query param
+      // Start celebration sequence
+      if (!prefersReducedMotion) {
+        setShowConfetti(true);
+      }
+      setShowCelebration(true);
+      
+      // Remove query param from history
       window.history.replaceState({}, '', '/achievements');
       
-      // Hide celebration after 3 seconds
-      setTimeout(() => setShowCelebration(false), 3000);
+      // After a delay, scroll to and highlight the unlocked badge
+      setTimeout(() => {
+        const element = document.querySelector(`[data-badge-code="${justUnlocked}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Trigger highlight via event or callback (will implement)
+          const event = new CustomEvent('highlightBadge', { detail: { badgeCode: justUnlocked } });
+          window.dispatchEvent(event);
+        }
+      }, prefersReducedMotion ? 0 : 1000); // Immediate for reduced motion, 1s delay for full animation
+      
+      // Hide celebration overlay
+      setTimeout(() => setShowCelebration(false), prefersReducedMotion ? 2000 : 3000);
     }
   }, []);
 
@@ -56,10 +73,10 @@ export default function Achievements() {
       {/* Celebration overlay */}
       {showCelebration && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="text-center space-y-4 animate-bounce">
+          <div className={`text-center space-y-4 ${window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'fade-in' : 'animate-bounce'}`}>
             <div className="text-6xl">🎉</div>
             <div className="text-2xl font-bold text-white">Badge Unlocked!</div>
-            <div className="text-sm text-gray-300">Check your achievements page!</div>
+            <div className="text-sm text-gray-300">Scroll down to see your new achievement!</div>
           </div>
         </div>
       )}

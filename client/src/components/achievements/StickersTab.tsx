@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import ProgressStrip from './ProgressStrip';
@@ -28,6 +28,18 @@ export default function StickersTab({ isActive }: StickersTabProps) {
   });
   const [selectedBadge, setSelectedBadge] = useState<BadgeVM | null>(null);
   const [highlightedBadge, setHighlightedBadge] = useState<string | null>(null);
+
+  // Listen for highlight events from celebration
+  useEffect(() => {
+    const handleHighlight = (event: CustomEvent) => {
+      const { badgeCode } = event.detail;
+      setHighlightedBadge(badgeCode);
+      setTimeout(() => setHighlightedBadge(null), 1500);
+    };
+
+    window.addEventListener('highlightBadge', handleHighlight as EventListener);
+    return () => window.removeEventListener('highlightBadge', handleHighlight as EventListener);
+  }, []);
 
   // Persist filter selection
   const handleCategoryChange = (category: string) => {

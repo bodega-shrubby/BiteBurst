@@ -1,6 +1,8 @@
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Download, Share2 } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useAuth } from '@/hooks/useAuth';
 import { getBadgeIcon, getBadgeCTA, getProgressPercentage, type BadgeVM } from '@/utils/badges';
+import { downloadBadgeImage, shareBadgeImage } from '@/utils/shareBadge';
 
 interface BadgeModalProps {
   badge: BadgeVM | null;
@@ -10,6 +12,7 @@ interface BadgeModalProps {
 
 export default function BadgeModal({ badge, isOpen, onClose }: BadgeModalProps) {
   const [, navigate] = useLocation();
+  const { user } = useAuth();
 
   if (!isOpen || !badge) return null;
 
@@ -35,6 +38,22 @@ export default function BadgeModal({ badge, isOpen, onClose }: BadgeModalProps) 
   const handleCTAClick = () => {
     onClose();
     navigate(cta.route);
+  };
+
+  const handleDownloadBadge = async () => {
+    try {
+      await downloadBadgeImage(badge, user?.displayName);
+    } catch (error) {
+      console.error('Failed to download badge:', error);
+    }
+  };
+
+  const handleShareBadge = async () => {
+    try {
+      await shareBadgeImage(badge, user?.displayName);
+    } catch (error) {
+      console.error('Failed to share badge:', error);
+    }
   };
 
   return (
@@ -153,16 +172,41 @@ export default function BadgeModal({ badge, isOpen, onClose }: BadgeModalProps) 
             </div>
           )}
 
-          {/* CTA Button */}
-          {!isEarned && (
-            <button
-              onClick={handleCTAClick}
-              className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-orange-600 transition-colors"
-            >
-              <span>{cta.text}</span>
-              <ExternalLink size={16} />
-            </button>
-          )}
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            {/* Save/Share Badge (for earned badges) */}
+            {isEarned && (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDownloadBadge}
+                  className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-green-600 transition-colors"
+                >
+                  <Download size={16} />
+                  <span>Save Badge</span>
+                </button>
+                
+                {navigator.share && (
+                  <button
+                    onClick={handleShareBadge}
+                    className="flex items-center justify-center gap-2 bg-blue-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-blue-600 transition-colors"
+                  >
+                    <Share2 size={16} />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* CTA Button (for locked badges) */}
+            {!isEarned && (
+              <button
+                onClick={handleCTAClick}
+                className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-orange-600 transition-colors"
+              >
+                <span>{cta.text}</span>
+                <ExternalLink size={16} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
