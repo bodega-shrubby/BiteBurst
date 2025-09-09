@@ -1,0 +1,116 @@
+Upgrade /track to a Duolingo-style, scrollable S-curve lesson path with 8 visible nodes (1 playable, 1 unlocks after play, remaining locked), proper progress, glow/unlock animations, and tidy spacing. Use our BiteBurst brand (white background, orange headers, rounded, kid-friendly). This is an MVP/prototype for investors.
+1) Files to create/update
+/src/routes/Track.tsx (or the current track component file)
+/src/components/PathNode.tsx (new)
+/src/components/CurvySpine.tsx (new SVG S-curve)
+/src/data/lessons-week1.json (new seed)
+/src/styles/track.css (update)
+If our project uses different paths, adapt, but keep component names.
+2) Data model & seed
+Create /src/data/lessons-week1.json:
+[
+  {"id":"snacks","title":"Healthy\nSnacks","icon":"🍎","xp":25,"state":"unlocked","order":1},
+  {"id":"hydration","title":"Hydration\nHeroes","icon":"💧","xp":25,"state":"locked","order":2},
+  {"id":"move","title":"Move &\nGroove","icon":"⚽","xp":25,"state":"locked","order":3},
+  {"id":"focus","title":"Focus\nBoosters","icon":"🧠","xp":25,"state":"locked","order":4},
+  {"id":"veggies","title":"Veggie\nVictory","icon":"🥦","xp":25,"state":"locked","order":5},
+  {"id":"carbs","title":"Smart\nCarbs","icon":"🍞","xp":25,"state":"locked","order":6},
+  {"id":"protein","title":"Protein\nPower","icon":"🍗","xp":25,"state":"locked","order":7},
+  {"id":"colors","title":"Colorful\nPlate","icon":"🌈","xp":25,"state":"locked","order":8}
+]
+In code, load this JSON and keep state in React: lessons, completedIds, and unlockedIds.
+3) Curvy spine (S-curve) with progress stroke
+Create CurvySpine.tsx:
+Render a tall SVG (width ~ 120, height contentHeight).
+Single cubic Bézier path that snakes top→bottom: e.g. M 60,40 C 260,200 -140,380 60,560 ... (scale for the full height).
+Two strokes stacked:
+Base spine: light gray #EDF1F3, width 8, rounded caps.
+Progress spine: bright orange #FF7A00 (or brand green if you prefer), width 8, rounded caps, strokeDasharray + strokeDashoffset to fill to the last completed node. Accept a progress prop (0–1).
+Place the SVG behind nodes using position:absolute; left: calc(50% - 60px); pointer-events:none;.
+4) Node component
+Create PathNode.tsx with props:
+type NodeState = 'complete' | 'unlocked' | 'locked';
+interface PathNodeProps {
+  x: number; y: number;
+  icon: string; title: string;
+  state: NodeState; order: number;
+  onClick?: () => void;
+}
+Visual spec:
+72px circle; soft shadow; thick white inner stroke.
+States:
+complete: green gradient fill, small gold star badge at top-right.
+unlocked: purple gradient, “START” ribbon pill under the circle.
+locked: gray with lock glyph; 60% opacity, no pointer.
+On hover/tap unlocked: 1.03 scale.
+On newly unlocked: play a 500ms pop (transform: scale(0) → 1.06 → 1.0) and a glow pulse ring (box-shadow keyframe 1.2s, 2 repeats).
+Accessibility:
+role="button" for unlocked, aria-disabled="true" for locked.
+aria-label="Healthy Snacks, unlocked, 25 XP" etc.
+Focus ring for keyboard.
+5) Layout algorithm (no random dots)
+Replace current absolute “bubbles” with a deterministic S-curve layout.
+In Track.tsx:
+Compute N = lessons.length.
+For each index i create a parameter t = i / (N-1) and sample a point along the Bézier path used in CurvySpine.
+Alternate lateral offsets so nodes flip left/right of the spine:
+offsetX = (i % 2 === 0 ? -90 : 90)
+final x = spineX + offsetX, y = spineY.
+Add top padding ~ 120px, vertical spacing ~ 160px.
+Page container: position:relative; min-height: 1400–1800px; overflow-y:auto; with scroll snapping: scroll-snap-type: y proximity; and each node wrapper scroll-snap-align: center.
+This removes the current scattered grays and aligns to a clean spine like Duolingo.
+6) Unlock/complete flow (demo)
+On first load: only snacks is unlocked; others locked.
+When snacks is “completed” (simulate via route /lesson/snacks → on exit), update local state: mark snacks → complete, hydration → unlocked; trigger pop + glow on hydration node; extend progress stroke to node 1.
+Keep other nodes locked but tappable-disabled with tooltip “Finish earlier lessons to unlock”.
+Persist demo progress in localStorage (bb_week1_progress).
+7) Header, counters, empty space
+Header:
+Title: Healthy Habits: Week 1
+Subtitle: “Learn the basics of healthy eating and movement”
+Footer progress: “1 of 8 lessons complete”
+Remove all stray gray dots; only show locked nodes that correspond to the 8 lessons.
+Ensure there’s a bit of scroll below last node so it never sticks to the tab bar.
+8) Styling tokens (/src/styles/track.css)
+Add variables:
+:root{
+  --bb-orange:#FF7A00;
+  --bb-green:#2AC769;
+  --bb-purple:#8B5CF6;
+  --bb-gray:#EDEFF3;
+  --bb-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+Keyframes:
+@keyframes popIn{0%{transform:scale(.0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes glowPulse{0%{box-shadow:0 0 0 0 rgba(255,122,0,.45)}80%{box-shadow:0 0 0 16px rgba(255,122,0,0)}100%{box-shadow:0 0 0 0 rgba(255,122,0,0)}}
+States:
+.node.complete { background:linear-gradient(180deg,#32D27A,#20B36A); }
+.node.unlocked { background:linear-gradient(180deg,#9D7BFF,#7A57F3); }
+.node.locked { background:#D7DCE4; filter:saturate(.2); }
+.node.unlocked.newlyUnlocked { animation: popIn .5s ease-out, glowPulse 1.2s ease-out 2; }
+9) Routing hooks
+Tap on unlocked node → navigate to /lesson/:id.
+After completing the demo lesson, call back to /track with ?completed=snacks or set a flag in localStorage. On read, mark snacks complete and unlock next.
+10) Clean up current screen issues (as seen in screenshots)
+Remove the scattered gray “placeholder” circles that don’t map to lessons.
+Align nodes strictly along the spine with alternating sides—no diagonal randomness.
+Re-size: nodes 72px, spacing ~160px vertical; keep left/right margins generous (20–24px).
+Ensure the purple START badge is centered under the unlocked node.
+Add the orange progress stroke on the spine that reaches the last completed node.
+Make the path scrollable; show ~3 nodes above the fold; the rest appear as the user scrolls.
+11) Acceptance criteria
+Spine renders with base + progress strokes; progress updates as lessons complete.
+Exactly 8 nodes render, alternating sides, snapped to the S-curve; no extra gray dots.
+States: complete (star badge), unlocked (purple with START), locked (gray + lock).
+Completing snacks unlocks hydration with pop + glow animation; others remain locked.
+Header + subtitle + footer counter match spec; screen scrolls smoothly; scroll-snap works.
+All interactive elements have keyboard focus + ARIA labels; locked nodes are disabled.
+Mobile first (≤420px wide), looks good on 375×812; no layout overflow.
+12) QA checklist
+ First load shows “1 of 8 lessons complete” only after finishing demo; otherwise “0 of 8”.
+ Refresh keeps progress (localStorage).
+ Tapping locked node shows tooltip and does nothing.
+ Progress stroke ends exactly at the last completed node.
+ Header remains pinned (optional) while content scrolls.
+ Performance: avoid layout thrash (use transforms, not top/left anims).
+If anything in the codebase is named differently, keep the behavior the same; the key is: Duolingo-style spine path, alternating nodes, proper states, progress stroke, and clean spacing.
