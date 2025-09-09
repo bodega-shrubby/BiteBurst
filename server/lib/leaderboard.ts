@@ -125,12 +125,17 @@ export async function getLeagueBoard(weekStart: string, tier: string): Promise<s
   
   if (!board) return null;
   
-  // Parse JSON string to actual array if needed
-  const members = board.members;
-  if (typeof members === 'string') {
-    return JSON.parse(members);
+  // JSONB-safe parsing
+  const raw = board.members as unknown;
+  if (Array.isArray(raw)) return raw as string[];
+  if (typeof raw === 'string') {
+    try { 
+      return JSON.parse(raw) as string[]; 
+    } catch { 
+      return [raw]; 
+    }
   }
-  return members as string[];
+  return null;
 }
 
 /**
@@ -228,8 +233,26 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
     memberIds = await getLeagueBoard(weekStartStr, userTier);
   }
   
-  if (!memberIds || memberIds.length === 0) {
-    // No league board exists yet, create empty response
+  // 🔒 Normalize to a proper array for SQL ANY/IN
+  let memberIdList: string[] = [];
+  if (Array.isArray(memberIds)) {
+    memberIdList = memberIds.filter(Boolean);
+  } else if (typeof memberIds === 'string' && memberIds.length > 0) {
+    // Defensive: in case something serialized it earlier
+    try { 
+      memberIdList = JSON.parse(memberIds); 
+    } catch { 
+      memberIdList = [memberIds]; 
+    }
+  }
+  
+  // Fallback: at least include the current user so query never breaks
+  if (memberIdList.length === 0) memberIdList = [userId];
+  
+  console.log('🔍 memberIdList (normalized):', memberIdList, 'isArray:', Array.isArray(memberIdList), 'length:', memberIdList.length);
+  
+  // Better empty board fallback (prevents 500 errors)
+  if (memberIdList.length === 0) {
     return {
       week: {
         start: weekStartStr,
@@ -238,30 +261,39 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
       },
       league: leagueConfig,
       promotion_zone_rank: leagueConfig.promote_count,
-      demotion_zone_rank: leagueConfig.demote_count > 0 ? (memberIds?.length || 30) - leagueConfig.demote_count + 1 : null,
+      demotion_zone_rank: leagueConfig.demote_count > 0 ? 30 - leagueConfig.demote_count + 1 : null,
       members: [],
       me: null,
       user_opted_out: false,
     };
   }
   
-  // Get user data for all members
-  console.log('🔍 memberIds before query:', memberIds, 'type:', typeof memberIds);
+  // Get user data for all members (guaranteed array now)
   const memberUsers = await db
     .select()
     .from(users)
-    .where(inArray(users.id, memberIds));
+    .where(inArray(users.id, memberIdList));
   
-  // Calculate weekly XP for all members
-  const membersWithXP = await Promise.all(
-    memberUsers.map(async (member) => {
-      const weeklyXP = await calculateWeeklyXP(member.id, weekStart, weekEnd);
-      return {
-        user: member,
-        xp_week: weeklyXP,
-      };
+  // Calculate weekly XP for all members (performance optimized - single query)
+  const xpRows = await db
+    .select({
+      userId: xpEvents.userId,
+      xp: sql<number>`COALESCE(SUM(${xpEvents.amount}), 0)`
     })
-  );
+    .from(xpEvents)
+    .where(and(
+      inArray(xpEvents.userId, memberIdList),
+      gte(xpEvents.ts, weekStart),
+      lte(xpEvents.ts, weekEnd)
+    ))
+    .groupBy(xpEvents.userId);
+
+  const xpMap = new Map(xpRows.map(r => [r.userId, r.xp]));
+
+  const membersWithXP = memberUsers.map(member => ({
+    user: member,
+    xp_week: xpMap.get(member.id) ?? 0
+  }));
   
   // Sort by XP (descending) with tie-breakers
   membersWithXP.sort((a, b) => {
@@ -319,13 +351,23 @@ export async function ensureUserInLeague(userId: string, tier: string, weekStart
     );
 
   if (existingBoard) {
-    // Add user to existing board if not already there
-    const currentMembers = existingBoard.members as string[];
-    if (!currentMembers.includes(userId)) {
-      const updatedMembers = [...currentMembers, userId];
+    // JSONB-safe member parsing
+    let members: string[] = [];
+    const raw = existingBoard.members as unknown;
+    if (Array.isArray(raw)) {
+      members = raw as string[];
+    } else if (typeof raw === 'string') {
+      try { 
+        members = JSON.parse(raw) as string[]; 
+      } catch { 
+        members = [raw]; 
+      }
+    }
+
+    if (!members.includes(userId)) {
       await db
         .update(leagueBoards)
-        .set({ members: updatedMembers })
+        .set({ members: [...members, userId] })
         .where(eq(leagueBoards.id, existingBoard.id));
     }
   } else {

@@ -1,0 +1,130 @@
+You’re hitting Postgres error 42809 because the query that fetches leaderboard members is using ANY/IN with a non-array on the right side.
+In your code, this is the line:
+const memberUsers = await db
+  .select()
+  .from(users)
+  .where(inArray(users.id, memberIds));   // <-- memberIds is sometimes a string/null
+Even though you try to parse JSON in getLeagueBoard, there are paths where memberIds is not an array (e.g., board missing, stringly members, or ensureUserInLeague writing a string array incorrectly). When Drizzle compiles this, Postgres sees = ANY($1) with $1 not an array → op ANY/ALL requires array on right side.
+Below are drop-in fixes plus a small hardening pass.
+1) Coerce memberIds to a real array right before the query
+// Build complete leaderboard for a user
+export async function buildLeaderboard(userId: string, tier?: string): Promise<LeaderboardResponse> {
+  // ...existing code...
+
+  let memberIds = await getLeagueBoard(weekStartStr, userTier);
+
+  if (!memberIds || !memberIds.includes(userId)) {
+    await ensureUserInLeague(userId, userTier, weekStartStr);
+    memberIds = await getLeagueBoard(weekStartStr, userTier);
+  }
+
+  // 🔒 Normalize to a proper array for SQL ANY/IN
+  let memberIdList: string[] =
+    Array.isArray(memberIds) ? memberIds
+    : (typeof memberIds === 'string' && memberIds.length > 0) ? JSON.parse(memberIds)
+    : [];
+
+  // Fallback: ensure at least the current user is present
+  if (memberIdList.length === 0) memberIdList = [userId];
+
+  console.log('🔍 memberIdList (normalized):', memberIdList, Array.isArray(memberIdList), memberIdList.length);
+
+  // Query users with a guaranteed array
+  const memberUsers = await db
+    .select()
+    .from(users)
+    .where(inArray(users.id, memberIdList));
+
+  // ...rest unchanged...
+}
+2) Make getLeagueBoard and ensureUserInLeague robust to string/JSON
+If leagueBoards.members is stored as TEXT or sometimes serialized JSON, Drizzle may return a string. Normalize everywhere you read or write it.
+export async function getLeagueBoard(weekStart: string, tier: string): Promise<string[] | null> {
+  const [board] = await db
+    .select()
+    .from(leagueBoards)
+    .where(and(eq(leagueBoards.weekStart, weekStart), eq(leagueBoards.leagueTier, tier)));
+
+  if (!board) return null;
+
+  const raw = board.members as unknown;
+  if (Array.isArray(raw)) return raw as string[];
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) as string[]; } catch { return [raw]; }
+  }
+  return null;
+}
+
+export async function ensureUserInLeague(userId: string, tier: string, weekStart: string): Promise<void> {
+  const [existingBoard] = await db
+    .select()
+    .from(leagueBoards)
+    .where(and(eq(leagueBoards.weekStart, weekStart), eq(leagueBoards.leagueTier, tier)));
+
+  if (existingBoard) {
+    // Normalize members
+    let currentMembers: string[] = [];
+    const raw = existingBoard.members as unknown;
+    if (Array.isArray(raw)) currentMembers = raw as string[];
+    else if (typeof raw === 'string') {
+      try { currentMembers = JSON.parse(raw) as string[]; } catch { currentMembers = [raw]; }
+    }
+
+    if (!currentMembers.includes(userId)) {
+      const updatedMembers = [...currentMembers, userId];
+      await db.update(leagueBoards).set({ members: updatedMembers }).where(eq(leagueBoards.id, existingBoard.id));
+    }
+  } else {
+    await db.insert(leagueBoards).values({ weekStart, leagueTier: tier, members: [userId] });
+  }
+}
+3) (If possible) make the column type JSONB in the schema
+If you control the Drizzle schema, define members as JSON to prevent string round-trips:
+// @shared/schema.ts (example)
+export const leagueBoards = pgTable('league_boards', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  weekStart: date('week_start').notNull(),
+  leagueTier: text('league_tier').notNull(),
+  members: jsonb('members').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
+});
+Run a migration to convert the column to JSONB if it’s currently TEXT.
+4) Better “no board” fallback (avoid 500 + empty UI)
+If for any reason the board is missing, return a friendly payload (and optionally seed a temp board with mock peers) instead of 500’ing:
+if (!memberIdList.length) {
+  return {
+    week: {
+      start: weekStartStr,
+      end: weekEnd.toISOString().split('T')[0],
+      seconds_remaining: Math.max(0, Math.floor((weekEnd.getTime() - Date.now()) / 1000)),
+    },
+    league: leagueConfig,
+    promotion_zone_rank: leagueConfig.promote_count,
+    demotion_zone_rank: leagueConfig.demote_count ? 30 - leagueConfig.demote_count + 1 : null,
+    members: [],
+    me: null,
+    user_opted_out: false,
+  };
+}
+5) (Optional) remove the N+1 XP query
+You currently run calculateWeeklyXP per member (N+1). You can fetch weekly XP for all members in one grouped query:
+const xpRows = await db
+  .select({ userId: xpEvents.userId, xp: sql<number>`COALESCE(SUM(${xpEvents.amount}),0)` })
+  .from(xpEvents)
+  .where(
+    and(
+      inArray(xpEvents.userId, memberIdList),
+      gte(xpEvents.ts, weekStart),
+      lte(xpEvents.ts, weekEnd)
+    )
+  )
+  .groupBy(xpEvents.userId);
+
+const xpMap = new Map(xpRows.map(r => [r.userId, r.xp]));
+// then memberUsers.map(u => xpMap.get(u.id) ?? 0)
+This won’t fix the error, but it will make the board snappier.
+6) Quick checklist to verify
+ Log memberIds and Array.isArray(memberIds) right before inArray(...).
+ Normalize memberIds to memberIdList: string[].
+ Ensure ensureUserInLeague reads/writes a real array.
+ (If feasible) migrate members to JSONB.
+ Re-test /api/leaderboard/league for the user bdc27d70-f2bb-470c-9bfa-9cdfc9112d4e — you should get 200 with a list.

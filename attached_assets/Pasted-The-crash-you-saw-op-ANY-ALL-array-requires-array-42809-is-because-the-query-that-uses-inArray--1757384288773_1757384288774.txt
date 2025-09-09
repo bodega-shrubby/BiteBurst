@@ -1,0 +1,109 @@
+The crash you saw (op ANY/ALL (array) requires array… 42809) is because the query that uses inArray(users.id, memberIds) sometimes receives a string or null instead of an array. Even though leagueBoards.members is jsonb, you still have a few paths that can hand a scalar to the query.
+Below is a safe, drop-in fix plus a couple of robustness upgrades. You can paste these directly.
+1) Normalize memberIds right before the query (and guarantee non-empty array)
+// buildLeaderboard(): replace the block before the memberUsers query
+let memberIds = await getLeagueBoard(weekStartStr, userTier);
+
+if (!memberIds || !memberIds.includes(userId)) {
+  await ensureUserInLeague(userId, userTier, weekStartStr);
+  memberIds = await getLeagueBoard(weekStartStr, userTier);
+}
+
+// 🔒 normalize to a real array; never pass scalar to SQL
+let memberIdList: string[] = [];
+if (Array.isArray(memberIds)) {
+  memberIdList = memberIds.filter(Boolean);
+} else if (typeof memberIds === 'string' && memberIds.length > 0) {
+  // defensive: in case something serialized it earlier
+  try { memberIdList = JSON.parse(memberIds); } catch { memberIdList = [memberIds]; }
+}
+
+// Fallback: at least include the current user so query never breaks
+if (memberIdList.length === 0) memberIdList = [userId];
+
+console.log('DBG memberIdList:', memberIdList, 'isArray?', Array.isArray(memberIdList), 'len', memberIdList.length);
+
+const memberUsers = await db
+  .select()
+  .from(users)
+  .where(inArray(users.id, memberIdList));
+Why this fixes it: inArray compiles to id = ANY($1); the right side must be an array (e.g., text[]/uuid[]). This guarantees you never hand it a scalar.
+2) Make getLeagueBoard and ensureUserInLeague JSONB-safe
+Even with jsonb, depending on inserts/updates you might read strings. Normalize everywhere you touch members.
+export async function getLeagueBoard(weekStart: string, tier: string): Promise<string[] | null> {
+  const [board] = await db
+    .select()
+    .from(leagueBoards)
+    .where(and(eq(leagueBoards.weekStart, weekStart), eq(leagueBoards.leagueTier, tier)));
+
+  if (!board) return null;
+
+  const raw = board.members as unknown;
+  if (Array.isArray(raw)) return raw as string[];
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) as string[]; } catch { return [raw]; }
+  }
+  return null;
+}
+
+export async function ensureUserInLeague(userId: string, tier: string, weekStart: string): Promise<void> {
+  const [existingBoard] = await db
+    .select()
+    .from(leagueBoards)
+    .where(and(eq(leagueBoards.weekStart, weekStart), eq(leagueBoards.leagueTier, tier)));
+
+  if (existingBoard) {
+    let members: string[] = [];
+    const raw = existingBoard.members as unknown;
+    if (Array.isArray(raw)) members = raw as string[];
+    else if (typeof raw === 'string') { try { members = JSON.parse(raw) as string[]; } catch { members = [raw]; } }
+
+    if (!members.includes(userId)) {
+      await db.update(leagueBoards).set({ members: [...members, userId] }).where(eq(leagueBoards.id, existingBoard.id));
+    }
+  } else {
+    await db.insert(leagueBoards).values({ weekStart, leagueTier: tier, members: [userId] });
+  }
+}
+3) Optional performance upgrade: remove N+1 XP queries
+Replace the per-member calculateWeeklyXP calls with one grouped query:
+const xpRows = await db
+  .select({
+    userId: xpEvents.userId,
+    xp: sql<number>`COALESCE(SUM(${xpEvents.amount}), 0)`
+  })
+  .from(xpEvents)
+  .where(and(
+    inArray(xpEvents.userId, memberIdList),
+    gte(xpEvents.ts, weekStart),
+    lte(xpEvents.ts, weekEnd)
+  ))
+  .groupBy(xpEvents.userId);
+
+const xpMap = new Map(xpRows.map(r => [r.userId, r.xp]));
+
+const membersWithXP = memberUsers.map(m => ({
+  user: m,
+  xp_week: xpMap.get(m.id) ?? 0
+}));
+4) Better empty/edge handling (prevents future 500s)
+If for any reason you still end up with no board:
+if (!memberIdList.length) {
+  return {
+    week: { start: weekStartStr, end: weekEnd.toISOString().split('T')[0],
+            seconds_remaining: Math.max(0, Math.floor((weekEnd.getTime() - Date.now()) / 1000)) },
+    league: leagueConfig,
+    promotion_zone_rank: leagueConfig.promote_count,
+    demotion_zone_rank: leagueConfig.demote_count ? 30 - leagueConfig.demote_count + 1 : null,
+    members: [],
+    me: null,
+    user_opted_out: false
+  };
+}
+Frontend can show “Your league starts soon” instead of crashing.
+5) Quick verification checklist
+Add the console.log shown above and confirm:
+memberIdList is an array and non-empty.
+Re-run the failing request for neeta:
+/api/leaderboard/league should now return 200 with members.
+Cross-check: ensure your users.id type matches what you store in members (both should be the same string/uuid format).
