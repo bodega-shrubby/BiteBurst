@@ -23,7 +23,7 @@ const quizOptions: QuizOption[] = [
 ];
 
 export default function LessonDemo() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState<LessonStep>('intro');
   const [lessonRun, setLessonRun] = useState<LessonRun | null>(null);
@@ -124,6 +124,18 @@ export default function LessonDemo() {
     const seconds = elapsed % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
+
+  // Show loading spinner while auth is checking
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-4xl animate-spin">🔄</div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

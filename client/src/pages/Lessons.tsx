@@ -6,7 +6,7 @@ import TrackNode, { type LessonNode } from '@/components/lessons/TrackNode';
 import lessonTrackData from '@/data/lessonTrack.json';
 
 export default function Lessons() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   const [nodes, setNodes] = useState<LessonNode[]>(lessonTrackData as LessonNode[]);
   const [showMascotBubble, setShowMascotBubble] = useState(false);
@@ -107,6 +107,18 @@ export default function Lessons() {
       console.log(`Lesson ${node.id} clicked - not yet implemented`);
     }
   };
+
+  // Show loading spinner while auth is checking
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-4xl animate-spin">🔄</div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
