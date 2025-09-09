@@ -249,7 +249,8 @@ export async function buildLeaderboard(userId: string, tier?: string): Promise<L
   // Fallback: at least include the current user so query never breaks
   if (memberIdList.length === 0) memberIdList = [userId];
   
-  console.log('🔍 memberIdList (normalized):', memberIdList, 'isArray:', Array.isArray(memberIdList), 'length:', memberIdList.length);
+  // Debug logging (can be removed in production)
+  console.log('✅ memberIdList normalized:', memberIdList.length, 'members');
   
   // Better empty board fallback (prevents 500 errors)
   if (memberIdList.length === 0) {
