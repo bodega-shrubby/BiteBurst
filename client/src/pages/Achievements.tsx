@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Trophy, Sparkles } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
+import Confetti from '@/components/Confetti';
 import ProgressStrip from '../components/achievements/ProgressStrip';
 import BadgeFilters from '../components/achievements/BadgeFilters';
 import BadgeCard from '../components/achievements/BadgeCard';
@@ -21,6 +22,7 @@ export default function Achievements() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBadge, setSelectedBadge] = useState<BadgeVM | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Fetch badge catalog
   const { data: catalog = [] } = useQuery<BadgeCatalog[]>({
@@ -46,6 +48,8 @@ export default function Achievements() {
     
     if (justUnlocked && badges.some(b => b.code === justUnlocked)) {
       setShowCelebration(true);
+      setShowConfetti(true);
+      
       // Remove query param
       window.history.replaceState({}, '', '/achievements');
       
@@ -85,12 +89,19 @@ export default function Achievements() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Confetti Animation */}
+      <Confetti 
+        show={showConfetti} 
+        onComplete={() => setShowConfetti(false)} 
+      />
+
       {/* Celebration overlay */}
       {showCelebration && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
           <div className="text-center space-y-4 animate-bounce">
             <div className="text-6xl">🎉</div>
             <div className="text-2xl font-bold text-white">Badge Unlocked!</div>
+            <div className="text-sm text-gray-300">Check your achievements page!</div>
           </div>
         </div>
       )}
