@@ -1,0 +1,103 @@
+Replit Agent — Upgrade “Achievements & Badges” Screen (MVP+)
+Goals
+Make Achievements feel collectible and celebratory (Duolingo-style), clarify progress, and keep scope tight. Add simple Personal Records vs Sticker Board grouping, light celebrations, and a share/export option.
+Tech & Location
+React app (same stack/patterns as other routes).
+Modify existing /achievements route (don’t change URL).
+Keep styles local to the feature folder; no external UI libs.
+Deliverables
+Tab layout (2 tabs)
+Tabs: Personal Records | Stickers
+Default to Stickers.
+Implement accessible tabs (keyboard focus, aria-selected, role="tablist").
+Header & “Next unlocks”
+Keep title + tagline.
+“Badges: X / Y” + progress bar (no percentage text needed).
+Next unlocks: show up to 3 chips. Tapping a chip scrolls & highlights its card in Stickers tab (brief glow ring).
+Filters (Stickers tab only)
+Chips: All, Streak, Food, Water, Activity, Combo, Records.
+Persist last selected filter in memory.
+Card states & progress clarity
+Earned card: full color, small “Earned” ribbon (top-right), subtle shine.
+Locked card: grayscale icon, dashed border + lock glyph.
+Progress text: replace confusing “48/1”. Use one of:
+Threshold badges → mini bar + “3/5” label beneath bar.
+One-off badges (e.g., First Food Log) → show Completed tag when done.
+Keep card size ~120–140px; 2 columns on mobile (≤420px).
+Personal Records tab
+Two large stat tiles (like Duolingo):
+Longest Streak (🔥 value)
+Daily Most XP (🏆 value)
+Optional: add “Best Week Rank” tile if value exists.
+Tiles have light glow; include the date of the record in tiny caption if available.
+Celebration moment
+When landing with ?justUnlocked=BADGE_CODE:
+Confetti burst + mascot bounce emoji near header.
+Scroll to that badge and pulse highlight for 1.5s.
+Respect prefers-reduced-motion (fade only).
+After showing once, strip the query param from history (no repeat on back).
+Share / Save
+On earned badge card (or modal), “Save badge” button.
+Use html2canvas (or pure canvas) to export a small PNG of:
+Badge icon, name, and the BiteBurst mascot stamp.
+Download filename: biteburst_badge_<code>.png.
+If no library allowed, implement with native canvas drawing.
+Modal (on card tap)
+Big sticker, title, friendly description.
+How to earn row with live progress (e.g., “Different fruits: 3/5”).
+Contextual CTA:
+Food variety → /food-log?hint=fruit
+Water → route to quick water log
+Activity → /activity-log
+Accessible focus trap; close on Esc.
+Data Shape & API (use existing endpoints; add fields if missing)
+GET /api/badges → catalog (code, name, desc, category, threshold?, icon?, rarity?, active).
+GET /api/user/:id/badges →
+{
+  "earned": [{"code":"FIRST_FOOD","earned_at":"..."}],
+  "progress": [{"code":"FOOD_VARIETY_5","current":3,"threshold":5}],
+  "records": {"dailyXpBest": 120, "longestStreak": 6, "bestWeekRank": 3}
+}
+If fields are missing, extend the response minimally; keep badge evaluation server-side (already wired post-log).
+View-model merge
+Combine catalog + earned + progress into:
+type BadgeVM = {
+  code: string;
+  name: string;
+  description?: string;
+  category: 'streak'|'food'|'water'|'activity'|'combo'|'records';
+  threshold?: number;
+  current?: number;
+  status: 'earned'|'locked';
+  icon?: string;           // SVG path
+};
+Compute next unlocks = locked badges sorted by (current/threshold) desc (thresholded only).
+Styling & Motion
+BiteBurst brand: white background, orange headers, black body text, rounded corners, soft shadows.
+Tap target ≥ 44×44; :focus-visible rings.
+Use CSS keyframes for tiny bounce on card press; switch to fade under reduced motion.
+Error & Loading
+Skeleton loader for header strip, filters, and grid.
+Friendly empty state if no badges or progress available.
+File plan
+src/routes/Achievements.tsx (update with tabs)
+src/components/achievements/ProgressStrip.tsx
+src/components/achievements/BadgeFilters.tsx
+src/components/achievements/BadgeCard.tsx
+src/components/achievements/BadgeModal.tsx
+src/components/achievements/RecordTiles.tsx
+src/utils/badges.ts (merge, next unlocks, highlight helpers)
+src/utils/shareBadge.ts (canvas export)
+Acceptance Criteria
+Tabs render; keyboard + screen reader friendly.
+“Next unlocks” chips scroll & highlight the relevant card.
+Locked vs earned visuals are distinct; progress bars show clear “x/y”.
+Modal shows “How to earn” and routes correctly to Food/Water/Activity logs.
+?justUnlocked=... triggers one-time confetti + highlight and then cleans the URL.
+“Save badge” downloads a PNG for earned badges.
+Personal Records tab displays stats and updates from API.
+Lighthouse a11y ≥ 90 on mobile viewport; no console errors.
+Stretch (only if time allows)
+Small color tiering (bronze/silver/gold outline) for difficulty.
+Optional third tab “Collections” for future sets (not required now).
+Please implement the above improvements in the existing Achievements route, keeping code organized and commented.
