@@ -18,8 +18,13 @@ export interface BadgeCheckContext {
     foodsToday: number;
     activitiesTotal: number;
     fruitsDistinctTotal: number; // distinct fruit emojis
+    vegetablesDistinctTotal: number; // distinct vegetable emojis
     waterDays: number; // days with water logged
     comboToday: boolean;
+  };
+  records: {
+    dailyXpBest: number;
+    longestStreak: number;
   };
 }
 
@@ -146,20 +151,25 @@ export async function buildBadgeContext(userId: string, timezone = 'UTC'): Promi
       eq(logs.logDate, today)
     ));
   
-  // Count distinct fruit emojis (simplified approach)
+  // Count distinct fruit and vegetable emojis (simplified approach)
   const fruitEmojis = ['🍎', '🍌', '🍇', '🍓', '🍊', '🫐', '🍉', '🥝', '🍑', '🍒', '🥭', '🍍'];
+  const vegetableEmojis = ['🥦', '🥕', '🌽', '🥒', '🍅', '🥬', '🥑', '🌶️', '🧄', '🧅', '🍆', '🥔'];
   const userLogs = await db
     .select({ content: logs.content })
     .from(logs)
     .where(and(eq(logs.userId, userId), eq(logs.type, 'food')));
   
   const uniqueFruits = new Set();
+  const uniqueVegetables = new Set();
   userLogs.forEach(log => {
     if (log.content && typeof log.content === 'object' && (log.content as any).emojis) {
       const emojis = (log.content as any).emojis as string[];
       emojis.forEach(emoji => {
         if (fruitEmojis.includes(emoji)) {
           uniqueFruits.add(emoji);
+        }
+        if (vegetableEmojis.includes(emoji)) {
+          uniqueVegetables.add(emoji);
         }
       });
     }
@@ -196,6 +206,22 @@ export async function buildBadgeContext(userId: string, timezone = 'UTC'): Promi
     }
   });
   
+  // Calculate personal records
+  // Daily XP best: get highest XP earned in a single day
+  const dailyXpRows = await db
+    .select({ 
+      logDate: logs.logDate,
+      totalXp: sql<number>`SUM(${logs.xpAwarded})`
+    })
+    .from(logs)
+    .where(eq(logs.userId, userId))
+    .groupBy(logs.logDate);
+  
+  const dailyXpBest = Math.max(0, ...dailyXpRows.map(row => row.totalXp));
+  
+  // Longest streak: from streaks table
+  const longestStreak = streakData?.longest || 0;
+  
   return {
     userId,
     nowISO,
@@ -206,8 +232,13 @@ export async function buildBadgeContext(userId: string, timezone = 'UTC'): Promi
       foodsToday: foodsTodayResult.count,
       activitiesTotal: activitiesTotalResult.count,
       fruitsDistinctTotal: uniqueFruits.size,
+      vegetablesDistinctTotal: uniqueVegetables.size,
       waterDays: waterDaysSet.size,
       comboToday: foodTodayCheck.count > 0 && activityTodayCheck.count > 0
+    },
+    records: {
+      dailyXpBest,
+      longestStreak
     }
   };
 }
@@ -260,6 +291,11 @@ export async function evaluateBadges(ctx: BadgeCheckContext): Promise<BadgeAward
     await tryAward('FOOD_VARIETY_5');
   }
   
+  // VEG_VARIETY_5 - Award when logged 5 different vegetables
+  if (ctx.totals.vegetablesDistinctTotal >= 5) {
+    await tryAward('VEG_VARIETY_5');
+  }
+  
   // ACTIVITY_10 - Award when logged 10 activities total
   if (ctx.totals.activitiesTotal >= 10) {
     await tryAward('ACTIVITY_10');
@@ -273,6 +309,15 @@ export async function evaluateBadges(ctx: BadgeCheckContext): Promise<BadgeAward
   // WATER_7 - Award when logged water on 7 different days
   if (ctx.totals.waterDays >= 7) {
     await tryAward('WATER_7');
+  }
+  
+  // Personal Record badges - always "earned" if values exist
+  if (ctx.records.dailyXpBest > 0) {
+    await tryAward('PR_DAILY_XP');
+  }
+  
+  if (ctx.records.longestStreak > 0) {
+    await tryAward('PR_LONGEST_STREAK');
   }
   
   // Get badge details for newly earned badges
@@ -313,6 +358,7 @@ export async function getAllBadges(): Promise<BadgeAward[]> {
 export async function getUserBadgesWithProgress(userId: string): Promise<{
   earned: Array<{ code: string; earnedAt: string }>;
   progress: Array<{ code: string; current: number; threshold: number }>;
+  records: { dailyXpBest: number; longestStreak: number };
 }> {
   // Get earned badges
   const earnedBadges = await db
@@ -345,6 +391,9 @@ export async function getUserBadgesWithProgress(userId: string): Promise<{
         case 'FOOD_VARIETY_5':
           current = ctx.totals.fruitsDistinctTotal;
           break;
+        case 'VEG_VARIETY_5':
+          current = ctx.totals.vegetablesDistinctTotal;
+          break;
         case 'ACTIVITY_10':
           current = ctx.totals.activitiesTotal;
           break;
@@ -364,6 +413,12 @@ export async function getUserBadgesWithProgress(userId: string): Promise<{
         case 'FIRST_ACTIVITY':
           current = ctx.totals.activitiesTotal;
           break;
+        case 'PR_DAILY_XP':
+          current = ctx.records.dailyXpBest;
+          break;
+        case 'PR_LONGEST_STREAK':
+          current = ctx.records.longestStreak;
+          break;
       }
       
       progress.push({
@@ -379,6 +434,7 @@ export async function getUserBadgesWithProgress(userId: string): Promise<{
       code: b.code,
       earnedAt: b.earnedAt.toISOString()
     })),
-    progress
+    progress,
+    records: ctx.records
   };
 }

@@ -1,0 +1,114 @@
+Replit Agent — Build “Achievements & Badges” (Sticker Board) Screen
+Goal
+Create a Duolingo-inspired trophy/sticker board that celebrates progress, personal records, and encourages variety (fruits, water, activities). Mobile-first MVP, shippable, accessible.
+Tech / Placement
+Framework: React + existing app architecture.
+Route: /achievements
+Nav: Add “🏅 Achievements” item to bottom nav and a “View achievements” card on Dashboard.
+Assets: SVGs in /public/assets/badges/*.svg with emoji fallbacks.
+UX & UI (match this closely)
+Header
+Title: “Achievements 🏆”
+Subtext: “Collect stickers by eating smart and moving daily.”
+Progress Strip (top)
+“Badges: X / Y” + thin progress bar.
+“Next unlocks” chips (top 2–3 locked by highest progress %, e.g., “Fruit Fighter 3/5”).
+Sticker Board (grid)
+Filter chips: All · Streak · Food · Water · Activity · Combo · Records
+Card size ~120–140px; 2–3 columns.
+Earned: full-color sticker + tiny “Earned” ribbon.
+Locked: grey outline + lock + one-line hint with progress (e.g., “Different fruits 3/5”).
+Badge Modal
+Big sticker, title, short description.
+“How to earn” with live progress (e.g., “Different fruits: 3/5”).
+Contextual CTA (routes):
+Food variety → /food-log?hint=fruit
+Water → quick log to water
+Activity → /activity-log
+Celebration
+Confetti + mascot bounce when arriving with ?justUnlocked=<code>. Respect prefers-reduced-motion.
+Accessibility
+44×44 min tap targets, focus rings, modal focus trap, aria-live="polite" for progress updates.
+Badge Set (MVP seed)
+Create a small catalog (10–12) mixing quick wins, variety, streaks, and personal records:
+Food
+FIRST_FOOD — 🍽 First Bite (first food log) — threshold 1
+FOOD_VARIETY_5 — 🍎 Fruit Fighter (5 different fruits lifetime)
+VEG_VARIETY_5 — 🥦 Veggie Victory (5 different veg lifetime)
+Water
+WATER_7 — 💧 Water Warrior (water on 7 distinct days)
+Activity
+FIRST_ACTIVITY — ⚽ Mover (first activity log)
+ACTIVITY_10 — 🎯 All-Rounder (10 activity logs lifetime)
+Streaks
+STREAK_3, STREAK_7, STREAK_30 — 🔥 Streak milestones
+Combo
+COMBO_DAY — 🔗 Fuel + Move same day (1 day)
+Personal Records (PR)
+PR_DAILY_XP — 🏆 Most XP in a day (track best)
+PR_LONGEST_STREAK — 🏆 Longest streak
+(PR badges are “leveling” records; display the best value on the sticker.)
+Data & API
+Tables (use/extend existing)
+badge_catalog (seeded; code, name, desc, category, threshold, icon, rarity, active)
+user_badges (user_id, code, earned_at)
+badge_progress (user_id, code, current, threshold) — OPTIONAL cache
+Reuse existing logs, xp_events, streaks.
+Endpoints (implement if missing)
+GET /api/badges → array of catalog items.
+GET /api/user/:id/badges → { earned: [{code, earned_at}], progress: [{code, current, threshold}], records: { dailyXpBest, longestStreak } }
+Badge evaluation runs after /api/log and streak updates (reuse current evaluation hook).
+Progress rules (server):
+Fruit/Veg variety: distinct normalized tokens/emoji over lifetime.
+Water_7: distinct days containing water log.
+Activity_10: count of activity logs.
+Combo_Day: has food + activity on same local day.
+Streaks: from streaks table.
+PR: recompute if a log changes best-of values; store best values for display.
+Return progress for all thresholded badges so UI shows live meters on locked cards.
+React Implementation
+Files
+src/routes/Achievements.tsx (page)
+src/components/achievements/ProgressStrip.tsx
+src/components/achievements/BadgeFilters.tsx
+src/components/achievements/BadgeCard.tsx
+src/components/achievements/BadgeModal.tsx
+src/utils/badges.ts (merge helpers, percent calc, next-unlocks)
+Page flow
+Parallel fetch GET /api/badges and GET /api/user/:id/badges.
+Merge catalog + earned + progress into a view model:
+type BadgeVM = Catalog & {
+  status: 'earned' | 'locked';
+  current?: number; threshold?: number;
+  displayValue?: number; // for PR badges
+};
+Compute earnedCount/totalCount and next unlocks (sort locked by current/threshold desc).
+Render filters, grid, modal; wire contextual CTAs to logging screens.
+If justUnlocked in query → confetti once, then remove query param.
+Styling & Motion
+Use your brand: white bg, orange headers, black body text, rounded cards, soft shadows.
+Card press: tiny bounce; earned card has subtle shine gradient.
+Respect reduced motion.
+Copy (kid-friendly)
+Header subtext: “Collect stickers by eating smart and moving daily.”
+Locked hints: short verbs (“Drink water 5 days”, “Try 5 fruits”).
+Modal CTA labels: “Log a new fruit”, “Log water”, “Log an activity”.
+Acceptance Criteria
+/achievements renders with progress strip, filters, grid, modal on mobile width ≤420px.
+Earned vs locked states display correctly from API; progress values render on locked cards.
+“Next unlocks” chips jump/scroll to the relevant card.
+Modal shows “How to earn” with live progress and correct CTA routing.
+Confetti shows only when arriving with ?justUnlocked=CODE and respects reduced motion.
+Lighthouse a11y ≥ 90; interactive targets ≥ 44×44; focus-visible rings; modal focus trap.
+No console errors; API failures show a friendly skeleton/empty state.
+Seed Data (for demo)
+Seed 8–12 badges into badge_catalog as listed above.
+Give the demo user:
+Earned: FIRST_FOOD, FIRST_ACTIVITY, STREAK_3
+Progress: FOOD_VARIETY_5 { current:3, threshold:5 }, WATER_7 { current:5, threshold:7 }
+PRs: dailyXpBest: 120, longestStreak: 6
+Provide 6–8 colorful SVGs; fallback to emoji if missing.
+Notes
+Keep evaluation server-side; client is read-only + animations.
+Keep code organized and commented; no external CSS frameworks; prefer small, reusable components.
+Please implement the route, components, endpoints (if missing), seed data, and wire navigation as specified.
