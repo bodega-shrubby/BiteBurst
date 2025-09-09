@@ -6,6 +6,7 @@ import LessonCircle from '@/components/LessonCircle';
 import StraightPath from '@/components/StraightPath';
 import StarBadge from '@/components/StarBadge';
 import { cleanLessons, type CleanLesson } from '@/data/clean-lessons';
+import mascotImage from '@/assets/mascot-teacher.png';
 
 export default function Lessons() {
   const { user, loading } = useAuth();
@@ -131,6 +132,15 @@ export default function Lessons() {
 
       {/* Track Container */}
       <main className="relative">
+        {/* Mascot on the left */}
+        <div className="hidden sm:block absolute left-4 top-32 z-10">
+          <img 
+            src={mascotImage} 
+            alt="BiteBurst Teacher Mascot" 
+            className="w-20 h-20 object-contain"
+          />
+        </div>
+
         <div className="max-w-sm mx-auto px-4 relative" style={{ width: '100%', maxWidth: `${containerWidth}px` }}>
           
           {/* Progress Card */}
