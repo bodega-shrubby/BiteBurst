@@ -116,18 +116,18 @@ export default function Lessons() {
     );
   }
 
-  const containerHeight = Math.max(1400, lessons.length * 160 + 400);
+  const containerHeight = Math.max(1000, lessons.length * 120 + 300);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-30 px-6 py-4">
+      <header className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 border-b border-orange-300 z-30 px-6 py-4 shadow-sm">
         <div className="max-w-md mx-auto">
           <div className="text-center space-y-1">
-            <h1 className="text-xl font-bold text-gray-900">
+            <h1 className="text-xl font-bold text-white">
               Healthy Habits: Week 1
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-orange-100">
               Learn the basics of healthy eating and movement
             </p>
           </div>
@@ -163,7 +163,7 @@ export default function Lessons() {
               >
                 <PathNode
                   x={spinePoint.x}
-                  y={spinePoint.y + 120} // Offset for header
+                  y={spinePoint.y + 80} // Reduced offset for tighter spacing
                   icon={lesson.icon}
                   title={lesson.title}
                   state={lesson.state}

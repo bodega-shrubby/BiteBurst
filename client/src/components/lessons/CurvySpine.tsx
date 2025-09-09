@@ -6,8 +6,8 @@ interface CurvySpineProps {
 }
 
 export default function CurvySpine({ progress, nodeCount }: CurvySpineProps) {
-  // Calculate SVG height based on number of nodes
-  const svgHeight = Math.max(600, nodeCount * 160 + 200);
+  // Calculate SVG height based on number of nodes - reduced spacing
+  const svgHeight = Math.max(500, nodeCount * 120 + 150);
   const svgWidth = 120;
   
   // Create the S-curve path using cubic Bézier curves
@@ -49,7 +49,7 @@ export default function CurvySpine({ progress, nodeCount }: CurvySpineProps) {
       className="absolute pointer-events-none z-0"
       style={{ 
         left: 'calc(50% - 60px)',
-        top: '120px',
+        top: '80px',
         width: svgWidth,
         height: svgHeight 
       }}
@@ -90,7 +90,7 @@ export default function CurvySpine({ progress, nodeCount }: CurvySpineProps) {
 // Helper function to sample points along the S-curve for node positioning
 export function sampleSpinePoint(t: number, nodeCount: number): { x: number; y: number } {
   // t should be between 0 and 1, representing position along the curve
-  const svgHeight = Math.max(600, nodeCount * 160 + 200);
+  const svgHeight = Math.max(500, nodeCount * 120 + 150);
   const svgWidth = 120;
   const centerX = svgWidth / 2;
   const amplitude = 100;
