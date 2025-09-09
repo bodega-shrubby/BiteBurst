@@ -15,7 +15,7 @@ const categories = [
 
 export default function BadgeFilters({ selectedCategory, onCategoryChange }: BadgeFiltersProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 pr-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <div className="flex gap-2 overflow-x-auto pb-1 pr-8 -mx-4 px-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       {categories.map((category) => (
         <button
           key={category.id}
