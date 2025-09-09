@@ -163,25 +163,59 @@ export default function Lessons() {
       </header>
 
       {/* Lesson Path */}
-      <main className="p-6">
-        <div className="max-w-md mx-auto">
-          <div className="flex flex-col items-center space-y-12">
-            {nodes.map((node) => (
-              <div 
-                key={node.id}
-                data-node-id={node.id}
-              >
-                <TrackNode
-                  node={node}
-                  onClick={() => handleNodeClick(node)}
-                  isGlowing={glowingNode === node.id}
-                />
-              </div>
-            ))}
+      <main className="p-6 pb-24">
+        <div className="max-w-md mx-auto relative">
+          {/* Winding path background */}
+          <svg 
+            className="absolute inset-0 w-full h-full pointer-events-none z-0" 
+            viewBox="0 0 300 600"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            {/* Curved path connecting nodes */}
+            <path
+              d="M 120 60 Q 180 100, 150 140 Q 120 180, 150 220 Q 180 260, 150 300 Q 120 340, 150 380"
+              stroke="#e5e7eb"
+              strokeWidth="4"
+              fill="none"
+              strokeDasharray="0"
+              className="opacity-60"
+            />
+            {/* Progress path - shows completed sections */}
+            <path
+              d={`M 120 60 ${nodes.filter(n => n.state === 'complete').length >= 1 ? 'Q 180 100, 150 140' : ''} ${nodes.filter(n => n.state === 'complete').length >= 2 ? 'Q 120 180, 150 220' : ''} ${nodes.filter(n => n.state === 'complete').length >= 3 ? 'Q 180 260, 150 300' : ''}`}
+              stroke="#10b981"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-80"
+            />
+          </svg>
+
+          {/* Lesson nodes */}
+          <div className="relative z-10 flex flex-col space-y-16 pt-4">
+            {nodes.map((node, index) => {
+              // Determine position for zigzag pattern
+              const position = index === 0 ? 'left' : 
+                              index % 2 === 1 ? 'right' : 'left';
+              
+              return (
+                <div 
+                  key={node.id}
+                  data-node-id={node.id}
+                  className="relative w-full"
+                >
+                  <TrackNode
+                    node={node}
+                    onClick={() => handleNodeClick(node)}
+                    isGlowing={glowingNode === node.id}
+                    position={position}
+                  />
+                </div>
+              );
+            })}
           </div>
           
           {/* Progress summary */}
-          <div className="mt-12 text-center space-y-2">
+          <div className="mt-16 text-center space-y-2">
             <div className="text-sm text-gray-600">
               {nodes.filter(n => n.state === 'complete').length} of {nodes.length} lessons complete
             </div>
