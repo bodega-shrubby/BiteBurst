@@ -166,16 +166,15 @@ export default function Lessons() {
       <main className="p-6 pb-24">
         <div className="max-w-md mx-auto relative">
           {/* Lesson nodes with star milestones */}
-          <div className="relative flex flex-col space-y-12 pt-4">
+          <div className="relative flex flex-col space-y-4 pt-4">
             {nodes.map((node, index) => {
-              // Determine position for zigzag pattern
-              const position = index === 0 ? 'center' : 
-                              index % 2 === 1 ? 'right' : 'left';
+              // Determine position for zigzag pattern - start winding from first lesson
+              const position = index % 2 === 0 ? 'left' : 'right';
               
               const showStar = (index + 1) % 3 === 0 && index < nodes.length - 1;
               
               return (
-                <div key={`${node.id}-group`} className="flex flex-col items-center space-y-8">
+                <div key={`${node.id}-group`} className="flex flex-col items-center space-y-4">
                   <div 
                     data-node-id={node.id}
                     className="relative w-full"
