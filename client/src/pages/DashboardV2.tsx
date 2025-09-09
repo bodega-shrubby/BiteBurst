@@ -318,6 +318,47 @@ export default function DashboardV2() {
           }}
         />
 
+        {/* Achievements Feature Card */}
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <span className="text-3xl">🏅</span>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Achievements</h3>
+                <p className="text-sm text-gray-700">Collect stickers for healthy habits</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => window.location.href = '/achievements'}
+              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-md"
+            >
+              View All
+            </button>
+          </div>
+          
+          <div className="bg-white/60 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Badges earned:</span>
+              <span className="font-bold text-gray-900">
+                {badgeData?.earned?.length || 0} / {badgeCatalog?.length || 12}
+              </span>
+            </div>
+            
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div 
+                className="bg-gradient-to-r from-orange-400 to-red-400 h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${badgeCatalog?.length ? ((badgeData?.earned?.length || 0) / badgeCatalog.length) * 100 : 0}%` 
+                }}
+              />
+            </div>
+            
+            <div className="text-center pt-2 text-xs text-gray-600">
+              🎯 Keep logging to unlock more stickers!
+            </div>
+          </div>
+        </div>
+
         {/* Leaderboard Feature Card */}
         <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
