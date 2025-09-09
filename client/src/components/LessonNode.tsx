@@ -65,9 +65,9 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
   const bgColor = isLocked ? '#CBD5E1' : '#FFFFFF';
 
   const nodeClasses = `
-    absolute w-18 h-18 rounded-full transition-all duration-300
+    absolute w-[72px] h-[72px] rounded-full transition-all duration-300
     ${isInteractive ? 'cursor-pointer' : 'cursor-default'}
-    ${isPressed && !prefersReducedMotion ? 'scale-98' : 'scale-100'}
+    ${isPressed && !prefersReducedMotion ? 'scale-[0.98]' : 'scale-100'}
     ${showEntrance && !prefersReducedMotion ? 'opacity-100 translate-y-0' : !prefersReducedMotion ? 'opacity-0 translate-y-4' : 'opacity-100'}
     ${side === 'left' ? 'left-6' : 'right-6'}
     ${isInteractive ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2' : ''}
@@ -102,7 +102,7 @@ export default function LessonNode({ lesson, side, y, index, onClick }: LessonNo
         tabIndex={isInteractive ? 0 : -1}
       >
         {/* Inner circle with content */}
-        <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center m-1">
+        <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center m-1 relative">
           {isLocked ? (
             <Lock className="w-6 h-6 text-gray-400" />
           ) : (
