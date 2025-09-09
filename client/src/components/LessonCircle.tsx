@@ -43,7 +43,7 @@ export default function LessonCircle({ lesson, y, onClick }: LessonCircleProps) 
 
       {/* START pill for current lesson */}
       {isCurrent && (
-        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
           <div className="bg-white text-blue-400 px-3 py-1 rounded-full text-xs font-bold border border-blue-400">
             START
           </div>
