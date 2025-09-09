@@ -25,10 +25,98 @@
   },
   {
     "id": "focus-power-ups",
-    "title": "Focus Power-Ups",
+    "title": "Focus Power",
     "icon": "🧠",
     "xp": 30,
     "state": "locked",
     "pathIndex": 3
+  },
+  {
+    "id": "veggie-victory",
+    "title": "Veggie Victory",
+    "icon": "🥕",
+    "xp": 25,
+    "state": "locked",
+    "pathIndex": 4
+  },
+  {
+    "id": "sleep-superstar",
+    "title": "Sleep Star",
+    "icon": "😴",
+    "xp": 30,
+    "state": "locked",
+    "pathIndex": 5
+  },
+  {
+    "id": "protein-power",
+    "title": "Protein Power",
+    "icon": "🥩",
+    "xp": 25,
+    "state": "locked",
+    "pathIndex": 6
+  },
+  {
+    "id": "stretch-squad",
+    "title": "Stretch Squad",
+    "icon": "🤸",
+    "xp": 30,
+    "state": "locked",
+    "pathIndex": 7
+  },
+  {
+    "id": "mindful-meals",
+    "title": "Mindful Meals",
+    "icon": "🍽️",
+    "xp": 35,
+    "state": "locked",
+    "pathIndex": 8
+  },
+  {
+    "id": "energy-boost",
+    "title": "Energy Boost",
+    "icon": "⚡",
+    "xp": 30,
+    "state": "locked",
+    "pathIndex": 9
+  },
+  {
+    "id": "balance-basics",
+    "title": "Balance Basics",
+    "icon": "⚖️",
+    "xp": 25,
+    "state": "locked",
+    "pathIndex": 10
+  },
+  {
+    "id": "outdoor-adventures",
+    "title": "Outdoor Fun",
+    "icon": "🌳",
+    "xp": 35,
+    "state": "locked",
+    "pathIndex": 11
+  },
+  {
+    "id": "breathing-buddy",
+    "title": "Breathing Buddy",
+    "icon": "🫁",
+    "xp": 25,
+    "state": "locked",
+    "pathIndex": 12
+  },
+  {
+    "id": "calcium-champions",
+    "title": "Calcium Champs",
+    "icon": "🥛",
+    "xp": 25,
+    "state": "locked",
+    "pathIndex": 13
+  },
+  {
+    "id": "cardio-crew",
+    "title": "Cardio Crew",
+    "icon": "❤️",
+    "xp": 35,
+    "state": "locked",
+    "pathIndex": 14
   }
 ]

@@ -165,50 +165,37 @@ export default function Lessons() {
       {/* Lesson Path */}
       <main className="p-6 pb-24">
         <div className="max-w-md mx-auto relative">
-          {/* Winding path background */}
-          <svg 
-            className="absolute inset-0 w-full h-full pointer-events-none z-0" 
-            viewBox="0 0 300 600"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            {/* Curved path connecting nodes */}
-            <path
-              d="M 120 60 Q 180 100, 150 140 Q 120 180, 150 220 Q 180 260, 150 300 Q 120 340, 150 380"
-              stroke="#e5e7eb"
-              strokeWidth="4"
-              fill="none"
-              strokeDasharray="0"
-              className="opacity-60"
-            />
-            {/* Progress path - shows completed sections */}
-            <path
-              d={`M 120 60 ${nodes.filter(n => n.state === 'complete').length >= 1 ? 'Q 180 100, 150 140' : ''} ${nodes.filter(n => n.state === 'complete').length >= 2 ? 'Q 120 180, 150 220' : ''} ${nodes.filter(n => n.state === 'complete').length >= 3 ? 'Q 180 260, 150 300' : ''}`}
-              stroke="#10b981"
-              strokeWidth="4"
-              fill="none"
-              className="opacity-80"
-            />
-          </svg>
-
-          {/* Lesson nodes */}
-          <div className="relative z-10 flex flex-col space-y-16 pt-4">
+          {/* Lesson nodes with star milestones */}
+          <div className="relative flex flex-col space-y-12 pt-4">
             {nodes.map((node, index) => {
               // Determine position for zigzag pattern
-              const position = index === 0 ? 'left' : 
+              const position = index === 0 ? 'center' : 
                               index % 2 === 1 ? 'right' : 'left';
               
+              const showStar = (index + 1) % 3 === 0 && index < nodes.length - 1;
+              
               return (
-                <div 
-                  key={node.id}
-                  data-node-id={node.id}
-                  className="relative w-full"
-                >
-                  <TrackNode
-                    node={node}
-                    onClick={() => handleNodeClick(node)}
-                    isGlowing={glowingNode === node.id}
-                    position={position}
-                  />
+                <div key={`${node.id}-group`} className="flex flex-col items-center space-y-8">
+                  <div 
+                    data-node-id={node.id}
+                    className="relative w-full"
+                  >
+                    <TrackNode
+                      node={node}
+                      onClick={() => handleNodeClick(node)}
+                      isGlowing={glowingNode === node.id}
+                      position={position}
+                    />
+                  </div>
+                  
+                  {/* Star milestone after every 3 lessons */}
+                  {showStar && (
+                    <div className="flex justify-center">
+                      <div className="w-12 h-12 rounded-full bg-gray-200 border-4 border-gray-300 flex items-center justify-center shadow-lg">
+                        <span className="text-gray-400 text-lg">★</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
