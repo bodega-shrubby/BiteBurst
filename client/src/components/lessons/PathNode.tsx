@@ -48,15 +48,11 @@ export default function PathNode({
   const isComplete = state === 'complete';
   const isUnlocked = state === 'unlocked';
 
-  // Calculate position offset for left/right alternating pattern
-  const offsetX = order % 2 === 0 ? -90 : 90;
-  const finalX = x + offsetX;
-
   return (
     <div
       className="absolute flex flex-col items-center"
       style={{
-        left: finalX - 36, // Center the 72px circle
+        left: x - 36, // Center the 72px circle on S-curve point
         top: y - 36,
         transform: showAnimation ? 'scale(1)' : 'scale(1)',
       }}
