@@ -1,35 +1,41 @@
 import { useMemo } from 'react';
 
-type Point = { x: number; y: number };
+type NodePosition = { x: number; y: number; side: 'left' | 'right' };
 
 interface PathCanvasProps {
-  points: Point[];
-  width: number;
+  nodePositions: NodePosition[];
+  containerWidth: number;
   height: number;
 }
 
-function makeSmoothPath(points: Point[]): string {
-  // Use cubic Beziers between midpoints for smoothness
-  if (points.length < 2) return '';
-  const d = [`M ${points[0].x} ${points[0].y}`];
-  for (let i = 1; i < points.length; i++) {
-    const p0 = points[i - 1];
-    const p1 = points[i];
-    const cx = (p0.x + p1.x) / 2;
-    d.push(`C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`);
+function makeZigZagPath(positions: NodePosition[]): string {
+  // Create zig-zag path connecting actual node centers
+  if (positions.length < 2) return '';
+  
+  const d = [`M ${positions[0].x} ${positions[0].y}`];
+  
+  for (let i = 1; i < positions.length; i++) {
+    const prev = positions[i - 1];
+    const curr = positions[i];
+    
+    // Add smooth curves between nodes for zig-zag effect
+    const midY = (prev.y + curr.y) / 2;
+    d.push(`C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`);
   }
+  
   return d.join(' ');
 }
 
-export default function PathCanvas({ points, width, height }: PathCanvasProps) {
-  const pathData = useMemo(() => makeSmoothPath(points), [points]);
+export default function PathCanvas({ nodePositions, containerWidth, height }: PathCanvasProps) {
+  const pathData = useMemo(() => makeZigZagPath(nodePositions), [nodePositions]);
 
   return (
     <svg
-      width={width}
+      width={containerWidth}
       height={height}
-      className="absolute inset-0 pointer-events-none"
+      className="absolute top-0 left-0 pointer-events-none"
       style={{ zIndex: 0 }}
+      viewBox={`0 0 ${containerWidth} ${height}`}
       aria-hidden="true"
     >
       {/* Faint trailing highlight overlay */}
@@ -41,7 +47,7 @@ export default function PathCanvas({ points, width, height }: PathCanvasProps) {
         fill="none"
       />
       
-      {/* Main path */}
+      {/* Main zig-zag path */}
       <path
         d={pathData}
         stroke="#E2E6EB"

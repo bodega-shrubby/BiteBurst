@@ -39,23 +39,24 @@ export default function Lessons() {
   const completed = lessons.filter(l => l.state === 'completed').length;
   const progressPercent = (completed / lessons.length) * 100;
 
-  // Layout calculations
-  const containerWidth = 420; // max-width of container
-  const centerX = containerWidth / 2;
+  // Responsive layout calculations
+  const containerWidth = 384; // max-w-sm = 24rem = 384px (mobile-friendly)
+  const leftNodeX = 24 + 36; // 24px from edge + 36px to center of 72px node
+  const rightNodeX = containerWidth - 24 - 36; // 24px from edge + 36px to center
   const startY = 120; // Below progress card
   const nodeGap = 120; // Vertical spacing between nodes
   const topPadding = 80;
   const bottomPadding = 160;
 
-  // Calculate anchor points for path (centered between left/right positions)
-  const pathPoints = useMemo(() => {
+  // Calculate node positions for zig-zag path
+  const nodePositions = useMemo(() => {
     return lessons.map((_, i) => {
+      const side: 'left' | 'right' = i % 2 === 0 ? 'left' : 'right';
+      const x = side === 'left' ? leftNodeX : rightNodeX;
       const y = startY + i * nodeGap;
-      // Path x with gentle sway - centered between left/right nodes
-      const x = centerX + Math.sin(i * 0.9) * 14;
-      return { x, y };
+      return { x, y, side };
     });
-  }, [lessons.length]);
+  }, [lessons.length, leftNodeX, rightNodeX]);
 
   // Calculate total height
   const totalHeight = topPadding + startY + (lessons.length - 1) * nodeGap + bottomPadding;
@@ -118,7 +119,7 @@ export default function Lessons() {
 
       {/* Track Container */}
       <main className="relative">
-        <div className="max-w-md mx-auto px-4 relative" style={{ maxWidth: '420px' }}>
+        <div className="max-w-sm mx-auto px-4 relative" style={{ width: '100%', maxWidth: '384px' }}>
           
           {/* Progress Card */}
           <div className="mt-4 mb-8">
@@ -152,25 +153,21 @@ export default function Lessons() {
           >
             {/* Path Canvas */}
             <PathCanvas 
-              points={pathPoints}
-              width={containerWidth}
+              nodePositions={nodePositions}
+              containerWidth={containerWidth}
               height={totalHeight}
             />
 
             {/* Lesson Nodes */}
             {lessons.map((lesson, index) => {
-              const side = index % 2 === 0 ? 'left' : 'right';
-              const y = startY + index * nodeGap;
-              // Add extra gap after every 3rd node for polish
-              const extraGap = index > 0 && index % 3 === 0 ? 10 : 0;
-              const adjustedY = y + Math.floor(index / 3) * extraGap;
-
+              const position = nodePositions[index];
+              
               return (
                 <LessonNode
                   key={lesson.id}
                   lesson={lesson}
-                  side={side}
-                  y={adjustedY}
+                  side={position.side}
+                  y={position.y}
                   index={index}
                   onClick={() => handleLessonClick(lesson)}
                 />
