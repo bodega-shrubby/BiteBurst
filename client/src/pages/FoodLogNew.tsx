@@ -283,7 +283,7 @@ export default function FoodLog() {
       <header className="bb-appbar">
         <button 
           className="bb-back" 
-          onClick={() => setLocation('/')}
+          onClick={() => setLocation('/dashboard')}
           aria-label="Back to dashboard"
         >
           ←
