@@ -193,19 +193,16 @@ export default function ActivityLog() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 bg-[#FF6A00] z-10 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setLocation('/dashboard')}
-            className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h1 className="text-xl font-bold text-white">LOG YOUR ACTIVITY</h1>
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
-            <img src={mascotImage} alt="Mascot" className="w-full h-full object-cover" />
-          </div>
-        </div>
+      <header className="bb-appbar">
+        <button 
+          className="bb-back" 
+          onClick={() => setLocation('/dashboard')}
+          aria-label="Back to dashboard"
+        >
+          ←
+        </button>
+        <h1>Log your activity</h1>
+        <img src={mascotImage} alt="BiteBurst mascot" className="bb-mascot" />
       </header>
 
       <main className="px-4 py-6 space-y-8 pb-24 max-w-md mx-auto">
