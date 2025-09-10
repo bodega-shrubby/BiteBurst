@@ -202,7 +202,7 @@ export default function ActivityLog() {
           ←
         </button>
         <h1>Log your activity</h1>
-        <div></div>
+        <div style={{ width: '32px', height: '32px' }}></div>
       </header>
 
       <main className="px-4 py-6 space-y-8 pb-24 max-w-md mx-auto">
