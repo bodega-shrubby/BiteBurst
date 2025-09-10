@@ -202,7 +202,6 @@ export default function ActivityLog() {
           ←
         </button>
         <h1>Log your activity</h1>
-        <img src={mascotImage} alt="BiteBurst mascot" className="bb-mascot" />
       </header>
 
       <main className="px-4 py-6 space-y-8 pb-24 max-w-md mx-auto">
