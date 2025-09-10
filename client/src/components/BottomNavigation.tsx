@@ -24,7 +24,7 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
     },
     {
       id: 'lessons',
-      label: 'Track',
+      label: 'Lesson',
       icon: '🗺️',
       path: '/lessons',
       isActive: location === '/lessons' || location.startsWith('/lesson/')
