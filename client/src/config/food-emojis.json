@@ -28,7 +28,15 @@
       ]
     },
     {
-      "name": "Grains & Bread",
+      "name": "Dairy",
+      "emojis": [
+        { "emoji": "🥛", "name": "milk", "healthy": true },
+        { "emoji": "🧈", "name": "yogurt", "healthy": true },
+        { "emoji": "🧀", "name": "cheese", "healthy": false }
+      ]
+    },
+    {
+      "name": "Bread",
       "emojis": [
         { "emoji": "🍞", "name": "bread", "healthy": false },
         { "emoji": "🥖", "name": "baguette", "healthy": false },
@@ -41,22 +49,18 @@
       ]
     },
     {
-      "name": "Protein",
+      "name": "Drinks",
       "emojis": [
-        { "emoji": "🥚", "name": "egg", "healthy": true },
-        { "emoji": "🍖", "name": "meat", "healthy": false },
-        { "emoji": "🍗", "name": "chicken", "healthy": true },
-        { "emoji": "🐟", "name": "fish", "healthy": true },
-        { "emoji": "🫘", "name": "beans", "healthy": true },
-        { "emoji": "🥜", "name": "nuts", "healthy": true },
-        { "emoji": "🧀", "name": "cheese", "healthy": false }
+        { "emoji": "💧", "name": "water", "healthy": true },
+        { "emoji": "🧃", "name": "juice", "healthy": false },
+        { "emoji": "🥤", "name": "soda", "healthy": false },
+        { "emoji": "🫖", "name": "tea", "healthy": true },
+        { "emoji": "☕", "name": "coffee", "healthy": false }
       ]
     },
     {
-      "name": "Dairy & Snacks",
+      "name": "Snacks",
       "emojis": [
-        { "emoji": "🥛", "name": "milk", "healthy": true },
-        { "emoji": "🧈", "name": "yogurt", "healthy": true },
         { "emoji": "🍪", "name": "cookie", "healthy": false },
         { "emoji": "🍰", "name": "cake", "healthy": false },
         { "emoji": "🍫", "name": "chocolate", "healthy": false },
@@ -65,14 +69,14 @@
       ]
     },
     {
-      "name": "Drinks",
+      "name": "Protein",
       "emojis": [
-        { "emoji": "💧", "name": "water", "healthy": true },
-        { "emoji": "🧃", "name": "juice", "healthy": false },
-        { "emoji": "🥤", "name": "soda", "healthy": false },
-        { "emoji": "🫖", "name": "tea", "healthy": true },
-        { "emoji": "☕", "name": "coffee", "healthy": false },
-        { "emoji": "🥤", "name": "smoothie", "healthy": true }
+        { "emoji": "🥚", "name": "egg", "healthy": true },
+        { "emoji": "🍖", "name": "meat", "healthy": false },
+        { "emoji": "🍗", "name": "chicken", "healthy": true },
+        { "emoji": "🐟", "name": "fish", "healthy": true },
+        { "emoji": "🫘", "name": "beans", "healthy": true },
+        { "emoji": "🥜", "name": "nuts", "healthy": true }
       ]
     }
   ]
