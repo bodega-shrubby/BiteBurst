@@ -211,22 +211,8 @@ export default function LessonDemo() {
               </div>
 
               {/* Mascot + subtitle */}
-              <div className="space-y-4 relative">
-                {/* Celebration mascot with sparkles */}
-                <div className="relative flex justify-center">
-                  <div className="animate-bounce">
-                    <img 
-                      src={SunnyProudImage} 
-                      alt="Sunny proud celebration" 
-                      className="w-32 h-32 object-contain"
-                    />
-                  </div>
-                  {/* Sparkle confetti around mascot */}
-                  <div className="absolute top-2 left-8 text-2xl animate-pulse">✨</div>
-                  <div className="absolute top-8 right-6 text-xl animate-pulse delay-100">✨</div>
-                  <div className="absolute bottom-4 left-12 text-lg animate-pulse delay-200">✨</div>
-                  <div className="absolute bottom-2 right-10 text-2xl animate-pulse delay-300">✨</div>
-                </div>
+              <div className="space-y-4">
+                <div className="text-6xl">🍊</div>
                 <p className="text-lg text-gray-700">
                   Pick the snack that powers you up!
                 </p>
