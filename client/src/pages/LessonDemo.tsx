@@ -211,8 +211,22 @@ export default function LessonDemo() {
               </div>
 
               {/* Mascot + subtitle */}
-              <div className="space-y-4">
-                <div className="text-6xl">🍊</div>
+              <div className="space-y-4 relative">
+                {/* Celebration mascot with sparkles */}
+                <div className="relative flex justify-center">
+                  <div className="animate-bounce">
+                    <img 
+                      src={SunnyProudImage} 
+                      alt="Sunny proud celebration" 
+                      className="w-32 h-32 object-contain"
+                    />
+                  </div>
+                  {/* Sparkle confetti around mascot */}
+                  <div className="absolute top-2 left-8 text-2xl animate-pulse">✨</div>
+                  <div className="absolute top-8 right-6 text-xl animate-pulse delay-100">✨</div>
+                  <div className="absolute bottom-4 left-12 text-lg animate-pulse delay-200">✨</div>
+                  <div className="absolute bottom-2 right-10 text-2xl animate-pulse delay-300">✨</div>
+                </div>
                 <p className="text-lg text-gray-700">
                   Pick the snack that powers you up!
                 </p>
@@ -244,16 +258,21 @@ export default function LessonDemo() {
             <div className="space-y-8 text-center animate-in fade-in duration-500">
               {/* Celebration illustration */}
               <div className="space-y-6">
-                <div className="animate-bounce">
-                  <img 
-                    src={SunnyProudImage} 
-                    alt="Sunny proud celebration" 
-                    className="w-24 h-24 mx-auto object-contain"
-                  />
-                </div>
-                <div className="flex justify-center space-x-4">
-                  <div className="text-4xl">🍊</div>
-                  <div className="text-4xl">🧒</div>
+                <div className="relative flex justify-center">
+                  <div className="animate-bounce">
+                    <img 
+                      src={SunnyProudImage} 
+                      alt="Sunny proud celebration" 
+                      className="w-36 h-36 object-contain"
+                    />
+                  </div>
+                  {/* Sparkle confetti around mascot */}
+                  <div className="absolute top-4 left-6 text-2xl animate-pulse">✨</div>
+                  <div className="absolute top-12 right-4 text-xl animate-pulse delay-100">✨</div>
+                  <div className="absolute bottom-6 left-8 text-lg animate-pulse delay-200">✨</div>
+                  <div className="absolute bottom-4 right-12 text-2xl animate-pulse delay-300">✨</div>
+                  <div className="absolute top-8 left-16 text-lg animate-pulse delay-400">✨</div>
+                  <div className="absolute bottom-12 right-6 text-xl animate-pulse delay-500">✨</div>
                 </div>
                 <h1 className="text-3xl font-bold text-orange-600">
                   Lesson complete!
