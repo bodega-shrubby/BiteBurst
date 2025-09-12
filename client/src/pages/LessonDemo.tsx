@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 import QuizPills, { type QuizOption } from '@/components/lessons/QuizPills';
 import SuccessStrip from '@/components/lessons/SuccessStrip';
 import Confetti from '@/components/lessons/Confetti';
-import BrainyBoltImage from '@assets/Mascots/BrainyBolt.png';
+import SunnyProudImage from '@assets/Mascots/sunny_proud.png';
 
 type LessonStep = 'intro' | 'quiz' | 'success' | 'complete';
 
