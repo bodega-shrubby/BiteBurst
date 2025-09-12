@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 import QuizPills, { type QuizOption } from '@/components/lessons/QuizPills';
 import SuccessStrip from '@/components/lessons/SuccessStrip';
 import Confetti from '@/components/lessons/Confetti';
+import BrainyBoltImage from '@assets/Mascots/BrainyBolt.png';
 
 type LessonStep = 'intro' | 'quiz' | 'success' | 'complete';
 
@@ -280,6 +281,15 @@ export default function LessonDemo() {
           )}
         </div>
       </main>
+
+      {/* Mascot at bottom */}
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10">
+        <img 
+          src={BrainyBoltImage} 
+          alt="BrainyBolt mascot" 
+          className="w-20 h-20 object-contain"
+        />
+      </div>
 
       {/* Success Strip */}
       <SuccessStrip
