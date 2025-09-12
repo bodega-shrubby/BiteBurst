@@ -17,6 +17,7 @@ interface LogState {
   textInput: string;
   photoFile: File | null;
   photoPreview: string | null;
+  selectedCategory: string | null;
 }
 
 // Haptic feedback helper
@@ -91,6 +92,7 @@ export default function FoodLog() {
     textInput: '',
     photoFile: null,
     photoPreview: null,
+    selectedCategory: null,
   });
 
   // Auto-focus textarea when switching to text method
@@ -100,17 +102,35 @@ export default function FoodLog() {
     }
   }, [state.method]);
 
-  // Flatten all emojis from config
-  const allEmojis = useMemo(() => 
-    foodEmojis.categories.flatMap(category => 
-      category.emojis.map(item => ({
-        emoji: item.emoji,
-        name: item.name,
-        healthy: item.healthy,
-        category: category.name
-      }))
-    )
-  , []);
+  // Category icons mapping
+  const categoryIcons = {
+    'Fruits': '🍎',
+    'Vegetables': '🥦',
+    'Dairy': '🥛',
+    'Bread': '🍞',
+    'Drinks': '💧',
+    'Snacks': '🍪',
+    'Protein': '🥚'
+  };
+
+  // Get emojis for selected category
+  const getCategoryEmojis = (categoryName: string) => {
+    const category = foodEmojis.categories.find(cat => cat.name === categoryName);
+    return category ? category.emojis.map(item => ({
+      emoji: item.emoji,
+      name: item.name,
+      healthy: item.healthy,
+      category: categoryName
+    })) : [];
+  };
+
+  // Current emojis to display (either all or filtered by category)
+  const currentEmojis = useMemo(() => {
+    if (state.selectedCategory) {
+      return getCategoryEmojis(state.selectedCategory);
+    }
+    return [];
+  }, [state.selectedCategory]);
 
   // Check if current state has valid content
   const hasValidContent = () => {
@@ -182,7 +202,31 @@ export default function FoodLog() {
   // Method selection handlers
   const selectMethod = (method: InputMethod) => {
     triggerHaptic();
-    setState(prev => ({ ...prev, method }));
+    setState(prev => ({ 
+      ...prev, 
+      method,
+      selectedCategory: null,
+      selectedEmojis: [],
+      textInput: '',
+      photoFile: null,
+      photoPreview: null
+    }));
+  };
+
+  const selectCategory = (categoryName: string) => {
+    setState(prev => ({
+      ...prev,
+      selectedCategory: categoryName
+    }));
+    triggerHaptic();
+  };
+
+  const goBackToCategories = () => {
+    setState(prev => ({
+      ...prev,
+      selectedCategory: null
+    }));
+    triggerHaptic();
   };
 
   // Emoji selection handlers
@@ -342,22 +386,57 @@ export default function FoodLog() {
         role="tabpanel"
         aria-labelledby="optEmoji"
       >
-        <h2 className="bb-section">Pick food emojis</h2>
-        <div className="bb-emoji-grid" role="listbox" aria-label="Food emojis">
-          {allEmojis.map((item, index) => (
-            <button
-              key={index}
-              className={`bb-emoji-tile ${state.selectedEmojis.includes(item.emoji) ? 'selected' : ''}`}
-              onClick={() => toggleEmoji(item.emoji)}
-              aria-pressed={state.selectedEmojis.includes(item.emoji)}
-              title={item.name}
-              role="option"
-              aria-selected={state.selectedEmojis.includes(item.emoji)}
-            >
-              {item.emoji}
-            </button>
-          ))}
-        </div>
+        {!state.selectedCategory ? (
+          // Category Selection View
+          <>
+            <h2 className="bb-section">Pick a food category</h2>
+            <div className="bb-category-grid" role="listbox" aria-label="Food categories">
+              {foodEmojis.categories.map((category) => (
+                <button
+                  key={category.name}
+                  className="bb-category-tile"
+                  onClick={() => selectCategory(category.name)}
+                  role="option"
+                  aria-label={`Select ${category.name} category`}
+                >
+                  <div className="bb-category-icon">
+                    {categoryIcons[category.name as keyof typeof categoryIcons]}
+                  </div>
+                  <span className="bb-category-name">{category.name}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          // Emoji Selection View for selected category
+          <>
+            <div className="bb-section-header">
+              <button 
+                className="bb-back-category"
+                onClick={goBackToCategories}
+                aria-label="Back to categories"
+              >
+                ←
+              </button>
+              <h2 className="bb-section">{state.selectedCategory}</h2>
+            </div>
+            <div className="bb-emoji-grid" role="listbox" aria-label={`${state.selectedCategory} emojis`}>
+              {currentEmojis.map((item, index) => (
+                <button
+                  key={index}
+                  className={`bb-emoji-tile ${state.selectedEmojis.includes(item.emoji) ? 'selected' : ''}`}
+                  onClick={() => toggleEmoji(item.emoji)}
+                  aria-pressed={state.selectedEmojis.includes(item.emoji)}
+                  title={item.name}
+                  role="option"
+                  aria-selected={state.selectedEmojis.includes(item.emoji)}
+                >
+                  {item.emoji}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
         
         {/* Selection Shelf */}
         <div 

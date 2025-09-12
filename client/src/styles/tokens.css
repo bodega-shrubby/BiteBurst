@@ -146,6 +146,75 @@ html {
   margin-bottom: 16px;
 }
 
+/* Category grid styles */
+.bb-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.bb-category-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 100px;
+  gap: 8px;
+}
+
+.bb-category-tile:hover {
+  border-color: var(--bb-orange);
+  background: #fff7ed;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 106, 0, 0.15);
+}
+
+.bb-category-tile:active {
+  transform: translateY(0);
+}
+
+.bb-category-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.bb-category-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+/* Category section header */
+.bb-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bb-back-category {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--bb-orange);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.bb-back-category:hover {
+  background: #fff7ed;
+}
+
 .bb-emoji-tile {
   width: 64px;
   height: 64px;
