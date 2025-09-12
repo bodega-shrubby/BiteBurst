@@ -454,6 +454,7 @@ export default function Feedback() {
           size="sm"
           onClick={handleBackToDashboard}
           className="text-white hover:bg-white/20 p-2"
+          data-testid="button-back-header"
         >
           <ArrowLeft size={20} />
         </Button>
@@ -470,7 +471,7 @@ export default function Feedback() {
         <div className="w-8" /> {/* Spacer for centering */}
       </header>
 
-      <div className="p-4 space-y-6 max-w-[420px] mx-auto">
+      <div className="p-4 space-y-6 max-w-[480px] mx-auto">
         {/* Hero Celebration Section */}
         <section className="bb-hero text-center space-y-6">
           <div className="bb-mascot-wrap relative inline-block">
@@ -571,88 +572,50 @@ export default function Feedback() {
           </div>
         )}
 
-        {/* AI Feedback with Speech Bubble */}
-        <div style={{ 
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '4px',
-          margin: '24px auto 0',
-          maxWidth: '420px',
-          width: '100%'
-        }}>
-          {/* Nutrition Coach Mascot */}
-          <div style={{ 
-            flexShrink: 0
-          }}>
+        {/* AI Feedback with Speech Bubble - Mobile Optimized */}
+        <div className="w-full px-4 mt-6">
+          {/* Nutrition Coach Mascot - Centered on Mobile */}
+          <div className="flex justify-center mb-6">
             <img 
               src={nutritionCoachMascot} 
               alt="Nutrition coach mascot"
-              style={{
-                width: '200px',
-                height: '250px',
-                objectFit: 'contain'
-              }}
+              className="w-40 h-40 object-contain drop-shadow-[0_6px_20px_rgba(255,106,0,0.15)]"
             />
           </div>
           
-          {/* Speech Bubble */}
-          <div style={{
-            position: 'relative',
-            backgroundColor: 'white',
-            border: '2px solid #e2e8f0',
-            borderRadius: '20px',
-            padding: '16px 20px',
-            flex: '1',
-            minHeight: '100px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-          }}>
-            {/* Speech bubble pointer */}
-            <div style={{
-              position: 'absolute',
-              left: '-10px',
-              top: '30px',
-              width: '0',
-              height: '0',
-              borderTop: '10px solid transparent',
-              borderBottom: '10px solid transparent',
-              borderRight: '10px solid white'
-            }}></div>
-            <div style={{
-              position: 'absolute',
-              left: '-12px',
-              top: '28px',
-              width: '0',
-              height: '0',
-              borderTop: '12px solid transparent',
-              borderBottom: '12px solid transparent',
-              borderRight: '12px solid #e2e8f0'
-            }}></div>
+          {/* Speech Bubble - Full Width on Mobile */}
+          <div className="relative bg-white border-2 border-orange-100 rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.08)] ring-1 ring-orange-50">
+            {/* Speech bubble pointer - pointing up to mascot */}
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-white"></div>
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-b-[14px] border-b-orange-100"></div>
             
-            {/* Content */}
+            {/* Content - Mobile Optimized Typography */}
             <div>
-              <h3 className="font-bold text-gray-800 mb-3 text-lg">
+              <h3 className="font-bold text-gray-800 mb-4 text-xl text-center">
                 Your nutrition coach says:
               </h3>
               
               {isLoading ? (
-                <div className="text-center text-gray-500 py-4">
-                  <div className="animate-spin w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-2"></div>
-                  <p className="text-sm">Getting your personalized feedback...</p>
+                <div className="text-center text-gray-500 py-6">
+                  <div className="animate-spin w-8 h-8 border-4 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-3"></div>
+                  <p className="text-base">Getting your personalized feedback...</p>
                 </div>
               ) : feedback ? (
                 <div className="relative">
-                  <p className={`text-base text-gray-700 leading-relaxed ${isTyping ? 'bb-typewriter' : ''}`}>
+                  <p className={`text-lg text-gray-700 leading-8 text-center ${isTyping ? 'bb-typewriter' : ''}`} 
+                     data-testid="coach-feedback-message"
+                     role="status"
+                     aria-live="polite">
                     {typewriterText || feedback}
                   </p>
                   {isTyping && (
-                    <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
+                    <span className="inline-block w-0.5 h-6 bg-gray-700 ml-0.5 animate-pulse" aria-hidden="true"></span>
                   )}
                 </div>
               ) : (
-                <p className="text-base text-gray-700 leading-relaxed">
+                <p className="text-lg text-gray-700 leading-8 text-center" 
+                   data-testid="coach-default-message"
+                   role="status">
                   Keep up the great work! Every healthy choice helps you grow stronger and smarter.
                 </p>
               )}
@@ -660,24 +623,26 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3 pt-4 flex flex-col items-center">
+        {/* Action Buttons - Mobile Optimized */}
+        <div className="w-full px-4 mt-8 space-y-4">
           <Button
             onClick={handleLogAnother}
-            className="bb-enhanced-button max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
-            style={{ borderRadius: '13px' }}
+            className="bb-enhanced-button w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-14 text-base font-bold uppercase tracking-wider shadow-[0_4px_12px_rgba(255,106,0,0.3)] hover:shadow-[0_6px_16px_rgba(255,106,0,0.4)] transition-all duration-200"
+            style={{ borderRadius: '16px' }}
+            data-testid="button-log-another"
           >
-            <RotateCcw size={20} className="mr-2" />
+            <RotateCcw size={22} className="mr-3" />
             {(logData as any)?.type === 'activity' ? 'LOG ANOTHER ACTIVITY' : 'LOG ANOTHER MEAL'}
           </Button>
           
           <Button
             onClick={handleBackToDashboard}
             variant="outline"
-            className="bb-enhanced-button max-w-[366px] w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
-            style={{ borderRadius: '13px' }}
+            className="bb-enhanced-button w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 hover:border-[#E55A00] h-14 text-base font-bold uppercase tracking-wider shadow-[0_2px_8px_rgba(255,106,0,0.15)] hover:shadow-[0_4px_12px_rgba(255,106,0,0.25)] transition-all duration-200"
+            style={{ borderRadius: '16px' }}
+            data-testid="button-back-dashboard"
           >
-            <Home size={20} className="mr-2" />
+            <Home size={22} className="mr-3" />
             BACK TO DASHBOARD
           </Button>
         </div>
