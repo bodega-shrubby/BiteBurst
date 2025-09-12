@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 import QuizPills, { type QuizOption } from '@/components/lessons/QuizPills';
 import SuccessStrip from '@/components/lessons/SuccessStrip';
 import Confetti from '@/components/lessons/Confetti';
+import BrainyBoltImage from '@assets/Mascots/BrainyBolt.png';
 import SunnyProudImage from '@assets/Mascots/sunny_proud.png';
 
 type LessonStep = 'intro' | 'quiz' | 'success' | 'complete';
@@ -243,7 +244,13 @@ export default function LessonDemo() {
             <div className="space-y-8 text-center animate-in fade-in duration-500">
               {/* Celebration illustration */}
               <div className="space-y-6">
-                <div className="text-6xl animate-bounce">🎉</div>
+                <div className="animate-bounce">
+                  <img 
+                    src={SunnyProudImage} 
+                    alt="Sunny proud celebration" 
+                    className="w-24 h-24 mx-auto object-contain"
+                  />
+                </div>
                 <div className="flex justify-center space-x-4">
                   <div className="text-4xl">🍊</div>
                   <div className="text-4xl">🧒</div>
