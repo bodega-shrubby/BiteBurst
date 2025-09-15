@@ -8,6 +8,9 @@ interface OnboardingProfile {
   email?: string;
   password?: string;
   hasParentConsent: boolean;
+  favorite_fruits?: string[];
+  favorite_veggies?: string[];
+  favorite_foods?: string[];
 }
 
 interface OnboardingContextType {
@@ -24,6 +27,9 @@ const defaultProfile: OnboardingProfile = {
   email: "",
   password: "",
   hasParentConsent: false,
+  favorite_fruits: [],
+  favorite_veggies: [],
+  favorite_foods: [],
 };
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
