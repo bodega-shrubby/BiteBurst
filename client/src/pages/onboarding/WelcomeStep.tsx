@@ -8,7 +8,7 @@ export default function WelcomeStep() {
   const [, setLocation] = useLocation();
 
   const handleGetStarted = () => {
-    setLocation("/profile/name");
+    setLocation("/profile/intro");
   };
 
   const handleSignIn = () => {
