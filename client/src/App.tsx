@@ -37,6 +37,29 @@ import PasswordStep from "@/pages/onboarding/PasswordStep";
 import ConsentStep from "@/pages/onboarding/ConsentStep";
 import ReviewStep from "@/pages/onboarding/ReviewStep";
 
+function OnboardingRoutes() {
+  return (
+    <OnboardingProvider>
+      <Switch>
+        <Route path="/start" component={WelcomeStep} />
+        <Route path="/profile/intro" component={MascotIntroStep} />
+        <Route path="/profile/name" component={NameStep} />
+        <Route path="/profile/age" component={AgeStep} />
+        <Route path="/profile/goal" component={GoalStep} />
+        <Route path="/profile/preferences/fruits" component={FruitsStep} />
+        <Route path="/profile/preferences/veggies" component={VeggiesStep} />
+        <Route path="/profile/preferences/foods" component={FoodsStep} />
+        <Route path="/profile/preferences/sports" component={SportsStep} />
+        <Route path="/profile/avatar" component={AvatarStep} />
+        <Route path="/profile/email" component={EmailStep} />
+        <Route path="/profile/password" component={PasswordStep} />
+        <Route path="/profile/consent" component={ConsentStep} />
+        <Route path="/profile/review" component={ReviewStep} />
+      </Switch>
+    </OnboardingProvider>
+  );
+}
+
 function Router() {
   return (
     <Switch>
@@ -55,90 +78,21 @@ function Router() {
       <Route path="/lesson/demo" component={LessonDemo} />
       <Route path="/streak" component={Streak} />
       
-      {/* Onboarding Flow */}
-      <Route path="/start">
-        <OnboardingProvider>
-          <WelcomeStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/intro">
-        <OnboardingProvider>
-          <MascotIntroStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/name">
-        <OnboardingProvider>
-          <NameStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/age">
-        <OnboardingProvider>
-          <AgeStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/goal">
-        <OnboardingProvider>
-          <GoalStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/preferences/fruits">
-        <OnboardingProvider>
-          <FruitsStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/preferences/veggies">
-        <OnboardingProvider>
-          <VeggiesStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/preferences/foods">
-        <OnboardingProvider>
-          <FoodsStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/preferences/sports">
-        <OnboardingProvider>
-          <SportsStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/avatar">
-        <OnboardingProvider>
-          <AvatarStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/email">
-        <OnboardingProvider>
-          <EmailStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/password">
-        <OnboardingProvider>
-          <PasswordStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/consent">
-        <OnboardingProvider>
-          <ConsentStep />
-        </OnboardingProvider>
-      </Route>
-      
-      <Route path="/profile/review">
-        <OnboardingProvider>
-          <ReviewStep />
-        </OnboardingProvider>
-      </Route>
+      {/* Onboarding Flow - Single Provider */}
+      <Route path="/start" component={OnboardingRoutes} />
+      <Route path="/profile/intro" component={OnboardingRoutes} />
+      <Route path="/profile/name" component={OnboardingRoutes} />
+      <Route path="/profile/age" component={OnboardingRoutes} />
+      <Route path="/profile/goal" component={OnboardingRoutes} />
+      <Route path="/profile/preferences/fruits" component={OnboardingRoutes} />
+      <Route path="/profile/preferences/veggies" component={OnboardingRoutes} />
+      <Route path="/profile/preferences/foods" component={OnboardingRoutes} />
+      <Route path="/profile/preferences/sports" component={OnboardingRoutes} />
+      <Route path="/profile/avatar" component={OnboardingRoutes} />
+      <Route path="/profile/email" component={OnboardingRoutes} />
+      <Route path="/profile/password" component={OnboardingRoutes} />
+      <Route path="/profile/consent" component={OnboardingRoutes} />
+      <Route path="/profile/review" component={OnboardingRoutes} />
       
       <Route component={NotFound} />
     </Switch>
