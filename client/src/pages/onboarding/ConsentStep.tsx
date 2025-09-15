@@ -17,7 +17,7 @@ export default function ConsentStep() {
   };
 
   return (
-    <OnboardingLayout step={8} totalSteps={9}>
+    <OnboardingLayout step={11} totalSteps={12}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

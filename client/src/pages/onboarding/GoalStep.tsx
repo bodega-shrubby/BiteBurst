@@ -35,12 +35,12 @@ export default function GoalStep() {
     // Auto-advance after brief delay to show selection
     setTimeout(() => {
       updateProfile({ goal });
-      setLocation("/profile/avatar");
+      setLocation("/profile/preferences/fruits");
     }, 150);
   };
 
   return (
-    <OnboardingLayout step={4} totalSteps={9}>
+    <OnboardingLayout step={4} totalSteps={12}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}
@@ -94,7 +94,7 @@ export default function GoalStep() {
             <Button
               onClick={() => {
                 updateProfile({ goal: selectedGoal });
-                setLocation("/profile/avatar");
+                setLocation("/profile/preferences/fruits");
               }}
               className="w-full text-white font-bold text-lg rounded-full transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
               style={{ 

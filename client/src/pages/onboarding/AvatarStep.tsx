@@ -55,7 +55,7 @@ export default function AvatarStep() {
   };
 
   return (
-    <OnboardingLayout step={5} totalSteps={9}>
+    <OnboardingLayout step={8} totalSteps={12}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

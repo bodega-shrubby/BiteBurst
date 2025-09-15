@@ -48,7 +48,7 @@ export default function PasswordStep() {
   };
 
   return (
-    <OnboardingLayout step={7} totalSteps={9}>
+    <OnboardingLayout step={10} totalSteps={12}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}
