@@ -235,7 +235,7 @@ export default function DashboardV2() {
   return (
     <div className="min-h-screen bg-white">
       {/* Profile Header */}
-      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-6 relative">
+      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-3 relative">
         <div className="max-w-md mx-auto">
           <div className="flex justify-end mb-4">
             {/* Settings Icon */}
@@ -252,7 +252,7 @@ export default function DashboardV2() {
       </header>
 
       {/* Dark Profile Card */}
-      <div className="max-w-md mx-auto px-4 -mt-8 relative z-10 mb-6">
+      <div className="max-w-md mx-auto px-4 relative z-10 mb-6">
         <div className="bg-neutral-900 rounded-2xl px-5 py-4 text-white shadow-xl" data-testid="profile-card">
           <h1 className="text-2xl font-bold text-center mb-2" data-testid="text-username">
             {dailySummary.user.display_name}
@@ -280,8 +280,8 @@ export default function DashboardV2() {
       <main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
         {/* Invite Button */}
         <button className="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
-          <span className="text-blue-500 text-lg">👥</span>
-          <span className="text-blue-500 font-bold">+ INVITE</span>
+          <span className="text-orange-500 text-lg">👥</span>
+          <span className="text-orange-500 font-bold">Add Friends</span>
         </button>
 
         {/* Overview Section */}

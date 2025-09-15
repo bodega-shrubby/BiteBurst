@@ -123,7 +123,7 @@ export default function BadgesShelf({
   
   return (
     <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
-      <h2 className="text-xs font-bold text-black mb-4">Badges & Rewards</h2>
+      <h2 className="text-xl font-bold text-black mb-4">Badges & Rewards</h2>
       
       {!hasAnyBadges ? (
         <div className="text-center py-8 space-y-3">
@@ -133,7 +133,7 @@ export default function BadgesShelf({
           </p>
         </div>
       ) : (
-        <div className="flex space-x-3 overflow-x-auto pb-2">
+        <div className="grid grid-cols-4 gap-3">
           {/* Earned badges first */}
           {earnedBadges.map((badge) => (
             <BadgeItem key={badge.code} badge={badge} isEarned={true} />

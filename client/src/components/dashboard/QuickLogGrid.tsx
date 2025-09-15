@@ -81,7 +81,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       <div>
-        <h3 className="text-xs font-bold text-black mb-3">Quick Log</h3>
+        <h3 className="text-xl font-bold text-black mb-3">Quick Log</h3>
         <p className="text-sm text-gray-600 mb-4">Tap, snap, go!</p>
       </div>
       
