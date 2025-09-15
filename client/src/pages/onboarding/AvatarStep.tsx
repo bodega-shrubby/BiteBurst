@@ -55,7 +55,7 @@ export default function AvatarStep() {
   };
 
   return (
-    <OnboardingLayout step={4} totalSteps={7}>
+    <OnboardingLayout step={5} totalSteps={9}>
       <div className="space-y-8">
         
         {/* Title */}

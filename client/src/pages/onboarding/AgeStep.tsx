@@ -25,7 +25,7 @@ export default function AgeStep() {
   };
 
   return (
-    <OnboardingLayout step={2} totalSteps={7}>
+    <OnboardingLayout step={3} totalSteps={9}>
       <div className="space-y-8">
         
         {/* Title */}

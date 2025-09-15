@@ -59,7 +59,7 @@ export default function ReviewStep() {
   };
 
   return (
-    <OnboardingLayout step={8} totalSteps={8} canGoBack={!isCreating}>
+    <OnboardingLayout step={9} totalSteps={9} canGoBack={!isCreating}>
       <div className="space-y-8">
         
         {/* Title */}

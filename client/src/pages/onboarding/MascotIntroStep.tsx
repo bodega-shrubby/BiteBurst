@@ -11,7 +11,7 @@ export default function MascotIntroStep() {
   };
 
   return (
-    <OnboardingLayout step={1} totalSteps={8}>
+    <OnboardingLayout step={1} totalSteps={9}>
       <div className="text-center space-y-8">
         
         {/* Speech Bubble */}

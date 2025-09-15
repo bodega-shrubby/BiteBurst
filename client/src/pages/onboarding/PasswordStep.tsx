@@ -48,7 +48,7 @@ export default function PasswordStep() {
   };
 
   return (
-    <OnboardingLayout step={6} totalSteps={8}>
+    <OnboardingLayout step={7} totalSteps={9}>
       <div className="space-y-8">
         
         {/* Title */}

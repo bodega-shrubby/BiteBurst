@@ -40,7 +40,7 @@ export default function GoalStep() {
   };
 
   return (
-    <OnboardingLayout step={3} totalSteps={7}>
+    <OnboardingLayout step={4} totalSteps={9}>
       <div className="space-y-8">
         
         {/* Title */}

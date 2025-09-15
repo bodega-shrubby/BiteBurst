@@ -46,7 +46,7 @@ export default function NameStep() {
   };
 
   return (
-    <OnboardingLayout step={1} totalSteps={7}>
+    <OnboardingLayout step={2} totalSteps={9}>
       <div className="space-y-8">
         
         {/* Title */}

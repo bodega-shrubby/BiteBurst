@@ -41,7 +41,7 @@ export default function EmailStep() {
   };
 
   return (
-    <OnboardingLayout step={5} totalSteps={7}>
+    <OnboardingLayout step={6} totalSteps={9}>
       <div className="space-y-8">
         
         {/* Title */}

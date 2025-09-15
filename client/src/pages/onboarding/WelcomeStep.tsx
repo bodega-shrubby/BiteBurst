@@ -17,7 +17,7 @@ export default function WelcomeStep() {
   };
 
   return (
-    <OnboardingLayout step={0} totalSteps={7} canGoBack={false}>
+    <OnboardingLayout step={0} totalSteps={9} canGoBack={false}>
       <div className="text-center space-y-8">
         
         {/* Logo and Mascot */}
