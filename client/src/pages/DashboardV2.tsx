@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import { Bell, Settings } from "lucide-react";
 
 // Dashboard V2 Components
@@ -12,6 +13,7 @@ import TodaysJourney from "@/components/dashboard/TodaysJourney";
 import BadgesShelf from "@/components/dashboard/BadgesShelf";
 import RecentLogsList from "@/components/dashboard/RecentLogsList";
 import BottomNavigation from "@/components/BottomNavigation";
+import { CharacterAvatar } from "@/components/dashboard/CharacterAvatar";
 
 interface DailySummaryV2 {
   xp_today: number;
@@ -99,8 +101,12 @@ function BadgeToast({ badge, isVisible, onClose }: BadgeToastProps) {
   );
 }
 
+// Consistent header styling
+const SECTION_HEADER = "text-2xl font-bold text-gray-900";
+
 export default function DashboardV2() {
   const { user, loading: authLoading } = useAuth();
+  const [location, setLocation] = useLocation();
   const [mascotState, setMascotState] = useState<'idle' | 'goalReached' | 'badgeUnlocked'>('idle');
   const [showConfetti, setShowConfetti] = useState(false);
   const [badgeToast, setBadgeToast] = useState<{ badge: { code: string; name: string }; visible: boolean } | null>(null);
@@ -200,7 +206,7 @@ export default function DashboardV2() {
   }
 
   if (!user) {
-    window.location.href = '/login';
+    setLocation('/login');
     return <div>Redirecting to login...</div>;
   }
 
@@ -229,63 +235,46 @@ export default function DashboardV2() {
   return (
     <div className="min-h-screen bg-white">
       {/* Profile Header */}
-      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-8">
+      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-12 relative">
         <div className="max-w-md mx-auto">
-          <div className="flex items-start justify-between mb-4">
-            {/* Profile Avatar */}
-            <div className="flex flex-col items-center space-y-3">
-              <div className="w-20 h-20 bg-gradient-to-b from-orange-300 to-orange-400 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full flex items-center justify-center relative">
-                  {/* Mock avatar face with glasses like Duolingo example */}
-                  <div className="w-14 h-14 bg-gradient-to-b from-orange-200 to-orange-300 rounded-full flex items-center justify-center">
-                    <div className="relative">
-                      {/* Eyes with glasses */}
-                      <div className="flex items-center space-x-2 mb-1">
-                        <div className="w-3 h-3 bg-white rounded-full border border-gray-400"></div>
-                        <div className="w-3 h-3 bg-white rounded-full border border-gray-400"></div>
-                      </div>
-                      {/* Nose */}
-                      <div className="w-1 h-1 bg-orange-400 rounded-full mx-auto mb-1"></div>
-                      {/* Mouth */}
-                      <div className="w-4 h-1 bg-orange-500 rounded-full mx-auto"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <h1 className="text-xl font-bold text-white text-center">
-                {dailySummary.user.display_name}
-              </h1>
-              <p className="text-purple-100 text-sm">@{dailySummary.user.display_name.toLowerCase()}</p>
-            </div>
-            
+          <div className="flex justify-end mb-8">
             {/* Settings Icon */}
-            <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors">
+            <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors" data-testid="button-settings">
               <Settings className="w-6 h-6 text-white" />
             </button>
           </div>
           
-          {/* Stats Row */}
-          <div className="flex items-center space-x-8 text-white">
-            <div className="text-center">
-              <div className="flex items-center space-x-1">
-                <div className="w-4 h-4 bg-blue-500 rounded-sm"></div>
-                <span className="text-sm font-medium">3</span>
-              </div>
-              <div className="text-xs text-purple-100">Courses</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm font-medium">11</div>
-              <div className="text-xs text-purple-100">Following</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm font-medium">9</div>
-              <div className="text-xs text-purple-100">Followers</div>
-            </div>
+          {/* Large Centered Character Avatar */}
+          <div className="flex justify-center">
+            <CharacterAvatar size="lg" />
           </div>
         </div>
       </header>
+
+      {/* Dark Profile Card */}
+      <div className="max-w-md mx-auto px-4 -mt-14 relative z-10">
+        <div className="bg-neutral-900 rounded-2xl px-5 py-4 text-white shadow-xl" data-testid="profile-card">
+          <h1 className="text-2xl font-bold text-center mb-2" data-testid="text-username">
+            {dailySummary.user.display_name}
+          </h1>
+          <p className="text-neutral-400 text-center text-sm mb-4">
+            @{dailySummary.user.display_name.toLowerCase()}
+          </p>
+          
+          {/* Stats Chips */}
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+              Level {dailySummary.user.level}
+            </div>
+            <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+              {dailySummary.streak_days} day streak
+            </div>
+            <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+              {dailySummary.xp_today} XP today
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
@@ -297,12 +286,12 @@ export default function DashboardV2() {
 
         {/* Overview Section */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
+          <h2 className={SECTION_HEADER} data-testid="header-overview">Overview</h2>
           
           <div className="grid grid-cols-2 gap-4">
             {/* Day Streak */}
             <button 
-              onClick={() => window.location.href = '/streak'}
+              onClick={() => setLocation('/streak')}
               className="bg-white border-2 border-gray-200 rounded-2xl p-4 text-left hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center space-x-2 mb-1">
@@ -345,7 +334,7 @@ export default function DashboardV2() {
 
         {/* Friend Streaks Section */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Friend Streaks</h2>
+          <h2 className={SECTION_HEADER} data-testid="header-friend-streaks">Friend Streaks</h2>
           
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-6">
             <div className="flex items-center space-x-4">
@@ -400,12 +389,12 @@ export default function DashboardV2() {
             <div className="flex items-center space-x-3">
               <span className="text-3xl">🏅</span>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Achievements</h3>
+                <h3 className={SECTION_HEADER} data-testid="header-achievements">Achievements</h3>
                 <p className="text-sm text-gray-700">Collect stickers for healthy habits</p>
               </div>
             </div>
             <button 
-              onClick={() => window.location.href = '/achievements'}
+              onClick={() => setLocation('/achievements')}
               className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-md"
             >
               View All
@@ -441,12 +430,12 @@ export default function DashboardV2() {
             <div className="flex items-center space-x-3">
               <span className="text-3xl">🏆</span>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Weekly Champions</h3>
+                <h3 className={SECTION_HEADER} data-testid="header-weekly-champions">Weekly Champions</h3>
                 <p className="text-sm text-gray-700">Compete with friends worldwide</p>
               </div>
             </div>
             <button 
-              onClick={() => window.location.href = '/leaderboard'}
+              onClick={() => setLocation('/leaderboard')}
               className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 shadow-md"
             >
               View League

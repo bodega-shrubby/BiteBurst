@@ -48,7 +48,7 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
   return (
     <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 ${className}`}>
       <div className="max-w-md mx-auto">
-        <nav className="flex items-center justify-between px-4 py-2">
+        <nav className="grid grid-cols-5 items-center px-4 py-2">
           {navItems.map((item) => {
             return (
               <button
@@ -64,6 +64,7 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
                 `}
                 aria-label={item.label}
+                data-testid={`nav-${item.id}`}
               >
                 <span 
                   className="text-xl transition-transform hover:scale-110"
