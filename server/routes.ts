@@ -280,6 +280,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user streak data
+  app.get('/api/user/:id/streak', requireAuth, async (req: any, res: any) => {
+    try {
+      const userId = req.params.id;
+      
+      // Only allow users to access their own streak data
+      if (req.user.userId !== userId) {
+        return res.status(403).json({ error: 'Cannot access other user data' });
+      }
+      
+      const streakData = await storage.getUserStreak(userId);
+      if (!streakData) {
+        // Return default streak data if none exists
+        return res.json({
+          current: 0,
+          longest: 0,
+          lastActive: null
+        });
+      }
+      
+      res.json({
+        current: streakData.current,
+        longest: streakData.longest,
+        lastActive: streakData.lastActive
+      });
+    } catch (error) {
+      console.error('Error getting streak data:', error);
+      res.status(500).json({ error: 'Failed to get streak data' });
+    }
+  });
+
   // Register routes
   registerDashboardRoutes(app, requireAuth);
   registerLogRoutes(app, requireAuth);

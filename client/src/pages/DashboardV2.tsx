@@ -228,177 +228,156 @@ export default function DashboardV2() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Enhanced Header */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-20 px-4 py-4">
-        <div className="flex items-center justify-between max-w-md mx-auto">
-          <div className="flex items-center space-x-3">
-            <MascotAvatar state={mascotState} size="medium" />
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">
-                {getCurrentGreeting()}, {dailySummary.user.display_name}
-              </h1>
-              <p className="text-sm text-gray-600">{getCurrentDate()}</p>
+      {/* Profile Header */}
+      <header className="bg-gradient-to-b from-green-400 to-green-500 px-4 py-8">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-start justify-between mb-4">
+            {/* Profile Avatar */}
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20 bg-gradient-to-b from-orange-300 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">👤</span>
+                </div>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">
+                  {dailySummary.user.display_name}
+                </h1>
+                <p className="text-green-100 text-sm">@{dailySummary.user.display_name.toLowerCase()}</p>
+              </div>
             </div>
+            
+            {/* Settings Icon */}
+            <button className="p-2 rounded-lg hover:bg-green-600 transition-colors">
+              <Settings className="w-6 h-6 text-white" />
+            </button>
           </div>
-          <div className="flex items-center space-x-3">
-            <StreakPill 
-              streakDays={dailySummary.streak_days}
-              onClick={() => {}} // Future: streak info modal
-            />
-            <Bell className="w-6 h-6 text-gray-600" />
-            <Settings className="w-6 h-6 text-gray-600" />
+          
+          {/* Stats Row */}
+          <div className="flex items-center space-x-8 text-white">
+            <div className="text-center">
+              <div className="flex items-center space-x-1">
+                <div className="w-4 h-4 bg-blue-500 rounded-sm"></div>
+                <span className="text-sm font-medium">3</span>
+              </div>
+              <div className="text-xs text-green-100">Courses</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-sm font-medium">11</div>
+              <div className="text-xs text-green-100">Following</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-sm font-medium">9</div>
+              <div className="text-xs text-green-100">Followers</div>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
-        {/* XP Progress Ring */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
-          <XPDayRing
-            xpToday={dailySummary.xp_today}
-            xpGoal={dailySummary.xp_goal}
-            lifetimeXP={dailySummary.user.lifetime_xp}
-            level={dailySummary.user.level}
-            onGoalReached={handleGoalReached}
-          />
+        {/* Invite Button */}
+        <button className="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
+          <span className="text-blue-500 text-lg">👥</span>
+          <span className="text-blue-500 font-bold">+ INVITE</span>
+        </button>
+
+        {/* Overview Section */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
           
-          {/* Best Streak Display */}
-          {dailySummary.best_streak > dailySummary.streak_days && (
-            <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-600">
-              <span>🏆</span>
-              <span>Best streak: {dailySummary.best_streak} days</span>
-            </div>
-          )}
-        </div>
-
-        {/* Goal Section */}
-        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-6">
-          <h2 className="text-xl font-bold text-[#FF6A00] mb-3">Your Goal</h2>
-          <div className="flex items-center space-x-3">
-            <span className="text-3xl">
-              {dailySummary.user.goal === 'energy' ? '⚡' : 
-               dailySummary.user.goal === 'focus' ? '🧠' : '💪'}
-            </span>
-            <div>
-              <h3 className="font-bold text-gray-900 capitalize mb-1">
-                {dailySummary.user.goal}
-              </h3>
-              <p className="text-sm text-gray-700">
-                {dailySummary.user.goal === 'energy' && "Fuel your day with balanced nutrition"}
-                {dailySummary.user.goal === 'focus' && "Sharpen your mind with brain-boosting foods"}
-                {dailySummary.user.goal === 'strength' && "Build power with protein and movement"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Log Grid */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <QuickLogGrid />
-        </div>
-
-        {/* Today's Journey */}
-        <TodaysJourney milestones={dailySummary.milestones} />
-
-        {/* Badges Shelf */}
-        <BadgesShelf
-          earnedBadges={badgeData?.earned?.map((badge: any) => ({
-            code: badge.code,
-            name: badgeCatalog?.find((b: any) => b.code === badge.code)?.name || badge.code,
-            description: badgeCatalog?.find((b: any) => b.code === badge.code)?.description || ''
-          })) || []}
-          lockedBadges={badgeCatalog?.filter((badge: any) => 
-            !badgeData?.earned?.some((earned: any) => earned.code === badge.code)
-          ) || []}
-          onBadgeUnlock={(badge) => {
-            setMascotState('badgeUnlocked');
-            setBadgeToast({ badge, visible: true });
-            setTimeout(() => setMascotState('idle'), 2000);
-          }}
-        />
-
-        {/* Achievements Feature Card */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl">🏅</span>
-              <div>
-                <h3 className="font-bold text-gray-900 text-lg">Achievements</h3>
-                <p className="text-sm text-gray-700">Collect stickers for healthy habits</p>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Day Streak */}
             <button 
-              onClick={() => window.location.href = '/achievements'}
-              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-md"
+              onClick={() => window.location.href = '/streak'}
+              className="bg-white border-2 border-gray-200 rounded-2xl p-4 text-left hover:bg-gray-50 transition-colors"
             >
-              View All
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-2xl">🔥</span>
+                <span className="text-2xl font-bold text-orange-500">{dailySummary.streak_days}</span>
+              </div>
+              <div className="text-sm text-gray-600 font-medium">Day streak</div>
             </button>
-          </div>
-          
-          <div className="bg-white/60 rounded-xl p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Badges earned:</span>
-              <span className="font-bold text-gray-900">
-                {badgeData?.earned?.length || 0} / {badgeCatalog?.length || 12}
-              </span>
+            
+            {/* Total XP */}
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-2xl">⚡</span>
+                <span className="text-2xl font-bold text-orange-500">{dailySummary.user.lifetime_xp}</span>
+              </div>
+              <div className="text-sm text-gray-600 font-medium">Total XP</div>
             </div>
             
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-              <div 
-                className="bg-gradient-to-r from-orange-400 to-red-400 h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${badgeCatalog?.length ? ((badgeData?.earned?.length || 0) / badgeCatalog.length) * 100 : 0}%` 
-                }}
-              />
+            {/* League */}
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-2xl">🥉</span>
+                <span className="text-lg font-bold text-orange-600">Bronze</span>
+              </div>
+              <div className="text-sm text-gray-600 font-medium">League</div>
             </div>
             
-            <div className="text-center pt-2 text-xs text-gray-600">
-              🎯 Keep logging to unlock more stickers!
+            {/* Lesson Score */}
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-2xl">🎯</span>
+                <span className="text-2xl font-bold text-orange-500">
+                  {Math.round((dailySummary.xp_today / dailySummary.xp_goal) * 100)}
+                </span>
+              </div>
+              <div className="text-sm text-gray-600 font-medium">Health Score</div>
             </div>
           </div>
         </div>
 
-        {/* Leaderboard Feature Card */}
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl">🏆</span>
-              <div>
-                <h3 className="font-bold text-gray-900 text-lg">Weekly Champions</h3>
-                <p className="text-sm text-gray-700">Compete with friends worldwide</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => window.location.href = '/leaderboard'}
-              className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 shadow-md"
-            >
-              View League
-            </button>
-          </div>
+        {/* Friend Streaks Section */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900">Friend Streaks</h2>
           
-          <div className="bg-white/60 rounded-xl p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Your league:</span>
-              <div className="flex items-center space-x-1">
-                <span>🥉</span>
-                <span className="font-semibold text-orange-700">Bronze League</span>
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-6">
+            <div className="flex items-center space-x-4">
+              {/* Active Friend */}
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-b from-purple-400 to-purple-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg">👩</span>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">This week's XP:</span>
-              <span className="font-bold text-gray-900">{dailySummary.xp_today} XP</span>
-            </div>
-            
-            <div className="text-center pt-2 text-xs text-gray-600">
-              🎯 Top 10 advance to Silver League
+              
+              {/* Empty Friend Slots */}
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-12 h-12 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center">
+                  <span className="text-gray-400 text-2xl">+</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Recent Logs */}
-        <RecentLogsList logs={dailySummary.recent_logs} />
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4">
+          <button 
+            onClick={() => window.location.href = '/food-log'}
+            className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6 text-left hover:bg-orange-100 transition-colors"
+          >
+            <div className="text-3xl mb-2">🍎</div>
+            <h3 className="font-bold text-gray-900 mb-1">Log Food</h3>
+            <p className="text-sm text-gray-600">Track your meals</p>
+          </button>
+          
+          <button 
+            onClick={() => window.location.href = '/lessons'}
+            className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-blue-200 rounded-2xl p-6 text-left hover:bg-blue-100 transition-colors"
+          >
+            <div className="text-3xl mb-2">🗺️</div>
+            <h3 className="font-bold text-gray-900 mb-1">Learn</h3>
+            <p className="text-sm text-gray-600">Practice lessons</p>
+          </button>
+        </div>
       </main>
 
       {/* Bottom Navigation */}
