@@ -229,26 +229,37 @@ export default function DashboardV2() {
   return (
     <div className="min-h-screen bg-white">
       {/* Profile Header */}
-      <header className="bg-gradient-to-b from-green-400 to-green-500 px-4 py-8">
+      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-8">
         <div className="max-w-md mx-auto">
           <div className="flex items-start justify-between mb-4">
             {/* Profile Avatar */}
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-gradient-to-b from-orange-300 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
-                <div className="w-16 h-16 bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">👤</span>
+            <div className="flex flex-col items-center space-y-3">
+              <div className="w-20 h-20 bg-gradient-to-b from-orange-300 to-orange-400 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+                <div className="w-full h-full bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full flex items-center justify-center relative">
+                  {/* Mock avatar face with glasses like Duolingo example */}
+                  <div className="w-14 h-14 bg-gradient-to-b from-orange-200 to-orange-300 rounded-full flex items-center justify-center">
+                    <div className="relative">
+                      {/* Eyes with glasses */}
+                      <div className="flex items-center space-x-2 mb-1">
+                        <div className="w-3 h-3 bg-white rounded-full border border-gray-400"></div>
+                        <div className="w-3 h-3 bg-white rounded-full border border-gray-400"></div>
+                      </div>
+                      {/* Nose */}
+                      <div className="w-1 h-1 bg-orange-400 rounded-full mx-auto mb-1"></div>
+                      {/* Mouth */}
+                      <div className="w-4 h-1 bg-orange-500 rounded-full mx-auto"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">
-                  {dailySummary.user.display_name}
-                </h1>
-                <p className="text-green-100 text-sm">@{dailySummary.user.display_name.toLowerCase()}</p>
-              </div>
+              <h1 className="text-xl font-bold text-white text-center">
+                {dailySummary.user.display_name}
+              </h1>
+              <p className="text-purple-100 text-sm">@{dailySummary.user.display_name.toLowerCase()}</p>
             </div>
             
             {/* Settings Icon */}
-            <button className="p-2 rounded-lg hover:bg-green-600 transition-colors">
+            <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors">
               <Settings className="w-6 h-6 text-white" />
             </button>
           </div>
@@ -260,17 +271,17 @@ export default function DashboardV2() {
                 <div className="w-4 h-4 bg-blue-500 rounded-sm"></div>
                 <span className="text-sm font-medium">3</span>
               </div>
-              <div className="text-xs text-green-100">Courses</div>
+              <div className="text-xs text-purple-100">Courses</div>
             </div>
             
             <div className="text-center">
               <div className="text-sm font-medium">11</div>
-              <div className="text-xs text-green-100">Following</div>
+              <div className="text-xs text-purple-100">Following</div>
             </div>
             
             <div className="text-center">
               <div className="text-sm font-medium">9</div>
-              <div className="text-xs text-green-100">Followers</div>
+              <div className="text-xs text-purple-100">Followers</div>
             </div>
           </div>
         </div>
@@ -358,26 +369,112 @@ export default function DashboardV2() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
-          <button 
-            onClick={() => window.location.href = '/food-log'}
-            className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6 text-left hover:bg-orange-100 transition-colors"
-          >
-            <div className="text-3xl mb-2">🍎</div>
-            <h3 className="font-bold text-gray-900 mb-1">Log Food</h3>
-            <p className="text-sm text-gray-600">Track your meals</p>
-          </button>
-          
-          <button 
-            onClick={() => window.location.href = '/lessons'}
-            className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-blue-200 rounded-2xl p-6 text-left hover:bg-blue-100 transition-colors"
-          >
-            <div className="text-3xl mb-2">🗺️</div>
-            <h3 className="font-bold text-gray-900 mb-1">Learn</h3>
-            <p className="text-sm text-gray-600">Practice lessons</p>
-          </button>
+        {/* Quick Log Grid */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <QuickLogGrid />
         </div>
+
+        {/* Today's Journey */}
+        <TodaysJourney milestones={dailySummary.milestones} />
+
+        {/* Badges Shelf */}
+        <BadgesShelf
+          earnedBadges={badgeData?.earned?.map((badge: any) => ({
+            code: badge.code,
+            name: badgeCatalog?.find((b: any) => b.code === badge.code)?.name || badge.code,
+            description: badgeCatalog?.find((b: any) => b.code === badge.code)?.description || ''
+          })) || []}
+          lockedBadges={badgeCatalog?.filter((badge: any) => 
+            !badgeData?.earned?.some((earned: any) => earned.code === badge.code)
+          ) || []}
+          onBadgeUnlock={(badge) => {
+            setMascotState('badgeUnlocked');
+            setBadgeToast({ badge, visible: true });
+            setTimeout(() => setMascotState('idle'), 2000);
+          }}
+        />
+
+        {/* Achievements Feature Card */}
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <span className="text-3xl">🏅</span>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Achievements</h3>
+                <p className="text-sm text-gray-700">Collect stickers for healthy habits</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => window.location.href = '/achievements'}
+              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-md"
+            >
+              View All
+            </button>
+          </div>
+          
+          <div className="bg-white/60 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Badges earned:</span>
+              <span className="font-bold text-gray-900">
+                {badgeData?.earned?.length || 0} / {badgeCatalog?.length || 12}
+              </span>
+            </div>
+            
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div 
+                className="bg-gradient-to-r from-orange-400 to-red-400 h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${badgeCatalog?.length ? ((badgeData?.earned?.length || 0) / badgeCatalog.length) * 100 : 0}%` 
+                }}
+              />
+            </div>
+            
+            <div className="text-center pt-2 text-xs text-gray-600">
+              🎯 Keep logging to unlock more stickers!
+            </div>
+          </div>
+        </div>
+
+        {/* Leaderboard Feature Card */}
+        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <span className="text-3xl">🏆</span>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Weekly Champions</h3>
+                <p className="text-sm text-gray-700">Compete with friends worldwide</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => window.location.href = '/leaderboard'}
+              className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 shadow-md"
+            >
+              View League
+            </button>
+          </div>
+          
+          <div className="bg-white/60 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Your league:</span>
+              <div className="flex items-center space-x-1">
+                <span>🥉</span>
+                <span className="font-semibold text-orange-700">Bronze League</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">This week's XP:</span>
+              <span className="font-bold text-gray-900">{dailySummary.xp_today} XP</span>
+            </div>
+            
+            <div className="text-center pt-2 text-xs text-gray-600">
+              🎯 Top 10 advance to Silver League
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Logs */}
+        <RecentLogsList logs={dailySummary.recent_logs} />
       </main>
 
       {/* Bottom Navigation */}

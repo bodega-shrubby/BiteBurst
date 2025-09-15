@@ -171,7 +171,7 @@ export default function Streak() {
         <div className="px-4 pt-4">
           <button
             onClick={() => window.location.href = '/food-log'}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl transition-colors shadow-lg text-lg"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl transition-colors shadow-lg text-lg"
             data-testid="button-log-now"
           >
             LOG NOW
