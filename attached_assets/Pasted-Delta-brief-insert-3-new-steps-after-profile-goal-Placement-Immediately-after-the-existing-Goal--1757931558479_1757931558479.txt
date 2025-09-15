@@ -1,0 +1,31 @@
+Delta brief — insert 3 new steps after /profile/goal
+Placement: Immediately after the existing Goal selection step (/profile/goal).
+Steps to add (each on its own screen):
+/profile/preferences/fruits
+/profile/preferences/veggies
+/profile/preferences/foods
+If you use a stepper, extend the total step count accordingly; if you show “Step X of Y,” update Y.
+UX copy + options (render with emojis, store text only)
+1) Favourite Fruits — /profile/preferences/fruits
+Prompt: “Which fruits do you love the most?”
+Options (multi-select):
+["🍎 Apple","🍌 Banana","🍇 Grapes","🍊 Orange","🍓 Strawberry","🥭 Mango","🍍 Pineapple","🍑 Peach","🍐 Pear","🍉 Watermelon","🫐 Blueberries","🍒 Cherries","🍋 Lemon","🍈 Melon","🍏 Green Apple","🥝 Kiwi"]
+2) Favourite Veggies — /profile/preferences/veggies
+Prompt: “Which veggies do you like?”
+Options (multi-select):
+["🥦 Broccoli","🥕 Carrot","🥒 Cucumber","🍅 Tomato","🌽 Corn","🥬 Lettuce","🧅 Onion","🥔 Potato","🫑 Bell Pepper","🥬 Spinach","🫛 Peas","🥦 Cauliflower","🍆 Aubergine"]
+3) Favourite Foods — /profile/preferences/foods
+Prompt: “What foods do you enjoy eating?”
+Options (multi-select, healthy + global + familiar):
+["🥗 Salad","🍲 Soup","🍛 Rice + Curry","🥘 Biryani","🌮 Tacos","🌯 Burrito","🍣 Sushi","🍜 Noodles","🥟 Dumplings","🥙 Wraps","🥩 Grilled Meat/Fish","🥪 Sandwich","🍝 Pasta","🍕 Pizza","🍔 Burger","🍟 Fries","🥞 Pancakes","🍳 Eggs","🥖 Bread/Rolls","🍦 Ice Cream","🍫 Chocolate","🍩 Donuts"]
+Save rule: Strip the emoji and persist only the text label (e.g., "🍎 Apple" → "Apple").
+UI/interaction requirements (match your current style)
+One screen per question (no grouping).
+Multi-select grid cards/chips; tap toggles; selected state shows ✅ and orange border.
+Validation: require ≥1 selection per screen unless your current pattern says otherwise.
+Navigation: Keep your existing Back/Next/Continue pattern. On final screen, use your standard “Save & Continue.”
+Data model (append to profile; backward compatible)
+Add fields to the user profile (arrays of strings):
+favorite_fruits: string[]
+favorite_veggies: string[]
+favorite_foods: string[]
