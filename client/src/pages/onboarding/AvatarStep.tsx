@@ -56,64 +56,67 @@ export default function AvatarStep() {
 
   return (
     <OnboardingLayout step={5} totalSteps={9}>
-      <div className="space-y-8">
+      <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
-        {/* Title */}
-        <h1 
-          className="font-extrabold text-3xl leading-tight"
-          style={{ color: 'var(--bb-text, #000000)' }}
-        >
-          Choose your avatar
-        </h1>
+        {/* Main Content */}
+        <div className="flex-1 space-y-8">
+          {/* Title */}
+          <h1 
+            className="font-extrabold text-3xl leading-tight"
+            style={{ color: 'var(--bb-text, #000000)' }}
+          >
+            Choose your avatar
+          </h1>
 
-        {/* Avatar Grid */}
-        <div className="grid grid-cols-3 gap-4">
-          {AVATAR_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => handleAvatarSelect(option.value)}
-              className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-200 hover:scale-[0.95] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
-                selectedAvatar === option.value
-                  ? 'bg-orange-50'
-                  : 'bg-gray-50 hover:bg-gray-100'
-              }`}
-              style={{ minHeight: '100px' }}
-            >
-              <div 
-                className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all duration-200 ${
+          {/* Avatar Grid */}
+          <div className="grid grid-cols-3 gap-4">
+            {AVATAR_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleAvatarSelect(option.value)}
+                className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-200 hover:scale-[0.95] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
                   selectedAvatar === option.value
-                    ? 'border-orange-500'
-                    : 'border-gray-200'
+                    ? 'bg-orange-50'
+                    : 'bg-gray-50 hover:bg-gray-100'
                 }`}
-                style={{
-                  borderColor: selectedAvatar === option.value ? 'var(--bb-header, #FF6A00)' : '#E5E7EB',
-                  borderWidth: selectedAvatar === option.value ? '3px' : '2px'
-                }}
+                style={{ minHeight: '100px' }}
               >
-                <img 
-                  src={option.image} 
-                  alt={option.label}
-                  className="w-full h-full object-cover"
-                />
-                {selectedAvatar === option.value && (
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-              <span className={`text-xs text-center font-medium ${
-                selectedAvatar === option.value ? 'text-orange-600' : 'text-gray-600'
-              }`}>
-                {option.label}
-              </span>
-            </button>
-          ))}
+                <div 
+                  className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all duration-200 ${
+                    selectedAvatar === option.value
+                      ? 'border-orange-500'
+                      : 'border-gray-200'
+                  }`}
+                  style={{
+                    borderColor: selectedAvatar === option.value ? 'var(--bb-header, #FF6A00)' : '#E5E7EB',
+                    borderWidth: selectedAvatar === option.value ? '3px' : '2px'
+                  }}
+                >
+                  <img 
+                    src={option.image} 
+                    alt={option.label}
+                    className="w-full h-full object-cover"
+                  />
+                  {selectedAvatar === option.value && (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <span className={`text-xs text-center font-medium ${
+                  selectedAvatar === option.value ? 'text-orange-600' : 'text-gray-600'
+                }`}>
+                  {option.label}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Next Button */}
-        <div className="pt-4 flex justify-center">
+        {/* Next Button - Fixed at Bottom */}
+        <div className="mt-auto pb-6 flex justify-center">
           <Button
             onClick={handleNext}
             disabled={!selectedAvatar}

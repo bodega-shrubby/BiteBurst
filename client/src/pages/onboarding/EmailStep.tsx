@@ -42,59 +42,62 @@ export default function EmailStep() {
 
   return (
     <OnboardingLayout step={6} totalSteps={9}>
-      <div className="space-y-8">
+      <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
-        {/* Title */}
-        <h1 
-          className="font-extrabold text-3xl leading-tight"
-          style={{ color: 'var(--bb-text, #000000)' }}
-        >
-          What's your email?
-        </h1>
+        {/* Main Content */}
+        <div className="flex-1 space-y-8">
+          {/* Title */}
+          <h1 
+            className="font-extrabold text-3xl leading-tight"
+            style={{ color: 'var(--bb-text, #000000)' }}
+          >
+            What's your email?
+          </h1>
 
-        {/* Description */}
-        <p className="text-lg text-gray-600 leading-relaxed">
-          We'll send you updates about your progress and new features.
-        </p>
+          {/* Description */}
+          <p className="text-lg text-gray-600 leading-relaxed">
+            We'll send you updates about your progress and new features.
+          </p>
 
-        {/* Email Input */}
-        <div className="space-y-2">
-          <div className="relative">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="your@email.com"
-              className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors duration-200"
-              style={{ height: '56px' }}
-              aria-describedby={error ? "email-error" : undefined}
-            />
-            {isValid && (
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+          {/* Email Input */}
+          <div className="space-y-2">
+            <div className="relative">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="your@email.com"
+                className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors duration-200"
+                style={{ height: '56px' }}
+                aria-describedby={error ? "email-error" : undefined}
+              />
+              {isValid && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              )}
+            </div>
+            
+            {error && (
+              <p 
+                id="email-error"
+                className="text-red-500 text-sm"
+                role="alert"
+                aria-live="polite"
+              >
+                {error}
+              </p>
             )}
           </div>
-          
-          {error && (
-            <p 
-              id="email-error"
-              className="text-red-500 text-sm"
-              role="alert"
-              aria-live="polite"
-            >
-              {error}
-            </p>
-          )}
         </div>
 
-        {/* Next Button */}
-        <div className="pt-8 flex justify-center">
+        {/* Next Button - Fixed at Bottom */}
+        <div className="mt-auto pb-6 flex justify-center">
           <Button
             onClick={handleNext}
             disabled={!isValid}

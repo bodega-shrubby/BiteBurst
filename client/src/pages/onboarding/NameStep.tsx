@@ -47,56 +47,59 @@ export default function NameStep() {
 
   return (
     <OnboardingLayout step={2} totalSteps={9}>
-      <div className="space-y-8">
+      <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
-        {/* Title */}
-        <h1 
-          className="font-extrabold text-3xl leading-tight"
-          style={{ color: 'var(--bb-text, #000000)' }}
-        >
-          What's your name?
-        </h1>
+        {/* Main Content */}
+        <div className="flex-1 space-y-8">
+          {/* Title */}
+          <h1 
+            className="font-extrabold text-3xl leading-tight"
+            style={{ color: 'var(--bb-text, #000000)' }}
+          >
+            What's your name?
+          </h1>
 
-        {/* Name Input */}
-        <div className="space-y-2">
-          <div className="relative">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Enter your name"
-              className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors duration-200"
-              style={{ height: '56px' }}
-              maxLength={20}
-              autoFocus
-              aria-describedby={error ? "name-error" : undefined}
-            />
-            {isValid && (
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+          {/* Name Input */}
+          <div className="space-y-2">
+            <div className="relative">
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter your name"
+                className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors duration-200"
+                style={{ height: '56px' }}
+                maxLength={20}
+                autoFocus
+                aria-describedby={error ? "name-error" : undefined}
+              />
+              {isValid && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              )}
+            </div>
+            
+            {error && (
+              <p 
+                id="name-error"
+                className="text-red-500 text-sm"
+                role="alert"
+                aria-live="polite"
+              >
+                {error}
+              </p>
             )}
           </div>
-          
-          {error && (
-            <p 
-              id="name-error"
-              className="text-red-500 text-sm"
-              role="alert"
-              aria-live="polite"
-            >
-              {error}
-            </p>
-          )}
         </div>
 
-        {/* Next Button */}
-        <div className="pt-8">
+        {/* Next Button - Fixed at Bottom */}
+        <div className="mt-auto pb-6">
           <Button
             onClick={handleNext}
             disabled={!isValid}
