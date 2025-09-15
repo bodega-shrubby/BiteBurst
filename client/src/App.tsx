@@ -27,6 +27,9 @@ import MascotIntroStep from "@/pages/onboarding/MascotIntroStep";
 import NameStep from "@/pages/onboarding/NameStep";
 import AgeStep from "@/pages/onboarding/AgeStep";
 import GoalStep from "@/pages/onboarding/GoalStep";
+import FruitsStep from "@/pages/onboarding/FruitsStep";
+import VeggiesStep from "@/pages/onboarding/VeggiesStep";
+import FoodsStep from "@/pages/onboarding/FoodsStep";
 import AvatarStep from "@/pages/onboarding/AvatarStep";
 import EmailStep from "@/pages/onboarding/EmailStep";
 import PasswordStep from "@/pages/onboarding/PasswordStep";
@@ -79,6 +82,24 @@ function Router() {
       <Route path="/profile/goal">
         <OnboardingProvider>
           <GoalStep />
+        </OnboardingProvider>
+      </Route>
+      
+      <Route path="/profile/preferences/fruits">
+        <OnboardingProvider>
+          <FruitsStep />
+        </OnboardingProvider>
+      </Route>
+      
+      <Route path="/profile/preferences/veggies">
+        <OnboardingProvider>
+          <VeggiesStep />
+        </OnboardingProvider>
+      </Route>
+      
+      <Route path="/profile/preferences/foods">
+        <OnboardingProvider>
+          <FoodsStep />
         </OnboardingProvider>
       </Route>
       
