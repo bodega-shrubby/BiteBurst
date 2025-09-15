@@ -11,6 +11,7 @@ interface OnboardingLayoutProps {
 
 const STEPS = [
   { path: "/start", name: "Welcome" },
+  { path: "/profile/intro", name: "Intro" },
   { path: "/profile/name", name: "Name" },
   { path: "/profile/age", name: "Age" },
   { path: "/profile/goal", name: "Goal" },
