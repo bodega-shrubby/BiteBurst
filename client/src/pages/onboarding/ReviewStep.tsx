@@ -29,16 +29,19 @@ export default function ReviewStep() {
       // Capture user's timezone
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       
-      return await apiRequest("POST", "/api/profile/create", {
-        username: profile.displayName,
-        email: profile.email,
-        password: profile.password,
-        name: profile.displayName,
-        ageBracket: profile.ageBracket,
-        goal: profile.goal,
-        avatar: profile.avatar,
-        timezone,
-        onboardingCompleted: true
+      return await apiRequest("/api/profile/create", {
+        method: "POST",
+        body: {
+          username: profile.displayName,
+          email: profile.email,
+          password: profile.password,
+          name: profile.displayName,
+          ageBracket: profile.ageBracket,
+          goal: profile.goal,
+          avatar: profile.avatar,
+          timezone,
+          onboardingCompleted: true
+        }
       });
     },
     onSuccess: () => {
