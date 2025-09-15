@@ -48,15 +48,15 @@ export default function BottomNavigation({ className = '' }: BottomNavigationPro
   return (
     <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 ${className}`}>
       <div className="max-w-md mx-auto">
-        <nav className="grid grid-cols-5 items-center px-4 py-2">
+        <nav className="grid grid-cols-5 gap-2 px-4 py-2">
           {navItems.map((item) => {
             return (
               <button
                 key={item.id}
                 onClick={() => setLocation(item.path)}
                 className={`
-                  flex flex-col items-center space-y-1 py-2 px-2 rounded-lg
-                  transition-all duration-200 min-h-[44px] min-w-[44px]
+                  flex flex-col items-center justify-center space-y-1 py-2 px-1 rounded-lg
+                  transition-all duration-200 min-h-[44px] w-full
                   ${item.isActive 
                     ? 'bg-orange-50' 
                     : 'hover:bg-orange-50'

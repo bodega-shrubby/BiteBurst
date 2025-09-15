@@ -16,7 +16,7 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
   if (logs.length === 0) {
     return (
       <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
-        <h2 className="text-xl font-bold text-[#FF6A00] mb-4">Today's Activity</h2>
+        <h2 className="text-xs font-bold text-black mb-4">Today's Activity</h2>
         <div className="text-center py-8 space-y-3">
           <div className="text-4xl">📝</div>
           <p className="text-gray-600">
@@ -59,7 +59,7 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
   
   return (
     <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
-      <h2 className="text-xl font-bold text-[#FF6A00] mb-4">Today's Activity</h2>
+      <h2 className="text-xs font-bold text-black mb-4">Today's Activity</h2>
       
       <div className="space-y-3">
         {logs.map((log, index) => (

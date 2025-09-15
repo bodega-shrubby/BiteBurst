@@ -102,7 +102,7 @@ function BadgeToast({ badge, isVisible, onClose }: BadgeToastProps) {
 }
 
 // Consistent header styling
-const SECTION_HEADER = "text-2xl font-bold text-gray-900";
+const SECTION_HEADER = "text-xl font-bold text-gray-900";
 
 export default function DashboardV2() {
   const { user, loading: authLoading } = useAuth();
@@ -235,9 +235,9 @@ export default function DashboardV2() {
   return (
     <div className="min-h-screen bg-white">
       {/* Profile Header */}
-      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-12 relative">
+      <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-6 relative">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-end mb-8">
+          <div className="flex justify-end mb-4">
             {/* Settings Icon */}
             <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors" data-testid="button-settings">
               <Settings className="w-6 h-6 text-white" />
@@ -245,14 +245,14 @@ export default function DashboardV2() {
           </div>
           
           {/* Large Centered Character Avatar */}
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center">
             <CharacterAvatar size="lg" />
           </div>
         </div>
       </header>
 
       {/* Dark Profile Card */}
-      <div className="max-w-md mx-auto px-4 -mt-14 relative z-10">
+      <div className="max-w-md mx-auto px-4 -mt-8 relative z-10 mb-6">
         <div className="bg-neutral-900 rounded-2xl px-5 py-4 text-white shadow-xl" data-testid="profile-card">
           <h1 className="text-2xl font-bold text-center mb-2" data-testid="text-username">
             {dailySummary.user.display_name}

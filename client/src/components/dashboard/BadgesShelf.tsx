@@ -123,7 +123,7 @@ export default function BadgesShelf({
   
   return (
     <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
-      <h2 className="text-xl font-bold text-[#FF6A00] mb-4">Badges & Rewards</h2>
+      <h2 className="text-xs font-bold text-black mb-4">Badges & Rewards</h2>
       
       {!hasAnyBadges ? (
         <div className="text-center py-8 space-y-3">
