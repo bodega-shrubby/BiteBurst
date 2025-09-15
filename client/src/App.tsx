@@ -23,6 +23,7 @@ import { useAuth } from "@/hooks/useAuth";
 // Onboarding components
 import { OnboardingProvider } from "@/pages/onboarding/OnboardingContext";
 import WelcomeStep from "@/pages/onboarding/WelcomeStep";
+import MascotIntroStep from "@/pages/onboarding/MascotIntroStep";
 import NameStep from "@/pages/onboarding/NameStep";
 import AgeStep from "@/pages/onboarding/AgeStep";
 import GoalStep from "@/pages/onboarding/GoalStep";
@@ -54,6 +55,12 @@ function Router() {
       <Route path="/start">
         <OnboardingProvider>
           <WelcomeStep />
+        </OnboardingProvider>
+      </Route>
+      
+      <Route path="/profile/intro">
+        <OnboardingProvider>
+          <MascotIntroStep />
         </OnboardingProvider>
       </Route>
       
