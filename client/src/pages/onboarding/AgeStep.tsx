@@ -25,7 +25,7 @@ export default function AgeStep() {
   };
 
   return (
-    <OnboardingLayout step={3} totalSteps={12}>
+    <OnboardingLayout step={3} totalSteps={13}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

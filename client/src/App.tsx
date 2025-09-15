@@ -30,6 +30,7 @@ import GoalStep from "@/pages/onboarding/GoalStep";
 import FruitsStep from "@/pages/onboarding/FruitsStep";
 import VeggiesStep from "@/pages/onboarding/VeggiesStep";
 import FoodsStep from "@/pages/onboarding/FoodsStep";
+import SportsStep from "@/pages/onboarding/SportsStep";
 import AvatarStep from "@/pages/onboarding/AvatarStep";
 import EmailStep from "@/pages/onboarding/EmailStep";
 import PasswordStep from "@/pages/onboarding/PasswordStep";
@@ -100,6 +101,12 @@ function Router() {
       <Route path="/profile/preferences/foods">
         <OnboardingProvider>
           <FoodsStep />
+        </OnboardingProvider>
+      </Route>
+      
+      <Route path="/profile/preferences/sports">
+        <OnboardingProvider>
+          <SportsStep />
         </OnboardingProvider>
       </Route>
       

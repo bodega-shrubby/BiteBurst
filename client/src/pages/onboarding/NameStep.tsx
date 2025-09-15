@@ -46,7 +46,7 @@ export default function NameStep() {
   };
 
   return (
-    <OnboardingLayout step={2} totalSteps={12}>
+    <OnboardingLayout step={2} totalSteps={13}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

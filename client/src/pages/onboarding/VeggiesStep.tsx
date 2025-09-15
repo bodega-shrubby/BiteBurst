@@ -45,7 +45,7 @@ export default function VeggiesStep() {
   };
 
   return (
-    <OnboardingLayout step={6} totalSteps={12}>
+    <OnboardingLayout step={6} totalSteps={13}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

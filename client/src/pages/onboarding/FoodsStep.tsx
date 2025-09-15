@@ -36,7 +36,7 @@ export default function FoodsStep() {
   const handleNext = () => {
     if (selectedFoods.length > 0) {
       updateProfile({ favorite_foods: selectedFoods });
-      setLocation("/profile/avatar");
+      setLocation("/profile/preferences/sports");
     }
   };
 
@@ -46,7 +46,7 @@ export default function FoodsStep() {
   };
 
   return (
-    <OnboardingLayout step={7} totalSteps={12}>
+    <OnboardingLayout step={7} totalSteps={13}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

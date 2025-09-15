@@ -41,7 +41,7 @@ export default function EmailStep() {
   };
 
   return (
-    <OnboardingLayout step={9} totalSteps={12}>
+    <OnboardingLayout step={10} totalSteps={13}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

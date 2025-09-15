@@ -18,6 +18,7 @@ const STEPS = [
   { path: "/profile/preferences/fruits", name: "Fruits" },
   { path: "/profile/preferences/veggies", name: "Veggies" },
   { path: "/profile/preferences/foods", name: "Foods" },
+  { path: "/profile/preferences/sports", name: "Sports" },
   { path: "/profile/avatar", name: "Avatar" },
   { path: "/profile/email", name: "Email" },
   { path: "/profile/password", name: "Password" },
