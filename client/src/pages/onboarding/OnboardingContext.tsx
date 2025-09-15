@@ -11,6 +11,7 @@ interface OnboardingProfile {
   favorite_fruits?: string[];
   favorite_veggies?: string[];
   favorite_foods?: string[];
+  favorite_sports?: string[];
 }
 
 interface OnboardingContextType {
@@ -30,6 +31,7 @@ const defaultProfile: OnboardingProfile = {
   favorite_fruits: [],
   favorite_veggies: [],
   favorite_foods: [],
+  favorite_sports: [],
 };
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
