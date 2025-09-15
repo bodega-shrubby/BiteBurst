@@ -32,11 +32,7 @@ export default function GoalStep() {
 
   const handleGoalSelect = (goal: string) => {
     setSelectedGoal(goal);
-    // Auto-advance after brief delay to show selection
-    setTimeout(() => {
-      updateProfile({ goal });
-      setLocation("/profile/preferences/fruits");
-    }, 150);
+    updateProfile({ goal });
   };
 
   return (

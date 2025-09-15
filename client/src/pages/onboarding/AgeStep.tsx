@@ -17,11 +17,7 @@ export default function AgeStep() {
 
   const handleAgeSelect = (age: string) => {
     setSelectedAge(age);
-    // Auto-advance after brief delay to show selection
-    setTimeout(() => {
-      updateProfile({ ageBracket: age });
-      setLocation("/profile/goal");
-    }, 150);
+    updateProfile({ ageBracket: age });
   };
 
   return (
