@@ -64,7 +64,7 @@ export default function Home() {
             <Button 
               className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
               style={{ borderRadius: '13px' }}
-              onClick={() => window.location.href = '/start'}
+              onClick={() => window.location.href = '/profile/intro'}
             >
               Get Started
             </Button>
@@ -279,7 +279,7 @@ export default function Home() {
               <Button 
                 className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
                 style={{ borderRadius: '13px' }}
-                onClick={() => window.location.href = '/start'}
+                onClick={() => window.location.href = '/profile/intro'}
               >
                 Let's Go!
               </Button>
