@@ -38,8 +38,8 @@ export default function OnboardingLayout({
   const handleBack = () => {
     if (onBack) {
       onBack();
-    } else if (step > 0) {
-      const previousPath = STEPS[step - 1]?.path;
+    } else if (step > 1) {
+      const previousPath = STEPS[step - 2]?.path;
       if (previousPath) {
         setLocation(previousPath);
       }
