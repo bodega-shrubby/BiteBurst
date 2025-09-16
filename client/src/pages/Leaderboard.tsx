@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Trophy, Users, Clock, ChevronUp, ChevronDown } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
-import MascotAvatar from '@/components/dashboard/MascotAvatar';
 
 interface WeekInfo {
   start: string;
@@ -319,17 +318,11 @@ export default function Leaderboard() {
     <div className="min-h-screen bg-white">
       <LeagueHeader data={leaderboardData} />
       
-      <main className="pb-24 relative">
-        {/* Floating mascot */}
-        {leaderboardData.members.length > 0 && (
-          <div className="fixed bottom-32 right-4 z-10">
-            <MascotAvatar size="medium" state="idle" />
-          </div>
-        )}
+      <main className="pb-24">
         {leaderboardData.members.length === 0 ? (
           <div className="max-w-md mx-auto p-4">
             <div className="text-center py-16 space-y-4">
-              <MascotAvatar size="large" state="idle" />
+              <div className="text-4xl">🏆</div>
               <h2 className="text-xl font-bold text-gray-900">
                 League Loading...
               </h2>
