@@ -7,34 +7,24 @@ import mascotImage from "@assets/ChatGPT Image Jun 20, 2025 at 04_16_09 PM_17504
 
 const AVATAR_OPTIONS = [
   { 
-    value: "mascot-happy", 
+    value: "mascot-01", 
     image: mascotImage,
-    label: "Happy Orange"
+    label: "Zestie"
   },
   { 
-    value: "mascot-cool", 
+    value: "kid-01", 
     image: mascotImage, // We'll use the same image for now
-    label: "Cool Orange"
+    label: "Skater"
   },
   { 
-    value: "mascot-strong", 
+    value: "kid-02", 
     image: mascotImage,
-    label: "Strong Orange"
+    label: "Artist"
   },
   { 
-    value: "mascot-smart", 
+    value: "kid-03", 
     image: mascotImage,
-    label: "Smart Orange"
-  },
-  { 
-    value: "mascot-energetic", 
-    image: mascotImage,
-    label: "Energetic Orange"
-  },
-  { 
-    value: "mascot-friendly", 
-    image: mascotImage,
-    label: "Friendly Orange"
+    label: "Explorer"
   }
 ];
 
