@@ -8,7 +8,7 @@ export default function SuccessStrip({ message, onContinue, show }: SuccessStrip
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-48 left-0 right-0 z-30">
+    <div className="fixed bottom-48 left-0 right-0 z-30 animate-in slide-in-from-bottom duration-500">
       <div className="bg-green-500 text-white px-6 py-4 mx-4 rounded-2xl shadow-lg">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
