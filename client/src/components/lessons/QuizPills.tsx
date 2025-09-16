@@ -30,7 +30,7 @@ export default function QuizPills({
     
     if (option.isCorrect) {
       setFeedback('correct');
-      // Trigger bounce animation and callback
+      // Show correct feedback and callback
       setTimeout(() => onAnswer(option.id, true), 300);
     } else {
       setFeedback('incorrect');
@@ -79,7 +79,7 @@ export default function QuizPills({
                   : ''
                 }
                 ${showCorrect 
-                  ? 'bg-green-100 border-green-400 text-green-800 animate-bounce' 
+                  ? 'bg-green-100 border-green-400 text-green-800' 
                   : showIncorrect
                   ? 'bg-red-100 border-red-400 text-red-800 animate-shake'
                   : isSelected
