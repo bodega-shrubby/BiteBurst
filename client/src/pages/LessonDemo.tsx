@@ -287,11 +287,11 @@ export default function LessonDemo() {
       </main>
 
       {/* Mascot at bottom */}
-      <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-20">
+      <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-20">
         <img 
           src={BrainyBoltImage} 
           alt="BrainyBolt mascot" 
-          className="w-32 h-32 sm:w-36 sm:h-36 object-contain drop-shadow-lg"
+          className="w-36 h-36 sm:w-40 sm:h-40 object-contain drop-shadow-lg"
         />
       </div>
 
