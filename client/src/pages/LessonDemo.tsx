@@ -266,18 +266,18 @@ export default function LessonDemo() {
               </div>
 
               {/* Stats tiles */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-orange-100 border-2 border-orange-300 rounded-2xl p-4 text-center flex flex-col justify-center items-center h-20">
-                  <div className="text-orange-600 text-2xl font-bold">⚡ 25</div>
-                  <div className="text-orange-800 text-xs font-medium">Total XP</div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-gray-800 border-2 border-yellow-400 rounded-xl p-3 text-center">
+                  <div className="text-yellow-400 text-xs font-bold mb-2 tracking-wide">TOTAL XP</div>
+                  <div className="text-yellow-400 text-xl font-bold">⚡ 25</div>
                 </div>
-                <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-4 text-center flex flex-col justify-center items-center h-20">
-                  <div className="text-green-600 text-2xl font-bold">✓ 100%</div>
-                  <div className="text-green-800 text-xs font-medium">Good</div>
+                <div className="bg-gray-800 border-2 border-green-400 rounded-xl p-3 text-center">
+                  <div className="text-green-400 text-xs font-bold mb-2 tracking-wide">AMAZING</div>
+                  <div className="text-green-400 text-xl font-bold">✓ 100%</div>
                 </div>
-                <div className="bg-blue-100 border-2 border-blue-300 rounded-2xl p-4 text-center flex flex-col justify-center items-center h-20">
-                  <div className="text-blue-600 text-2xl font-bold">⏱ {getElapsedTime()}</div>
-                  <div className="text-blue-800 text-xs font-medium">Speedy</div>
+                <div className="bg-gray-800 border-2 border-blue-400 rounded-xl p-3 text-center">
+                  <div className="text-blue-400 text-xs font-bold mb-2 tracking-wide">SPEEDY</div>
+                  <div className="text-blue-400 text-xl font-bold">⏱ {getElapsedTime()}</div>
                 </div>
               </div>
 
