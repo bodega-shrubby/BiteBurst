@@ -336,7 +336,7 @@ export default function Leaderboard() {
             {leaderboardData.members.map((member, index) => {
               const isMe = member.user_id === leaderboardData.me?.user_id;
               const showPromotion = member.rank === leaderboardData.promotion_zone_rank + 1;
-              const showDemotion = leaderboardData.demotion_zone_rank && member.rank === leaderboardData.demotion_zone_rank;
+              const showDemotion = leaderboardData.demotion_zone_rank ? member.rank === leaderboardData.demotion_zone_rank : false;
               
               return (
                 <div 
