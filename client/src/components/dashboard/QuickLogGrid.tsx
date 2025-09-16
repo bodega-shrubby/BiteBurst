@@ -62,7 +62,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
           w-16 h-16 rounded-2xl border-2 border-gray-200
           bg-gray-50 hover:bg-orange-50 hover:border-orange-200
           transition-all duration-150
-          ${isPressed ? 'scale-95 bg-orange-100' : 'hover:scale-105'}
+          ${isPressed ? 'bg-orange-100' : ''}
           min-h-[44px] min-w-[44px]
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
         `}
