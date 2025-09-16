@@ -29,7 +29,8 @@ export default function ReviewStep() {
       // Capture user's timezone
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       
-      return await apiRequest("/api/profile/create", {
+      // Step 1: Create the account
+      await apiRequest("/api/profile/create", {
         method: "POST",
         body: {
           username: profile.displayName,
@@ -43,11 +44,36 @@ export default function ReviewStep() {
           onboardingCompleted: true
         }
       });
+
+      // Step 2: Auto-login the user
+      const loginResponse = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: profile.displayName,
+          password: profile.password
+        }),
+      });
+
+      const loginData = await loginResponse.json();
+      
+      if (!loginResponse.ok || !loginData.success) {
+        throw new Error(loginData.error || "Auto-login failed");
+      }
+
+      return loginData;
     },
-    onSuccess: () => {
+    onSuccess: (loginData) => {
+      // Store session data for auto-login
+      localStorage.setItem("sessionId", loginData.sessionId);
+      localStorage.setItem("user", JSON.stringify(loginData.user));
+      
       resetProfile();
-      // Redirect to Replit Auth login after profile creation
-      window.location.href = "/api/login";
+      
+      // Redirect to dashboard
+      setLocation("/dashboard");
     },
     onError: (error) => {
       console.error("Account creation failed:", error);
