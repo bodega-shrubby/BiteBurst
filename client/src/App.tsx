@@ -22,7 +22,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 // Onboarding components
 import { OnboardingProvider } from "@/pages/onboarding/OnboardingContext";
-import WelcomeStep from "@/pages/onboarding/WelcomeStep";
 import MascotIntroStep from "@/pages/onboarding/MascotIntroStep";
 import NameStep from "@/pages/onboarding/NameStep";
 import AgeStep from "@/pages/onboarding/AgeStep";
@@ -41,7 +40,6 @@ function OnboardingRoutes() {
   return (
     <OnboardingProvider>
       <Switch>
-        <Route path="/start" component={WelcomeStep} />
         <Route path="/profile/intro" component={MascotIntroStep} />
         <Route path="/profile/name" component={NameStep} />
         <Route path="/profile/age" component={AgeStep} />
@@ -79,7 +77,6 @@ function Router() {
       <Route path="/streak" component={Streak} />
       
       {/* Onboarding Flow - Single Provider */}
-      <Route path="/start" component={OnboardingRoutes} />
       <Route path="/profile/intro" component={OnboardingRoutes} />
       <Route path="/profile/name" component={OnboardingRoutes} />
       <Route path="/profile/age" component={OnboardingRoutes} />
