@@ -243,7 +243,7 @@ export default function LessonDemo() {
           {currentStep === 'complete' && (
             <div className="space-y-8 text-center animate-in fade-in duration-500">
               {/* Celebration illustration */}
-              <div className="space-y-6">
+              <div className="space-y-6 mt-12">
                 <div className="relative flex justify-center">
                   <div className="animate-bounce">
                     <img 
@@ -267,41 +267,46 @@ export default function LessonDemo() {
 
               {/* Stats tiles */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-orange-100 border-2 border-orange-300 rounded-2xl p-4">
+                <div className="bg-orange-100 border-2 border-orange-300 rounded-2xl p-4 text-center">
                   <div className="text-orange-600 text-2xl font-bold">⚡ 25</div>
                   <div className="text-orange-800 text-xs font-medium mt-1">Total XP</div>
                 </div>
-                <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-4">
+                <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-4 text-center">
                   <div className="text-green-600 text-2xl font-bold">✓ 100%</div>
                   <div className="text-green-800 text-xs font-medium mt-1">Good</div>
                 </div>
-                <div className="bg-blue-100 border-2 border-blue-300 rounded-2xl p-4">
+                <div className="bg-blue-100 border-2 border-blue-300 rounded-2xl p-4 text-center">
                   <div className="text-blue-600 text-2xl font-bold">⏱ {getElapsedTime()}</div>
                   <div className="text-blue-800 text-xs font-medium mt-1">Speedy</div>
                 </div>
               </div>
 
-              {/* Claim XP button */}
-              <button
-                onClick={handleClaimXp}
-                disabled={awardXpMutation.isPending}
-                className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-bold py-4 px-6 rounded-2xl transition-colors shadow-lg"
-              >
-                {awardXpMutation.isPending ? 'Claiming XP...' : 'Claim XP'}
-              </button>
             </div>
           )}
         </div>
       </main>
 
       {/* Mascot at bottom */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-20">
         <img 
           src={BrainyBoltImage} 
           alt="BrainyBolt mascot" 
           className="w-32 h-32 sm:w-36 sm:h-36 object-contain drop-shadow-lg"
         />
       </div>
+
+      {/* Claim XP button - below mascot */}
+      {currentStep === 'complete' && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-md px-6">
+          <button
+            onClick={handleClaimXp}
+            disabled={awardXpMutation.isPending}
+            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-bold py-4 px-6 rounded-2xl transition-colors shadow-lg"
+          >
+            {awardXpMutation.isPending ? 'Claiming XP...' : 'Claim XP'}
+          </button>
+        </div>
+      )}
 
       {/* Success Strip */}
       <SuccessStrip
