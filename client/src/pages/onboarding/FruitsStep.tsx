@@ -45,7 +45,7 @@ export default function FruitsStep() {
   };
 
   return (
-    <OnboardingLayout step={5} totalSteps={13}>
+    <OnboardingLayout step={6} totalSteps={14}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

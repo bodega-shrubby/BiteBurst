@@ -36,7 +36,7 @@ export default function GoalStep() {
   };
 
   return (
-    <OnboardingLayout step={4} totalSteps={13}>
+    <OnboardingLayout step={5} totalSteps={14}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

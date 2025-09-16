@@ -57,7 +57,7 @@ export default function SportsStep() {
   };
 
   return (
-    <OnboardingLayout step={8} totalSteps={13}>
+    <OnboardingLayout step={9} totalSteps={14}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

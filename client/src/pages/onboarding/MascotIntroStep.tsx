@@ -11,7 +11,7 @@ export default function MascotIntroStep() {
   };
 
   return (
-    <OnboardingLayout step={1} totalSteps={13}>
+    <OnboardingLayout step={1} totalSteps={14}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content - Centered */}
