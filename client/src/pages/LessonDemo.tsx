@@ -268,16 +268,16 @@ export default function LessonDemo() {
               {/* Stats tiles */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-orange-100 border-2 border-orange-300 rounded-2xl p-4 text-center">
-                  <div className="text-orange-600 text-2xl font-bold">⚡ 25</div>
-                  <div className="text-orange-800 text-xs font-medium mt-1">Total XP</div>
+                  <div className="text-orange-600 text-2xl font-bold leading-none">⚡ 25</div>
+                  <div className="text-orange-800 text-xs font-medium mt-2 leading-tight">Total XP</div>
                 </div>
                 <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-4 text-center">
-                  <div className="text-green-600 text-2xl font-bold">✓ 100%</div>
-                  <div className="text-green-800 text-xs font-medium mt-1">Good</div>
+                  <div className="text-green-600 text-2xl font-bold leading-none">✓ 100%</div>
+                  <div className="text-green-800 text-xs font-medium mt-2 leading-tight">Good</div>
                 </div>
                 <div className="bg-blue-100 border-2 border-blue-300 rounded-2xl p-4 text-center">
-                  <div className="text-blue-600 text-2xl font-bold">⏱ {getElapsedTime()}</div>
-                  <div className="text-blue-800 text-xs font-medium mt-1">Speedy</div>
+                  <div className="text-blue-600 text-2xl font-bold leading-none">⏱ {getElapsedTime()}</div>
+                  <div className="text-blue-800 text-xs font-medium mt-2 leading-tight">Speedy</div>
                 </div>
               </div>
 
