@@ -7,7 +7,7 @@ export default function MascotIntroStep() {
   const [, setLocation] = useLocation();
 
   const handleContinue = () => {
-    setLocation("/profile/name");
+    setLocation("/profile/questions");
   };
 
   return (
