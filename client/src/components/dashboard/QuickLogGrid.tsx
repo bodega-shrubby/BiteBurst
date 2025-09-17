@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
 interface QuickLogGridProps {
@@ -23,19 +27,91 @@ const ACTIVITY_OPTIONS = [
 export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
   const [, setLocation] = useLocation();
   const [pressedTile, setPressedTile] = useState<string | null>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Mutation for logging food automatically
+  const foodLogMutation = useMutation({
+    mutationFn: async (foodData: { emoji: string; label: string }) => {
+      if (!user) throw new Error('User not authenticated');
+      
+      return apiRequest('/api/logs', {
+        method: 'POST',
+        body: {
+          userId: user.id,
+          type: 'food',
+          entryMethod: 'emoji',
+          content: {
+            emojis: [foodData.emoji]
+          }
+        }
+      });
+    },
+    onSuccess: (response) => {
+      // Invalidate relevant caches
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: ['/api/user', user.id, 'daily-summary'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/logs'] });
+      }
+      
+      // Navigate to success page with log details
+      const logId = response.id || 'temp';
+      const xp = response.xpAwarded || 15;
+      setLocation(`/success?logId=${logId}&xp=${xp}&type=food`);
+    },
+    onError: (error) => {
+      console.error('Quick food log error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to log food item. Please try again.',
+        variant: 'destructive',
+      });
+      setPressedTile(null);
+    }
+  });
   
   const handleTilePress = (type: 'food' | 'activity', query: string) => {
+    // Prevent action if already processing a food log
+    if (foodLogMutation.isPending) return;
+    
+    // Check authentication
+    if (!user) {
+      toast({
+        title: 'Please log in',
+        description: 'You need to log in to track your food and activities.',
+        action: (
+          <button
+            onClick={() => setLocation('/login')}
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium hover:bg-gray-100"
+          >
+            Login
+          </button>
+        )
+      });
+      return;
+    }
+    
     setPressedTile(`${type}-${query}`);
     
-    // Navigate with preselection
-    const url = type === 'food' 
-      ? `/food-log?preselect=${query}`
-      : `/activity-log?activity=${query}`;
-    
-    setTimeout(() => {
-      setLocation(url);
-      setPressedTile(null);
-    }, 150); // Brief bounce animation
+    if (type === 'food') {
+      // For food items: automatically log and navigate to success
+      const foodOption = FOOD_OPTIONS.find(opt => opt.query === query);
+      if (foodOption) {
+        setTimeout(() => {
+          foodLogMutation.mutate({
+            emoji: foodOption.emoji,
+            label: foodOption.label
+          });
+        }, 150); // Brief bounce animation
+      }
+    } else {
+      // For activity items: navigate to activity log page
+      setTimeout(() => {
+        setLocation(`/activity-log?activity=${query}`);
+        setPressedTile(null);
+      }, 150);
+    }
   };
   
   const TileButton = ({ 
@@ -50,23 +126,28 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
     type: 'food' | 'activity';
   }) => {
     const isPressed = pressedTile === `${type}-${query}`;
+    const isDisabled = type === 'food' && foodLogMutation.isPending;
     
     return (
       <button
-        onMouseDown={() => setPressedTile(`${type}-${query}`)}
+        onMouseDown={() => !isDisabled && setPressedTile(`${type}-${query}`)}
         onMouseUp={() => setPressedTile(null)}
         onMouseLeave={() => setPressedTile(null)}
         onClick={() => handleTilePress(type, query)}
+        disabled={isDisabled}
+        data-testid={`quick-log-${type}-${query}`}
         className={`
           flex flex-col items-center justify-center
           w-16 h-16 rounded-2xl border-2 border-gray-200
           bg-gray-50 hover:bg-orange-50 hover:border-orange-200
           transition-all duration-150
           ${isPressed ? 'scale-95 bg-orange-100' : 'hover:scale-105'}
+          ${isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
           min-h-[44px] min-w-[44px]
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
         `}
         aria-label={`Quick log ${label.toLowerCase()}`}
+        aria-busy={isDisabled}
       >
         <span className="text-2xl mb-1" role="img" aria-hidden="true">
           {emoji}
@@ -74,6 +155,11 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
         <span className="text-xs font-medium text-gray-700 leading-tight">
           {label}
         </span>
+        {isDisabled && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
       </button>
     );
   };
@@ -121,6 +207,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
       <div className="flex flex-col gap-3 pt-2">
         <Button
           onClick={() => setLocation('/food-log')}
+          data-testid="button-log-meal"
           className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
           style={{ borderRadius: '13px' }}
         >
@@ -130,6 +217,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
         
         <Button
           onClick={() => setLocation('/activity-log')}
+          data-testid="button-log-activity"
           variant="outline"
           className="w-full border-2 border-[#FF6A00] text-[#FF6A00] hover:bg-orange-50 h-12 text-base font-bold uppercase tracking-wider"
           style={{ borderRadius: '13px' }}
