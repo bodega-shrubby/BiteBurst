@@ -143,8 +143,8 @@ export default function LessonSuccess({
       {/* Success Banner and Continue Button */}
       {showContinueButton && (
         <div className="space-y-4">
-          {/* Green success banner */}
-          <div className="bg-green-500 text-white p-4 rounded-xl text-center">
+          {/* Blue success banner */}
+          <div className="bg-blue-500 text-white p-4 rounded-xl text-center">
             <div className="flex items-center justify-center space-x-2">
               <Check className="w-6 h-6" />
               <span className="text-lg font-bold">Nice!</span>
