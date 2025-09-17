@@ -5,13 +5,15 @@ import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
 interface LessonStep {
   id: string;
   stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching';
+  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering';
   question: string;
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
     feedback?: string;
     matchingPairs?: Array<{ left: string; right: string }>;
+    labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
+    orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
   };
   xpReward: number;
   mascotAction?: string;
@@ -38,6 +40,10 @@ export default function LessonAsking({
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   
+  // Ordering game state
+  const [orderedItems, setOrderedItems] = useState<string[]>([]);
+  const [draggedOrderItem, setDraggedOrderItem] = useState<string | null>(null);
+  
   // Auto-update answer when matching is complete
   useEffect(() => {
     if (step.questionType === 'matching' && step.content.matchingPairs) {
@@ -52,6 +58,24 @@ export default function LessonAsking({
       }
     }
   }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
+  
+  // Auto-update answer when ordering is complete and correct
+  useEffect(() => {
+    if (step.questionType === 'ordering' && step.content.orderingItems) {
+      const items = step.content.orderingItems;
+      const isCorrectOrder = orderedItems.length === items.length && 
+        orderedItems.every((itemId, index) => {
+          const item = items.find(i => i.id === itemId);
+          return item && item.correctOrder === index + 1;
+        });
+      
+      if (isCorrectOrder && selectedAnswer !== 'ordering-complete') {
+        onAnswerSelect('ordering-complete');
+      } else if (!isCorrectOrder && selectedAnswer === 'ordering-complete') {
+        onAnswerSelect('');
+      }
+    }
+  }, [orderedItems, step.questionType, step.content.orderingItems, selectedAnswer, onAnswerSelect]);
   
   const renderMultipleChoice = () => {
     if (!step.content.options) return null;
@@ -249,6 +273,147 @@ export default function LessonAsking({
       </div>
     );
   };
+  
+  const renderLabelReading = () => {
+    if (!step.content.labelOptions) return null;
+    
+    return (
+      <div className="space-y-4">
+        {/* Instructions */}
+        <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+          Compare the nutrition labels and choose the better option!
+        </div>
+        
+        {/* Label Options */}
+        <div className="space-y-3">
+          {step.content.labelOptions.map((label) => (
+            <button
+              key={label.id}
+              onClick={() => onAnswerSelect(label.id)}
+              disabled={isSubmitting}
+              className={`
+                w-full p-4 rounded-2xl border-2 text-left transition-all duration-200
+                ${selectedAnswer === label.id
+                  ? 'border-orange-400 bg-orange-50'
+                  : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-25'
+                }
+                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `}
+              data-testid={`label-option-${label.id}`}
+            >
+              <div className="space-y-2">
+                <div className="font-bold text-lg text-gray-900">{label.name}</div>
+                <div className="bg-gray-50 p-3 rounded-lg space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Sugar:</span>
+                    <span className="font-medium">{label.sugar}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Fiber:</span>
+                    <span className="font-medium">{label.fiber}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Protein:</span>
+                    <span className="font-medium">{label.protein}</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  
+  const renderOrdering = () => {
+    if (!step.content.orderingItems) return null;
+    
+    const items = step.content.orderingItems;
+    
+    // Initialize ordered items if empty
+    if (orderedItems.length === 0 && items.length > 0) {
+      setOrderedItems(items.map(item => item.id));
+    }
+    
+    const handleOrderDragStart = (e: React.DragEvent, itemId: string) => {
+      setDraggedOrderItem(itemId);
+      e.dataTransfer.effectAllowed = 'move';
+    };
+    
+    const handleOrderDragOver = (e: React.DragEvent) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    };
+    
+    const handleOrderDrop = (e: React.DragEvent, targetIndex: number) => {
+      e.preventDefault();
+      if (draggedOrderItem) {
+        const draggedIndex = orderedItems.indexOf(draggedOrderItem);
+        const newOrder = [...orderedItems];
+        
+        // Remove item from current position
+        newOrder.splice(draggedIndex, 1);
+        // Insert at new position
+        newOrder.splice(targetIndex, 0, draggedOrderItem);
+        
+        setOrderedItems(newOrder);
+        setDraggedOrderItem(null);
+      }
+    };
+    
+    return (
+      <div className="space-y-4">
+        {/* Instructions */}
+        <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+          Drag items to put them in the correct order!
+        </div>
+        
+        {/* Ordering List */}
+        <div className="space-y-2">
+          {orderedItems.map((itemId, index) => {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return null;
+            
+            const isCorrectPosition = item.correctOrder === index + 1;
+            
+            return (
+              <div
+                key={itemId}
+                draggable
+                onDragStart={(e) => handleOrderDragStart(e, itemId)}
+                onDragOver={handleOrderDragOver}
+                onDrop={(e) => handleOrderDrop(e, index)}
+                className={`
+                  p-4 rounded-xl border-2 cursor-move transition-all
+                  ${draggedOrderItem === itemId ? 'opacity-50' : ''}
+                  ${isCorrectPosition && orderedItems.length === items.length
+                    ? 'bg-green-50 border-green-300'
+                    : 'bg-white border-gray-200 hover:border-orange-200'
+                  }
+                `}
+                data-testid={`order-item-${itemId}`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm font-bold text-orange-600">
+                    {index + 1}
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{item.text}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Progress Indicator */}
+        <div className="text-center text-sm text-gray-600">
+          {orderedItems.every((itemId, index) => {
+            const item = items.find(i => i.id === itemId);
+            return item && item.correctOrder === index + 1;
+          }) ? '✅ Perfect order!' : 'Keep arranging...'}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-md mx-auto space-y-6">
@@ -273,6 +438,8 @@ export default function LessonAsking({
         {step.questionType === 'multiple-choice' && renderMultipleChoice()}
         {step.questionType === 'true-false' && renderTrueFalse()}
         {step.questionType === 'matching' && renderMatching()}
+        {step.questionType === 'label-reading' && renderLabelReading()}
+        {step.questionType === 'ordering' && renderOrdering()}
       </div>
 
       {/* Check Button */}

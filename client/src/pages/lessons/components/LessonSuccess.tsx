@@ -5,13 +5,15 @@ import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
 interface LessonStep {
   id: string;
   stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching';
+  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering';
   question: string;
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
     feedback?: string;
     matchingPairs?: Array<{ left: string; right: string }>;
+    labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
+    orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
   };
   xpReward: number;
   mascotAction?: string;
@@ -37,6 +39,9 @@ export default function LessonSuccess({
     if (step.questionType === 'multiple-choice' && step.content.options) {
       return step.content.options.find(opt => opt.correct || opt.id === selectedAnswer);
     }
+    if (step.questionType === 'label-reading' && step.content.labelOptions) {
+      return step.content.labelOptions.find(opt => opt.correct || opt.id === selectedAnswer);
+    }
     return null;
   };
 
@@ -46,11 +51,24 @@ export default function LessonSuccess({
   const renderMatchingSuccess = () => {
     if (!step.content.matchingPairs) return null;
     
-    const matchingFeedback = {
+    // Different feedback based on lesson type
+    const footballMatchingFeedback = {
       '🥦 Broccoli': 'Keeps your body strong for the whole match.',
       '🥣 Yogurt with berries': 'Helps your muscles recover after playing.',
       '🥚 Boiled egg': 'Builds strength so you can kick harder.'
     };
+    
+    const brainMatchingFeedback = {
+      '🐟 Salmon': 'Salmon gives your brain healthy fats for focus.',
+      '🥚 Eggs': 'Eggs help your brain send messages faster.',
+      '🥦 Broccoli': 'Broccoli has vitamins to keep you alert.',
+      '🫘 Beans': 'Beans have iron, which carries oxygen so your brain stays focused.'
+    };
+    
+    // Use brain feedback if it contains salmon, otherwise use football feedback
+    const feedbackMap = step.content.matchingPairs.some(pair => pair.left.includes('Salmon')) 
+      ? brainMatchingFeedback 
+      : footballMatchingFeedback;
     
     return (
       <div className="space-y-4">
@@ -71,7 +89,39 @@ export default function LessonSuccess({
                 <span className="text-sm text-gray-600">{pair.right}</span>
               </div>
               <div className="text-sm text-green-700 pl-2">
-                {matchingFeedback[pair.left as keyof typeof matchingFeedback]}
+                {feedbackMap[pair.left as keyof typeof feedbackMap]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  
+  // Special handling for ordering game success
+  const renderOrderingSuccess = () => {
+    if (!step.content.orderingItems) return null;
+    
+    const sortedItems = [...step.content.orderingItems].sort((a, b) => a.correctOrder - b.correctOrder);
+    
+    return (
+      <div className="space-y-4">
+        <div className="text-lg font-bold text-green-800 mb-3">
+          ✅ Nice! Perfect order!
+        </div>
+        
+        {/* Show the correct sequence */}
+        <div className="space-y-2">
+          {sortedItems.map((item, index) => (
+            <div
+              key={item.id}
+              className="bg-white p-3 rounded-xl border border-green-200 text-left"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-sm font-bold text-green-600">
+                  {index + 1}
+                </div>
+                <span className="text-sm font-medium text-gray-800">{item.text}</span>
               </div>
             </div>
           ))}
@@ -100,6 +150,22 @@ export default function LessonSuccess({
         {step.questionType === 'matching' ? (
           <div className="bg-green-50 p-4 rounded-2xl border border-green-200">
             {renderMatchingSuccess()}
+          </div>
+        ) : step.questionType === 'ordering' ? (
+          <div className="bg-green-50 p-4 rounded-2xl border border-green-200">
+            {renderOrderingSuccess()}
+          </div>
+        ) : step.questionType === 'label-reading' ? (
+          <div className="bg-green-50 p-4 rounded-2xl border border-green-200">
+            <div className="text-lg font-bold text-green-800 mb-3">
+              ✅ Nice! Great choice!
+            </div>
+            {correctOption && (
+              <div className="bg-white p-3 rounded-xl border border-green-200">
+                <div className="font-bold text-lg text-gray-900 mb-2">{(correctOption as any).name}</div>
+                <div className="text-sm text-green-700">{step.content.feedback}</div>
+              </div>
+            )}
           </div>
         ) : (
           <>
