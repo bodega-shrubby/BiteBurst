@@ -19,6 +19,7 @@ export const ageBracketEnum = pgEnum('age_bracket', ['6-8', '9-11', '12-14']);
 export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
 export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
+export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching']);
 
 // Catalog tables
 export const avatars = pgTable("avatars", {
@@ -136,6 +137,46 @@ export const leaderboardCache = pgTable("leaderboard_cache", {
   unique: { name: "leaderboard_cache_unique", columns: [table.metric, table.leagueTier, table.weekStart] }
 }));
 
+// Lesson tables
+export const lessons = pgTable("lessons", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  targetAgeBracket: ageBracketEnum("target_age_bracket").notNull(),
+  totalSteps: integer("total_steps").notNull(),
+  category: text("category").notNull().default('nutrition'),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const lessonSteps = pgTable("lesson_steps", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lessonId: varchar("lesson_id").notNull().references(() => lessons.id, { onDelete: 'cascade' }),
+  stepNumber: integer("step_number").notNull(),
+  questionType: questionTypeEnum("question_type").notNull(),
+  question: text("question").notNull(),
+  content: jsonb("content").notNull(), // Stores options, correct answers, feedback, etc.
+  xpReward: integer("xp_reward").notNull().default(10),
+  mascotAction: text("mascot_action"), // For future mascot integration
+}, (table) => ({
+  unique: { name: "lesson_steps_unique", columns: [table.lessonId, table.stepNumber] },
+  lessonIdIdx: index("lesson_steps_lesson_id_idx").on(table.lessonId)
+}));
+
+export const userLessonProgress = pgTable("user_lesson_progress", {
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  lessonId: varchar("lesson_id").notNull().references(() => lessons.id, { onDelete: 'cascade' }),
+  currentStep: integer("current_step").notNull().default(1),
+  completed: boolean("completed").notNull().default(false),
+  completedAt: timestamp("completed_at"),
+  totalXpEarned: integer("total_xp_earned").notNull().default(0),
+  startedAt: timestamp("started_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  pk: { name: "user_lesson_progress_pkey", columns: [table.userId, table.lessonId] }
+}));
+
 // Note: Indexes are created via SQL commands, not in Drizzle schema
 
 // Type exports
@@ -152,6 +193,12 @@ export type XpEvent = typeof xpEvents.$inferSelect;
 export type LeagueBoard = typeof leagueBoards.$inferSelect;
 export type InsertLeagueBoard = typeof leagueBoards.$inferInsert;
 export type LeaderboardCache = typeof leaderboardCache.$inferSelect;
+export type Lesson = typeof lessons.$inferSelect;
+export type InsertLesson = typeof lessons.$inferInsert;
+export type LessonStep = typeof lessonSteps.$inferSelect;
+export type InsertLessonStep = typeof lessonSteps.$inferInsert;
+export type UserLessonProgress = typeof userLessonProgress.$inferSelect;
+export type InsertUserLessonProgress = typeof userLessonProgress.$inferInsert;
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -177,5 +224,34 @@ export const insertLogSchema = createInsertSchema(logs).pick({
   mood: true,
 });
 
+export const insertLessonSchema = createInsertSchema(lessons).pick({
+  title: true,
+  description: true,
+  targetAgeBracket: true,
+  totalSteps: true,
+  category: true,
+  isActive: true,
+});
+
+export const insertLessonStepSchema = createInsertSchema(lessonSteps).pick({
+  lessonId: true,
+  stepNumber: true,
+  questionType: true,
+  question: true,
+  content: true,
+  xpReward: true,
+  mascotAction: true,
+});
+
+export const insertUserLessonProgressSchema = createInsertSchema(userLessonProgress).pick({
+  userId: true,
+  lessonId: true,
+  currentStep: true,
+  // Note: completed, completedAt, totalXpEarned are server-controlled only for security
+});
+
 export type InsertUserType = z.infer<typeof insertUserSchema>;
 export type InsertLogType = z.infer<typeof insertLogSchema>;
+export type InsertLessonType = z.infer<typeof insertLessonSchema>;
+export type InsertLessonStepType = z.infer<typeof insertLessonStepSchema>;
+export type InsertUserLessonProgressType = z.infer<typeof insertUserLessonProgressSchema>;

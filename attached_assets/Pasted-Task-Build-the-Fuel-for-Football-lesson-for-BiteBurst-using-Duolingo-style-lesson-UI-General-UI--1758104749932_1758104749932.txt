@@ -1,0 +1,69 @@
+Task: Build the “Fuel for Football” lesson for BiteBurst using Duolingo-style lesson UI.
+General UI Guidelines
+Mobile-first layout (430×932 as shown in reference).
+Two key states:
+Lesson Asking Screen → Question prompt with answer options.
+Lesson Success Screen → Feedback with mascot reaction + XP.
+Progress bar at top (yellow fill, light grey background).
+Hearts (lives) visible in top-right corner.
+“CHECK” button disabled until an option is chosen.
+On success, green banner with ✔ “Nice!” and CONTINUE button appears.
+Lesson Structure (Fuel for Football, Ages 6–8)
+Step 1 – Asking Screen
+Question: “What’s the best breakfast before football training?”
+Answer Options:
+🥣 Porridge with fruit (correct)
+🥐 Croissant with jam
+🥤 Fizzy drink
+Mascot Placement: BiteBurst Orange mascot on left side, holding a football.
+Step 1 – Success Screen
+Correct Answer Highlighted: 🥣 Porridge with fruit.
+Mascot Animation: Mascot scores a goal.
+Feedback text: “Yes! Oats give long energy and fruit adds vitamins. That’s why players eat porridge before training — it keeps them running all game!”
+XP Animation: +10 XP flashes near progress bar.
+Green banner: ✔ Nice! + CONTINUE button.
+Step 2 – Asking Screen
+Question: “Water helps footballers stay strong for the whole game.”
+Answer Options: True / False
+Mascot Placement: BiteBurst Orange mascot sipping from a water bottle.
+Step 2 – Success Screen
+Correct Answer Highlighted: True.
+Mascot Animation: Mascot speeds up and dashes across the screen.
+Feedback text: “Correct! Even Messi drinks water at half-time. It cools your body and keeps you fast.”
+XP Animation: +10 XP.
+Green banner: ✔ Nice! + CONTINUE button.
+Step 3 – Asking Screen (Matching Game)
+Question: “Match the food to its benefit.”
+Draggable Words/Icons: 🥦 Broccoli, 🥣 Yogurt with berries, 🥚 Boiled egg.
+Drop Zones:
+Vitamins for stamina
+Recovery fuel for muscles
+Protein for strength
+Mascot Placement: Mascot juggling a football.
+Step 3 – Success Screen
+Correct matches shown connected with lines.
+Feedback text per item:
+Broccoli → “Keeps your body strong for the whole match.”
+Yogurt → “Helps your muscles recover after playing.”
+Egg → “Builds strength so you can kick harder.”
+Mascot Animation: Does a trick shot.
+XP Animation: +15 XP.
+Green banner: ✔ Nice! + CONTINUE button.
+Step 4 – Asking Screen
+Question: “What’s the best half-time snack to keep your energy up?”
+Answer Options:
+🍫 Chocolate bar
+🍌 Banana (correct)
+🍟 Crisps
+Mascot Placement: Mascot next to a goalpost.
+Step 4 – Success Screen
+Correct Answer Highlighted: 🍌 Banana.
+Mascot Animation: Mascot high-fives player.
+Feedback text: “Perfect! Bananas give quick energy to refuel your legs so you can sprint again in the second half — just like Mbappé.”
+XP Animation: +10 XP.
+Green banner: ✔ Nice! + CONTINUE button.
+Final Wrap-Up Screen
+Mascot lifts a trophy 🏆 alongside silhouette of a football star.
+XP bar fills to total earned.
+Badge unlocked: “⚡ Energy Star”.
+Button: CONTINUE TO NEXT LESSON → Hydration Hero.
