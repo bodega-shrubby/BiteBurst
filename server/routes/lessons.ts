@@ -55,15 +55,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             {
               id: 'step-3',
               stepNumber: 3,
-              questionType: 'multiple-choice' as const,
-              question: "Which food helps your muscles recover after playing football?",
+              questionType: 'matching' as const,
+              question: "Match the food to its benefit.",
               content: {
-                options: [
-                  { id: 'broccoli', text: 'Broccoli', emoji: '🥦', correct: false },
-                  { id: 'yogurt', text: 'Yogurt with berries', emoji: '🥣', correct: true },
-                  { id: 'egg', text: 'Boiled egg', emoji: '🥚', correct: false }
+                matchingPairs: [
+                  { left: '🥦 Broccoli', right: 'Vitamins for stamina' },
+                  { left: '🥣 Yogurt with berries', right: 'Recovery fuel for muscles' },
+                  { left: '🥚 Boiled egg', right: 'Protein for strength' }
                 ],
-                feedback: "Perfect! Yogurt with berries helps your muscles recover after playing. The protein rebuilds your muscles while the berries give energy."
+                feedback: "Perfect matches! Each food gives your body exactly what it needs for football."
               },
               xpReward: 15,
               mascotAction: 'juggling_football'
@@ -112,7 +112,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const correctAnswers: Record<string, string | boolean> = {
         'step-1': 'porridge',
         'step-2': true,
-        'step-3': 'yogurt',
+        'step-3': 'matching-complete',
         'step-4': 'banana'
       };
 

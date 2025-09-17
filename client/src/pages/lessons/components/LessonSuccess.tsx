@@ -41,6 +41,44 @@ export default function LessonSuccess({
 
   const correctOption = getCorrectOption();
 
+  // Special handling for matching game success
+  const renderMatchingSuccess = () => {
+    if (!step.content.matchingPairs) return null;
+    
+    const matchingFeedback = {
+      '🥦 Broccoli': 'Keeps your body strong for the whole match.',
+      '🥣 Yogurt with berries': 'Helps your muscles recover after playing.',
+      '🥚 Boiled egg': 'Builds strength so you can kick harder.'
+    };
+    
+    return (
+      <div className="space-y-4">
+        <div className="text-lg font-bold text-green-800 mb-3">
+          ✅ Nice! Perfect matches!
+        </div>
+        
+        {/* Show each correct match with its specific feedback */}
+        <div className="space-y-3">
+          {step.content.matchingPairs.map((pair, index) => (
+            <div
+              key={index}
+              className="bg-white p-3 rounded-xl border border-green-200 text-left"
+            >
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="font-medium text-gray-800">{pair.left}</span>
+                <span className="text-green-600">→</span>
+                <span className="text-sm text-gray-600">{pair.right}</span>
+              </div>
+              <div className="text-sm text-green-700 pl-2">
+                {matchingFeedback[pair.left as keyof typeof matchingFeedback]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-md mx-auto space-y-6">
       {/* Mascot Celebration Placeholder */}
@@ -51,38 +89,46 @@ export default function LessonSuccess({
         </div>
       </div>
 
-      {/* Question with Correct Answer Highlighted */}
+      {/* Success Content */}
       <div className="text-center space-y-4">
         <h2 className="text-xl font-bold text-gray-900 leading-relaxed">
           {step.question}
         </h2>
         
-        {/* Show correct answer highlighted */}
-        {correctOption && (
-          <div className="p-4 rounded-2xl border-2 border-green-400 bg-green-50">
-            <div className="flex items-center justify-center space-x-3">
-              <Check className="w-6 h-6 text-green-600" />
-              {correctOption.emoji && (
-                <span className="text-2xl" role="img" aria-hidden="true">
-                  {correctOption.emoji}
-                </span>
-              )}
-              <span className="text-lg font-medium text-gray-900">
-                {correctOption.text}
-              </span>
-            </div>
+        {step.questionType === 'matching' ? (
+          <div className="bg-green-50 p-4 rounded-2xl border border-green-200">
+            {renderMatchingSuccess()}
           </div>
+        ) : (
+          <>
+            {/* Show correct answer highlighted for non-matching questions */}
+            {correctOption && (
+              <div className="p-4 rounded-2xl border-2 border-green-400 bg-green-50">
+                <div className="flex items-center justify-center space-x-3">
+                  <Check className="w-6 h-6 text-green-600" />
+                  {correctOption.emoji && (
+                    <span className="text-2xl" role="img" aria-hidden="true">
+                      {correctOption.emoji}
+                    </span>
+                  )}
+                  <span className="text-lg font-medium text-gray-900">
+                    {correctOption.text}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            {/* Feedback */}
+            {step.content.feedback && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-gray-700 leading-relaxed">
+                  {step.content.feedback}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
-
-      {/* Feedback */}
-      {step.content.feedback && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <p className="text-gray-700 leading-relaxed">
-            {step.content.feedback}
-          </p>
-        </div>
-      )}
 
       {/* XP Animation */}
       <div className="text-center">
