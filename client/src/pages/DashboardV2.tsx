@@ -89,8 +89,8 @@ function BadgeToast({ badge, isVisible, onClose }: BadgeToastProps) {
   if (!isVisible) return null;
   
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 toast-enter">
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 max-w-sm">
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 toast-enter pointer-events-none">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 max-w-sm pointer-events-auto">
         <div className="text-2xl animate-bounce">🏆</div>
         <div>
           <p className="font-bold text-sm">New Badge Unlocked!</p>

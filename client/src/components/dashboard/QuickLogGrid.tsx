@@ -72,11 +72,17 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
   });
   
   const handleTilePress = (type: 'food' | 'activity', query: string) => {
+    console.log('🔍 Quick Log - Tile pressed:', { type, query, isPending: foodLogMutation.isPending, user: !!user });
+    
     // Prevent action if already processing a food log
-    if (foodLogMutation.isPending) return;
+    if (foodLogMutation.isPending) {
+      console.log('⏳ Quick Log - Mutation is pending, skipping action');
+      return;
+    }
     
     // Check authentication
     if (!user) {
+      console.log('❌ Quick Log - User not authenticated');
       toast({
         title: 'Please log in',
         description: 'You need to log in to track your food and activities.',
@@ -93,12 +99,15 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
     }
     
     setPressedTile(`${type}-${query}`);
+    console.log('🎯 Quick Log - Setting pressedTile:', `${type}-${query}`);
     
     if (type === 'food') {
       // For food items: automatically log and navigate to success
       const foodOption = FOOD_OPTIONS.find(opt => opt.query === query);
+      console.log('🍎 Quick Log - Food option found:', foodOption);
       if (foodOption) {
         setTimeout(() => {
+          console.log('🚀 Quick Log - Triggering food mutation:', { emoji: foodOption.emoji, label: foodOption.label });
           foodLogMutation.mutate({
             emoji: foodOption.emoji,
             label: foodOption.label
@@ -107,6 +116,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
       }
     } else {
       // For activity items: navigate to activity log page
+      console.log('⚽ Quick Log - Activity navigation:', `/activity-log?activity=${query}`);
       setTimeout(() => {
         setLocation(`/activity-log?activity=${query}`);
         setPressedTile(null);
@@ -133,19 +143,24 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
         onMouseDown={() => !isDisabled && setPressedTile(`${type}-${query}`)}
         onMouseUp={() => setPressedTile(null)}
         onMouseLeave={() => setPressedTile(null)}
-        onClick={() => handleTilePress(type, query)}
+        onClick={() => {
+          console.log('🔥 TILE CLICKED:', { type, query, label, isDisabled });
+          handleTilePress(type, query);
+        }}
         disabled={isDisabled}
         data-testid={`quick-log-${type}-${query}`}
         className={`
+          relative z-10 pointer-events-auto
           flex flex-col items-center justify-center
           w-16 h-16 rounded-2xl border-2 border-gray-200
           bg-gray-50 hover:bg-orange-50 hover:border-orange-200
           transition-all duration-150
           ${isPressed ? 'scale-95 bg-orange-100' : 'hover:scale-105'}
-          ${isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
+          ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
           min-h-[44px] min-w-[44px]
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
         `}
+        style={{ pointerEvents: isDisabled ? 'none' : 'auto' }}
         aria-label={`Quick log ${label.toLowerCase()}`}
         aria-busy={isDisabled}
       >
@@ -174,7 +189,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
       {/* Food Row */}
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-gray-700">Food</h4>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="relative flex gap-3 overflow-x-auto pb-2">
           {FOOD_OPTIONS.map((option) => (
             <TileButton
               key={option.query}
@@ -190,7 +205,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
       {/* Activity Row */}
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-gray-700">Activity</h4>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="relative flex gap-3 overflow-x-auto pb-2">
           {ACTIVITY_OPTIONS.map((option) => (
             <TileButton
               key={option.query}
