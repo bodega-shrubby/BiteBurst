@@ -16,13 +16,15 @@ type LessonState = 'asking' | 'success' | 'complete';
 interface LessonStep {
   id: string;
   stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching';
+  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering';
   question: string;
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
     feedback?: string;
     matchingPairs?: Array<{ left: string; right: string }>;
+    labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
+    orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
   };
   xpReward: number;
   mascotAction?: string;

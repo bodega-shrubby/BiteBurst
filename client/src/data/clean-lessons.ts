@@ -9,7 +9,8 @@ export interface CleanLesson {
 
 export const cleanLessons: CleanLesson[] = [
   { id: 'fuel-for-football', title: 'Fuel for\nFootball', icon: '⚽', state: 'current' },
-  { id: 'hydration', title: 'Hydration\nHeroes', icon: '💧', state: 'unlocked' },
+  { id: 'brainfuel-for-school', title: 'BrainFuel\nfor School', icon: '🧠', state: 'unlocked' },
+  { id: 'hydration', title: 'Hydration\nHeroes', icon: '💧', state: 'locked' },
   { id: 'move', title: 'Move &\nGroove', icon: '⚽', state: 'locked' },
   { id: 'focus', title: 'Focus\nBoosters', icon: '🧠', state: 'locked' },
   { id: 'veggies', title: 'Veggie\nVictory', icon: '🥦', state: 'locked' },

@@ -78,6 +78,8 @@ export default function Lessons() {
     if (lesson.state === 'current' || lesson.state === 'unlocked') {
       if (lesson.id === 'fuel-for-football') {
         setLocation('/lesson/fuel-for-football');
+      } else if (lesson.id === 'brainfuel-for-school') {
+        setLocation('/lesson/brainfuel-for-school');
       } else {
         setLocation(`/lesson/demo?id=${lesson.id}`);
       }
