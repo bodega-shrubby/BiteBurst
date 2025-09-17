@@ -1,9 +1,4 @@
-import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
 interface QuickLogGridProps {
@@ -26,56 +21,6 @@ const ACTIVITY_OPTIONS = [
 
 export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
   const [, setLocation] = useLocation();
-  const [pressedTile, setPressedTile] = useState<string | null>(null);
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Mutation for logging food automatically
-  const foodLogMutation = useMutation({
-    mutationFn: async (foodData: { emoji: string; label: string }) => {
-      if (!user) throw new Error('User not authenticated');
-      
-      return apiRequest('/api/logs', {
-        method: 'POST',
-        body: {
-          userId: user.id,
-          type: 'food',
-          entryMethod: 'emoji',
-          content: {
-            emojis: [foodData.emoji]
-          }
-        }
-      });
-    },
-    onSuccess: (response) => {
-      // Invalidate relevant caches
-      if (user) {
-        queryClient.invalidateQueries({ queryKey: ['/api/user', user.id, 'daily-summary'] });
-        queryClient.invalidateQueries({ queryKey: ['/api/logs'] });
-      }
-      
-      // Navigate to success page with log details
-      const logId = response.id || 'temp';
-      const xp = response.xpAwarded || 15;
-      setLocation(`/success?logId=${logId}&xp=${xp}&type=food`);
-    },
-    onError: (error) => {
-      console.error('Quick food log error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to log food item. Please try again.',
-        variant: 'destructive',
-      });
-      setPressedTile(null);
-    }
-  });
-  
-  // Simplified test function to bypass complex logic
-  const handleSimpleTest = () => {
-    console.log('🎯 SIMPLE TEST BUTTON CLICKED!');
-    alert('Button clicked! If you see this, clicks are working.');
-  };
   
   const TileButton = ({ 
     emoji, 
@@ -88,44 +33,25 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
     query: string; 
     type: 'food' | 'activity';
   }) => {
-    const isPressed = pressedTile === `${type}-${query}`;
-    const isDisabled = type === 'food' && foodLogMutation.isPending;
-    
-    console.log(`🔧 TileButton ${type}-${query}: pressed=${isPressed}, disabled=${isDisabled}, pending=${foodLogMutation.isPending}`);
-    
     return (
       <button
-        onMouseDown={() => !isDisabled && setPressedTile(`${type}-${query}`)}
-        onMouseUp={() => setPressedTile(null)}
-        onMouseLeave={() => setPressedTile(null)}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('🔥 SIMPLE CLICK TEST:', type, query);
+        onClick={() => {
           if (type === 'food') {
-            console.log('🍎 Food clicked - navigating to success');
-            setLocation('/success?type=food&xp=15');
+            setLocation('/food-log');
           } else {
-            console.log('⚽ Activity clicked - navigating to activity log');
-            setLocation(`/activity-log?activity=${query}`);
+            setLocation('/activity-log');
           }
         }}
-        disabled={isDisabled}
         data-testid={`quick-log-${type}-${query}`}
-        className={`
-          relative z-10 pointer-events-auto
+        className="
           flex flex-col items-center justify-center
           w-16 h-16 rounded-2xl border-2 border-gray-200
           bg-gray-50 hover:bg-orange-50 hover:border-orange-200
-          transition-all duration-150
-          ${isPressed ? 'scale-95 bg-orange-100' : 'hover:scale-105'}
-          ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+          transition-all duration-150 hover:scale-105
           min-h-[44px] min-w-[44px]
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
-        `}
-        style={{ pointerEvents: isDisabled ? 'none' : 'auto' }}
+        "
         aria-label={`Quick log ${label.toLowerCase()}`}
-        aria-busy={isDisabled}
       >
         <span className="text-2xl mb-1" role="img" aria-hidden="true">
           {emoji}
@@ -133,11 +59,6 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
         <span className="text-xs font-medium text-gray-700 leading-tight">
           {label}
         </span>
-        {isDisabled && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
       </button>
     );
   };
@@ -147,12 +68,6 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
       <div>
         <h3 className="text-xl font-bold text-black mb-3">Quick Log</h3>
         <p className="text-sm text-gray-600 mb-4">Tap, snap, go!</p>
-        <button 
-          onClick={handleSimpleTest}
-          className="bg-red-500 text-white px-4 py-2 rounded mb-4"
-        >
-          TEST CLICK - If this works, clicks are functional
-        </button>
       </div>
       
       {/* Food Row */}
