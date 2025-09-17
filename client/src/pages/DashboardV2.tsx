@@ -156,6 +156,16 @@ export default function DashboardV2() {
     },
   });
 
+  // Debug: Add global click inspector
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      console.log('🎯 GLOBAL CLICK DEBUG - Top element at click:', el, 'className:', el?.className);
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
+
   // Handle goal completion celebration
   useEffect(() => {
     if (dailySummary && !hasGoalCelebrated) {
@@ -359,7 +369,7 @@ export default function DashboardV2() {
         </div>
 
         {/* Quick Log Grid */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="relative z-[999] pointer-events-auto outline outline-2 outline-red-500 bg-white rounded-2xl border border-gray-200 p-6">
           <QuickLogGrid />
         </div>
 
