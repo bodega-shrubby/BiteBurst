@@ -90,6 +90,111 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.json(lessonData);
       }
       
+      if (lessonId === 'brainfuel-for-school') {
+        const lessonData = {
+          id: 'brainfuel-for-school',
+          title: 'BrainFuel for School',
+          description: 'Learn the best foods to fuel your brain for exams and studying!',
+          totalSteps: 6,
+          steps: [
+            {
+              id: 'step-1',
+              stepNumber: 1,
+              questionType: 'multiple-choice' as const,
+              question: "Which breakfast gives your brain the best fuel for a 2-hour exam?",
+              content: {
+                options: [
+                  { id: 'porridge-berries', text: 'Porridge with blueberries + milk', emoji: '🥣', correct: true },
+                  { id: 'chocolate-cereal', text: 'Chocolate cereal + fizzy drink', emoji: '🥛', correct: false },
+                  { id: 'white-toast', text: 'White toast with jam', emoji: '🍞', correct: false }
+                ],
+                feedback: "Great choice! Porridge gives slow, steady energy. Blueberries help with memory, and milk's protein keeps your brain working smoothly through the exam."
+              },
+              xpReward: 10,
+              mascotAction: 'graduation_cap'
+            },
+            {
+              id: 'step-2',
+              stepNumber: 2,
+              questionType: 'true-false' as const,
+              question: "Your brain is mostly water. Even small dehydration can make it harder to concentrate.",
+              content: {
+                correctAnswer: true,
+                feedback: "Right! Even losing a bit of water makes you think slower and feel tired. Drinking water keeps you sharp in lessons and exams."
+              },
+              xpReward: 10,
+              mascotAction: 'brain_glow'
+            },
+            {
+              id: 'step-3',
+              stepNumber: 3,
+              questionType: 'matching' as const,
+              question: "Match the food to what it helps most.",
+              content: {
+                matchingPairs: [
+                  { left: '🐟 Salmon', right: 'Brain cells' },
+                  { left: '🥚 Eggs', right: 'Nerves' },
+                  { left: '🥦 Broccoli', right: 'Clear thinking' },
+                  { left: '🫘 Beans', right: 'Oxygen delivery' }
+                ],
+                feedback: "Perfect matches! Each food helps your brain work better in different ways."
+              },
+              xpReward: 15,
+              mascotAction: 'clipboard_tick'
+            },
+            {
+              id: 'step-4',
+              stepNumber: 4,
+              questionType: 'multiple-choice' as const,
+              question: "It's 30 minutes before your science quiz. What's the best quick snack?",
+              content: {
+                options: [
+                  { id: 'banana-water', text: 'Banana + water', emoji: '🍌', correct: true },
+                  { id: 'chocolate-juice', text: 'Chocolate bar + juice', emoji: '🍫', correct: false },
+                  { id: 'large-sandwich', text: 'Large sandwich', emoji: '🥪', correct: false }
+                ],
+                feedback: "A banana gives quick energy and water keeps your brain working fast. Heavy food or lots of sugar can make you slow down during the quiz."
+              },
+              xpReward: 10,
+              mascotAction: 'ready_sign'
+            },
+            {
+              id: 'step-5',
+              stepNumber: 5,
+              questionType: 'label-reading' as const,
+              question: "Which revision snack is better for longer focus?",
+              content: {
+                labelOptions: [
+                  { id: 'snack-a', name: 'Snack A', sugar: '15g', fiber: '1g', protein: '0g', correct: false },
+                  { id: 'snack-b', name: 'Snack B', sugar: '9g', fiber: '4g', protein: '7g', correct: true }
+                ],
+                feedback: "Snack B! The fibre and protein slow down the energy release, so your brain gets steady fuel while you revise."
+              },
+              xpReward: 10,
+              mascotAction: 'snack_pot'
+            },
+            {
+              id: 'step-6',
+              stepNumber: 6,
+              questionType: 'ordering' as const,
+              question: "Put these in the best order before a test.",
+              content: {
+                orderingItems: [
+                  { id: 'drink-water', text: 'Drink water', correctOrder: 1 },
+                  { id: 'light-snack', text: 'Eat a light snack', correctOrder: 2 },
+                  { id: 'deep-breaths', text: '3 deep breaths + check your things', correctOrder: 3 }
+                ],
+                feedback: "Hydration first, then steady fuel, then calming your nerves. That way you're ready to focus."
+              },
+              xpReward: 15,
+              mascotAction: 'thumbs_up'
+            }
+          ]
+        };
+        
+        return res.json(lessonData);
+      }
+      
       return res.status(404).json({ error: 'Lesson not found' });
     } catch (error) {
       console.error('Get lesson error:', error);
@@ -107,16 +212,30 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
-      // For now, hardcode the correct answers
+      // For now, hardcode the correct answers by lesson
       // In the future, this would check against the database
-      const correctAnswers: Record<string, string | boolean> = {
+      const fuelForFootballAnswers: Record<string, string | boolean> = {
         'step-1': 'porridge',
         'step-2': true,
         'step-3': 'matching-complete',
         'step-4': 'banana'
       };
+      
+      const brainFuelAnswers: Record<string, string | boolean> = {
+        'step-1': 'porridge-berries',
+        'step-2': true,
+        'step-3': 'matching-complete',
+        'step-4': 'banana-water',
+        'step-5': 'snack-b',
+        'step-6': 'ordering-complete'
+      };
 
-      const expectedAnswer = correctAnswers[validatedData.stepId];
+      let expectedAnswer;
+      if (validatedData.lessonId === 'fuel-for-football') {
+        expectedAnswer = fuelForFootballAnswers[validatedData.stepId];
+      } else if (validatedData.lessonId === 'brainfuel-for-school') {
+        expectedAnswer = brainFuelAnswers[validatedData.stepId];
+      }
       let isCorrect = false;
 
       if (typeof expectedAnswer === 'boolean') {
@@ -125,15 +244,29 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         isCorrect = validatedData.answer === expectedAnswer;
       }
 
-      // Award XP based on step
-      const xpRewards: Record<string, number> = {
-        'step-1': 10,
-        'step-2': 10,
-        'step-3': 15,
-        'step-4': 10
-      };
+      // Award XP based on lesson and step
+      let xpReward = 10; // default
+      if (validatedData.lessonId === 'fuel-for-football') {
+        const fuelXpRewards: Record<string, number> = {
+          'step-1': 10,
+          'step-2': 10,
+          'step-3': 15,
+          'step-4': 10
+        };
+        xpReward = fuelXpRewards[validatedData.stepId] || 10;
+      } else if (validatedData.lessonId === 'brainfuel-for-school') {
+        const brainXpRewards: Record<string, number> = {
+          'step-1': 10,
+          'step-2': 10,
+          'step-3': 15,
+          'step-4': 10,
+          'step-5': 10,
+          'step-6': 15
+        };
+        xpReward = brainXpRewards[validatedData.stepId] || 10;
+      }
 
-      const xpAwarded = isCorrect ? xpRewards[validatedData.stepId] || 10 : 0;
+      const xpAwarded = isCorrect ? xpReward : 0;
 
       // If correct, award XP to user
       if (isCorrect && xpAwarded > 0) {

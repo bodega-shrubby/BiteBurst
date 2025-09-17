@@ -1,0 +1,83 @@
+Task: Build the “BrainFuel for School” lesson for BiteBurst using Duolingo-style lesson UI.
+General UI Guidelines
+Mobile-first layout (430×932).
+Two key states:
+Lesson Asking Screen → Question prompt with answer options.
+Lesson Success Screen → Feedback with mascot reaction + XP.
+Progress bar at top (yellow fill, light grey background).
+Hearts (lives) in top-right corner.
+“CHECK” button disabled until an option is chosen.
+On success: green banner ✔ “Nice!” with CONTINUE button.
+Mascot = BiteBurst Orange with glasses + clipboard.
+Lesson Structure (BrainFuel for School, Ages 12–14)
+Step 1 – Asking Screen
+Question: “Which breakfast gives your brain the best fuel for a 2-hour exam?”
+Answer Options:
+🥣 Porridge with blueberries + milk (correct)
+🥛 Chocolate cereal + fizzy drink
+🍞 White toast with jam
+Success Screen:
+Highlighted correct answer.
+Mascot animation: throws graduation cap.
+Feedback: “Great choice! Porridge gives slow, steady energy. Blueberries help with memory, and milk’s protein keeps your brain working smoothly through the exam.”
++10 XP appears by progress bar.
+Step 2 – Asking Screen
+Question: “Your brain is mostly water. Even small dehydration can make it harder to concentrate.”
+Answer Options: True (correct) | False
+Success Screen:
+Highlighted correct answer: True.
+Mascot animation: sips water, brain glows.
+Feedback: “Right! Even losing a bit of water makes you think slower and feel tired. Drinking water keeps you sharp in lessons and exams.”
++10 XP.
+Step 3 – Asking Screen (Matching Game)
+Question: “Match the food to what it helps most.”
+Draggables: 🐟 Salmon, 🥚 Eggs, 🥦 Broccoli, 🫘 Beans
+Drop Zones: Brain cells, Nerves, Clear thinking (vitamins), Oxygen delivery
+Correct Matches:
+Salmon → Brain cells
+Eggs → Nerves
+Broccoli → Clear thinking
+Beans → Oxygen delivery
+Success Screen:
+Matches highlighted with lines.
+Feedback per item:
+“Salmon gives your brain healthy fats for focus.”
+“Eggs help your brain send messages faster.”
+“Broccoli has vitamins to keep you alert.”
+“Beans have iron, which carries oxygen so your brain stays focused.”
+Mascot animation: ticks off a clipboard.
++15 XP.
+Step 4 – Asking Screen
+Question: “It’s 30 minutes before your science quiz. What’s the best quick snack?”
+Answer Options:
+🍌 Banana + water (correct)
+🍫 Chocolate bar + juice
+🥪 Large sandwich
+Success Screen:
+Highlighted correct answer: Banana + water.
+Mascot animation: stopwatch appears, mascot gives “ready” sign.
+Feedback: “A banana gives quick energy and water keeps your brain working fast. Heavy food or lots of sugar can make you slow down during the quiz.”
++10 XP.
+Step 5 – Asking Screen (Label Reading)
+Question: “Which revision snack is better for longer focus?”
+Snack A: 15g sugar, 1g fibre, 0g protein
+Snack B: 9g sugar, 4g fibre, 7g protein (correct)
+Success Screen:
+Highlighted Snack B.
+Mascot animation: holds up a snack pot with a smile.
+Feedback: “Snack B! The fibre and protein slow down the energy release, so your brain gets steady fuel while you revise.”
++10 XP.
+Step 6 – Asking Screen (Ordering Game)
+Question: “Put these in the best order before a test.”
+Items: Drink water → Eat a light snack → 3 deep breaths + check your things
+Correct Order: [Drink water, Eat a light snack, 3 deep breaths + check things]
+Success Screen:
+Correct order locks into place.
+Mascot animation: takes a deep breath and thumbs up.
+Feedback: “Hydration first, then steady fuel, then calming your nerves. That way you’re ready to focus.”
++15 XP.
+Wrap-Up Screen
+Mascot with glasses + clipboard: “Well done! You fueled your brain like a pro.”
+Trophy animation + XP total shown.
+Badge unlocked: “🧠 Focus Master”.
+Next lesson unlocked: Memory Boost Foods.
