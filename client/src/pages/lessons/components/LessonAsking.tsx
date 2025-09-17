@@ -44,34 +44,29 @@ export default function LessonAsking({
   const [orderedItems, setOrderedItems] = useState<string[]>([]);
   const [draggedOrderItem, setDraggedOrderItem] = useState<string | null>(null);
   
-  // Auto-update answer when matching is complete
+  // Auto-update answer when matching is complete (allows checking even if incorrect)
   useEffect(() => {
     if (step.questionType === 'matching' && step.content.matchingPairs) {
       const pairs = step.content.matchingPairs;
       const allMatched = Object.keys(matches).length === pairs.length;
-      const correctMatches = pairs.every(pair => matches[pair.left] === pair.right);
       
-      if (allMatched && correctMatches && selectedAnswer !== 'matching-complete') {
+      if (allMatched && selectedAnswer !== 'matching-complete') {
         onAnswerSelect('matching-complete');
-      } else if ((!allMatched || !correctMatches) && selectedAnswer === 'matching-complete') {
+      } else if (!allMatched && selectedAnswer === 'matching-complete') {
         onAnswerSelect('');
       }
     }
   }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
   
-  // Auto-update answer when ordering is complete and correct
+  // Auto-update answer when ordering is complete (allows checking even if incorrect)
   useEffect(() => {
     if (step.questionType === 'ordering' && step.content.orderingItems) {
       const items = step.content.orderingItems;
-      const isCorrectOrder = orderedItems.length === items.length && 
-        orderedItems.every((itemId, index) => {
-          const item = items.find(i => i.id === itemId);
-          return item && item.correctOrder === index + 1;
-        });
+      const allItemsPlaced = orderedItems.length === items.length;
       
-      if (isCorrectOrder && selectedAnswer !== 'ordering-complete') {
+      if (allItemsPlaced && selectedAnswer !== 'ordering-complete') {
         onAnswerSelect('ordering-complete');
-      } else if (!isCorrectOrder && selectedAnswer === 'ordering-complete') {
+      } else if (!allItemsPlaced && selectedAnswer === 'ordering-complete') {
         onAnswerSelect('');
       }
     }
