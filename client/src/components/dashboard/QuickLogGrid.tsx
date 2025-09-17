@@ -91,6 +91,8 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
     const isPressed = pressedTile === `${type}-${query}`;
     const isDisabled = type === 'food' && foodLogMutation.isPending;
     
+    console.log(`🔧 TileButton ${type}-${query}: pressed=${isPressed}, disabled=${isDisabled}, pending=${foodLogMutation.isPending}`);
+    
     return (
       <button
         onMouseDown={() => !isDisabled && setPressedTile(`${type}-${query}`)}
