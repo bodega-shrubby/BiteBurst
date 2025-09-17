@@ -16,6 +16,7 @@ import Leaderboard from "@/pages/Leaderboard";
 import Achievements from "@/pages/Achievements";
 import Lessons from "@/pages/Lessons";
 import LessonDemo from "@/pages/LessonDemo";
+import FuelForFootball from "@/pages/lessons/FuelForFootball";
 import Streak from "@/pages/Streak";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +77,7 @@ function Router() {
       <Route path="/achievements" component={Achievements} />
       <Route path="/lessons" component={Lessons} />
       <Route path="/lesson/demo" component={LessonDemo} />
+      <Route path="/lesson/fuel-for-football" component={FuelForFootball} />
       <Route path="/streak" component={Streak} />
       
       {/* Onboarding Flow - Single Provider */}

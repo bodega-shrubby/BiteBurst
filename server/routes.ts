@@ -9,6 +9,7 @@ import { registerDailySummaryRoutes } from "./routes/dailySummary";
 import { registerDailySummaryV2Routes } from "./routes/dailySummaryV2";
 import { registerBadgeRoutes } from "./routes/badges";
 import { registerLeaderboardRoutes } from "./routes/leaderboard";
+import { registerLessonRoutes } from "./routes/lessons";
 import { updateStreak, getCurrentTime } from "./utils/streakTracker";
 // Replit Auth completely removed
 
