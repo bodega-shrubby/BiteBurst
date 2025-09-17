@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
-import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
+import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
 
 interface LessonStep {
   id: string;
@@ -82,11 +82,11 @@ export default function LessonSuccess({
 
   return (
     <div className="max-w-md mx-auto space-y-6">
-      {/* Captain Carrot Celebrating */}
+      {/* Sunny Celebrating */}
       <div className="flex justify-center">
         <img 
-          src={captainCarrotImage} 
-          alt="Captain Carrot Celebrating" 
+          src={sunnyCelebrateImage} 
+          alt="Sunny Celebrating" 
           className="w-24 h-24 object-contain animate-bounce"
         />
       </div>
