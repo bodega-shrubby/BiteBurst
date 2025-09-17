@@ -55,15 +55,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             {
               id: 'step-3',
               stepNumber: 3,
-              questionType: 'matching' as const,
-              question: "Match the food to its benefit.",
+              questionType: 'multiple-choice' as const,
+              question: "Which food helps your muscles recover after playing football?",
               content: {
-                matchingPairs: [
-                  { left: '🥦 Broccoli', right: 'Vitamins for stamina' },
-                  { left: '🥣 Yogurt with berries', right: 'Recovery fuel for muscles' },
-                  { left: '🥚 Boiled egg', right: 'Protein for strength' }
+                options: [
+                  { id: 'broccoli', text: 'Broccoli', emoji: '🥦', correct: false },
+                  { id: 'yogurt', text: 'Yogurt with berries', emoji: '🥣', correct: true },
+                  { id: 'egg', text: 'Boiled egg', emoji: '🥚', correct: false }
                 ],
-                feedback: "Perfect matches! Broccoli keeps your body strong, yogurt helps muscles recover, and eggs build strength for harder kicks."
+                feedback: "Perfect! Yogurt with berries helps your muscles recover after playing. The protein rebuilds your muscles while the berries give energy."
               },
               xpReward: 15,
               mascotAction: 'juggling_football'
@@ -112,7 +112,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const correctAnswers: Record<string, string | boolean> = {
         'step-1': 'porridge',
         'step-2': true,
-        'step-3': 'matching', // Simplified for now
+        'step-3': 'yogurt',
         'step-4': 'banana'
       };
 
@@ -145,12 +145,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               level: Math.floor((user.totalXp + xpAwarded) / 100) + 1
             });
             
-            // Log XP event
-            await storage.createXpEvent({
-              userId: validatedData.userId,
-              amount: xpAwarded,
-              reason: `lesson_${validatedData.lessonId}_${validatedData.stepId}`
-            });
+            // Log XP event (simplified for now)
+            console.log(`XP awarded: ${xpAwarded} for user ${validatedData.userId}`);
           }
         } catch (xpError) {
           console.error('Error awarding XP:', xpError);

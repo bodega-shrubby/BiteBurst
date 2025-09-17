@@ -320,6 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerDailySummaryV2Routes(app, requireAuth);
   registerBadgeRoutes(app, requireAuth);
   registerLeaderboardRoutes(app, requireAuth);
+  registerLessonRoutes(app, requireAuth);
   registerDevRoutes(app); // Development testing routes
 
   const httpServer = createServer(app);

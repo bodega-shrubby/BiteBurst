@@ -8,7 +8,7 @@ export interface CleanLesson {
 }
 
 export const cleanLessons: CleanLesson[] = [
-  { id: 'snacks', title: 'Healthy\nSnacks', icon: '🍎', state: 'current' },
+  { id: 'fuel-for-football', title: 'Fuel for\nFootball', icon: '⚽', state: 'current' },
   { id: 'hydration', title: 'Hydration\nHeroes', icon: '💧', state: 'unlocked' },
   { id: 'move', title: 'Move &\nGroove', icon: '⚽', state: 'locked' },
   { id: 'focus', title: 'Focus\nBoosters', icon: '🧠', state: 'locked' },

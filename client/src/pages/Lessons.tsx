@@ -76,14 +76,18 @@ export default function Lessons() {
   // Handle lesson click
   const handleLessonClick = (lesson: CleanLesson) => {
     if (lesson.state === 'current' || lesson.state === 'unlocked') {
-      setLocation(`/lesson/demo?id=${lesson.id}`);
+      if (lesson.id === 'fuel-for-football') {
+        setLocation('/lesson/fuel-for-football');
+      } else {
+        setLocation(`/lesson/demo?id=${lesson.id}`);
+      }
     }
   };
 
   // Progress hint text
   const getProgressHint = () => {
     if (completed === 0) {
-      return 'Tap "Healthy Snacks" to start your journey!';
+      return 'Tap "Fuel for Football" to start your journey!';
     }
     return 'Great progress! Keep going to unlock more lessons!';
   };
@@ -121,10 +125,10 @@ export default function Lessons() {
         <div className="max-w-sm mx-auto">
           <div className="text-center space-y-1">
             <h1 className="text-xl font-bold text-white">
-              Healthy Habits: Week 1
+              Sports Nutrition: Week 1
             </h1>
             <p className="text-sm text-orange-100">
-              Learn the basics of healthy eating and movement
+              Learn what foods fuel your body for football and sports
             </p>
           </div>
         </div>
