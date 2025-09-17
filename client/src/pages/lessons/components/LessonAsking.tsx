@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
 
 interface LessonStep {
   id: string;
@@ -36,6 +37,21 @@ export default function LessonAsking({
   // Matching game state
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  
+  // Auto-update answer when matching is complete
+  useEffect(() => {
+    if (step.questionType === 'matching' && step.content.matchingPairs) {
+      const pairs = step.content.matchingPairs;
+      const allMatched = Object.keys(matches).length === pairs.length;
+      const correctMatches = pairs.every(pair => matches[pair.left] === pair.right);
+      
+      if (allMatched && correctMatches && selectedAnswer !== 'matching-complete') {
+        onAnswerSelect('matching-complete');
+      } else if ((!allMatched || !correctMatches) && selectedAnswer === 'matching-complete') {
+        onAnswerSelect('');
+      }
+    }
+  }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
   
   const renderMultipleChoice = () => {
     if (!step.content.options) return null;
@@ -120,13 +136,6 @@ export default function LessonAsking({
     // Check if all matches are complete and correct
     const allMatched = Object.keys(matches).length === pairs.length;
     const correctMatches = pairs.every(pair => matches[pair.left] === pair.right);
-    
-    // Automatically set answer when all matches are complete
-    if (allMatched && correctMatches && selectedAnswer !== 'matching-complete') {
-      onAnswerSelect('matching-complete');
-    } else if ((!allMatched || !correctMatches) && selectedAnswer === 'matching-complete') {
-      onAnswerSelect('');
-    }
     
     const handleDragStart = (e: React.DragEvent, item: string) => {
       setDraggedItem(item);
@@ -243,12 +252,13 @@ export default function LessonAsking({
 
   return (
     <div className="max-w-md mx-auto space-y-6">
-      {/* Mascot Placeholder */}
+      {/* Captain Carrot Mascot */}
       <div className="flex justify-center">
-        <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center border-2 border-orange-200">
-          <span className="text-3xl">🍊</span>
-          <span className="sr-only">Mascot placeholder</span>
-        </div>
+        <img 
+          src={captainCarrotImage} 
+          alt="Captain Carrot Mascot" 
+          className="w-24 h-24 object-contain"
+        />
       </div>
 
       {/* Question */}
