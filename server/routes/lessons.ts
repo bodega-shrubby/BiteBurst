@@ -38,7 +38,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Yes! Oats give long energy and fruit adds vitamins. That's why players eat porridge before training — it keeps them running all game!"
               },
               xpReward: 10,
-              mascotAction: 'holding_football'
+              mascotAction: 'holding_football',
+              retryConfig: {
+                maxAttempts: 2,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Not quite — think steady energy that lasts the whole session.",
+                  tryAgain2: "Almost! Which breakfast keeps you running, not just at the start?",
+                  learnCard: "Porridge gives slow, steady energy and fruit adds vitamins — perfect to keep you running till the final whistle."
+                }
+              }
             },
             {
               id: 'step-2',
@@ -50,7 +59,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Correct! Even Messi drinks water at half-time. It cools your body and keeps you fast."
               },
               xpReward: 10,
-              mascotAction: 'sipping_water'
+              mascotAction: 'sipping_water',
+              retryConfig: {
+                maxAttempts: 2,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Try again — players drink water so they don't slow down later.",
+                  learnCard: "Even a bit of dehydration makes you slow and tired. Water keeps you cool and fast for the match."
+                }
+              }
             },
             {
               id: 'step-3',
@@ -66,7 +83,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Perfect matches! Each food gives your body exactly what it needs for football."
               },
               xpReward: 15,
-              mascotAction: 'juggling_football'
+              mascotAction: 'juggling_football',
+              retryConfig: {
+                maxAttempts: 2,
+                xp: { firstTry: 15, secondTry: 8, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Some matches aren't right — think stamina, recovery, and strength.",
+                  learnCard: "🥦 Broccoli: vitamins to keep you going.\n🥣 Yogurt + berries: helps muscles recover after play.\n🥚 Egg: protein for strong legs to kick harder."
+                }
+              }
             },
             {
               id: 'step-4',
@@ -82,7 +107,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Perfect! Bananas give quick energy to refuel your legs so you can sprint again in the second half — just like Mbappé."
               },
               xpReward: 10,
-              mascotAction: 'high_five'
+              mascotAction: 'high_five',
+              retryConfig: {
+                maxAttempts: 2,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "That's a quick burst… but you'll slow down after. Pick one that refuels your legs.",
+                  learnCard: "Banana gives quick, clean energy so you can sprint again in the second half."
+                }
+              }
             }
           ]
         };
