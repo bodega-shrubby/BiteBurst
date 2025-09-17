@@ -59,10 +59,10 @@ export default function LessonSuccess({
     };
     
     const brainMatchingFeedback = {
-      '🐟 Salmon': 'Salmon gives your brain healthy fats for focus.',
-      '🥚 Eggs': 'Eggs help your brain send messages faster.',
-      '🥦 Broccoli': 'Broccoli has vitamins to keep you alert.',
-      '🫘 Beans': 'Beans have iron, which carries oxygen so your brain stays focused.'
+      '🐟 Salmon': 'Salmon has healthy fats that boost memory.',
+      '🥚 Eggs': 'Eggs give protein for steady energy, helping you focus.',
+      '🥦 Broccoli': 'Broccoli\'s vitamins keep you healthy and alert.',
+      '🫘 Beans': 'Beans have iron, which carries oxygen in your blood so your brain stays sharp.'
     };
     
     // Use brain feedback if it contains salmon, otherwise use football feedback
@@ -174,13 +174,13 @@ export default function LessonSuccess({
               <div className="p-4 rounded-2xl border-2 border-green-400 bg-green-50">
                 <div className="flex items-center justify-center space-x-3">
                   <Check className="w-6 h-6 text-green-600" />
-                  {correctOption.emoji && (
+                  {'emoji' in correctOption && correctOption.emoji && (
                     <span className="text-2xl" role="img" aria-hidden="true">
                       {correctOption.emoji}
                     </span>
                   )}
                   <span className="text-lg font-medium text-gray-900">
-                    {correctOption.text}
+                    {'text' in correctOption ? correctOption.text : 'name' in correctOption ? correctOption.name : ''}
                   </span>
                 </div>
               </div>

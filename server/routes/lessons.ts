@@ -129,13 +129,13 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-3',
               stepNumber: 3,
               questionType: 'matching' as const,
-              question: "Match the food to what it helps most.",
+              question: "Match the food to what it gives your brain for school.",
               content: {
                 matchingPairs: [
-                  { left: '🐟 Salmon', right: 'Brain cells' },
-                  { left: '🥚 Eggs', right: 'Nerves' },
-                  { left: '🥦 Broccoli', right: 'Clear thinking' },
-                  { left: '🫘 Beans', right: 'Oxygen delivery' }
+                  { left: '🐟 Salmon', right: 'Stronger memory for tests' },
+                  { left: '🥚 Eggs', right: 'Energy to focus in lessons' },
+                  { left: '🥦 Broccoli', right: 'Vitamins to stay healthy' },
+                  { left: '🫘 Beans', right: 'Oxygen for clear thinking' }
                 ],
                 feedback: "Perfect matches! Each food helps your brain work better in different ways."
               },
