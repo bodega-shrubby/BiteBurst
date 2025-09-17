@@ -156,14 +156,22 @@ export default function DashboardV2() {
     },
   });
 
-  // Debug: Add global click inspector
+
+  // Debug: Global click inspector to identify blocking elements
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      console.log('🎯 GLOBAL CLICK DEBUG - Top element at click:', el, 'className:', el?.className);
+      const target = e.target as HTMLElement;
+      const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+      const allElementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+      
+      console.log('🎯 GLOBAL CLICK DEBUG:');
+      console.log('  Target:', target, target?.className);
+      console.log('  ElementAtPoint:', elementAtPoint, elementAtPoint?.className);
+      console.log('  All elements:', allElementsAtPoint.slice(0, 5).map(el => ({ tag: el.tagName, class: el.className })));
     };
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
+    
+    document.addEventListener('click', handleClick, true); // Use capture to catch all clicks
+    return () => document.removeEventListener('click', handleClick, true);
   }, []);
 
   // Handle goal completion celebration
@@ -369,7 +377,7 @@ export default function DashboardV2() {
         </div>
 
         {/* Quick Log Grid */}
-        <div className="relative z-[999] pointer-events-auto outline outline-2 outline-red-500 bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="relative z-50 bg-white rounded-2xl border border-gray-200 p-6">
           <QuickLogGrid />
         </div>
 

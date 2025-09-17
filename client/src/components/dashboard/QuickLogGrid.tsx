@@ -71,57 +71,10 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
     }
   });
   
-  const handleTilePress = (type: 'food' | 'activity', query: string) => {
-    console.log('🔍 Quick Log - Tile pressed:', { type, query, isPending: foodLogMutation.isPending, user: !!user });
-    
-    // Prevent action if already processing a food log
-    if (foodLogMutation.isPending) {
-      console.log('⏳ Quick Log - Mutation is pending, skipping action');
-      return;
-    }
-    
-    // Check authentication
-    if (!user) {
-      console.log('❌ Quick Log - User not authenticated');
-      toast({
-        title: 'Please log in',
-        description: 'You need to log in to track your food and activities.',
-        action: (
-          <button
-            onClick={() => setLocation('/login')}
-            className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium hover:bg-gray-100"
-          >
-            Login
-          </button>
-        )
-      });
-      return;
-    }
-    
-    setPressedTile(`${type}-${query}`);
-    console.log('🎯 Quick Log - Setting pressedTile:', `${type}-${query}`);
-    
-    if (type === 'food') {
-      // For food items: automatically log and navigate to success
-      const foodOption = FOOD_OPTIONS.find(opt => opt.query === query);
-      console.log('🍎 Quick Log - Food option found:', foodOption);
-      if (foodOption) {
-        setTimeout(() => {
-          console.log('🚀 Quick Log - Triggering food mutation:', { emoji: foodOption.emoji, label: foodOption.label });
-          foodLogMutation.mutate({
-            emoji: foodOption.emoji,
-            label: foodOption.label
-          });
-        }, 150); // Brief bounce animation
-      }
-    } else {
-      // For activity items: navigate to activity log page
-      console.log('⚽ Quick Log - Activity navigation:', `/activity-log?activity=${query}`);
-      setTimeout(() => {
-        setLocation(`/activity-log?activity=${query}`);
-        setPressedTile(null);
-      }, 150);
-    }
+  // Simplified test function to bypass complex logic
+  const handleSimpleTest = () => {
+    console.log('🎯 SIMPLE TEST BUTTON CLICKED!');
+    alert('Button clicked! If you see this, clicks are working.');
   };
   
   const TileButton = ({ 
@@ -143,9 +96,17 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
         onMouseDown={() => !isDisabled && setPressedTile(`${type}-${query}`)}
         onMouseUp={() => setPressedTile(null)}
         onMouseLeave={() => setPressedTile(null)}
-        onClick={() => {
-          console.log('🔥 TILE CLICKED:', { type, query, label, isDisabled });
-          handleTilePress(type, query);
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('🔥 SIMPLE CLICK TEST:', type, query);
+          if (type === 'food') {
+            console.log('🍎 Food clicked - navigating to success');
+            setLocation('/success?type=food&xp=15');
+          } else {
+            console.log('⚽ Activity clicked - navigating to activity log');
+            setLocation(`/activity-log?activity=${query}`);
+          }
         }}
         disabled={isDisabled}
         data-testid={`quick-log-${type}-${query}`}
@@ -184,6 +145,12 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
       <div>
         <h3 className="text-xl font-bold text-black mb-3">Quick Log</h3>
         <p className="text-sm text-gray-600 mb-4">Tap, snap, go!</p>
+        <button 
+          onClick={handleSimpleTest}
+          className="bg-red-500 text-white px-4 py-2 rounded mb-4"
+        >
+          TEST CLICK - If this works, clicks are functional
+        </button>
       </div>
       
       {/* Food Row */}
