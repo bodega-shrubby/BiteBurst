@@ -6,6 +6,7 @@ import {
   xpEvents,
   avatars,
   goals,
+  lessonAttempts,
   type User,
   type InsertUser,
   type Log,
@@ -14,6 +15,8 @@ import {
   type Badge,
   type Avatar,
   type Goal,
+  type LessonAttempt,
+  type InsertLessonAttempt,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -46,6 +49,9 @@ export interface IStorage {
   // XP operations
   updateUserXP(userId: string, updates: { totalXp: number; level: number; streak: number; lastLogAt: Date }): Promise<User>;
   logXPEvent(event: { userId: string; amount: number; reason: string; refLog?: string }): Promise<any>;
+  
+  // Lesson attempt operations
+  logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -177,6 +183,14 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return xpEvent;
+  }
+
+  async logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt> {
+    const [attempt] = await db
+      .insert(lessonAttempts)
+      .values(insertAttempt as any)
+      .returning();
+    return attempt;
   }
 }
 

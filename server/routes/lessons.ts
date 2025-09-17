@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { z } from "zod";
+import { insertLessonAttemptSchema } from "../../shared/schema";
 
 const answerSubmissionSchema = z.object({
   userId: z.string(),
@@ -328,6 +329,26 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     } catch (error) {
       console.error('Submit answer error:', error);
       res.status(500).json({ error: 'Failed to submit answer' });
+    }
+  });
+
+  // Log lesson attempt analytics
+  app.post('/api/lessons/log-attempt', requireAuth, async (req: any, res: any) => {
+    try {
+      const validatedData = insertLessonAttemptSchema.parse(req.body);
+      
+      // Verify user matches authenticated user
+      if (validatedData.userId !== req.user.userId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      // Store the analytics data
+      await storage.logLessonAttempt(validatedData);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Log attempt error:', error);
+      res.status(500).json({ error: 'Failed to log attempt' });
     }
   });
 }
