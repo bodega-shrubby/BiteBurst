@@ -72,6 +72,32 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     enabled: !!lessonId,
   });
 
+  // Analytics logging mutation
+  const logAttemptMutation = useMutation({
+    mutationFn: async (attemptData: {
+      lessonId: string;
+      stepId: string;
+      stepNumber: number;
+      attemptNumber: number;
+      isCorrect: boolean;
+      selectedAnswer: string;
+      timeOnStepMs: number;
+      heartsRemaining: number;
+      xpEarned: number;
+      usedLearnCard: boolean;
+    }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      return apiRequest('/api/lessons/log-attempt', {
+        method: 'POST',
+        body: {
+          userId: user.id,
+          ...attemptData,
+        }
+      });
+    },
+  });
+
   // Submit answer mutation
   const submitAnswerMutation = useMutation({
     mutationFn: async ({ stepId, answer }: { stepId: string; answer: string }) => {
@@ -95,6 +121,23 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         // Calculate XP based on current attempt
         const xpEarned = currentStep ? calculateXP(currentStep, currentAttempt) : response.xpAwarded || 0;
         setTotalXpEarned(prev => prev + xpEarned);
+        
+        // Log successful attempt
+        if (currentStep && selectedAnswer) {
+          logAttemptMutation.mutate({
+            lessonId,
+            stepId: currentStep.id,
+            stepNumber: currentStep.stepNumber,
+            attemptNumber: currentAttempt,
+            isCorrect: true,
+            selectedAnswer,
+            timeOnStepMs,
+            heartsRemaining: lives,
+            xpEarned,
+            usedLearnCard: false
+          });
+        }
+        
         setLessonState('success');
         // Show continue button after a delay
         setTimeout(() => setShowContinueButton(true), 1500);
@@ -112,6 +155,22 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }
         
         const maxAttempts = currentStep.retryConfig.maxAttempts;
+        
+        // Log incorrect attempt
+        if (currentStep && selectedAnswer) {
+          logAttemptMutation.mutate({
+            lessonId,
+            stepId: currentStep.id,
+            stepNumber: currentStep.stepNumber,
+            attemptNumber: currentAttempt,
+            isCorrect: false,
+            selectedAnswer,
+            timeOnStepMs,
+            heartsRemaining: Math.max(0, lives - 1), // After deduction, clamped
+            xpEarned: 0,
+            usedLearnCard: false
+          });
+        }
         
         // SPEC FIX: Handle attempt 2 routing correctly
         if (currentAttempt === 1) {
@@ -131,12 +190,44 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             const learnXP = calculateXP(currentStep, 3); // Should be 0
             setTotalXpEarned(prev => prev + learnXP);
             setLessonState('learn');
+            
+            // Log learn card usage
+            if (currentStep && selectedAnswer) {
+              logAttemptMutation.mutate({
+                lessonId,
+                stepId: currentStep.id,
+                stepNumber: currentStep.stepNumber,
+                attemptNumber: 3, // Learn card is attempt 3
+                isCorrect: false,
+                selectedAnswer: 'learn-card-shown',
+                timeOnStepMs,
+                heartsRemaining: Math.max(0, lives - 1), // After deduction, clamped
+                xpEarned: learnXP,
+                usedLearnCard: true
+              });
+            }
           }
         } else {
           // Third attempt or max attempts reached - show learn card
           const learnXP = calculateXP(currentStep, 3); // Should be 0
           setTotalXpEarned(prev => prev + learnXP);
           setLessonState('learn');
+          
+          // Log learn card usage
+          if (currentStep && selectedAnswer) {
+            logAttemptMutation.mutate({
+              lessonId,
+              stepId: currentStep.id,
+              stepNumber: currentStep.stepNumber,
+              attemptNumber: 3, // Learn card is attempt 3
+              isCorrect: false,
+              selectedAnswer: 'learn-card-shown',
+              timeOnStepMs,
+              heartsRemaining: Math.max(0, lives - 1), // After deduction, clamped
+              xpEarned: learnXP,
+              usedLearnCard: true
+            });
+          }
         }
       }
     }
