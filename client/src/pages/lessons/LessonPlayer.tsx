@@ -5,13 +5,13 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { LessonAsking, LessonSuccess, ProgressBar } from './components';
+import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, ProgressBar } from './components';
 
 interface LessonPlayerProps {
   lessonId: string;
 }
 
-type LessonState = 'asking' | 'success' | 'complete';
+type LessonState = 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
 
 interface LessonStep {
   id: string;
@@ -28,6 +28,15 @@ interface LessonStep {
   };
   xpReward: number;
   mascotAction?: string;
+  retryConfig?: {
+    maxAttempts: number;
+    xp: { firstTry: number; secondTry: number; learnCard: number };
+    messages: {
+      tryAgain1: string;
+      tryAgain2?: string;
+      learnCard: string;
+    };
+  };
 }
 
 interface LessonData {
@@ -47,8 +56,14 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
   const [lives, setLives] = useState(5);
+  // Removed redundant hearts state - using lives for consistency
   const [totalXpEarned, setTotalXpEarned] = useState(0);
   const [showContinueButton, setShowContinueButton] = useState(false);
+  
+  // Retry flow state
+  const [currentAttempt, setCurrentAttempt] = useState(1); // 1, 2, or 3 (learn card)
+  const [stepStartTime, setStepStartTime] = useState<number>(Date.now());
+  const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
 
   // Fetch lesson data
   const { data: lessonData, isLoading } = useQuery({
@@ -73,19 +88,56 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       });
     },
     onSuccess: (response) => {
+      const timeOnStepMs = Date.now() - stepStartTime;
       setIsAnswerCorrect(response.correct);
-      setTotalXpEarned(prev => prev + (response.xpAwarded || 0));
       
       if (response.correct) {
+        // Calculate XP based on current attempt
+        const xpEarned = currentStep ? calculateXP(currentStep, currentAttempt) : response.xpAwarded || 0;
+        setTotalXpEarned(prev => prev + xpEarned);
         setLessonState('success');
         // Show continue button after a delay
         setTimeout(() => setShowContinueButton(true), 1500);
       } else {
+        // Handle incorrect answer - deduct life and show retry flow
         setLives(prev => Math.max(0, prev - 1));
-        // Reset for retry
-        setTimeout(() => {
-          setSelectedAnswer(null);
-        }, 1500);
+        
+        if (!currentStep?.retryConfig) {
+          // No retry config - use old behavior
+          setTimeout(() => {
+            setSelectedAnswer(null);
+            setHasSelectionChanged(false);
+          }, 1500);
+          return;
+        }
+        
+        const maxAttempts = currentStep.retryConfig.maxAttempts;
+        
+        // SPEC FIX: Handle attempt 2 routing correctly
+        if (currentAttempt === 1) {
+          // First incorrect - always show try-again banner
+          setLessonState('incorrect');
+          setCurrentAttempt(2);
+          setHasSelectionChanged(false);
+        } else if (currentAttempt === 2) {
+          // Second incorrect - check if tryAgain2 message exists
+          if (currentStep.retryConfig.messages.tryAgain2) {
+            // Show try-again banner with second message
+            setLessonState('incorrect');
+            setCurrentAttempt(3);
+            setHasSelectionChanged(false);
+          } else {
+            // No second message - go straight to learn card
+            const learnXP = calculateXP(currentStep, 3); // Should be 0
+            setTotalXpEarned(prev => prev + learnXP);
+            setLessonState('learn');
+          }
+        } else {
+          // Third attempt or max attempts reached - show learn card
+          const learnXP = calculateXP(currentStep, 3); // Should be 0
+          setTotalXpEarned(prev => prev + learnXP);
+          setLessonState('learn');
+        }
       }
     }
   });
@@ -95,6 +147,38 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
+    setHasSelectionChanged(true);
+  };
+
+  // Calculate XP based on current attempt and retryConfig
+  const calculateXP = (step: LessonStep, attempt: number): number => {
+    if (!step.retryConfig) return step.xpReward; // Fallback to original XP
+    
+    if (attempt === 1) return step.retryConfig.xp.firstTry;
+    if (attempt === 2) return step.retryConfig.xp.secondTry;
+    return step.retryConfig.xp.learnCard; // Attempt 3 (learn card)
+  };
+
+  // Get retry message based on attempt number
+  const getRetryMessage = (step: LessonStep, attempt: number): string => {
+    if (!step.retryConfig) return "Try again!";
+    
+    if (attempt === 1) return step.retryConfig.messages.tryAgain1;
+    if (attempt === 2 && step.retryConfig.messages.tryAgain2) {
+      return step.retryConfig.messages.tryAgain2;
+    }
+    return step.retryConfig.messages.tryAgain1; // Fallback to first message
+  };
+
+  // Reset state for next step
+  const resetForNextStep = () => {
+    setCurrentStepIndex(prev => prev + 1);
+    setLessonState('asking');
+    setSelectedAnswer(null);
+    setShowContinueButton(false);
+    setCurrentAttempt(1);
+    setStepStartTime(Date.now());
+    setHasSelectionChanged(false);
   };
 
   const handleCheckAnswer = () => {
@@ -109,12 +193,25 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const handleContinue = () => {
     if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
       // Move to next step
-      setCurrentStepIndex(prev => prev + 1);
-      setLessonState('asking');
-      setSelectedAnswer(null);
-      setShowContinueButton(false);
+      resetForNextStep();
     } else {
       // Lesson complete
+      setLessonState('complete');
+    }
+  };
+
+  // Handle "Try Again" from incorrect banner
+  const handleTryAgain = () => {
+    setLessonState('asking');
+    setSelectedAnswer(null);
+    setHasSelectionChanged(false);
+  };
+
+  // Handle "Continue" from learn card (skip to next step)
+  const handleLearnContinue = () => {
+    if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
+      resetForNextStep();
+    } else {
       setLessonState('complete');
     }
   };
@@ -122,6 +219,11 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const handleClose = () => {
     setLocation('/lessons');
   };
+
+  // Reset step start time when step changes
+  useEffect(() => {
+    setStepStartTime(Date.now());
+  }, [currentStepIndex]);
 
   if (isLoading) {
     return (
@@ -202,11 +304,26 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           />
         )}
         
+        {lessonState === 'incorrect' && currentStep && (
+          <LessonIncorrect
+            message={getRetryMessage(currentStep, currentAttempt - 1)} // -1 because we already incremented
+            onTryAgain={handleTryAgain}
+            canTryAgain={true} // CRITICAL FIX: Always enable Try Again button
+          />
+        )}
+        
+        {lessonState === 'learn' && currentStep && (
+          <LessonLearn
+            message={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
+            onContinue={handleLearnContinue}
+          />
+        )}
+        
         {lessonState === 'success' && currentStep && (
           <LessonSuccess
             step={currentStep}
             selectedAnswer={selectedAnswer}
-            xpEarned={currentStep.xpReward}
+            xpEarned={calculateXP(currentStep, currentAttempt)}
             onContinue={handleContinue}
             showContinueButton={showContinueButton}
           />
