@@ -9,7 +9,8 @@ import {
   integer,
   boolean,
   date,
-  pgEnum
+  pgEnum,
+  uuid
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -171,10 +172,31 @@ export const userLessonProgress = pgTable("user_lesson_progress", {
   completed: boolean("completed").notNull().default(false),
   completedAt: timestamp("completed_at"),
   totalXpEarned: integer("total_xp_earned").notNull().default(0),
+  hearts: integer("hearts").notNull().default(3), // Track hearts/lives internally
   startedAt: timestamp("started_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => ({
   pk: { name: "user_lesson_progress_pkey", columns: [table.userId, table.lessonId] }
+}));
+
+// Lesson attempt analytics table  
+export const lessonAttempts = pgTable("lesson_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  lessonId: varchar("lesson_id").notNull().references(() => lessons.id, { onDelete: 'cascade' }),
+  stepId: varchar("step_id").notNull().references(() => lessonSteps.id, { onDelete: 'cascade' }),
+  stepNumber: integer("step_number").notNull(),
+  attemptNumber: integer("attempt_number").notNull(), // 1, 2, or 3 (learn card)
+  isCorrect: boolean("is_correct").notNull(),
+  selectedAnswer: text("selected_answer"), // The answer they selected
+  timeOnStepMs: integer("time_on_step_ms"), // Time spent on this step
+  heartsRemaining: integer("hearts_remaining").notNull(),
+  xpEarned: integer("xp_earned").notNull().default(0),
+  usedLearnCard: boolean("used_learn_card").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  userLessonIdx: index("lesson_attempts_user_lesson_idx").on(table.userId, table.lessonId),
+  stepIdx: index("lesson_attempts_step_idx").on(table.stepId)
 }));
 
 // Note: Indexes are created via SQL commands, not in Drizzle schema
@@ -199,6 +221,8 @@ export type LessonStep = typeof lessonSteps.$inferSelect;
 export type InsertLessonStep = typeof lessonSteps.$inferInsert;
 export type UserLessonProgress = typeof userLessonProgress.$inferSelect;
 export type InsertUserLessonProgress = typeof userLessonProgress.$inferInsert;
+export type LessonAttempt = typeof lessonAttempts.$inferSelect;
+export type InsertLessonAttempt = typeof lessonAttempts.$inferInsert;
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -247,7 +271,21 @@ export const insertUserLessonProgressSchema = createInsertSchema(userLessonProgr
   userId: true,
   lessonId: true,
   currentStep: true,
-  // Note: completed, completedAt, totalXpEarned are server-controlled only for security
+  // Note: completed, completedAt, totalXpEarned, hearts are server-controlled only for security
+});
+
+export const insertLessonAttemptSchema = createInsertSchema(lessonAttempts).pick({
+  userId: true,
+  lessonId: true,
+  stepId: true,
+  stepNumber: true,
+  attemptNumber: true,
+  isCorrect: true,
+  selectedAnswer: true,
+  timeOnStepMs: true,
+  heartsRemaining: true,
+  xpEarned: true,
+  usedLearnCard: true,
 });
 
 export type InsertUserType = z.infer<typeof insertUserSchema>;

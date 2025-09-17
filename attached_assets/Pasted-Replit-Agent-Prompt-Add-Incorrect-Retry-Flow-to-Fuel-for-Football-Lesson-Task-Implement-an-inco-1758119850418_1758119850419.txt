@@ -1,0 +1,115 @@
+Replit Agent Prompt — Add Incorrect/Retry Flow to “Fuel for Football” Lesson
+Task: Implement an incorrect-answer flow for the existing Fuel for Football lesson:
+Try-again hint on the same screen
+Auto-fallback to a short Learn card after max attempts
+Adjust XP/Hearts logic accordingly
+Do not change the existing correct flows, visuals, or copy except where noted below
+Global UX Rules
+Max attempts per step: 2
+Hearts/Lives: lose 1 heart per incorrect submission (on CHECK)
+Don’t deduct hearts while the learner is still dragging/re-selecting before CHECK.
+XP awards:
+Correct on first try → full XP (10 standard, 15 for mini-game)
+Correct on second try → half XP (5 standard, 8 for mini-game)
+Learn card (after 2 misses) → 0 XP
+States per step:
+Asking (what you already have)
+Incorrect / Try again (inline banner + hint; stays on Asking UI)
+Learn card (replaces the content after 2nd miss; short explanation + Continue)
+Success (unchanged for correct answers)
+UI Components
+Try-again banner: soft red/pink (#FDEBEC), icon ⚠️, copy ≤ 100 chars, “Try again” CTA; disable CHECK until selection changes.
+Learn card: soft blue (#E8F2FF), icon 💡, 1–2 lines of explanation tied to football outcome, Continue CTA; no green success bar.
+Success page: unchanged (green ✔ “Nice!”, mascot celebration, XP burst).
+Apply to Each Step of “Fuel for Football”
+Lesson (current) recap for reference
+Step 1: MCQ — Best breakfast before football training?
+Step 2: True/False — Water helps footballers stay strong for the whole game.
+Step 3: Matching — Match food → benefit (🥦 Broccoli, 🥣 Yogurt with berries, 🥚 Boiled egg)
+Step 4: MCQ — Best half-time snack? (🍌 Banana correct)
+Wrap-up: unchanged
+Step 1 — MCQ (Porridge with fruit = correct)
+Incorrect (first miss):
+Banner: “Not quite — think steady energy that lasts the whole session.”
+Incorrect (second miss):
+Banner: “Almost! Which breakfast helps you keep running, not just at the start?”
+Learn card (after 2 misses):
+Copy: “Porridge gives slow, steady energy and fruit adds vitamins — perfect to keep you running till the final whistle.”
+Mascot: quick dribble → thumbs-up.
+Step 2 — True/False (True = correct)
+Incorrect (chose False):
+Banner: “Try again — players drink water so they don’t slow down later.”
+Learn card:
+Copy: “Even a bit of dehydration makes you slow and tired. Water keeps you cool and fast for the match.”
+Mascot: sips bottle → sprint.
+Step 3 — Matching (🥦 Broccoli, 🥣 Yogurt with berries, 🥚 Egg)
+Correct pairs (reference):
+Broccoli → Vitamins for stamina
+Yogurt with berries → Recovery fuel for muscles
+Boiled egg → Protein for strength
+Incorrect (any wrong submission):
+Banner: “Some matches aren’t right — think stamina, recovery, and strength.”
+(Keep items draggable; no heart until CHECK is pressed.)
+Learn card:
+Copy (bullet style):
+“🥦 Broccoli: vitamins to keep you going.”
+“🥣 Yogurt + berries: helps muscles recover after play.”
+“🥚 Egg: protein for strong legs to kick harder.”
+Mascot: keepie-uppies.
+Step 4 — MCQ (🍌 Banana = correct)
+Incorrect (Chocolate bar/Crisps):
+Banner: “That’s a quick burst… but you’ll slow down after. Pick one that refuels your legs.”
+Learn card:
+Copy: “Banana gives quick, clean energy so you can sprint again in the second half.”
+Mascot: high-five at the touchline.
+Implementation Notes
+1) Step Config (example schema)
+Add per-step fields (no need to rename existing keys):
+type StepRetryConfig = {
+  maxAttempts: 2,
+  heartPenaltyOnIncorrect: true,
+  xp: { firstTry: 10|15, secondTry: 5|8, learnCard: 0 },
+  messages: {
+    tryAgain1: string,
+    tryAgain2?: string,
+    learnCard: string
+  }
+}
+2) State machine (pseudo)
+onCheck() {
+  if (isCorrect()) return showSuccess(fullOrHalfXP());
+  step.attempts++;
+  loseHeart();
+  if (step.attempts < step.maxAttempts) return showTryAgainBanner(step.messages.tryAgainX);
+  return showLearnCard(step.messages.learnCard); // then Continue → next step
+}
+3) Analytics
+Log: attempts, timeOnStep, heartsRemaining, earnedXP, usedLearnCard (boolean).
+Purpose: show friction → learning and completion in investor deck.
+Exact Copy to Inject (so devs can paste)
+Step 1 (Breakfast)
+tryAgain1: “Not quite — think steady energy that lasts the whole session.”
+tryAgain2: “Almost! Which breakfast keeps you running, not just at the start?”
+learnCard: “Porridge gives slow, steady energy and fruit adds vitamins — perfect to keep you running till the final whistle.”
+Step 2 (Hydration)
+tryAgain1: “Try again — players drink water so they don’t slow down later.”
+learnCard: “Even a bit of dehydration makes you slow and tired. Water keeps you cool and fast for the match.”
+Step 3 (Matching)
+tryAgain1: “Some matches aren’t right — think stamina, recovery, and strength.”
+learnCard:
+“🥦 Broccoli: vitamins to keep you going.”
+“🥣 Yogurt + berries: helps muscles recover after play.”
+“🥚 Egg: protein for strong legs to kick harder.”
+Step 4 (Half-time snack)
+tryAgain1: “That’s a quick burst… but you’ll slow down after. Pick one that refuels your legs.”
+learnCard: “Banana gives quick, clean energy so you can sprint again in the second half.”
+XP/Hearts:
+Step1: 10 / 5 / 0
+Step2: 10 / 5 / 0
+Step3: 15 / 8 / 0
+Step4: 10 / 5 / 0
+Acceptance Criteria
+Incorrect submissions show a red/pink hint banner on the same screen; CHECK disabled until the selection changes.
+After 2 incorrect submissions on any step, a Learn card replaces the content; Continue moves to the next step (no success page, no XP).
+Hearts decrement only on submit; XP awarded according to first/second/learn path.
+Success pages remain unchanged for correct answers.
