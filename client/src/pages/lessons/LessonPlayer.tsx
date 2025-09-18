@@ -173,8 +173,11 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }
         
         // SPEC FIX: Handle attempt 2 routing correctly
+        console.log('🔥 DEBUG - Before state change:', { currentAttempt, lessonState, lives });
+        
         if (currentAttempt === 1) {
           // First incorrect - always show try-again banner
+          console.log('📍 Setting state to incorrect, attempt 1->2');
           setLessonState('incorrect');
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
@@ -182,11 +185,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           // Second incorrect - check if tryAgain2 message exists
           if (currentStep.retryConfig.messages.tryAgain2) {
             // Show try-again banner with second message
+            console.log('📍 Setting state to incorrect, attempt 2->3');
             setLessonState('incorrect');
             setCurrentAttempt(3);
             setHasSelectionChanged(false);
           } else {
             // No second message - go straight to learn card
+            console.log('📍 Setting state to learn (no tryAgain2)');
             const learnXP = calculateXP(currentStep, 3); // Should be 0
             setTotalXpEarned(prev => prev + learnXP);
             setLessonState('learn');
@@ -209,6 +214,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           }
         } else {
           // Third attempt or max attempts reached - show learn card
+          console.log('📍 Setting state to learn (attempt 3+)');
           const learnXP = calculateXP(currentStep, 3); // Should be 0
           setTotalXpEarned(prev => prev + learnXP);
           setLessonState('learn');
@@ -384,6 +390,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
+        {/* DEBUG: Show current state */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-4 p-2 bg-yellow-100 text-xs">
+            State: {lessonState} | Attempt: {currentAttempt} | HasChanged: {hasSelectionChanged ? 'Y' : 'N'}
+          </div>
+        )}
+        
         {lessonState === 'asking' && currentStep && (
           <LessonAsking
             step={currentStep}
