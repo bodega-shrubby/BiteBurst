@@ -41,7 +41,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               xpReward: 10,
               mascotAction: 'holding_football',
               retryConfig: {
-                maxAttempts: 2,
+                maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
                   tryAgain1: "Not quite — think steady energy that lasts the whole session.",
@@ -62,10 +62,11 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               xpReward: 10,
               mascotAction: 'sipping_water',
               retryConfig: {
-                maxAttempts: 2,
+                maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
                   tryAgain1: "Try again — players drink water so they don't slow down later.",
+                  tryAgain2: "One more go! Staying hydrated keeps your passes sharp all game.",
                   learnCard: "Even a bit of dehydration makes you slow and tired. Water keeps you cool and fast for the match."
                 }
               }
@@ -86,10 +87,11 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               xpReward: 15,
               mascotAction: 'juggling_football',
               retryConfig: {
-                maxAttempts: 2,
+                maxAttempts: 3,
                 xp: { firstTry: 15, secondTry: 8, learnCard: 0 },
                 messages: {
                   tryAgain1: "Some matches aren't right — think stamina, recovery, and strength.",
+                  tryAgain2: "Keep matching! Each food helps with a different football superpower.",
                   learnCard: "🥦 Broccoli: vitamins to keep you going.\n🥣 Yogurt + berries: helps muscles recover after play.\n🥚 Egg: protein for strong legs to kick harder."
                 }
               }
@@ -110,10 +112,11 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               xpReward: 10,
               mascotAction: 'high_five',
               retryConfig: {
-                maxAttempts: 2,
+                maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
                   tryAgain1: "That's a quick burst… but you'll slow down after. Pick one that refuels your legs.",
+                  tryAgain2: "Think of something light that players grab at half-time for energy.",
                   learnCard: "Banana gives quick, clean energy so you can sprint again in the second half."
                 }
               }
