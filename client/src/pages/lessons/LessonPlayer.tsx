@@ -67,11 +67,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
 
 
-  // Fetch lesson data
+  // Fetch lesson data (cache-busted to get fresh retryConfig)
   const { data: lessonData, isLoading } = useQuery({
-    queryKey: ['/api/lessons', lessonId],
-    queryFn: () => apiRequest(`/api/lessons/${lessonId}`),
+    queryKey: ['/api/lessons', lessonId, Date.now()],
+    queryFn: () => apiRequest(`/api/lessons/${lessonId}?cacheBust=${Date.now()}`),
     enabled: !!lessonId,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   // Analytics logging mutation
