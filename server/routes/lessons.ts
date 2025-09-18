@@ -124,6 +124,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           ]
         };
         
+        // Prevent caching to ensure fresh lesson data with retryConfig
+        res.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+        res.set('Vary', 'Authorization');
+        
         return res.json(lessonData);
       }
       
@@ -228,6 +234,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             }
           ]
         };
+        
+        // Prevent caching to ensure fresh lesson data with retryConfig
+        res.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+        res.set('Vary', 'Authorization');
         
         return res.json(lessonData);
       }
