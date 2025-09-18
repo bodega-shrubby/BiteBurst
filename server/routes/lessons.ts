@@ -197,14 +197,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-1',
               stepNumber: 1,
               questionType: 'multiple-choice' as const,
-              question: "Which breakfast gives your brain the best fuel for a 2-hour exam?",
+              question: "Which food gives the most steady energy for study or revision?",
               content: {
                 options: [
-                  { id: 'porridge-berries', text: 'Porridge with blueberries + milk', emoji: '🥣', correct: true },
-                  { id: 'chocolate-cereal', text: 'Chocolate cereal + fizzy drink', emoji: '🥛', correct: false },
-                  { id: 'white-toast', text: 'White toast with jam', emoji: '🍞', correct: false }
+                  { id: 'sweets', text: 'Sweets', emoji: '🍬', correct: false },
+                  { id: 'white-bread', text: 'White bread', emoji: '🍞', correct: false },
+                  { id: 'brown-rice', text: 'Brown rice', emoji: '🍚', correct: true },
+                  { id: 'fizzy-drink', text: 'Fizzy drink', emoji: '🥤', correct: false }
                 ],
-                feedback: "Great choice! Porridge gives slow, steady energy. Blueberries help with memory, and milk's protein keeps your brain working smoothly through the exam."
+                feedback: "Correct. Wholegrain carbs (like brown rice, oats, wholemeal pasta) release glucose slowly, keeping focus steady across a lesson."
               },
               xpReward: 10,
               mascotAction: 'graduation_cap',
@@ -212,9 +213,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Think steady energy that lasts through your exam, not a sugar rush.",
-                  tryAgain2: "Which breakfast keeps your brain working smoothly for 2 hours?",
-                  learnCard: "Porridge gives slow, steady energy. Blueberries help with memory, and milk's protein keeps your brain working smoothly through the exam."
+                  tryAgain1: "Think slow & steady fuel, not a quick burst.",
+                  tryAgain2: "Which option keeps blood sugar stable through the lesson?",
+                  learnCard: "The brain uses glucose. Wholegrains release it gradually → fewer dips in focus."
                 }
               }
             },
@@ -222,10 +223,10 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-2',
               stepNumber: 2,
               questionType: 'true-false' as const,
-              question: "Your brain is mostly water. Even small dehydration can make it harder to concentrate.",
+              question: "Proteins are only for muscles, not the brain. True or false?",
               content: {
-                correctAnswer: true,
-                feedback: "Right! Even losing a bit of water makes you think slower and feel tired. Drinking water keeps you sharp in lessons and exams."
+                correctAnswer: false,
+                feedback: "Right. Protein helps build/repair tissues and make brain messengers; healthy fats (e.g., omega-3) support cell membranes and memory."
               },
               xpReward: 10,
               mascotAction: 'brain_glow',
@@ -233,9 +234,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Think about what your brain is mostly made of - it needs this to work well.",
-                  tryAgain2: "What happens when you don't drink enough during the day?",
-                  learnCard: "Your brain is about 80% water! Even losing a bit makes you think slower and feel tired. Drinking water keeps you sharp in lessons and exams."
+                  tryAgain1: "Your brain also needs building blocks.",
+                  tryAgain2: "Which choice recognises protein's role beyond muscles?",
+                  learnCard: "KS3 nutrition: protein = growth & repair; fats = energy/structures; both matter for brain function."
                 }
               }
             },
@@ -243,25 +244,25 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-3',
               stepNumber: 3,
               questionType: 'matching' as const,
-              question: "Match the food to what it gives your brain for school.",
+              question: "Match the nutrient to how it helps you think and learn.",
               content: {
                 matchingPairs: [
-                  { left: '🐟 Salmon', right: 'Stronger memory for tests' },
-                  { left: '🥚 Eggs', right: 'Energy to focus in lessons' },
-                  { left: '🥦 Broccoli', right: 'Vitamins to stay healthy' },
-                  { left: '🫘 Beans', right: 'Oxygen for clear thinking' }
+                  { left: '🧠 Omega-3 fats', right: 'Supports memory & learning (cell membranes)' },
+                  { left: '⚡ B vitamins', right: 'Helps release energy from food for focus' },
+                  { left: '🩸 Iron', right: 'Carries oxygen to the brain (clear thinking)' },
+                  { left: '🛡️ Vitamin C', right: 'Helps protect cells (antioxidant)' }
                 ],
-                feedback: "Perfect matches! Each food helps your brain work better in different ways."
+                feedback: "Omega-3: healthy brain cell membranes → memory.\nB vitamins: energy release → concentration.\nIron: oxygen supply → less tiredness.\nVitamin C: protection → healthy function."
               },
               xpReward: 15,
               mascotAction: 'clipboard_tick',
               retryConfig: {
                 maxAttempts: 3,
-                xp: { firstTry: 15, secondTry: 7, learnCard: 0 },
+                xp: { firstTry: 15, secondTry: 8, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Think about what each food gives your brain - they all help in different ways.",
-                  tryAgain2: "Match what makes your memory stronger, what gives energy, what keeps you healthy.",
-                  learnCard: "Each food helps your brain differently: Salmon strengthens memory, eggs give focus energy, broccoli provides vitamins, and beans deliver oxygen for clear thinking."
+                  tryAgain1: "Think energy, oxygen, memory, protection.",
+                  tryAgain2: "Which one links to oxygen in blood?",
+                  learnCard: "Omega-3→memory; B vits→energy release; Iron→oxygen; Vit C→protection."
                 }
               }
             },
@@ -269,14 +270,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-4',
               stepNumber: 4,
               questionType: 'multiple-choice' as const,
-              question: "It's 30 minutes before your science quiz. What's the best quick snack?",
+              question: "Exam in 1 hour. Best snack for sharp focus?",
               content: {
                 options: [
-                  { id: 'banana-water', text: 'Banana + water', emoji: '🍌', correct: true },
-                  { id: 'chocolate-juice', text: 'Chocolate bar + juice', emoji: '🍫', correct: false },
-                  { id: 'large-sandwich', text: 'Large sandwich', emoji: '🥪', correct: false }
+                  { id: 'chocolate-bar', text: 'Chocolate bar', emoji: '🍫', correct: false },
+                  { id: 'banana-nuts', text: 'Banana + nuts', emoji: '🍌', correct: true },
+                  { id: 'fizzy-drink', text: 'Fizzy drink', emoji: '🥤', correct: false },
+                  { id: 'crisps', text: 'Crisps', emoji: '🍟', correct: false }
                 ],
-                feedback: "A banana gives quick energy and water keeps your brain working fast. Heavy food or lots of sugar can make you slow down during the quiz."
+                feedback: "Yes. Fruit + nuts give glucose + protein + minerals → steady energy through the exam."
               },
               xpReward: 10,
               mascotAction: 'ready_sign',
@@ -284,58 +286,61 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Think quick energy + brain hydration, but not too heavy before a quiz.",
-                  tryAgain2: "What gives fast energy without making you sleepy during the test?",
-                  learnCard: "A banana gives quick energy and water keeps your brain working fast. Heavy food or lots of sugar can make you slow down during the quiz."
+                  tryAgain1: "Some choices spike then crash. Which lasts longer?",
+                  tryAgain2: "Pick the one that combines energy and nutrients.",
+                  learnCard: "Smart snacks blend carb + protein + vitamins (e.g., fruit+nuts, yogurt+berries)."
                 }
               }
             },
             {
               id: 'step-5',
               stepNumber: 5,
-              questionType: 'label-reading' as const,
-              question: "Which revision snack is better for longer focus?",
+              questionType: 'ordering' as const,
+              question: "Put the steps in order to show how nutrients reach your brain.",
               content: {
-                labelOptions: [
-                  { id: 'snack-a', name: 'Snack A', sugar: '15g', fiber: '1g', protein: '0g', correct: false },
-                  { id: 'snack-b', name: 'Snack B', sugar: '9g', fiber: '4g', protein: '7g', correct: true }
+                orderingItems: [
+                  { id: 'chew-mouth', text: 'Chew food in the mouth', correctOrder: 1 },
+                  { id: 'stomach-breakdown', text: 'Food broken down more in the stomach', correctOrder: 2 },
+                  { id: 'small-intestine', text: 'Small intestine absorbs nutrients into blood', correctOrder: 3 },
+                  { id: 'blood-transport', text: 'Nutrients travel in blood to brain & muscles', correctOrder: 4 }
                 ],
-                feedback: "Snack B! The fibre and protein slow down the energy release, so your brain gets steady fuel while you revise."
+                feedback: "Exactly. Most absorption happens in the small intestine; blood then delivers nutrients to the brain."
               },
-              xpReward: 10,
+              xpReward: 15,
               mascotAction: 'snack_pot',
               retryConfig: {
                 maxAttempts: 3,
-                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                xp: { firstTry: 15, secondTry: 8, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Look at the fiber and protein - which one gives steady energy instead of a sugar crash?",
-                  tryAgain2: "Higher fiber and protein means slower energy release for longer focus.",
-                  learnCard: "Snack B! The fiber and protein slow down the energy release, so your brain gets steady fuel while you revise."
+                  tryAgain1: "Chew → digest → absorb → transport.",
+                  tryAgain2: "Which organ does the absorbing step?",
+                  learnCard: "Small intestine = main site of nutrient absorption into the bloodstream."
                 }
               }
             },
             {
               id: 'step-6',
               stepNumber: 6,
-              questionType: 'ordering' as const,
-              question: "Put these in the best order before a test.",
+              questionType: 'multiple-choice' as const,
+              question: "If you often skip breakfast, what's most likely?",
               content: {
-                orderingItems: [
-                  { id: 'drink-water', text: 'Drink water', correctOrder: 1 },
-                  { id: 'light-snack', text: 'Eat a light snack', correctOrder: 2 },
-                  { id: 'deep-breaths', text: '3 deep breaths + check your things', correctOrder: 3 }
+                options: [
+                  { id: 'tiredness-focus', text: 'Tiredness & poor focus', emoji: '💤', correct: true },
+                  { id: 'faster-running', text: 'Faster running speed', emoji: '🏃', correct: false },
+                  { id: 'better-memory', text: 'Better memory', emoji: '🎧', correct: false },
+                  { id: 'stronger-muscles', text: 'Stronger muscles', emoji: '💪', correct: false }
                 ],
-                feedback: "Hydration first, then steady fuel, then calming your nerves. That way you're ready to focus."
+                feedback: "Correct. Low morning glucose → less concentration and slower thinking in lessons."
               },
-              xpReward: 15,
+              xpReward: 10,
               mascotAction: 'thumbs_up',
               retryConfig: {
                 maxAttempts: 3,
-                xp: { firstTry: 15, secondTry: 7, learnCard: 0 },
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Think about preparing your body first, then your mind for the test.",
-                  tryAgain2: "What order helps you feel calm and ready - hydration, fuel, then relaxation?",
-                  learnCard: "Hydration first, then steady fuel, then calming your nerves. That way you're ready to focus and do your best on the test."
+                  tryAgain1: "Skipping meals rarely improves performance.",
+                  tryAgain2: "What happens when the brain's fuel runs low?",
+                  learnCard: "Breakfast = steady morning energy → better attention and memory in class."
                 }
               }
             }
@@ -383,12 +388,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       };
       
       const brainFuelAnswers: Record<string, string | boolean> = {
-        'step-1': 'porridge-berries',
-        'step-2': true,
+        'step-1': 'brown-rice',
+        'step-2': false,
         'step-3': 'matching-complete',
-        'step-4': 'banana-water',
-        'step-5': 'snack-b',
-        'step-6': 'ordering-complete'
+        'step-4': 'banana-nuts',
+        'step-5': 'ordering-complete',
+        'step-6': 'tiredness-focus'
       };
 
       let expectedAnswer;
@@ -423,8 +428,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           'step-2': 10,
           'step-3': 15,
           'step-4': 10,
-          'step-5': 10,
-          'step-6': 15
+          'step-5': 15,
+          'step-6': 10
         };
         xpReward = brainXpRewards[validatedData.stepId] || 10;
       }
