@@ -222,7 +222,9 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           console.log('📍 Setting state to learn (attempt 3+)');
           const learnXP = calculateXP(currentStep, 3); // Should be 0
           setTotalXpEarned(prev => prev + learnXP);
+          console.log('🚀 ABOUT TO SET STATE TO LEARN - current state:', lessonState);
           setLessonState('learn');
+          console.log('✅ CALLED setLessonState(learn)');
           
           // Log learn card usage
           if (currentStep && selectedAnswer) {
