@@ -424,10 +424,25 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         )}
         
         {lessonState === 'learn' && currentStep && (
-          <LessonLearn
-            message={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
-            onContinue={handleLearnContinue}
-          />
+          <>
+            {console.log('🎓 RENDERING LEARN CARD:', { 
+              lessonState, 
+              currentStep: currentStep?.id, 
+              message: currentStep.retryConfig?.messages.learnCard 
+            })}
+            <LessonLearn
+              message={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
+              onContinue={handleLearnContinue}
+            />
+          </>
+        )}
+        
+        {lessonState === 'learn' && !currentStep && (
+          <div className="text-red-500">❌ LEARN STATE BUT NO CURRENT STEP</div>
+        )}
+        
+        {lessonState !== 'asking' && lessonState !== 'incorrect' && lessonState !== 'learn' && lessonState !== 'success' && (
+          <div className="text-red-500">❌ UNKNOWN STATE: {lessonState}</div>
         )}
         
         {lessonState === 'success' && currentStep && (
