@@ -67,13 +67,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
 
 
-  // Fetch lesson data (cache-busted to get fresh retryConfig)
+  // Fetch lesson data with cache invalidation
   const { data: lessonData, isLoading } = useQuery({
-    queryKey: ['/api/lessons', lessonId, Date.now()],
-    queryFn: () => apiRequest(`/api/lessons/${lessonId}?cacheBust=${Date.now()}`),
+    queryKey: ['/api/lessons', lessonId],
+    queryFn: () => apiRequest(`/api/lessons/${lessonId}?v=2`),
     enabled: !!lessonId,
     staleTime: 0,
-    gcTime: 0,
   });
 
   // Analytics logging mutation
@@ -221,7 +220,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
         // Check if max attempts exceeded - route to learn card immediately
         if (currentAttempt >= maxAttempts) {
-          console.log('🎯 RETRY DEBUG: Max attempts exceeded - going to learn card');
           const learnXP = calculateXP(currentStep, 3) ?? 0; // Guard against undefined
           setTotalXpEarned(prev => prev + learnXP);
           setLessonState('learn');
@@ -277,16 +275,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }
         
         // Show appropriate incorrect banner based on attempt
-        console.log('🎯 RETRY DEBUG: currentAttempt =', currentAttempt, 'maxAttempts =', maxAttempts);
         if (currentAttempt === 1) {
-          console.log('🎯 RETRY DEBUG: Setting lessonState to incorrect (attempt 1)');
           setLessonState('incorrect');
           setBannerAttempt(1);
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
         } else if (currentAttempt === 2) {
           if (currentStep.retryConfig.messages.tryAgain2) {
-            console.log('🎯 RETRY DEBUG: Setting lessonState to incorrect (attempt 2)');
             setLessonState('incorrect');
             setBannerAttempt(2);
             setCurrentAttempt(3);
