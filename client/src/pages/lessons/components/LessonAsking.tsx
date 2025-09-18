@@ -39,6 +39,8 @@ export default function LessonAsking({
   // Matching game state
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [shuffledLeftItems, setShuffledLeftItems] = useState<string[]>([]);
+  const [shuffledRightItems, setShuffledRightItems] = useState<string[]>([]);
   
   // Ordering game state
   const [orderedItems, setOrderedItems] = useState<string[]>([]);
@@ -57,6 +59,32 @@ export default function LessonAsking({
       }
     }
   }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
+  
+  // Initialize shuffled matching items on step change
+  useEffect(() => {
+    if (step.questionType === 'matching' && step.content.matchingPairs) {
+      const pairs = step.content.matchingPairs;
+      
+      // Fisher-Yates shuffle for left items
+      const leftItems = [...pairs.map(p => p.left)];
+      for (let i = leftItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [leftItems[i], leftItems[j]] = [leftItems[j], leftItems[i]];
+      }
+      
+      // Fisher-Yates shuffle for right items  
+      const rightItems = [...pairs.map(p => p.right)];
+      for (let i = rightItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [rightItems[i], rightItems[j]] = [rightItems[j], rightItems[i]];
+      }
+      
+      setShuffledLeftItems(leftItems);
+      setShuffledRightItems(rightItems);
+      setMatches({}); // Clear any previous matches
+      onAnswerSelect(''); // Clear any previous answer
+    }
+  }, [step.id, step.questionType]);
   
   // Initialize shuffled ordering items on step change
   useEffect(() => {
@@ -157,8 +185,9 @@ export default function LessonAsking({
     if (!step.content.matchingPairs) return null;
     
     const pairs = step.content.matchingPairs;
-    const leftItems = pairs.map(p => p.left);
-    const rightItems = pairs.map(p => p.right);
+    // Use shuffled arrays instead of direct mapping
+    const leftItems = shuffledLeftItems.length > 0 ? shuffledLeftItems : pairs.map(p => p.left);
+    const rightItems = shuffledRightItems.length > 0 ? shuffledRightItems : pairs.map(p => p.right);
     
     // Check if all matches are complete and correct
     const allMatched = Object.keys(matches).length === pairs.length;
