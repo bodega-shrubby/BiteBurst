@@ -148,11 +148,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         const heartsRemaining = Math.max(0, lives - 1);
         setLives(heartsRemaining);
         
-        // DEBUG: Check what retryConfig looks like
-        console.log('🔍 DEBUG: currentStep:', currentStep);
-        console.log('🔍 DEBUG: retryConfig:', currentStep?.retryConfig);
-        console.log('🔍 DEBUG: retryConfig check:', !currentStep?.retryConfig);
-        
         if (!currentStep?.retryConfig) {
           // Fall back to a simple two-step retry: one incorrect banner, then learn on next miss
           const nextAttempt = Math.min(currentAttempt + 1, 3);
@@ -224,6 +219,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
         // Check if max attempts exceeded - route to learn card immediately
         if (currentAttempt >= maxAttempts) {
+          console.log('🎯 RETRY DEBUG: Max attempts exceeded - going to learn card');
           const learnXP = calculateXP(currentStep, 3) ?? 0; // Guard against undefined
           setTotalXpEarned(prev => prev + learnXP);
           setLessonState('learn');
@@ -279,13 +275,16 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }
         
         // Show appropriate incorrect banner based on attempt
+        console.log('🎯 RETRY DEBUG: currentAttempt =', currentAttempt, 'maxAttempts =', maxAttempts);
         if (currentAttempt === 1) {
+          console.log('🎯 RETRY DEBUG: Setting lessonState to incorrect (attempt 1)');
           setLessonState('incorrect');
           setBannerAttempt(1);
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
         } else if (currentAttempt === 2) {
           if (currentStep.retryConfig.messages.tryAgain2) {
+            console.log('🎯 RETRY DEBUG: Setting lessonState to incorrect (attempt 2)');
             setLessonState('incorrect');
             setBannerAttempt(2);
             setCurrentAttempt(3);
