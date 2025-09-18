@@ -124,11 +124,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           ]
         };
         
+        // Force disable ETags and prevent all caching
         res.set({
-          'Cache-Control': 'no-store, must-revalidate',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
           Pragma: 'no-cache',
-          Expires: '0'
+          Expires: '0',
+          'Last-Modified': new Date().toUTCString(),
+          ETag: 'W/"' + Date.now() + '"'
         });
+        console.log('📤 LESSON CACHE: Sending fuel-for-football with cache headers');
         return res.json(lessonData);
       }
 
@@ -288,11 +292,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           ]
         };
         
+        // Force disable ETags and prevent all caching
         res.set({
-          'Cache-Control': 'no-store, must-revalidate',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
           Pragma: 'no-cache',
-          Expires: '0'
+          Expires: '0',
+          'Last-Modified': new Date().toUTCString(),
+          ETag: 'W/"' + Date.now() + '"'
         });
+        console.log('📤 LESSON CACHE: Sending brainfuel-for-school with cache headers');
         return res.json(lessonData);
       }
       
