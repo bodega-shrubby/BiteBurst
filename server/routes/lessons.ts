@@ -23,20 +23,20 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           id: 'fuel-for-football',
           title: 'Fuel for Football',
           description: 'Learn the best foods to eat before and during football training!',
-          totalSteps: 4,
+          totalSteps: 6,
           steps: [
             {
               id: 'step-1',
               stepNumber: 1,
               questionType: 'multiple-choice' as const,
-              question: "What's the best breakfast before football training?",
+              question: "Before a football match, which food gives you the best long-lasting energy?",
               content: {
                 options: [
-                  { id: 'porridge', text: 'Porridge with fruit', emoji: '🥣', correct: true },
-                  { id: 'croissant', text: 'Croissant with jam', emoji: '🥐', correct: false },
-                  { id: 'fizzy', text: 'Fizzy drink', emoji: '🥤', correct: false }
+                  { id: 'sweets', text: 'Sweets', emoji: '🍬', correct: false },
+                  { id: 'white-bread', text: 'White bread', emoji: '🍞', correct: false },
+                  { id: 'oats', text: 'Oats', emoji: '🥣', correct: true }
                 ],
-                feedback: "Yes! Oats give long energy and fruit adds vitamins. That's why players eat porridge before training — it keeps them running all game!"
+                feedback: "Correct! Oats give slow-release energy so you don't run out of steam — just like Lionel Messi keeps moving all game."
               },
               xpReward: 10,
               mascotAction: 'holding_football',
@@ -44,9 +44,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Not quite — think steady energy that lasts the whole session.",
-                  tryAgain2: "Almost! Which breakfast keeps you running, not just at the start?",
-                  learnCard: "Porridge gives slow, steady energy and fruit adds vitamins — perfect to keep you running till the final whistle."
+                  tryAgain1: "Not quite — think steady energy for the whole game.",
+                  tryAgain2: "Almost! Which breakfast keeps you running past half-time?",
+                  learnCard: "Oats give steady energy. That's why top players eat porridge before matches."
                 }
               }
             },
@@ -54,10 +54,10 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-2',
               stepNumber: 2,
               questionType: 'true-false' as const,
-              question: "Water helps footballers stay strong for the whole game.",
+              question: "Drinking water helps footballers play their best.",
               content: {
                 correctAnswer: true,
-                feedback: "Correct! Even Messi drinks water at half-time. It cools your body and keeps you fast."
+                feedback: "Yes! Even Cristiano Ronaldo is known for choosing water over fizzy drinks — it keeps muscles working and the brain sharp."
               },
               xpReward: 10,
               mascotAction: 'sipping_water',
@@ -65,9 +65,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Try again — players drink water so they don't slow down later.",
-                  tryAgain2: "One more go! Staying hydrated keeps your passes sharp all game.",
-                  learnCard: "Even a bit of dehydration makes you slow and tired. Water keeps you cool and fast for the match."
+                  tryAgain1: "Try again — players drink water so they don't slow down.",
+                  tryAgain2: "Hint: the best choice keeps you cool and thinking clearly.",
+                  learnCard: "Without water, players slow down. Staying hydrated helps you play like the pros."
                 }
               }
             },
@@ -75,14 +75,14 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-3',
               stepNumber: 3,
               questionType: 'matching' as const,
-              question: "Match the food to its benefit.",
+              question: "Match the food to what it does for your body when playing football.",
               content: {
                 matchingPairs: [
-                  { left: '🥦 Broccoli', right: 'Vitamins for stamina' },
-                  { left: '🥣 Yogurt with berries', right: 'Recovery fuel for muscles' },
-                  { left: '🥚 Boiled egg', right: 'Protein for strength' }
+                  { left: '🥣 Oats', right: 'Long-lasting energy for running' },
+                  { left: '🥛 Yogurt', right: 'Repairs muscles and strengthens bones' },
+                  { left: '🍟 Crisps', right: 'Extra fat, not much help on the pitch' }
                 ],
-                feedback: "Perfect matches! Each food gives your body exactly what it needs for football."
+                feedback: "Oats = steady energy, like Erling Haaland powering through defenders.\nYogurt = repairs muscles, like Alexia Putellas staying strong in midfield.\nCrisps = tasty, but won't fuel you like Sam Kerr sprinting for a goal."
               },
               xpReward: 15,
               mascotAction: 'juggling_football',
@@ -90,9 +90,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 15, secondTry: 8, learnCard: 0 },
                 messages: {
-                  tryAgain1: "Some matches aren't right — think stamina, recovery, and strength.",
-                  tryAgain2: "Keep matching! Each food helps with a different football superpower.",
-                  learnCard: "🥦 Broccoli: vitamins to keep you going.\n🥣 Yogurt + berries: helps muscles recover after play.\n🥚 Egg: protein for strong legs to kick harder."
+                  tryAgain1: "Some matches aren't right — think energy, repair, and 'not much help'.",
+                  tryAgain2: "Check again: oats = energy. Which one repairs muscles and bones?",
+                  learnCard: "Correct matches: Oats → energy, Yogurt → muscles & bones, Crisps → not much help."
                 }
               }
             },
@@ -100,14 +100,14 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               id: 'step-4',
               stepNumber: 4,
               questionType: 'multiple-choice' as const,
-              question: "What's the best half-time snack to keep your energy up?",
+              question: "Which of these is the best half-time snack to keep your energy up?",
               content: {
                 options: [
-                  { id: 'chocolate', text: 'Chocolate bar', emoji: '🍫', correct: false },
                   { id: 'banana', text: 'Banana', emoji: '🍌', correct: true },
-                  { id: 'crisps', text: 'Crisps', emoji: '🍟', correct: false }
+                  { id: 'chocolate-bar', text: 'Chocolate bar', emoji: '🍫', correct: false },
+                  { id: 'fizzy-drink', text: 'Fizzy drink', emoji: '🥤', correct: false }
                 ],
-                feedback: "Perfect! Bananas give quick energy to refuel your legs so you can sprint again in the second half — just like Mbappé."
+                feedback: "Spot on! Bananas give quick, clean energy. That's why Kylian Mbappé often eats fruit to stay sharp in matches."
               },
               xpReward: 10,
               mascotAction: 'high_five',
@@ -115,9 +115,59 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 maxAttempts: 3,
                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
                 messages: {
-                  tryAgain1: "That's a quick burst… but you'll slow down after. Pick one that refuels your legs.",
-                  tryAgain2: "Think of something light that players grab at half-time for energy.",
-                  learnCard: "Banana gives quick, clean energy so you can sprint again in the second half."
+                  tryAgain1: "That's a quick burst… it fades fast. Pick one for the second half.",
+                  tryAgain2: "Hint: choose the snack with clean energy for sprinting.",
+                  learnCard: "Bananas = quick, clean energy. They keep you running in the second half like the pros."
+                }
+              }
+            },
+            {
+              id: 'step-5',
+              stepNumber: 5,
+              questionType: 'ordering' as const,
+              question: "Put these foods in order to make a balanced footballer's plate.",
+              content: {
+                orderingItems: [
+                  { id: 'pasta', text: 'Pasta', correctOrder: 1 },
+                  { id: 'yogurt', text: 'Yogurt', correctOrder: 2 },
+                  { id: 'broccoli', text: 'Broccoli', correctOrder: 3 }
+                ],
+                feedback: "Nice! Pasta = energy, Yogurt = muscle repair, Broccoli = vitamins. That's how players like Lucy Bronze and Neymar fuel before big games."
+              },
+              xpReward: 10,
+              mascotAction: 'plate_builder',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Nearly — start with energy, then repair, then vitamins.",
+                  tryAgain2: "Think: carbs → protein/dairy → fruit/veg.",
+                  learnCard: "Balanced plate: Pasta (energy), Yogurt (repair), Broccoli (health)."
+                }
+              }
+            },
+            {
+              id: 'step-6',
+              stepNumber: 6,
+              questionType: 'multiple-choice' as const,
+              question: "After a football match, eating protein helps your ______ recover.",
+              content: {
+                options: [
+                  { id: 'brain', text: 'Brain', emoji: '🧠', correct: false },
+                  { id: 'muscles', text: 'Muscles', emoji: '💪', correct: true },
+                  { id: 'hair', text: 'Hair', emoji: '💇', correct: false }
+                ],
+                feedback: "Exactly! Protein repairs muscles so you're ready to train again — just like Sam Kerr or Harry Kane preparing for the next match."
+              },
+              xpReward: 10,
+              mascotAction: 'flexing',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Think about what works hardest in football.",
+                  tryAgain2: "Hint: protein helps the part that kicks, runs, and jumps.",
+                  learnCard: "Protein = muscle repair. That's why players eat yogurt, eggs, or beans after matches."
                 }
               }
             }
@@ -324,10 +374,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       // For now, hardcode the correct answers by lesson
       // In the future, this would check against the database
       const fuelForFootballAnswers: Record<string, string | boolean> = {
-        'step-1': 'porridge',
+        'step-1': 'oats',
         'step-2': true,
         'step-3': 'matching-complete',
-        'step-4': 'banana'
+        'step-4': 'banana',
+        'step-5': 'ordering-complete',
+        'step-6': 'muscles'
       };
       
       const brainFuelAnswers: Record<string, string | boolean> = {
@@ -360,7 +412,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           'step-1': 10,
           'step-2': 10,
           'step-3': 15,
-          'step-4': 10
+          'step-4': 10,
+          'step-5': 10,
+          'step-6': 10
         };
         xpReward = fuelXpRewards[validatedData.stepId] || 10;
       } else if (validatedData.lessonId === 'brainfuel-for-school') {
