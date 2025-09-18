@@ -1,0 +1,111 @@
+What’s broken (and why)
+You short-circuit the entire retry flow when a step has no retryConfig
+In the onSuccess error branch you do:
+if (!currentStep?.retryConfig) {
+  setTimeout(() => { setSelectedAnswer(null); setHasSelectionChanged(false); }, 1500);
+  return; // ← no lessonState change -> no Incorrect or Learn UI ever shows
+}
+Result: no banner/hint, no learn card, just a silent reset. If any step lacks retryConfig, you’ll think the UI is broken.
+You don’t respect maxAttempts (and that can block the learn card)
+You calculate maxAttempts but never use it. If content authors expect the learn card after maxAttempts (e.g., 2), your code may still show another “incorrect” banner instead of routing to learn.
+Off-by-one messaging + state race for the banner text
+You increment currentAttempt immediately (e.g., set to 2) and then render the banner with:
+message={getRetryMessage(currentStep, currentAttempt - 1)}
+Because React state updates are async, sometimes currentAttempt is still 1 during render and you pass 0 into getRetryMessage, which falls back to the first message. This can make your messaging inconsistent and look “broken”.
+Possible NaN on XP during learn card
+calculateXP(step, 3) can return undefined if retryConfig.xp.learnCard is missing. Then:
+setTotalXpEarned(prev => prev + learnXP) // prev + undefined => NaN
+Once totalXpEarned becomes NaN, any XP display looks broken and can mask the real issue (“learn” shows but you only notice the busted numbers).
+Learn card might be unreachable depending on step data
+Your routing to learn only happens:
+after second incorrect if tryAgain2 is absent, or
+whenever currentAttempt is 3+
+If content authors provided tryAgain2 and intended maxAttempts: 2, your code will still show a second incorrect banner and not jump to learn.
+No fallback “incorrect” experience if retryConfig is partially defined
+If retryConfig exists but is missing some messages fields, you risk silent fallbacks that don’t match expectations.
+Quick patches (minimal code changes)
+Apply these changes to make the flow robust:
+A) Always show an incorrect banner at least once, even without retryConfig
+if (!currentStep?.retryConfig) {
+  // Fall back to a simple two-step retry: one incorrect banner, then learn on next miss
+  setLessonState('incorrect');
+  setCurrentAttempt(a => Math.min(a + 1, 3));
+  setHasSelectionChanged(false);
+  return;
+}
+B) Respect maxAttempts and route to learn when exceeded
+const maxAttempts = currentStep.retryConfig.maxAttempts ?? 3;
+const nextAttempt = Math.min(currentAttempt + 1, 3);
+
+if (currentAttempt >= maxAttempts) {
+  const learnXP = calculateXP(currentStep, 3) ?? 0; // guard
+  setTotalXpEarned(prev => prev + learnXP);
+  setLessonState('learn');
+  // (log learn usage here)
+  return;
+}
+C) Stop using currentAttempt - 1 in render; track the banner attempt explicitly
+Add a small state to remember which attempt the banner is for:
+const [bannerAttempt, setBannerAttempt] = useState<1 | 2>(1);
+When you set incorrect:
+if (currentAttempt === 1) {
+  setLessonState('incorrect');
+  setBannerAttempt(1);
+  setCurrentAttempt(2);
+  setHasSelectionChanged(false);
+} else if (currentAttempt === 2) {
+  if (currentStep.retryConfig.messages.tryAgain2) {
+    setLessonState('incorrect');
+    setBannerAttempt(2);
+    setCurrentAttempt(3);
+    setHasSelectionChanged(false);
+  } else {
+    // go to learn
+    ...
+  }
+}
+Then render:
+{lessonState === 'incorrect' && currentStep && (
+  <LessonIncorrect
+    message={getRetryMessage(currentStep, bannerAttempt)}
+    onTryAgain={handleTryAgain}
+    canTryAgain={true}
+  />
+)}
+D) Guard XP math everywhere
+const xpEarned = currentStep ? (calculateXP(currentStep, currentAttempt) ?? 0) : (response.xpAwarded || 0);
+...
+const learnXP = calculateXP(currentStep, 3) ?? 0;
+E) Add a lifesaver fallback when hearts hit zero
+If you want the learn card to appear when lives are gone:
+if (lives - 1 <= 0) {
+  const learnXP = calculateXP(currentStep, 3) ?? 0;
+  setTotalXpEarned(prev => prev + learnXP);
+  setLessonState('learn');
+  // (log learn usage)
+  return;
+}
+F) Make getRetryMessage resilient
+const getRetryMessage = (step: LessonStep, attempt: 1 | 2): string => {
+  const msgs = step.retryConfig?.messages;
+  if (!msgs) return "Try again!";
+  if (attempt === 1) return msgs.tryAgain1 || "Try again!";
+  return msgs.tryAgain2 || msgs.tryAgain1 || "Try again!";
+};
+Sanity checklist for your content
+Each step should either:
+include a full retryConfig like:
+{
+  "maxAttempts": 3,
+  "xp": { "firstTry": 10, "secondTry": 5, "learnCard": 0 },
+  "messages": { "tryAgain1": "Close! Re-read the label.", "tryAgain2": "Hint: Look at sugar per 100g.", "learnCard": "Here’s how to read the label…" }
+}
+or be okay with the fallback (one incorrect banner, then learn).
+Ensure xp.learnCard exists (or expect it to be 0).
+If authors set maxAttempts: 2, expect learn on the second miss—your code should now do that.
+TL;DR fixes
+Don’t return early when retryConfig is missing—show incorrect.
+Honor maxAttempts to route to learn.
+Stop relying on currentAttempt - 1 for the hint message (racey).
+Default XP values to 0 to avoid NaN.
+Optional: route to learn when hearts hit zero.

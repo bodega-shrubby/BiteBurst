@@ -12,12 +12,9 @@ export default function LessonLearn({
 }: LessonLearnProps) {
   return (
     <div className="space-y-6">
-      {/* DEBUG: Make learn card super visible */}
-      <div className="text-center text-red-600 font-bold">🎓 LEARN CARD IS RENDERING</div>
-      
       {/* Learn card */}
       <div 
-        className="p-6 rounded-2xl border-4 border-red-500 bg-red-100 shadow-lg"
+        className="p-6 rounded-2xl border border-blue-200 bg-blue-50"
         role="region"
         aria-live="polite"
         data-testid="learn-card"

@@ -62,13 +62,10 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   
   // Retry flow state
   const [currentAttempt, setCurrentAttempt] = useState(1); // 1, 2, or 3 (learn card)
+  const [bannerAttempt, setBannerAttempt] = useState<1 | 2>(1); // Track which banner to show
   const [stepStartTime, setStepStartTime] = useState<number>(Date.now());
   const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
 
-  // Debug state changes
-  useEffect(() => {
-    console.log('🔄 STATE CHANGED:', { lessonState, currentAttempt, currentStepId: currentStep?.id });
-  }, [lessonState, currentAttempt]);
 
   // Fetch lesson data
   const { data: lessonData, isLoading } = useQuery({
@@ -123,8 +120,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       setIsAnswerCorrect(response.correct);
       
       if (response.correct) {
-        // Calculate XP based on current attempt
-        const xpEarned = currentStep ? calculateXP(currentStep, currentAttempt) : response.xpAwarded || 0;
+        // Calculate XP based on current attempt (guarded)
+        const xpEarned = currentStep ? (calculateXP(currentStep, currentAttempt) ?? 0) : (response.xpAwarded || 0);
         setTotalXpEarned(prev => prev + xpEarned);
         
         // Log successful attempt
@@ -148,18 +145,117 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         setTimeout(() => setShowContinueButton(true), 1500);
       } else {
         // Handle incorrect answer - deduct life and show retry flow
-        setLives(prev => Math.max(0, prev - 1));
+        const heartsRemaining = Math.max(0, lives - 1);
+        setLives(heartsRemaining);
         
         if (!currentStep?.retryConfig) {
-          // No retry config - use old behavior
-          setTimeout(() => {
-            setSelectedAnswer(null);
+          // Fall back to a simple two-step retry: one incorrect banner, then learn on next miss
+          const nextAttempt = Math.min(currentAttempt + 1, 3);
+          if (currentAttempt >= 2) {
+            // Second miss without retryConfig - go to learn card
+            const learnXP = calculateXP(currentStep, 3) ?? 0;
+            setTotalXpEarned(prev => prev + learnXP);
+            setLessonState('learn');
+            
+            // Log the incorrect attempt that triggered the learn card
+            if (currentStep && selectedAnswer) {
+              logAttemptMutation.mutate({
+                lessonId,
+                stepId: currentStep.id,
+                stepNumber: currentStep.stepNumber,
+                attemptNumber: currentAttempt,
+                isCorrect: false,
+                selectedAnswer,
+                timeOnStepMs,
+                heartsRemaining: heartsRemaining,
+                xpEarned: 0,
+                usedLearnCard: false
+              });
+            }
+            
+            // Log learn card usage
+            if (currentStep && selectedAnswer) {
+              logAttemptMutation.mutate({
+                lessonId,
+                stepId: currentStep.id,
+                stepNumber: currentStep.stepNumber,
+                attemptNumber: 3, // Standardize learn-card logs
+                isCorrect: false,
+                selectedAnswer: 'learn-card-shown',
+                timeOnStepMs,
+                heartsRemaining: heartsRemaining,
+                xpEarned: learnXP,
+                usedLearnCard: true
+              });
+            }
+          } else {
+            // First miss without retryConfig - show incorrect banner  
+            setLessonState('incorrect');
+            setBannerAttempt(1);
+            setCurrentAttempt(nextAttempt);
             setHasSelectionChanged(false);
-          }, 1500);
+            
+            // Log the first incorrect attempt
+            if (currentStep && selectedAnswer) {
+              logAttemptMutation.mutate({
+                lessonId,
+                stepId: currentStep.id,
+                stepNumber: currentStep.stepNumber,
+                attemptNumber: currentAttempt,
+                isCorrect: false,
+                selectedAnswer,
+                timeOnStepMs,
+                heartsRemaining: heartsRemaining,
+                xpEarned: 0,
+                usedLearnCard: false
+              });
+            }
+          }
           return;
         }
         
-        const maxAttempts = currentStep.retryConfig.maxAttempts;
+        const maxAttempts = currentStep.retryConfig.maxAttempts ?? 3;
+        const nextAttempt = Math.min(currentAttempt + 1, 3);
+
+        // Check if max attempts exceeded - route to learn card immediately
+        if (currentAttempt >= maxAttempts) {
+          const learnXP = calculateXP(currentStep, 3) ?? 0; // Guard against undefined
+          setTotalXpEarned(prev => prev + learnXP);
+          setLessonState('learn');
+          
+          // Log the incorrect attempt that triggered the learn card
+          if (currentStep && selectedAnswer) {
+            logAttemptMutation.mutate({
+              lessonId,
+              stepId: currentStep.id,
+              stepNumber: currentStep.stepNumber,
+              attemptNumber: currentAttempt,
+              isCorrect: false,
+              selectedAnswer,
+              timeOnStepMs,
+              heartsRemaining: heartsRemaining,
+              xpEarned: 0,
+              usedLearnCard: false
+            });
+          }
+          
+          // Log learn card usage
+          if (currentStep && selectedAnswer) {
+            logAttemptMutation.mutate({
+              lessonId,
+              stepId: currentStep.id,
+              stepNumber: currentStep.stepNumber,
+              attemptNumber: 3, // Standardize learn-card logs to attempt 3
+              isCorrect: false,
+              selectedAnswer: 'learn-card-shown',
+              timeOnStepMs,
+              heartsRemaining: heartsRemaining,
+              xpEarned: learnXP,
+              usedLearnCard: true
+            });
+          }
+          return;
+        }
         
         // Log incorrect attempt
         if (currentStep && selectedAnswer) {
@@ -171,72 +267,61 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             isCorrect: false,
             selectedAnswer,
             timeOnStepMs,
-            heartsRemaining: Math.max(0, lives - 1), // After deduction, clamped
+            heartsRemaining: heartsRemaining,
             xpEarned: 0,
             usedLearnCard: false
           });
         }
         
-        // SPEC FIX: Handle attempt 2 routing correctly
-        console.log('🔥 DEBUG - Before state change:', { currentAttempt, lessonState, lives });
-        
+        // Show appropriate incorrect banner based on attempt
         if (currentAttempt === 1) {
-          // First incorrect - always show try-again banner
-          console.log('📍 Setting state to incorrect, attempt 1->2');
           setLessonState('incorrect');
+          setBannerAttempt(1);
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
         } else if (currentAttempt === 2) {
-          // Second incorrect - check if tryAgain2 message exists
           if (currentStep.retryConfig.messages.tryAgain2) {
-            // Show try-again banner with second message
-            console.log('📍 Setting state to incorrect, attempt 2->3');
             setLessonState('incorrect');
+            setBannerAttempt(2);
             setCurrentAttempt(3);
             setHasSelectionChanged(false);
           } else {
-            // No second message - go straight to learn card
-            console.log('📍 Setting state to learn (no tryAgain2)');
-            const learnXP = calculateXP(currentStep, 3); // Should be 0
+            // No second message - go to learn card
+            const learnXP = calculateXP(currentStep, 3) ?? 0;
             setTotalXpEarned(prev => prev + learnXP);
             setLessonState('learn');
             
-            // Log learn card usage
             if (currentStep && selectedAnswer) {
               logAttemptMutation.mutate({
                 lessonId,
                 stepId: currentStep.id,
                 stepNumber: currentStep.stepNumber,
-                attemptNumber: 3, // Learn card is attempt 3
+                attemptNumber: 3,
                 isCorrect: false,
                 selectedAnswer: 'learn-card-shown',
                 timeOnStepMs,
-                heartsRemaining: Math.max(0, lives - 1), // After deduction, clamped
+                heartsRemaining: heartsRemaining,
                 xpEarned: learnXP,
                 usedLearnCard: true
               });
             }
           }
         } else {
-          // Third attempt or max attempts reached - show learn card
-          console.log('📍 Setting state to learn (attempt 3+)');
-          const learnXP = calculateXP(currentStep, 3); // Should be 0
+          // Final attempt - show learn card
+          const learnXP = calculateXP(currentStep, 3) ?? 0;
           setTotalXpEarned(prev => prev + learnXP);
-          console.log('🚀 ABOUT TO SET STATE TO LEARN - current state:', lessonState);
           setLessonState('learn');
-          console.log('✅ CALLED setLessonState(learn)');
           
-          // Log learn card usage
           if (currentStep && selectedAnswer) {
             logAttemptMutation.mutate({
               lessonId,
               stepId: currentStep.id,
               stepNumber: currentStep.stepNumber,
-              attemptNumber: 3, // Learn card is attempt 3
+              attemptNumber: 3, // Standardize learn-card logs
               isCorrect: false,
               selectedAnswer: 'learn-card-shown',
               timeOnStepMs,
-              heartsRemaining: Math.max(0, lives - 1), // After deduction, clamped
+              heartsRemaining: heartsRemaining,
               xpEarned: learnXP,
               usedLearnCard: true
             });
@@ -263,15 +348,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     return step.retryConfig.xp.learnCard; // Attempt 3 (learn card)
   };
 
-  // Get retry message based on attempt number
-  const getRetryMessage = (step: LessonStep, attempt: number): string => {
-    if (!step.retryConfig) return "Try again!";
-    
-    if (attempt === 1) return step.retryConfig.messages.tryAgain1;
-    if (attempt === 2 && step.retryConfig.messages.tryAgain2) {
-      return step.retryConfig.messages.tryAgain2;
-    }
-    return step.retryConfig.messages.tryAgain1; // Fallback to first message
+  // Get retry message based on attempt number (resilient)
+  const getRetryMessage = (step: LessonStep, attempt: 1 | 2): string => {
+    const msgs = step.retryConfig?.messages;
+    if (!msgs) return "Try again!";
+    if (attempt === 1) return msgs.tryAgain1 || "Try again!";
+    return msgs.tryAgain2 || msgs.tryAgain1 || "Try again!";
   };
 
   // Reset state for next step
@@ -281,6 +363,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setSelectedAnswer(null);
     setShowContinueButton(false);
     setCurrentAttempt(1);
+    setBannerAttempt(1);
     setStepStartTime(Date.now());
     setHasSelectionChanged(false);
   };
@@ -309,6 +392,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setLessonState('asking');
     setSelectedAnswer(null);
     setHasSelectionChanged(false);
+    // bannerAttempt remains the same for proper messaging
   };
 
   // Handle "Continue" from learn card (skip to next step)
@@ -397,13 +481,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
-        {/* DEBUG: Show current state */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mb-4 p-2 bg-yellow-100 text-xs">
-            State: {lessonState} | Attempt: {currentAttempt} | HasChanged: {hasSelectionChanged ? 'Y' : 'N'}
-          </div>
-        )}
-        
         {lessonState === 'asking' && currentStep && (
           <LessonAsking
             step={currentStep}
@@ -417,39 +494,24 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         
         {lessonState === 'incorrect' && currentStep && (
           <LessonIncorrect
-            message={getRetryMessage(currentStep, currentAttempt - 1)} // -1 because we already incremented
+            message={getRetryMessage(currentStep, bannerAttempt)}
             onTryAgain={handleTryAgain}
-            canTryAgain={true} // CRITICAL FIX: Always enable Try Again button
+            canTryAgain={true}
           />
         )}
         
         {lessonState === 'learn' && currentStep && (
-          <>
-            {console.log('🎓 RENDERING LEARN CARD:', { 
-              lessonState, 
-              currentStep: currentStep?.id, 
-              message: currentStep.retryConfig?.messages.learnCard 
-            })}
-            <LessonLearn
-              message={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
-              onContinue={handleLearnContinue}
-            />
-          </>
-        )}
-        
-        {lessonState === 'learn' && !currentStep && (
-          <div className="text-red-500">❌ LEARN STATE BUT NO CURRENT STEP</div>
-        )}
-        
-        {lessonState !== 'asking' && lessonState !== 'incorrect' && lessonState !== 'learn' && lessonState !== 'success' && (
-          <div className="text-red-500">❌ UNKNOWN STATE: {lessonState}</div>
+          <LessonLearn
+            message={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
+            onContinue={handleLearnContinue}
+          />
         )}
         
         {lessonState === 'success' && currentStep && (
           <LessonSuccess
             step={currentStep}
             selectedAnswer={selectedAnswer}
-            xpEarned={calculateXP(currentStep, currentAttempt)}
+            xpEarned={calculateXP(currentStep, currentAttempt) ?? 0}
             onContinue={handleContinue}
             showContinueButton={showContinueButton}
           />
