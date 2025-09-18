@@ -404,7 +404,29 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       }
       let isCorrect = false;
 
-      if (typeof expectedAnswer === 'boolean') {
+      // Special handling for ordering questions
+      if (validatedData.stepId.includes('step-5') && 
+          (validatedData.lessonId === 'brainfuel-for-school' || validatedData.lessonId === 'fuel-for-football')) {
+        try {
+          const submittedOrder = JSON.parse(validatedData.answer);
+          
+          // Get lesson data to find correct order
+          let correctOrderIds: string[] = [];
+          
+          if (validatedData.lessonId === 'brainfuel-for-school') {
+            // BrainFuel step-5 ordering
+            correctOrderIds = ['chew-mouth', 'stomach-breakdown', 'small-intestine', 'blood-transport'];
+          } else if (validatedData.lessonId === 'fuel-for-football') {
+            // Fuel for Football step-5 ordering  
+            correctOrderIds = ['pasta', 'yogurt', 'broccoli'];
+          }
+          
+          isCorrect = JSON.stringify(submittedOrder) === JSON.stringify(correctOrderIds);
+        } catch (e) {
+          console.error('Failed to parse ordering answer:', e);
+          isCorrect = false;
+        }
+      } else if (typeof expectedAnswer === 'boolean') {
         isCorrect = validatedData.answer === String(expectedAnswer);
       } else {
         isCorrect = validatedData.answer === expectedAnswer;

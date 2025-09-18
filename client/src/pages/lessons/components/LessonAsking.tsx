@@ -58,19 +58,27 @@ export default function LessonAsking({
     }
   }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
   
-  // Auto-update answer when ordering is complete (allows checking even if incorrect)
+  // Initialize shuffled ordering items on step change
   useEffect(() => {
     if (step.questionType === 'ordering' && step.content.orderingItems) {
       const items = step.content.orderingItems;
-      const allItemsPlaced = orderedItems.length === items.length;
-      
-      if (allItemsPlaced && selectedAnswer !== 'ordering-complete') {
-        onAnswerSelect('ordering-complete');
-      } else if (!allItemsPlaced && selectedAnswer === 'ordering-complete') {
-        onAnswerSelect('');
+      // Fisher-Yates shuffle
+      const shuffledIds = [...items.map(item => item.id)];
+      for (let i = shuffledIds.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledIds[i], shuffledIds[j]] = [shuffledIds[j], shuffledIds[i]];
       }
+      setOrderedItems(shuffledIds);
+      onAnswerSelect(''); // Clear any previous answer
     }
-  }, [orderedItems, step.questionType, step.content.orderingItems, selectedAnswer, onAnswerSelect]);
+  }, [step.id, step.questionType]);
+  
+  // Update answer when ordering changes (for submission)
+  useEffect(() => {
+    if (step.questionType === 'ordering' && orderedItems.length > 0) {
+      onAnswerSelect(JSON.stringify(orderedItems));
+    }
+  }, [orderedItems, step.questionType]);
   
   const renderMultipleChoice = () => {
     if (!step.content.options) return null;
@@ -325,10 +333,7 @@ export default function LessonAsking({
     
     const items = step.content.orderingItems;
     
-    // Initialize ordered items if empty
-    if (orderedItems.length === 0 && items.length > 0) {
-      setOrderedItems(items.map(item => item.id));
-    }
+    // Items are now initialized via useEffect with shuffling
     
     const handleOrderDragStart = (e: React.DragEvent, itemId: string) => {
       setDraggedOrderItem(itemId);
