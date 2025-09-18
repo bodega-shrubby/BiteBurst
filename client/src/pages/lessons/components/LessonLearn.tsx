@@ -10,6 +10,7 @@ export default function LessonLearn({
   message, 
   onContinue 
 }: LessonLearnProps) {
+  console.log('🎯 LessonLearn COMPONENT RENDERING with message:', message);
   return (
     <div className="space-y-6">
       {/* Learn card */}

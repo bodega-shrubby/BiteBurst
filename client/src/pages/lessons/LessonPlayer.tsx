@@ -220,6 +220,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
         // Check if max attempts exceeded - route to learn card immediately
         if (currentAttempt >= maxAttempts) {
+          console.log('🔍 DEBUG: Max attempts exceeded - setting lessonState to learn');
           const learnXP = calculateXP(currentStep, 3) ?? 0; // Guard against undefined
           setTotalXpEarned(prev => prev + learnXP);
           setLessonState('learn');
@@ -275,13 +276,16 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }
         
         // Show appropriate incorrect banner based on attempt
+        console.log('🔍 DEBUG: About to set lessonState - currentAttempt:', currentAttempt);
         if (currentAttempt === 1) {
+          console.log('🔍 DEBUG: Setting lessonState to incorrect (attempt 1)');
           setLessonState('incorrect');
           setBannerAttempt(1);
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
         } else if (currentAttempt === 2) {
           if (currentStep.retryConfig.messages.tryAgain2) {
+            console.log('🔍 DEBUG: Setting lessonState to incorrect (attempt 2)');
             setLessonState('incorrect');
             setBannerAttempt(2);
             setCurrentAttempt(3);
@@ -482,6 +486,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
+        {console.log('🎯 RENDER DEBUG: lessonState =', lessonState, 'currentStep =', !!currentStep)}
         {lessonState === 'asking' && currentStep && (
           <LessonAsking
             step={currentStep}
@@ -503,7 +508,11 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         
         {lessonState === 'learn' && currentStep && (
           <LessonLearn
-            message={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
+            message={(() => {
+              const learnMessage = currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!";
+              console.log('🔍 DEBUG: Rendering LessonLearn with message:', learnMessage);
+              return learnMessage;
+            })()}
             onContinue={handleLearnContinue}
           />
         )}
