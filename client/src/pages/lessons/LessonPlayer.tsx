@@ -65,6 +65,11 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [stepStartTime, setStepStartTime] = useState<number>(Date.now());
   const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
 
+  // Debug state changes
+  useEffect(() => {
+    console.log('🔄 STATE CHANGED:', { lessonState, currentAttempt, currentStepId: currentStep?.id });
+  }, [lessonState, currentAttempt]);
+
   // Fetch lesson data
   const { data: lessonData, isLoading } = useQuery({
     queryKey: ['/api/lessons', lessonId],
