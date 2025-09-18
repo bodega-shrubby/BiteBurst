@@ -51,32 +51,13 @@ export default function LessonSuccess({
   const renderMatchingSuccess = () => {
     if (!step.content.matchingPairs) return null;
     
-    // Different feedback based on lesson type
-    const footballMatchingFeedback = {
-      '🥦 Broccoli': 'Keeps your body strong for the whole match.',
-      '🥣 Yogurt with berries': 'Helps your muscles recover after playing.',
-      '🥚 Boiled egg': 'Builds strength so you can kick harder.'
-    };
-    
-    const brainMatchingFeedback = {
-      '🐟 Salmon': 'Salmon has healthy fats that boost memory.',
-      '🥚 Eggs': 'Eggs give protein for steady energy, helping you focus.',
-      '🥦 Broccoli': 'Broccoli\'s vitamins keep you healthy and alert.',
-      '🫘 Beans': 'Beans have iron, which carries oxygen in your blood so your brain stays sharp.'
-    };
-    
-    // Use brain feedback if it contains salmon, otherwise use football feedback
-    const feedbackMap = step.content.matchingPairs.some(pair => pair.left.includes('Salmon')) 
-      ? brainMatchingFeedback 
-      : footballMatchingFeedback;
-    
     return (
       <div className="space-y-4">
         <div className="text-lg font-bold text-green-800 mb-3">
           ✅ Nice! Perfect matches!
         </div>
         
-        {/* Show each correct match with its specific feedback */}
+        {/* Show each correct match */}
         <div className="space-y-3">
           {step.content.matchingPairs.map((pair, index) => (
             <div
@@ -88,12 +69,18 @@ export default function LessonSuccess({
                 <span className="text-green-600">→</span>
                 <span className="text-sm text-gray-600">{pair.right}</span>
               </div>
-              <div className="text-sm text-green-700 pl-2">
-                {feedbackMap[pair.left as keyof typeof feedbackMap]}
-              </div>
             </div>
           ))}
         </div>
+        
+        {/* Show lesson feedback with player references */}
+        {step.content.feedback && (
+          <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
+            <div className="text-sm text-green-700 whitespace-pre-line">
+              {step.content.feedback}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
