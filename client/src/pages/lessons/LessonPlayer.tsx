@@ -148,6 +148,11 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         const heartsRemaining = Math.max(0, lives - 1);
         setLives(heartsRemaining);
         
+        // DEBUG: Check what retryConfig looks like
+        console.log('🔍 DEBUG: currentStep:', currentStep);
+        console.log('🔍 DEBUG: retryConfig:', currentStep?.retryConfig);
+        console.log('🔍 DEBUG: retryConfig check:', !currentStep?.retryConfig);
+        
         if (!currentStep?.retryConfig) {
           // Fall back to a simple two-step retry: one incorrect banner, then learn on next miss
           const nextAttempt = Math.min(currentAttempt + 1, 3);
