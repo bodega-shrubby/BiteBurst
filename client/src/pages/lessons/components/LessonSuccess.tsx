@@ -113,6 +113,15 @@ export default function LessonSuccess({
             </div>
           ))}
         </div>
+        
+        {/* Show lesson feedback with player references */}
+        {step.content.feedback && (
+          <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
+            <div className="text-sm text-green-700">
+              {step.content.feedback}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
