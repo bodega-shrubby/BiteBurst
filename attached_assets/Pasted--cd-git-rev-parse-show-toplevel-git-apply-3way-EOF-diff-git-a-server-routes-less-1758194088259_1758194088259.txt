@@ -1,0 +1,128 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/server/routes/lessons.ts b/server/routes/lessons.ts
+index 8fec399713a1d18b3ee210c656e4a176db10c7d1..9830d383e9de36dc0dde8501e2a337ba760462b3 100644
+--- a/server/routes/lessons.ts
++++ b/server/routes/lessons.ts
+@@ -102,53 +102,58 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
+               questionType: 'multiple-choice' as const,
+               question: "What's the best half-time snack to keep your energy up?",
+               content: {
+                 options: [
+                   { id: 'chocolate', text: 'Chocolate bar', emoji: '🍫', correct: false },
+                   { id: 'banana', text: 'Banana', emoji: '🍌', correct: true },
+                   { id: 'crisps', text: 'Crisps', emoji: '🍟', correct: false }
+                 ],
+                 feedback: "Perfect! Bananas give quick energy to refuel your legs so you can sprint again in the second half — just like Mbappé."
+               },
+               xpReward: 10,
+               mascotAction: 'high_five',
+               retryConfig: {
+                 maxAttempts: 3,
+                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                 messages: {
+                   tryAgain1: "That's a quick burst… but you'll slow down after. Pick one that refuels your legs.",
+                   tryAgain2: "Think of something light that players grab at half-time for energy.",
+                   learnCard: "Banana gives quick, clean energy so you can sprint again in the second half."
+                 }
+               }
+             }
+           ]
+         };
+         
++        res.set({
++          'Cache-Control': 'no-store, must-revalidate',
++          Pragma: 'no-cache',
++          Expires: '0'
++        });
+         return res.json(lessonData);
+       }
+-      
++
+       if (lessonId === 'brainfuel-for-school') {
+         const lessonData = {
+           id: 'brainfuel-for-school',
+           title: 'BrainFuel for School',
+           description: 'Learn the best foods to fuel your brain for exams and studying!',
+           totalSteps: 6,
+           steps: [
+             {
+               id: 'step-1',
+               stepNumber: 1,
+               questionType: 'multiple-choice' as const,
+               question: "Which breakfast gives your brain the best fuel for a 2-hour exam?",
+               content: {
+                 options: [
+                   { id: 'porridge-berries', text: 'Porridge with blueberries + milk', emoji: '🥣', correct: true },
+                   { id: 'chocolate-cereal', text: 'Chocolate cereal + fizzy drink', emoji: '🥛', correct: false },
+                   { id: 'white-toast', text: 'White toast with jam', emoji: '🍞', correct: false }
+                 ],
+                 feedback: "Great choice! Porridge gives slow, steady energy. Blueberries help with memory, and milk's protein keeps your brain working smoothly through the exam."
+               },
+               xpReward: 10,
+               mascotAction: 'graduation_cap'
+             },
+             {
+               id: 'step-2',
+diff --git a/server/routes/lessons.ts b/server/routes/lessons.ts
+index 8fec399713a1d18b3ee210c656e4a176db10c7d1..9830d383e9de36dc0dde8501e2a337ba760462b3 100644
+--- a/server/routes/lessons.ts
++++ b/server/routes/lessons.ts
+@@ -207,50 +212,55 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
+                 ],
+                 feedback: "Snack B! The fibre and protein slow down the energy release, so your brain gets steady fuel while you revise."
+               },
+               xpReward: 10,
+               mascotAction: 'snack_pot'
+             },
+             {
+               id: 'step-6',
+               stepNumber: 6,
+               questionType: 'ordering' as const,
+               question: "Put these in the best order before a test.",
+               content: {
+                 orderingItems: [
+                   { id: 'drink-water', text: 'Drink water', correctOrder: 1 },
+                   { id: 'light-snack', text: 'Eat a light snack', correctOrder: 2 },
+                   { id: 'deep-breaths', text: '3 deep breaths + check your things', correctOrder: 3 }
+                 ],
+                 feedback: "Hydration first, then steady fuel, then calming your nerves. That way you're ready to focus."
+               },
+               xpReward: 15,
+               mascotAction: 'thumbs_up'
+             }
+           ]
+         };
+         
++        res.set({
++          'Cache-Control': 'no-store, must-revalidate',
++          Pragma: 'no-cache',
++          Expires: '0'
++        });
+         return res.json(lessonData);
+       }
+       
+       return res.status(404).json({ error: 'Lesson not found' });
+     } catch (error) {
+       console.error('Get lesson error:', error);
+       res.status(500).json({ error: 'Failed to load lesson' });
+     }
+   });
+ 
+   // Submit lesson answer
+   app.post('/api/lessons/answer', requireAuth, async (req: any, res: any) => {
+     try {
+       const validatedData = answerSubmissionSchema.parse(req.body);
+       
+       // Verify user matches authenticated user
+       if (validatedData.userId !== req.user.userId) {
+         return res.status(403).json({ error: 'Unauthorized' });
+       }
+ 
+       // For now, hardcode the correct answers by lesson
+       // In the future, this would check against the database
+       const fuelForFootballAnswers: Record<string, string | boolean> = {
+         'step-1': 'porridge',
+         'step-2': true,
+ 
+EOF
+)

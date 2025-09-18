@@ -124,15 +124,14 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           ]
         };
         
-        // Prevent caching to ensure fresh lesson data with retryConfig
-        res.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
-        res.set('Pragma', 'no-cache');
-        res.set('Expires', '0');
-        res.set('Vary', 'Authorization');
-        
+        res.set({
+          'Cache-Control': 'no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0'
+        });
         return res.json(lessonData);
       }
-      
+
       if (lessonId === 'brainfuel-for-school') {
         const lessonData = {
           id: 'brainfuel-for-school',
@@ -154,7 +153,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Great choice! Porridge gives slow, steady energy. Blueberries help with memory, and milk's protein keeps your brain working smoothly through the exam."
               },
               xpReward: 10,
-              mascotAction: 'graduation_cap'
+              mascotAction: 'graduation_cap',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Think steady energy that lasts through your exam, not a sugar rush.",
+                  tryAgain2: "Which breakfast keeps your brain working smoothly for 2 hours?",
+                  learnCard: "Porridge gives slow, steady energy. Blueberries help with memory, and milk's protein keeps your brain working smoothly through the exam."
+                }
+              }
             },
             {
               id: 'step-2',
@@ -166,7 +174,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Right! Even losing a bit of water makes you think slower and feel tired. Drinking water keeps you sharp in lessons and exams."
               },
               xpReward: 10,
-              mascotAction: 'brain_glow'
+              mascotAction: 'brain_glow',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Think about what your brain is mostly made of - it needs this to work well.",
+                  tryAgain2: "What happens when you don't drink enough during the day?",
+                  learnCard: "Your brain is about 80% water! Even losing a bit makes you think slower and feel tired. Drinking water keeps you sharp in lessons and exams."
+                }
+              }
             },
             {
               id: 'step-3',
@@ -183,7 +200,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Perfect matches! Each food helps your brain work better in different ways."
               },
               xpReward: 15,
-              mascotAction: 'clipboard_tick'
+              mascotAction: 'clipboard_tick',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 15, secondTry: 7, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Think about what each food gives your brain - they all help in different ways.",
+                  tryAgain2: "Match what makes your memory stronger, what gives energy, what keeps you healthy.",
+                  learnCard: "Each food helps your brain differently: Salmon strengthens memory, eggs give focus energy, broccoli provides vitamins, and beans deliver oxygen for clear thinking."
+                }
+              }
             },
             {
               id: 'step-4',
@@ -199,7 +225,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "A banana gives quick energy and water keeps your brain working fast. Heavy food or lots of sugar can make you slow down during the quiz."
               },
               xpReward: 10,
-              mascotAction: 'ready_sign'
+              mascotAction: 'ready_sign',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Think quick energy + brain hydration, but not too heavy before a quiz.",
+                  tryAgain2: "What gives fast energy without making you sleepy during the test?",
+                  learnCard: "A banana gives quick energy and water keeps your brain working fast. Heavy food or lots of sugar can make you slow down during the quiz."
+                }
+              }
             },
             {
               id: 'step-5',
@@ -214,7 +249,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Snack B! The fibre and protein slow down the energy release, so your brain gets steady fuel while you revise."
               },
               xpReward: 10,
-              mascotAction: 'snack_pot'
+              mascotAction: 'snack_pot',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Look at the fiber and protein - which one gives steady energy instead of a sugar crash?",
+                  tryAgain2: "Higher fiber and protein means slower energy release for longer focus.",
+                  learnCard: "Snack B! The fiber and protein slow down the energy release, so your brain gets steady fuel while you revise."
+                }
+              }
             },
             {
               id: 'step-6',
@@ -230,17 +274,25 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 feedback: "Hydration first, then steady fuel, then calming your nerves. That way you're ready to focus."
               },
               xpReward: 15,
-              mascotAction: 'thumbs_up'
+              mascotAction: 'thumbs_up',
+              retryConfig: {
+                maxAttempts: 3,
+                xp: { firstTry: 15, secondTry: 7, learnCard: 0 },
+                messages: {
+                  tryAgain1: "Think about preparing your body first, then your mind for the test.",
+                  tryAgain2: "What order helps you feel calm and ready - hydration, fuel, then relaxation?",
+                  learnCard: "Hydration first, then steady fuel, then calming your nerves. That way you're ready to focus and do your best on the test."
+                }
+              }
             }
           ]
         };
         
-        // Prevent caching to ensure fresh lesson data with retryConfig
-        res.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
-        res.set('Pragma', 'no-cache');
-        res.set('Expires', '0');
-        res.set('Vary', 'Authorization');
-        
+        res.set({
+          'Cache-Control': 'no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0'
+        });
         return res.json(lessonData);
       }
       
