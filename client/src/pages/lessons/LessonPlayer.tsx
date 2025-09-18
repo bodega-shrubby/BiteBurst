@@ -172,9 +172,17 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           });
         }
         
-        // SPEC FIX: Handle attempt 2 routing correctly
+        // SPEC FIX: Handle attempt 2 routing correctly  
+        console.log('🔥 RETRY FLOW DEBUG:', { 
+          currentAttempt, 
+          lives, 
+          stepId: currentStep.id, 
+          hasTryAgain2: !!currentStep.retryConfig.messages.tryAgain2 
+        });
+        
         if (currentAttempt === 1) {
           // First incorrect - always show try-again banner
+          console.log('📍 First incorrect - showing tryAgain1 banner');
           setLessonState('incorrect');
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
@@ -182,11 +190,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           // Second incorrect - check if tryAgain2 message exists
           if (currentStep.retryConfig.messages.tryAgain2) {
             // Show try-again banner with second message
+            console.log('📍 Second incorrect - showing tryAgain2 banner');
             setLessonState('incorrect');
             setCurrentAttempt(3);
             setHasSelectionChanged(false);
           } else {
             // No second message - go straight to learn card
+            console.log('📍 Second incorrect - no tryAgain2, showing learn card');
             const learnXP = calculateXP(currentStep, 3); // Should be 0
             setTotalXpEarned(prev => prev + learnXP);
             setLessonState('learn');
@@ -209,6 +219,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           }
         } else {
           // Third attempt or max attempts reached - show learn card
+          console.log('📍 Third incorrect - showing learn card');
           const learnXP = calculateXP(currentStep, 3); // Should be 0
           setTotalXpEarned(prev => prev + learnXP);
           setLessonState('learn');
@@ -253,6 +264,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   // Get retry message based on attempt number
   const getRetryMessage = (step: LessonStep, attempt: number): string => {
     if (!step.retryConfig) return "Try again!";
+    
+    console.log('🔧 getRetryMessage called:', { 
+      attempt, 
+      stepId: step.id, 
+      tryAgain1: step.retryConfig.messages.tryAgain1, 
+      tryAgain2: step.retryConfig.messages.tryAgain2 
+    });
     
     if (attempt === 1) return step.retryConfig.messages.tryAgain1;
     if (attempt === 2 && step.retryConfig.messages.tryAgain2) {
