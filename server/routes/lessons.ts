@@ -381,18 +381,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const fuelForFootballAnswers: Record<string, string | boolean> = {
         'step-1': 'oats',
         'step-2': true,
-        'step-3': 'matching-complete',
+        // step-3 (matching) and step-5 (ordering) handled by special logic below
         'step-4': 'banana',
-        'step-5': 'ordering-complete',
         'step-6': 'muscles'
       };
       
       const brainFuelAnswers: Record<string, string | boolean> = {
         'step-1': 'brown-rice',
         'step-2': false,
-        'step-3': 'matching-complete',
+        // step-3 (matching) and step-5 (ordering) handled by special logic below
         'step-4': 'banana-nuts',
-        'step-5': 'ordering-complete',
         'step-6': 'tiredness-focus'
       };
 
@@ -404,8 +402,43 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       }
       let isCorrect = false;
 
-      // Special handling for ordering questions
-      if (validatedData.stepId.includes('step-5') && 
+      // Special handling for matching questions (step-3)
+      if (validatedData.stepId.includes('step-3') && 
+          (validatedData.lessonId === 'brainfuel-for-school' || validatedData.lessonId === 'fuel-for-football')) {
+        try {
+          const submittedMatches = JSON.parse(validatedData.answer);
+          
+          // Define correct matching pairs
+          let correctMatches: Record<string, string> = {};
+          
+          if (validatedData.lessonId === 'brainfuel-for-school') {
+            // BrainFuel step-3 matching pairs
+            correctMatches = {
+              '🥛 Milk': 'Sleepy brain helpers',
+              '🥔 Potato': 'Fast brain fuel', 
+              '🥗 Salad': 'Brain vitamins'
+            };
+          } else if (validatedData.lessonId === 'fuel-for-football') {
+            // Fuel for Football step-3 matching pairs
+            correctMatches = {
+              '🥣 Oats': 'Long-lasting energy for running',
+              '🥛 Yogurt': 'Repairs muscles and strengthens bones',
+              '🍟 Crisps': 'Extra fat, not much help on the pitch'
+            };
+          }
+          
+          // Check if all pairs match correctly
+          isCorrect = Object.keys(correctMatches).every(left => 
+            submittedMatches[left] === correctMatches[left]
+          ) && Object.keys(submittedMatches).length === Object.keys(correctMatches).length;
+          
+        } catch (e) {
+          console.error('Failed to parse matching answer:', e);
+          isCorrect = false;
+        }
+      }
+      // Special handling for ordering questions (step-5)
+      else if (validatedData.stepId.includes('step-5') && 
           (validatedData.lessonId === 'brainfuel-for-school' || validatedData.lessonId === 'fuel-for-football')) {
         try {
           const submittedOrder = JSON.parse(validatedData.answer);
@@ -426,7 +459,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           console.error('Failed to parse ordering answer:', e);
           isCorrect = false;
         }
-      } else if (typeof expectedAnswer === 'boolean') {
+      } 
+      // Handle other question types
+      else if (typeof expectedAnswer === 'boolean') {
         isCorrect = validatedData.answer === String(expectedAnswer);
       } else {
         isCorrect = validatedData.answer === expectedAnswer;

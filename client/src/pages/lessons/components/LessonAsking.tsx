@@ -46,25 +46,21 @@ export default function LessonAsking({
   const [orderedItems, setOrderedItems] = useState<string[]>([]);
   const [draggedOrderItem, setDraggedOrderItem] = useState<string | null>(null);
   
-  // Auto-update answer when matching is complete AND correct
+  // Auto-update answer when matching slots are filled (send real data for backend validation)
   useEffect(() => {
     if (step.questionType === 'matching' && step.content.matchingPairs) {
       const pairs = step.content.matchingPairs;
       const allMatched = Object.keys(matches).length === pairs.length;
       
       if (allMatched) {
-        // Check if all matches are correct
-        const allCorrect = pairs.every(pair => matches[pair.left] === pair.right);
-        
-        if (allCorrect && selectedAnswer !== 'matching-complete') {
-          onAnswerSelect('matching-complete');
-        } else if (!allCorrect && selectedAnswer !== 'matching-incorrect') {
-          // All slots filled but incorrect - send incorrect signal
-          onAnswerSelect('matching-incorrect');
+        // Always send actual matches data, let backend validate correctness
+        const matchesJson = JSON.stringify(matches);
+        if (selectedAnswer !== matchesJson) {
+          onAnswerSelect(matchesJson);
         }
       } else {
         // Not all slots filled - clear selection
-        if (selectedAnswer === 'matching-complete' || selectedAnswer === 'matching-incorrect') {
+        if (selectedAnswer && selectedAnswer.startsWith('{')) {
           onAnswerSelect('');
         }
       }
@@ -112,28 +108,21 @@ export default function LessonAsking({
     }
   }, [step.id, step.questionType]);
   
-  // Auto-update answer when ordering is complete AND correct
+  // Auto-update answer when all ordering items are placed (send real data for backend validation)
   useEffect(() => {
     if (step.questionType === 'ordering' && step.content.orderingItems && orderedItems.length > 0) {
       const items = step.content.orderingItems;
       const allPlaced = orderedItems.length === items.length;
       
       if (allPlaced) {
-        // Check if all items are in correct order
-        const allCorrect = orderedItems.every((itemId, index) => {
-          const item = items.find(i => i.id === itemId);
-          return item && item.correctOrder === index + 1;
-        });
-        
-        if (allCorrect && selectedAnswer !== 'ordering-complete') {
-          onAnswerSelect('ordering-complete');
-        } else if (!allCorrect && selectedAnswer !== 'ordering-incorrect') {
-          // All items placed but incorrect order - send incorrect signal
-          onAnswerSelect('ordering-incorrect');
+        // Always send actual order data, let backend validate correctness
+        const orderJson = JSON.stringify(orderedItems);
+        if (selectedAnswer !== orderJson) {
+          onAnswerSelect(orderJson);
         }
       } else {
         // Not all items placed - clear selection
-        if (selectedAnswer === 'ordering-complete' || selectedAnswer === 'ordering-incorrect') {
+        if (selectedAnswer && selectedAnswer.startsWith('[')) {
           onAnswerSelect('');
         }
       }
