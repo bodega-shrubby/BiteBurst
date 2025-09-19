@@ -101,12 +101,7 @@ export default function LessonAsking({
     }
   }, [step.id, step.questionType]);
   
-  // Update answer when ordering changes (for submission)
-  useEffect(() => {
-    if (step.questionType === 'ordering' && orderedItems.length > 0) {
-      onAnswerSelect(JSON.stringify(orderedItems));
-    }
-  }, [orderedItems, step.questionType]);
+  // Note: Answer selection moved to handleOrderDrop to prevent render loops
   
   const renderMultipleChoice = () => {
     if (!step.content.options) return null;
@@ -387,6 +382,8 @@ export default function LessonAsking({
         
         setOrderedItems(newOrder);
         setDraggedOrderItem(null);
+        // Update answer for submission (moved from useEffect to prevent render loops)
+        onAnswerSelect(JSON.stringify(newOrder));
       }
     };
     

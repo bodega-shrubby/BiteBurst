@@ -342,7 +342,10 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Calculate XP based on current attempt and retryConfig
   const calculateXP = (step: LessonStep, attempt: number): number => {
-    if (!step.retryConfig) return step.xpReward; // Fallback to original XP
+    if (!step.retryConfig) {
+      // Fallback behavior: only grant XP on first attempt, learn cards get 0 XP
+      return attempt === 1 ? step.xpReward : 0;
+    }
     
     if (attempt === 1) return step.retryConfig.xp.firstTry;
     if (attempt === 2) return step.retryConfig.xp.secondTry;
@@ -393,6 +396,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setLessonState('asking');
     setSelectedAnswer(null);
     setHasSelectionChanged(false);
+    setStepStartTime(Date.now()); // Reset timing for retry attempt analytics
     // bannerAttempt remains the same for proper messaging
   };
 
