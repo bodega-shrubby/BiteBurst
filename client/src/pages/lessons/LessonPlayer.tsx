@@ -153,11 +153,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           // Fall back to a simple two-step retry: one incorrect banner, then learn on next miss
           const nextAttempt = Math.min(currentAttempt + 1, 3);
           if (currentAttempt >= 2) {
-            // Second miss without retryConfig - go to learn card
-            const learnXP = calculateXP(currentStep, 3) ?? 0;
-            setTotalXpEarned(prev => prev + learnXP);
+            // Second miss without retryConfig - go to learn card (no XP awarded)
             const prevAnswer = selectedAnswer; // Capture before clearing
-            console.debug('🔄 RETRY DEBUG: Setting state to learn (fallback)', { currentAttempt, selectedAnswer });
             setLessonState('learn');
             setSelectedAnswer(null);
             
@@ -177,7 +174,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
               });
             }
             
-            // Log learn card usage
+            // Log learn card usage (no XP for fallback)
             if (currentStep) {
               logAttemptMutation.mutate({
                 lessonId,
@@ -188,14 +185,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
                 selectedAnswer: 'learn-card-shown',
                 timeOnStepMs,
                 heartsRemaining: heartsRemaining,
-                xpEarned: learnXP,
+                xpEarned: 0,
                 usedLearnCard: true
               });
             }
           } else {
             // First miss without retryConfig - show incorrect banner  
             const prevAnswer = selectedAnswer; // Capture before clearing
-            console.debug('🔄 RETRY DEBUG: Setting state to incorrect (fallback)', { currentAttempt, selectedAnswer });
             setLessonState('incorrect');
             setSelectedAnswer(null);
             setBannerAttempt(1);
@@ -229,7 +225,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           const learnXP = calculateXP(currentStep, 3) ?? 0; // Guard against undefined
           setTotalXpEarned(prev => prev + learnXP);
           const prevAnswer = selectedAnswer; // Capture before clearing
-          console.debug('🔄 RETRY DEBUG: Setting state to learn (max attempts)', { currentAttempt, maxAttempts, selectedAnswer });
           setLessonState('learn');
           setSelectedAnswer(null);
           
@@ -287,7 +282,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         // Show appropriate incorrect banner based on attempt
         if (currentAttempt === 1) {
           const prevAnswer = selectedAnswer; // Capture before clearing
-          console.debug('🔄 RETRY DEBUG: Setting state to incorrect (attempt 1)', { currentAttempt, selectedAnswer });
           setLessonState('incorrect');
           setSelectedAnswer(null);
           setBannerAttempt(1);
@@ -296,7 +290,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         } else if (currentAttempt === 2) {
           if (currentStep.retryConfig.messages.tryAgain2) {
             const prevAnswer = selectedAnswer; // Capture before clearing
-            console.debug('🔄 RETRY DEBUG: Setting state to incorrect (attempt 2)', { currentAttempt, selectedAnswer });
             setLessonState('incorrect');
             setSelectedAnswer(null);
             setBannerAttempt(2);
@@ -307,7 +300,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             const learnXP = calculateXP(currentStep, 3) ?? 0;
             setTotalXpEarned(prev => prev + learnXP);
             const prevAnswer = selectedAnswer; // Capture before clearing
-            console.debug('🔄 RETRY DEBUG: Setting state to learn (no second message)', { currentAttempt, selectedAnswer });
             setLessonState('learn');
             setSelectedAnswer(null);
             
@@ -331,7 +323,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           const learnXP = calculateXP(currentStep, 3) ?? 0;
           setTotalXpEarned(prev => prev + learnXP);
           const prevAnswer = selectedAnswer; // Capture before clearing
-          console.debug('🔄 RETRY DEBUG: Setting state to learn (final attempt)', { currentAttempt, selectedAnswer });
           setLessonState('learn');
           setSelectedAnswer(null);
           
