@@ -412,11 +412,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           let correctMatches: Record<string, string> = {};
           
           if (validatedData.lessonId === 'brainfuel-for-school') {
-            // BrainFuel step-3 matching pairs
+            // BrainFuel step-3 matching pairs (updated to match actual lesson content)
             correctMatches = {
-              '🥛 Milk': 'Sleepy brain helpers',
-              '🥔 Potato': 'Fast brain fuel', 
-              '🥗 Salad': 'Brain vitamins'
+              '🧠 Omega-3 fats': 'Supports memory & learning (cell membranes)',
+              '⚡ B vitamins': 'Helps release energy from food for focus',
+              '🩸 Iron': 'Carries oxygen to the brain (clear thinking)',
+              '🛡️ Vitamin C': 'Helps protect cells (antioxidant)'
             };
           } else if (validatedData.lessonId === 'fuel-for-football') {
             // Fuel for Football step-3 matching pairs
