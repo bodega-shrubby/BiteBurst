@@ -46,16 +46,27 @@ export default function LessonAsking({
   const [orderedItems, setOrderedItems] = useState<string[]>([]);
   const [draggedOrderItem, setDraggedOrderItem] = useState<string | null>(null);
   
-  // Auto-update answer when matching is complete (allows checking even if incorrect)
+  // Auto-update answer when matching is complete AND correct
   useEffect(() => {
     if (step.questionType === 'matching' && step.content.matchingPairs) {
       const pairs = step.content.matchingPairs;
       const allMatched = Object.keys(matches).length === pairs.length;
       
-      if (allMatched && selectedAnswer !== 'matching-complete') {
-        onAnswerSelect('matching-complete');
-      } else if (!allMatched && selectedAnswer === 'matching-complete') {
-        onAnswerSelect('');
+      if (allMatched) {
+        // Check if all matches are correct
+        const allCorrect = pairs.every(pair => matches[pair.left] === pair.right);
+        
+        if (allCorrect && selectedAnswer !== 'matching-complete') {
+          onAnswerSelect('matching-complete');
+        } else if (!allCorrect && selectedAnswer !== 'matching-incorrect') {
+          // All slots filled but incorrect - send incorrect signal
+          onAnswerSelect('matching-incorrect');
+        }
+      } else {
+        // Not all slots filled - clear selection
+        if (selectedAnswer === 'matching-complete' || selectedAnswer === 'matching-incorrect') {
+          onAnswerSelect('');
+        }
       }
     }
   }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
@@ -100,6 +111,34 @@ export default function LessonAsking({
       onAnswerSelect(''); // Clear any previous answer
     }
   }, [step.id, step.questionType]);
+  
+  // Auto-update answer when ordering is complete AND correct
+  useEffect(() => {
+    if (step.questionType === 'ordering' && step.content.orderingItems && orderedItems.length > 0) {
+      const items = step.content.orderingItems;
+      const allPlaced = orderedItems.length === items.length;
+      
+      if (allPlaced) {
+        // Check if all items are in correct order
+        const allCorrect = orderedItems.every((itemId, index) => {
+          const item = items.find(i => i.id === itemId);
+          return item && item.correctOrder === index + 1;
+        });
+        
+        if (allCorrect && selectedAnswer !== 'ordering-complete') {
+          onAnswerSelect('ordering-complete');
+        } else if (!allCorrect && selectedAnswer !== 'ordering-incorrect') {
+          // All items placed but incorrect order - send incorrect signal
+          onAnswerSelect('ordering-incorrect');
+        }
+      } else {
+        // Not all items placed - clear selection
+        if (selectedAnswer === 'ordering-complete' || selectedAnswer === 'ordering-incorrect') {
+          onAnswerSelect('');
+        }
+      }
+    }
+  }, [orderedItems, step.questionType, step.content.orderingItems, selectedAnswer, onAnswerSelect]);
   
   // Note: Answer selection moved to handleOrderDrop to prevent render loops
   
@@ -294,8 +333,14 @@ export default function LessonAsking({
         </div>
         
         {/* Progress Indicator */}
-        <div className="text-center text-sm text-gray-600">
-          {Object.keys(matches).length} of {pairs.length} matched
+        <div className="text-center text-sm">
+          {allMatched && correctMatches ? (
+            <div className="text-green-600 font-medium">✅ All matches correct!</div>
+          ) : allMatched && !correctMatches ? (
+            <div className="text-red-600 font-medium">❌ Some matches are wrong - try again!</div>
+          ) : (
+            <div className="text-gray-600">{Object.keys(matches).length} of {pairs.length} matched</div>
+          )}
         </div>
       </div>
     );
@@ -382,8 +427,7 @@ export default function LessonAsking({
         
         setOrderedItems(newOrder);
         setDraggedOrderItem(null);
-        // Update answer for submission (moved from useEffect to prevent render loops)
-        onAnswerSelect(JSON.stringify(newOrder));
+        // Don't auto-select answer here - let the useEffect handle validation
       }
     };
     
@@ -431,11 +475,22 @@ export default function LessonAsking({
         </div>
         
         {/* Progress Indicator */}
-        <div className="text-center text-sm text-gray-600">
-          {orderedItems.every((itemId, index) => {
-            const item = items.find(i => i.id === itemId);
-            return item && item.correctOrder === index + 1;
-          }) ? '✅ Perfect order!' : 'Keep arranging...'}
+        <div className="text-center text-sm">
+          {(() => {
+            const allPlaced = orderedItems.length === items.length;
+            const allCorrect = orderedItems.every((itemId, index) => {
+              const item = items.find(i => i.id === itemId);
+              return item && item.correctOrder === index + 1;
+            });
+            
+            if (allPlaced && allCorrect) {
+              return <div className="text-green-600 font-medium">✅ Perfect order!</div>;
+            } else if (allPlaced && !allCorrect) {
+              return <div className="text-red-600 font-medium">❌ Wrong order - try rearranging!</div>;
+            } else {
+              return <div className="text-gray-600">Keep arranging...</div>;
+            }
+          })()} 
         </div>
       </div>
     );
