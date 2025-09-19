@@ -10,12 +10,48 @@ const answerSubmissionSchema = z.object({
   answer: z.string(),
 });
 
+const setLessonCacheHeaders = (res: any) => {
+  const lastModified = new Date();
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+    Pragma: 'no-cache',
+    Expires: '0',
+    'Last-Modified': lastModified.toUTCString(),
+    ETag: `W/"${lastModified.getTime()}"`
+  });
+};
+
 export function registerLessonRoutes(app: Express, requireAuth: any) {
   // Get lesson by ID
   app.get('/api/lessons/:lessonId', requireAuth, async (req: any, res: any) => {
     try {
       const { lessonId } = req.params;
-      
+
+      const lessonFromDb = await storage.getLessonWithSteps(lessonId);
+
+      if (lessonFromDb) {
+        const lessonData = {
+          id: lessonFromDb.id,
+          title: lessonFromDb.title,
+          description: lessonFromDb.description ?? '',
+          totalSteps: lessonFromDb.totalSteps ?? lessonFromDb.steps.length,
+          steps: lessonFromDb.steps.map((step) => ({
+            id: step.id,
+            stepNumber: step.stepNumber,
+            questionType: step.questionType,
+            question: step.question,
+            content: step.content,
+            xpReward: step.xpReward,
+            mascotAction: step.mascotAction ?? undefined,
+            retryConfig: step.retryConfig ?? undefined,
+          })),
+        };
+
+        setLessonCacheHeaders(res);
+        console.log(`📤 LESSON CACHE: Sending ${lessonId} from database with cache headers`);
+        return res.json(lessonData);
+      }
+
       // For now, return hardcoded "Fuel for Football" lesson data
       // In the future, this would come from the database
       if (lessonId === 'fuel-for-football') {
@@ -173,15 +209,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             }
           ]
         };
-        
+
         // Force disable ETags and prevent all caching
-        res.set({
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-          Pragma: 'no-cache',
-          Expires: '0',
-          'Last-Modified': new Date().toUTCString(),
-          ETag: 'W/"' + Date.now() + '"'
-        });
+        setLessonCacheHeaders(res);
         console.log('📤 LESSON CACHE: Sending fuel-for-football with cache headers');
         return res.json(lessonData);
       }
@@ -346,15 +376,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             }
           ]
         };
-        
+
         // Force disable ETags and prevent all caching
-        res.set({
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-          Pragma: 'no-cache',
-          Expires: '0',
-          'Last-Modified': new Date().toUTCString(),
-          ETag: 'W/"' + Date.now() + '"'
-        });
+        setLessonCacheHeaders(res);
         console.log('📤 LESSON CACHE: Sending brainfuel-for-school with cache headers');
         return res.json(lessonData);
       }
