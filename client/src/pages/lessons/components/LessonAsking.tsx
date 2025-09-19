@@ -46,6 +46,10 @@ export default function LessonAsking({
   const [orderedItems, setOrderedItems] = useState<string[]>([]);
   const [draggedOrderItem, setDraggedOrderItem] = useState<string | null>(null);
   
+  // Mobile touch support state
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [selectedOrderItem, setSelectedOrderItem] = useState<string | null>(null);
+  
   // Auto-update answer when matching slots are filled (send real data for backend validation)
   useEffect(() => {
     if (step.questionType === 'matching' && step.content.matchingPairs) {
@@ -128,6 +132,12 @@ export default function LessonAsking({
       }
     }
   }, [orderedItems, step.questionType, step.content.orderingItems, selectedAnswer, onAnswerSelect]);
+  
+  // Reset mobile touch selections on step change to prevent state leakage
+  useEffect(() => {
+    setSelectedItem(null);
+    setSelectedOrderItem(null);
+  }, [step.id]);
   
   // Note: Answer selection moved to handleOrderDrop to prevent render loops
   
@@ -245,11 +255,33 @@ export default function LessonAsking({
       });
     };
     
+    // Mobile touch handlers for matching
+    const handleItemTouch = (item: string) => {
+      if (matches[item]) return; // Already matched
+      
+      if (selectedItem === item) {
+        // Deselect if same item touched again
+        setSelectedItem(null);
+      } else {
+        // Select this item
+        setSelectedItem(item);
+      }
+    };
+    
+    const handleZoneTouch = (zone: string) => {
+      // Safety check: only match if selectedItem exists and is in current leftItems
+      if (selectedItem && !matches[selectedItem] && leftItems.includes(selectedItem)) {
+        // Match selected item to this zone
+        setMatches(prev => ({ ...prev, [selectedItem]: zone }));
+        setSelectedItem(null);
+      }
+    };
+    
     return (
       <div className="space-y-6">
         {/* Instructions */}
         <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-          Drag each food to match it with its benefit!
+          Drag or tap each food, then tap its benefit!
         </div>
         
         {/* Draggable Food Items */}
@@ -261,20 +293,29 @@ export default function LessonAsking({
                 key={item}
                 draggable={!matches[item]}
                 onDragStart={(e) => handleDragStart(e, item)}
+                onClick={() => handleItemTouch(item)}
                 className={`
-                  p-3 rounded-xl border-2 cursor-move transition-all
+                  p-3 rounded-xl border-2 transition-all
                   ${matches[item] 
                     ? 'bg-green-100 border-green-300 opacity-60' 
-                    : 'bg-white border-orange-200 hover:border-orange-400 hover:shadow-md'
+                    : selectedItem === item
+                      ? 'bg-blue-100 border-blue-400 shadow-lg cursor-pointer'
+                      : 'bg-white border-orange-200 hover:border-orange-400 hover:shadow-md cursor-pointer md:cursor-move'
                   }
                   ${draggedItem === item ? 'opacity-50' : ''}
                 `}
                 data-testid={`drag-item-${item.replace(/[^a-zA-Z0-9]/g, '-')}`}
               >
                 <span className="text-sm font-medium">{item}</span>
+                {selectedItem === item && !matches[item] && (
+                  <span className="ml-2 text-xs text-blue-600 font-medium">Selected - tap a benefit!</span>
+                )}
                 {matches[item] && (
                   <button
-                    onClick={() => handleRemoveMatch(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveMatch(item);
+                    }}
                     className="ml-2 text-xs text-red-500 hover:text-red-700"
                     data-testid={`remove-match-${item.replace(/[^a-zA-Z0-9]/g, '-')}`}
                   >
@@ -297,12 +338,15 @@ export default function LessonAsking({
                   key={zone}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, zone)}
+                  onClick={() => handleZoneTouch(zone)}
                   className={`
                     p-4 rounded-xl border-2 border-dashed min-h-[60px] 
                     flex items-center justify-center text-center transition-all
                     ${matchedFood 
                       ? 'bg-green-50 border-green-400 border-solid' 
-                      : 'bg-gray-50 border-gray-300 hover:border-orange-400 hover:bg-orange-50'
+                      : selectedItem && !matchedFood
+                        ? 'bg-blue-50 border-blue-400 hover:bg-blue-100 cursor-pointer'
+                        : 'bg-gray-50 border-gray-300 hover:border-orange-400 hover:bg-orange-50 cursor-pointer'
                     }
                   `}
                   data-testid={`drop-zone-${zone.replace(/[^a-zA-Z0-9]/g, '-')}`}
@@ -420,11 +464,40 @@ export default function LessonAsking({
       }
     };
     
+    // Mobile touch handlers for ordering
+    const handleOrderItemTouch = (itemId: string) => {
+      if (selectedOrderItem === itemId) {
+        // Deselect if same item touched again
+        setSelectedOrderItem(null);
+      } else {
+        // Select this item
+        setSelectedOrderItem(itemId);
+      }
+    };
+    
+    const handleOrderPositionTouch = (targetIndex: number) => {
+      if (selectedOrderItem) {
+        const draggedIndex = orderedItems.indexOf(selectedOrderItem);
+        // Safety check: only proceed if item exists in current order
+        if (draggedIndex === -1) return;
+        
+        const newOrder = [...orderedItems];
+        
+        // Remove item from current position
+        newOrder.splice(draggedIndex, 1);
+        // Insert at new position
+        newOrder.splice(targetIndex, 0, selectedOrderItem);
+        
+        setOrderedItems(newOrder);
+        setSelectedOrderItem(null);
+      }
+    };
+    
     return (
       <div className="space-y-4">
         {/* Instructions */}
         <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-          Drag items to put them in the correct order!
+          Drag or tap items to put them in the correct order!
         </div>
         
         {/* Ordering List */}
@@ -442,12 +515,22 @@ export default function LessonAsking({
                 onDragStart={(e) => handleOrderDragStart(e, itemId)}
                 onDragOver={handleOrderDragOver}
                 onDrop={(e) => handleOrderDrop(e, index)}
+                onClick={() => {
+                  if (selectedOrderItem && selectedOrderItem !== itemId) {
+                    handleOrderPositionTouch(index);
+                  } else {
+                    handleOrderItemTouch(itemId);
+                  }
+                }}
                 className={`
-                  p-4 rounded-xl border-2 cursor-move transition-all
+                  p-4 rounded-xl border-2 transition-all cursor-pointer md:cursor-move
                   ${draggedOrderItem === itemId ? 'opacity-50' : ''}
+                  ${selectedOrderItem === itemId ? 'bg-blue-100 border-blue-400 shadow-lg' : ''}
+                  ${selectedOrderItem && selectedOrderItem !== itemId ? 'bg-yellow-50 border-yellow-300 hover:bg-yellow-100' : ''}
                   ${isCorrectPosition && orderedItems.length === items.length
                     ? 'bg-green-50 border-green-300'
-                    : 'bg-white border-gray-200 hover:border-orange-200'
+                    : selectedOrderItem === itemId || (selectedOrderItem && selectedOrderItem !== itemId)
+                      ? '' : 'bg-white border-gray-200 hover:border-orange-200'
                   }
                 `}
                 data-testid={`order-item-${itemId}`}
@@ -457,6 +540,12 @@ export default function LessonAsking({
                     {index + 1}
                   </div>
                   <span className="text-sm font-medium text-gray-900">{item.text}</span>
+                  {selectedOrderItem === itemId && (
+                    <span className="text-xs text-blue-600 font-medium ml-auto">Selected - tap position!</span>
+                  )}
+                  {selectedOrderItem && selectedOrderItem !== itemId && (
+                    <span className="text-xs text-yellow-600 font-medium ml-auto">Tap to move here</span>
+                  )}
                 </div>
               </div>
             );
