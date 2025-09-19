@@ -1,0 +1,221 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/server/routes/lessons.ts b/server/routes/lessons.ts
+index a4e6657faefc4d6defc16e893a94464195272a5d..d300119cf0b3e9a6276c64e257bea9b4986970e6 100644
+--- a/server/routes/lessons.ts
++++ b/server/routes/lessons.ts
+@@ -1,43 +1,79 @@
+ import type { Express } from "express";
+ import { storage } from "../storage";
+ import { z } from "zod";
+ import { insertLessonAttemptSchema } from "../../shared/schema";
+ 
+ const answerSubmissionSchema = z.object({
+   userId: z.string(),
+   lessonId: z.string(),
+   stepId: z.string(),
+   answer: z.string(),
+ });
+ 
++const setLessonCacheHeaders = (res: any) => {
++  const lastModified = new Date();
++  res.set({
++    'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
++    Pragma: 'no-cache',
++    Expires: '0',
++    'Last-Modified': lastModified.toUTCString(),
++    ETag: `W/"${lastModified.getTime()}"`
++  });
++};
++
+ export function registerLessonRoutes(app: Express, requireAuth: any) {
+   // Get lesson by ID
+   app.get('/api/lessons/:lessonId', requireAuth, async (req: any, res: any) => {
+     try {
+       const { lessonId } = req.params;
+-      
++
++      const lessonFromDb = await storage.getLessonWithSteps(lessonId);
++
++      if (lessonFromDb) {
++        const lessonData = {
++          id: lessonFromDb.id,
++          title: lessonFromDb.title,
++          description: lessonFromDb.description ?? '',
++          totalSteps: lessonFromDb.totalSteps ?? lessonFromDb.steps.length,
++          steps: lessonFromDb.steps.map((step) => ({
++            id: step.id,
++            stepNumber: step.stepNumber,
++            questionType: step.questionType,
++            question: step.question,
++            content: step.content,
++            xpReward: step.xpReward,
++            mascotAction: step.mascotAction ?? undefined,
++            retryConfig: step.retryConfig ?? undefined,
++          })),
++        };
++
++        setLessonCacheHeaders(res);
++        console.log(`📤 LESSON CACHE: Sending ${lessonId} from database with cache headers`);
++        return res.json(lessonData);
++      }
++
+       // For now, return hardcoded "Fuel for Football" lesson data
+       // In the future, this would come from the database
+       if (lessonId === 'fuel-for-football') {
+         const lessonData = {
+           id: 'fuel-for-football',
+           title: 'Fuel for Football',
+           description: 'Learn the best foods to eat before and during football training!',
+           totalSteps: 6,
+           steps: [
+             {
+               id: 'step-1',
+               stepNumber: 1,
+               questionType: 'multiple-choice' as const,
+               question: "Before a football match, which food gives you the best long-lasting energy?",
+               content: {
+                 options: [
+                   { id: 'sweets', text: 'Sweets', emoji: '🍬', correct: false },
+                   { id: 'white-bread', text: 'White bread', emoji: '🍞', correct: false },
+                   { id: 'oats', text: 'Oats', emoji: '🥣', correct: true }
+                 ],
+                 feedback: "Correct! Oats give slow-release energy so you don't run out of steam — just like Lionel Messi keeps moving all game."
+               },
+               xpReward: 10,
+               mascotAction: 'holding_football',
+               retryConfig: {
+diff --git a/server/routes/lessons.ts b/server/routes/lessons.ts
+index a4e6657faefc4d6defc16e893a94464195272a5d..d300119cf0b3e9a6276c64e257bea9b4986970e6 100644
+--- a/server/routes/lessons.ts
++++ b/server/routes/lessons.ts
+@@ -151,59 +187,53 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
+               stepNumber: 6,
+               questionType: 'multiple-choice' as const,
+               question: "After a football match, eating protein helps your ______ recover.",
+               content: {
+                 options: [
+                   { id: 'brain', text: 'Brain', emoji: '🧠', correct: false },
+                   { id: 'muscles', text: 'Muscles', emoji: '💪', correct: true },
+                   { id: 'hair', text: 'Hair', emoji: '💇', correct: false }
+                 ],
+                 feedback: "Exactly! Protein repairs muscles so you're ready to train again — just like Sam Kerr or Harry Kane preparing for the next match."
+               },
+               xpReward: 10,
+               mascotAction: 'flexing',
+               retryConfig: {
+                 maxAttempts: 3,
+                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                 messages: {
+                   tryAgain1: "Think about what works hardest in football.",
+                   tryAgain2: "Hint: protein helps the part that kicks, runs, and jumps.",
+                   learnCard: "Protein = muscle repair. That's why players eat yogurt, eggs, or beans after matches."
+                 }
+               }
+             }
+           ]
+         };
+-        
++
+         // Force disable ETags and prevent all caching
+-        res.set({
+-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+-          Pragma: 'no-cache',
+-          Expires: '0',
+-          'Last-Modified': new Date().toUTCString(),
+-          ETag: 'W/"' + Date.now() + '"'
+-        });
++        setLessonCacheHeaders(res);
+         console.log('📤 LESSON CACHE: Sending fuel-for-football with cache headers');
+         return res.json(lessonData);
+       }
+ 
+       if (lessonId === 'brainfuel-for-school') {
+         const lessonData = {
+           id: 'brainfuel-for-school',
+           title: 'BrainFuel for School',
+           description: 'Learn the best foods to fuel your brain for exams and studying!',
+           totalSteps: 6,
+           steps: [
+             {
+               id: 'step-1',
+               stepNumber: 1,
+               questionType: 'multiple-choice' as const,
+               question: "Which food gives the most steady energy for study or revision?",
+               content: {
+                 options: [
+                   { id: 'sweets', text: 'Sweets', emoji: '🍬', correct: false },
+                   { id: 'white-bread', text: 'White bread', emoji: '🍞', correct: false },
+                   { id: 'brown-rice', text: 'Brown rice', emoji: '🍚', correct: true },
+                   { id: 'fizzy-drink', text: 'Fizzy drink', emoji: '🥤', correct: false }
+                 ],
+                 feedback: "Correct. Wholegrain carbs (like brown rice, oats, wholemeal pasta) release glucose slowly, keeping focus steady across a lesson."
+               },
+diff --git a/server/routes/lessons.ts b/server/routes/lessons.ts
+index a4e6657faefc4d6defc16e893a94464195272a5d..d300119cf0b3e9a6276c64e257bea9b4986970e6 100644
+--- a/server/routes/lessons.ts
++++ b/server/routes/lessons.ts
+@@ -324,59 +354,53 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
+               questionType: 'multiple-choice' as const,
+               question: "If you often skip breakfast, what's most likely?",
+               content: {
+                 options: [
+                   { id: 'tiredness-focus', text: 'Tiredness & poor focus', emoji: '💤', correct: true },
+                   { id: 'faster-running', text: 'Faster running speed', emoji: '🏃', correct: false },
+                   { id: 'better-memory', text: 'Better memory', emoji: '🎧', correct: false },
+                   { id: 'stronger-muscles', text: 'Stronger muscles', emoji: '💪', correct: false }
+                 ],
+                 feedback: "Correct. Low morning glucose → less concentration and slower thinking in lessons."
+               },
+               xpReward: 10,
+               mascotAction: 'thumbs_up',
+               retryConfig: {
+                 maxAttempts: 3,
+                 xp: { firstTry: 10, secondTry: 5, learnCard: 0 },
+                 messages: {
+                   tryAgain1: "Skipping meals rarely improves performance.",
+                   tryAgain2: "What happens when the brain's fuel runs low?",
+                   learnCard: "Breakfast = steady morning energy → better attention and memory in class."
+                 }
+               }
+             }
+           ]
+         };
+-        
++
+         // Force disable ETags and prevent all caching
+-        res.set({
+-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+-          Pragma: 'no-cache',
+-          Expires: '0',
+-          'Last-Modified': new Date().toUTCString(),
+-          ETag: 'W/"' + Date.now() + '"'
+-        });
++        setLessonCacheHeaders(res);
+         console.log('📤 LESSON CACHE: Sending brainfuel-for-school with cache headers');
+         return res.json(lessonData);
+       }
+       
+       return res.status(404).json({ error: 'Lesson not found' });
+     } catch (error) {
+       console.error('Get lesson error:', error);
+       res.status(500).json({ error: 'Failed to load lesson' });
+     }
+   });
+ 
+   // Submit lesson answer
+   app.post('/api/lessons/answer', requireAuth, async (req: any, res: any) => {
+     try {
+       const validatedData = answerSubmissionSchema.parse(req.body);
+       
+       // Verify user matches authenticated user
+       if (validatedData.userId !== req.user.userId) {
+         return res.status(403).json({ error: 'Unauthorized' });
+       }
+ 
+       // For now, hardcode the correct answers by lesson
+       // In the future, this would check against the database
+       const fuelForFootballAnswers: Record<string, string | boolean> = {
+         'step-1': 'oats',
+ 
+EOF
+)
