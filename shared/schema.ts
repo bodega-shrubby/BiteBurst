@@ -160,6 +160,7 @@ export const lessonSteps = pgTable("lesson_steps", {
   content: jsonb("content").notNull(), // Stores options, correct answers, feedback, etc.
   xpReward: integer("xp_reward").notNull().default(10),
   mascotAction: text("mascot_action"), // For future mascot integration
+  retryConfig: jsonb("retry_config"), // Stores maxAttempts, XP tiers, and messages for retry flow
 }, (table) => ({
   unique: { name: "lesson_steps_unique", columns: [table.lessonId, table.stepNumber] },
   lessonIdIdx: index("lesson_steps_lesson_id_idx").on(table.lessonId)
@@ -265,6 +266,7 @@ export const insertLessonStepSchema = createInsertSchema(lessonSteps).pick({
   content: true,
   xpReward: true,
   mascotAction: true,
+  retryConfig: true,
 });
 
 export const insertUserLessonProgressSchema = createInsertSchema(userLessonProgress).pick({
