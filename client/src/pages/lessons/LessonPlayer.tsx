@@ -156,17 +156,20 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             // Second miss without retryConfig - go to learn card
             const learnXP = calculateXP(currentStep, 3) ?? 0;
             setTotalXpEarned(prev => prev + learnXP);
+            const prevAnswer = selectedAnswer; // Capture before clearing
+            console.debug('🔄 RETRY DEBUG: Setting state to learn (fallback)', { currentAttempt, selectedAnswer });
             setLessonState('learn');
+            setSelectedAnswer(null);
             
             // Log the incorrect attempt that triggered the learn card
-            if (currentStep && selectedAnswer) {
+            if (currentStep && prevAnswer) {
               logAttemptMutation.mutate({
                 lessonId,
                 stepId: currentStep.id,
                 stepNumber: currentStep.stepNumber,
                 attemptNumber: currentAttempt,
                 isCorrect: false,
-                selectedAnswer,
+                selectedAnswer: prevAnswer,
                 timeOnStepMs,
                 heartsRemaining: heartsRemaining,
                 xpEarned: 0,
@@ -175,7 +178,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             }
             
             // Log learn card usage
-            if (currentStep && selectedAnswer) {
+            if (currentStep) {
               logAttemptMutation.mutate({
                 lessonId,
                 stepId: currentStep.id,
@@ -191,20 +194,23 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             }
           } else {
             // First miss without retryConfig - show incorrect banner  
+            const prevAnswer = selectedAnswer; // Capture before clearing
+            console.debug('🔄 RETRY DEBUG: Setting state to incorrect (fallback)', { currentAttempt, selectedAnswer });
             setLessonState('incorrect');
+            setSelectedAnswer(null);
             setBannerAttempt(1);
             setCurrentAttempt(nextAttempt);
             setHasSelectionChanged(false);
             
             // Log the first incorrect attempt
-            if (currentStep && selectedAnswer) {
+            if (currentStep && prevAnswer) {
               logAttemptMutation.mutate({
                 lessonId,
                 stepId: currentStep.id,
                 stepNumber: currentStep.stepNumber,
                 attemptNumber: currentAttempt,
                 isCorrect: false,
-                selectedAnswer,
+                selectedAnswer: prevAnswer,
                 timeOnStepMs,
                 heartsRemaining: heartsRemaining,
                 xpEarned: 0,
@@ -222,17 +228,20 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         if (currentAttempt >= maxAttempts) {
           const learnXP = calculateXP(currentStep, 3) ?? 0; // Guard against undefined
           setTotalXpEarned(prev => prev + learnXP);
+          const prevAnswer = selectedAnswer; // Capture before clearing
+          console.debug('🔄 RETRY DEBUG: Setting state to learn (max attempts)', { currentAttempt, maxAttempts, selectedAnswer });
           setLessonState('learn');
+          setSelectedAnswer(null);
           
           // Log the incorrect attempt that triggered the learn card
-          if (currentStep && selectedAnswer) {
+          if (currentStep && prevAnswer) {
             logAttemptMutation.mutate({
               lessonId,
               stepId: currentStep.id,
               stepNumber: currentStep.stepNumber,
               attemptNumber: currentAttempt,
               isCorrect: false,
-              selectedAnswer,
+              selectedAnswer: prevAnswer,
               timeOnStepMs,
               heartsRemaining: heartsRemaining,
               xpEarned: 0,
@@ -241,7 +250,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           }
           
           // Log learn card usage
-          if (currentStep && selectedAnswer) {
+          if (currentStep) {
             logAttemptMutation.mutate({
               lessonId,
               stepId: currentStep.id,
@@ -258,15 +267,16 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           return;
         }
         
-        // Log incorrect attempt
-        if (currentStep && selectedAnswer) {
+        // Log incorrect attempt (before state change) 
+        const prevAnswer = selectedAnswer; // Capture for logging
+        if (currentStep && prevAnswer) {
           logAttemptMutation.mutate({
             lessonId,
             stepId: currentStep.id,
             stepNumber: currentStep.stepNumber,
             attemptNumber: currentAttempt,
             isCorrect: false,
-            selectedAnswer,
+            selectedAnswer: prevAnswer,
             timeOnStepMs,
             heartsRemaining: heartsRemaining,
             xpEarned: 0,
@@ -276,13 +286,19 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         
         // Show appropriate incorrect banner based on attempt
         if (currentAttempt === 1) {
+          const prevAnswer = selectedAnswer; // Capture before clearing
+          console.debug('🔄 RETRY DEBUG: Setting state to incorrect (attempt 1)', { currentAttempt, selectedAnswer });
           setLessonState('incorrect');
+          setSelectedAnswer(null);
           setBannerAttempt(1);
           setCurrentAttempt(2);
           setHasSelectionChanged(false);
         } else if (currentAttempt === 2) {
           if (currentStep.retryConfig.messages.tryAgain2) {
+            const prevAnswer = selectedAnswer; // Capture before clearing
+            console.debug('🔄 RETRY DEBUG: Setting state to incorrect (attempt 2)', { currentAttempt, selectedAnswer });
             setLessonState('incorrect');
+            setSelectedAnswer(null);
             setBannerAttempt(2);
             setCurrentAttempt(3);
             setHasSelectionChanged(false);
@@ -290,9 +306,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             // No second message - go to learn card
             const learnXP = calculateXP(currentStep, 3) ?? 0;
             setTotalXpEarned(prev => prev + learnXP);
+            const prevAnswer = selectedAnswer; // Capture before clearing
+            console.debug('🔄 RETRY DEBUG: Setting state to learn (no second message)', { currentAttempt, selectedAnswer });
             setLessonState('learn');
+            setSelectedAnswer(null);
             
-            if (currentStep && selectedAnswer) {
+            if (currentStep) {
               logAttemptMutation.mutate({
                 lessonId,
                 stepId: currentStep.id,
@@ -311,9 +330,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           // Final attempt - show learn card
           const learnXP = calculateXP(currentStep, 3) ?? 0;
           setTotalXpEarned(prev => prev + learnXP);
+          const prevAnswer = selectedAnswer; // Capture before clearing
+          console.debug('🔄 RETRY DEBUG: Setting state to learn (final attempt)', { currentAttempt, selectedAnswer });
           setLessonState('learn');
+          setSelectedAnswer(null);
           
-          if (currentStep && selectedAnswer) {
+          if (currentStep) {
             logAttemptMutation.mutate({
               lessonId,
               stepId: currentStep.id,
