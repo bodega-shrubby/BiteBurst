@@ -403,7 +403,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       // For now, hardcode the correct answers by lesson
       // In the future, this would check against the database
       const fuelForFootballAnswers: Record<string, string | boolean> = {
-        'step-1': 'porridge',
+        'step-1': 'oats',
         'step-2': true,
         // step-3 (matching) and step-5 (ordering) handled by special logic below
         'step-4': 'banana',
@@ -444,11 +444,11 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               '🛡️ Vitamin C': 'Helps protect cells (antioxidant)'
             };
           } else if (validatedData.lessonId === 'fuel-for-football') {
-            // Fuel for Football step-3 matching pairs (updated to match actual lesson content)
+            // Fuel for Football step-3 matching pairs (updated to match specification)
             correctMatches = {
-              '🥦 Broccoli': 'Vitamins for stamina',
-              '🥣 Yogurt with berries': 'Recovery fuel for muscles',
-              '🥚 Boiled egg': 'Protein for strength'
+              '🥣 Oats': 'Long-lasting energy for running',
+              '🥛 Yogurt': 'Repairs muscles and strengthens bones',
+              '🍟 Crisps': 'Extra fat, not much help on the pitch'
             };
           }
           
