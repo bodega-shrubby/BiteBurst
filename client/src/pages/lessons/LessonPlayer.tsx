@@ -274,8 +274,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
-    // Track selection changes, especially important for TRY_AGAIN state
-    setHasSelectionChanged(answer !== lastSelectedAnswer);
+    // In TRY_AGAIN state, any selection after entering the state should enable the button
+    if (lessonState === 'TRY_AGAIN') {
+      setHasSelectionChanged(true);
+    } else {
+      // Track selection changes for other states
+      setHasSelectionChanged(answer !== lastSelectedAnswer);
+    }
     setLastSelectedAnswer(answer);
   };
 
