@@ -410,20 +410,20 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         'step-6': 'muscles'
       };
       
+      const brainFuelAnswers: Record<string, string | boolean> = {
+        'step-1-brain': 'brown-rice',
+        'step-2-brain': false,
+        // step-3 (matching) and step-5 (ordering) handled by special logic below
+        'step-4-brain': 'banana-nuts', 
+        'step-6-brain': 'tiredness-focus'
+      };
+      
       console.log('DEBUG - Answer submission:', {
         lessonId: validatedData.lessonId,
         stepId: validatedData.stepId,
         submittedAnswer: validatedData.answer,
         expectedAnswer: validatedData.lessonId === 'fuel-for-football' ? fuelForFootballAnswers[validatedData.stepId] : brainFuelAnswers[validatedData.stepId]
       });
-      
-      const brainFuelAnswers: Record<string, string | boolean> = {
-        'step-1-brain': 'brown-rice',
-        'step-2-brain': false,
-        // step-3 (matching) and step-5 (ordering) handled by special logic below
-        'step-4-brain': 'banana-nuts',
-        'step-6-brain': 'tiredness-focus'
-      };
 
       let expectedAnswer;
       if (validatedData.lessonId === 'fuel-for-football') {

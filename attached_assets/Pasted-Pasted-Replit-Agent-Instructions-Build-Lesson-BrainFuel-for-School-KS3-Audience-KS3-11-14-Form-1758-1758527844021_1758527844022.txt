@@ -1,0 +1,97 @@
+Pasted--Replit-Agent-Instructions-Build-Lesson-BrainFuel-for-School-KS3-Audience-KS3-11-14-Form-1758526975073_1758526975073.txt
+📋 Replit Agent Instructions — Build Lesson: “BrainFuel for School (KS3)”
+Audience: KS3 (11–14)
+Format: 6 steps → each has Question, Options, Success feedback, TryAgain1, TryAgain2, Learn card
+Mechanics:
+XP: +10 per standard step, +15 for matching/ordering
+Hearts: −1 on incorrect submission (on CHECK)
+Correct → Success page; Incorrect → Try-again banner; 2nd incorrect → Learn card → Continue
+STEP 1 — Carbohydrates (slow vs fast energy)
+Question: “Which food gives the most steady energy for study or revision?”
+Options:
+🍬 Sweets (fast spike)
+🍞 White bread (quick release)
+🍚 Brown rice ✅ (wholegrain, slow release)
+🥤 Fizzy drink (spike then crash)
+Success: “Correct. Wholegrain carbs (like brown rice, oats, wholemeal pasta) release glucose slowly, keeping focus steady across a lesson.”
+TryAgain1: “Think slow & steady fuel, not a quick burst.”
+TryAgain2: “Which option keeps blood sugar stable through the lesson?”
+Learn card: “The brain uses glucose. Wholegrains release it gradually → fewer dips in focus.” 
+The National Academy
++1
+STEP 2 — Protein & fats (more than muscles)
+Question: “Proteins are only for muscles, not the brain. True or false?”
+Options: False ✅ / True
+Success: “Right. Protein helps build/repair tissues and make brain messengers; healthy fats (e.g., omega-3) support cell membranes and memory.”
+TryAgain1: “Your brain also needs building blocks.”
+TryAgain2: “Which choice recognises protein’s role beyond muscles?”
+Learn card: “KS3 nutrition: protein = growth & repair; fats = energy/structures; both matter for brain function.” 
+The National Academy
++1
+STEP 3 — Match nutrients → brain role (drag & drop)
+Question: “Match the nutrient to how it helps you think and learn.”
+Pairs to build:
+🧠 Omega-3 fats → “Supports memory & learning (cell membranes)”
+⚡ B vitamins → “Helps release energy from food for focus”
+🩸 Iron → “Carries oxygen to the brain (clear thinking)”
+🛡️ Vitamin C → “Helps protect cells (antioxidant)”
+Success (show under each pair):
+“Omega-3: healthy brain cell membranes → memory.”
+“B vitamins: energy release → concentration.”
+“Iron: oxygen supply → less tiredness.”
+“Vitamin C: protection → healthy function.”
+TryAgain1: “Think energy, oxygen, memory, protection.”
+TryAgain2: “Which one links to oxygen in blood?”
+Learn card: “Omega-3→memory; B vits→energy release; Iron→oxygen; Vit C→protection.” 
+The National Academy
++1
+
+XP: +15
+STEP 4 — Smart exam snack (balance carbs + protein)
+Question: “Exam in 1 hour. Best snack for sharp focus?”
+Options:
+🍫 Chocolate bar (sugar crash)
+🍌 Banana + nuts ✅ (carbs + protein + micronutrients)
+🥤 Fizzy drink (dehydrating, crash)
+🍟 Crisps (fatty, low nutrient)
+Success: “Yes. Fruit + nuts give glucose + protein + minerals → steady energy through the exam.”
+TryAgain1: “Some choices spike then crash. Which lasts longer?”
+TryAgain2: “Pick the one that combines energy and nutrients.”
+Learn card: “Smart snacks blend carb + protein + vitamins (e.g., fruit+nuts, yogurt+berries).” 
+The National Academy
+STEP 5 — Digestion & absorption (ordering)
+Question: “Put the steps in order to show how nutrients reach your brain.”
+Items to order:
+Chew food in the mouth
+Food broken down more in the stomach
+Small intestine absorbs nutrients into blood
+Nutrients travel in blood to brain & muscles
+Correct order: Mouth → Stomach → Small intestine → Blood
+Success: “Exactly. Most absorption happens in the small intestine; blood then delivers nutrients to the brain.”
+TryAgain1: “Chew → digest → absorb → transport.”
+TryAgain2: “Which organ does the absorbing step?”
+Learn card: “Small intestine = main site of nutrient absorption into the bloodstream.” 
+Study Mind
+
+XP: +15
+STEP 6 — Consequences of poor fuelling
+Question: “If you often skip breakfast, what’s most likely?”
+Options:
+💤 Tiredness & poor focus ✅
+🏃 Faster running speed
+🎧 Better memory
+💪 Stronger muscles
+Success: “Correct. Low morning glucose → less concentration and slower thinking in lessons.”
+TryAgain1: “Skipping meals rarely improves performance.”
+TryAgain2: “What happens when the brain’s fuel runs low?”
+Learn card: “Breakfast = steady morning energy → better attention and memory in class.” 
+The National Academy
+Wrap-up (system)
+XP total: +70 (two +15 steps)
+Badge: “🧠 Focus Master”
+Next unlock: “BrainFuel: Memory Boost Foods (KS3)”
+Implementation notes (concise)
+Two incorrect attempts → show Learn card; award 0 XP for that step.
+Disable CHECK until selection changes after a try-again state.
+For match/order steps, only evaluate when all slots filled.
+Log analytics: attempts, timeOnStep, usedLearnCard, heartsRemaining, xpEarned.
