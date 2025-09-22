@@ -421,8 +421,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       console.log('DEBUG - Answer submission:', {
         lessonId: validatedData.lessonId,
         stepId: validatedData.stepId,
-        submittedAnswer: validatedData.answer,
-        expectedAnswer: validatedData.lessonId === 'fuel-for-football' ? fuelForFootballAnswers[validatedData.stepId] : brainFuelAnswers[validatedData.stepId]
+        submittedAnswer: validatedData.answer
       });
 
       let expectedAnswer;
