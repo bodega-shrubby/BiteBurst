@@ -274,8 +274,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
-    // In TRY_AGAIN state, any selection after entering the state should enable the button
-    if (lessonState === 'TRY_AGAIN') {
+    // In incorrect state, any selection after entering the state should enable the button
+    if (lessonState === 'incorrect') {
       setHasSelectionChanged(true);
     } else {
       // Track selection changes for other states
@@ -298,13 +298,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Calculate CHECK button state based on current lesson state and selection
   const getCanCheck = (): boolean => {
-    // In ASK state: allow check if answer selected
-    if (lessonState === 'ASK') {
+    // In asking state: allow check if answer selected
+    if (lessonState === 'asking') {
       return !!selectedAnswer;
     }
     
-    // In TRY_AGAIN state: need both answer selected AND selection changed
-    if (lessonState === 'TRY_AGAIN') {
+    // In incorrect state: need both answer selected AND selection changed
+    if (lessonState === 'incorrect') {
       return !!selectedAnswer && hasSelectionChanged;
     }
     
