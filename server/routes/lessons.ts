@@ -403,19 +403,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       // For now, hardcode the correct answers by lesson
       // In the future, this would check against the database
       const fuelForFootballAnswers: Record<string, string | boolean> = {
-        'step-1': 'oats',
+        'step-1': 'porridge',
         'step-2': true,
-        // step-3 (matching) and step-5 (ordering) handled by special logic below
-        'step-4': 'banana',
-        'step-6': 'muscles'
+        // step-3 (matching) handled by special logic below
+        'step-4': 'banana'
       };
       
       const brainFuelAnswers: Record<string, string | boolean> = {
-        'step-1': 'brown-rice',
-        'step-2': false,
-        // step-3 (matching) and step-5 (ordering) handled by special logic below
-        'step-4': 'banana-nuts',
-        'step-6': 'tiredness-focus'
+        'step-1-brain': 'porridge-berries',
+        'step-2-brain': true,
+        // step-3 (matching) handled by special logic below
       };
 
       let expectedAnswer;
@@ -438,17 +435,17 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           if (validatedData.lessonId === 'brainfuel-for-school') {
             // BrainFuel step-3 matching pairs (updated to match actual lesson content)
             correctMatches = {
-              '🧠 Omega-3 fats': 'Supports memory & learning (cell membranes)',
-              '⚡ B vitamins': 'Helps release energy from food for focus',
-              '🩸 Iron': 'Carries oxygen to the brain (clear thinking)',
-              '🛡️ Vitamin C': 'Helps protect cells (antioxidant)'
+              '🐟 Salmon': 'Stronger memory for tests',
+              '🥚 Eggs': 'Energy to focus in lessons',
+              '🥦 Broccoli': 'Vitamins to stay healthy',
+              '🫘 Beans': 'Oxygen for clear thinking'
             };
           } else if (validatedData.lessonId === 'fuel-for-football') {
-            // Fuel for Football step-3 matching pairs
+            // Fuel for Football step-3 matching pairs (updated to match actual lesson content)
             correctMatches = {
-              '🥣 Oats': 'Long-lasting energy for running',
-              '🥛 Yogurt': 'Repairs muscles and strengthens bones',
-              '🍟 Crisps': 'Extra fat, not much help on the pitch'
+              '🥦 Broccoli': 'Vitamins for stamina',
+              '🥣 Yogurt with berries': 'Recovery fuel for muscles',
+              '🥚 Boiled egg': 'Protein for strength'
             };
           }
           
