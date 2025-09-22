@@ -179,8 +179,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             setHasSelectionChanged(false);
             setLastSelectedAnswer(null);
           } else {
-            // Second attempt failed - go to LEARN_CARD with no XP
-            setLessonState('LEARN_CARD');
+            // Second attempt failed - go to learn card with no XP
+            setLessonState('learn');
             setSelectedAnswer(null);
             
             // Log learn card usage
@@ -224,8 +224,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             setHasSelectionChanged(false);
             setLastSelectedAnswer(null);
           } else {
-            // No second message - go directly to LEARN_CARD with XP (but only awarded on SUCCESS)
-            setLessonState('LEARN_CARD');
+            // No second message - go directly to learn card with XP (but only awarded on SUCCESS)
+            setLessonState('learn');
             setSelectedAnswer(null);
             
             // Log learn card usage
@@ -245,8 +245,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             }
           }
         } else {
-          // Final incorrect (maxAttempts reached): TRY_AGAIN → LEARN_CARD  
-          setLessonState('LEARN_CARD');
+          // Final incorrect (maxAttempts reached): TRY_AGAIN → learn card  
+          setLessonState('learn');
           setSelectedAnswer(null);
           
           // Log learn card usage
@@ -470,14 +470,14 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           />
         )}
         
-        {lessonState === 'LEARN_CARD' && currentStep && (
+        {lessonState === 'learn' && currentStep && (
           <LessonLearn
             body={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
             onContinue={handleLearnContinue}
           />
         )}
         
-        {lessonState === 'SUCCESS' && currentStep && (
+        {lessonState === 'success' && currentStep && (
           <LessonSuccess
             step={currentStep}
             selectedAnswer={selectedAnswer}
