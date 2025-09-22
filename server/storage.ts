@@ -6,6 +6,8 @@ import {
   xpEvents,
   avatars,
   goals,
+  lessons,
+  lessonSteps,
   lessonAttempts,
   type User,
   type InsertUser,
@@ -15,6 +17,8 @@ import {
   type Badge,
   type Avatar,
   type Goal,
+  type Lesson,
+  type LessonStep,
   type LessonAttempt,
   type InsertLessonAttempt,
 } from "@shared/schema";
@@ -52,6 +56,9 @@ export interface IStorage {
   
   // Lesson attempt operations
   logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt>;
+  
+  // Lesson operations
+  getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -191,6 +198,42 @@ export class DatabaseStorage implements IStorage {
       .values(insertAttempt as any)
       .returning();
     return attempt;
+  }
+  
+  async getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined> {
+    // Get lesson data
+    const [lesson] = await db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.id, lessonId));
+    
+    if (!lesson) {
+      return undefined;
+    }
+    
+    // Get lesson steps
+    const steps = await db
+      .select()
+      .from(lessonSteps)
+      .where(eq(lessonSteps.lessonId, lessonId))
+      .orderBy(lessonSteps.stepNumber);
+    
+    return {
+      id: lesson.id,
+      title: lesson.title,
+      description: lesson.description || undefined,
+      totalSteps: lesson.totalSteps || steps.length,
+      steps: steps.map(step => ({
+        id: step.id,
+        stepNumber: step.stepNumber,
+        questionType: step.questionType,
+        question: step.question,
+        content: step.content,
+        xpReward: step.xpReward,
+        mascotAction: step.mascotAction || undefined,
+        retryConfig: step.retryConfig || undefined,
+      }))
+    };
   }
 }
 
