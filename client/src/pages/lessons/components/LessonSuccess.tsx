@@ -77,7 +77,7 @@ export default function LessonSuccess({
         {step.content.feedback && (
           <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
             <div className="text-sm text-green-700 whitespace-pre-line">
-              {step.content.feedback}
+              {step.content.feedback?.replace(/\\n/g, '\n')}
             </div>
           </div>
         )}
