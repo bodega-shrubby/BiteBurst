@@ -410,6 +410,13 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         'step-6': 'muscles'
       };
       
+      console.log('DEBUG - Answer submission:', {
+        lessonId: validatedData.lessonId,
+        stepId: validatedData.stepId,
+        submittedAnswer: validatedData.answer,
+        expectedAnswer: validatedData.lessonId === 'fuel-for-football' ? fuelForFootballAnswers[validatedData.stepId] : brainFuelAnswers[validatedData.stepId]
+      });
+      
       const brainFuelAnswers: Record<string, string | boolean> = {
         'step-1-brain': 'brown-rice',
         'step-2-brain': false,
