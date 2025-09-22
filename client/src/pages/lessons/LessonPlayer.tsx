@@ -336,8 +336,10 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const handleContinue = () => {
     if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
-      // Move to next step
-      resetForNextStep();
+      // Add a brief delay for smooth transition to next step
+      setTimeout(() => {
+        resetForNextStep();
+      }, 400);
     } else {
       // Lesson complete
       setLessonState('COMPLETE');
