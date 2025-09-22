@@ -293,13 +293,15 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Calculate CHECK button state based on current lesson state and selection
   const getCanCheck = (): boolean => {
-    if (!selectedAnswer) return false;
+    // In ASK state: allow check if answer selected
+    if (lessonState === 'ASK') {
+      return !!selectedAnswer;
+    }
     
-    // In ASK state: always allow check if answer selected
-    if (lessonState === 'ASK') return true;
-    
-    // In TRY_AGAIN state: only allow check if selection has changed
-    if (lessonState === 'TRY_AGAIN') return hasSelectionChanged;
+    // In TRY_AGAIN state: need both answer selected AND selection changed
+    if (lessonState === 'TRY_AGAIN') {
+      return !!selectedAnswer && hasSelectionChanged;
+    }
     
     // Other states don't use the CHECK button
     return false;
