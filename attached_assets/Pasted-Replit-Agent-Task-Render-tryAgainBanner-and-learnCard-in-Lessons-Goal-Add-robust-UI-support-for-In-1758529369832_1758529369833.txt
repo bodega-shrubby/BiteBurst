@@ -1,0 +1,130 @@
+Replit Agent Task — Render tryAgainBanner and learnCard in Lessons
+Goal
+Add robust UI support for Incorrect → Try Again → Learn Card across all lesson steps, so learners always see:
+A Try Again banner after the first incorrect submit
+A second Try Again banner after the second incorrect submit (if configured)
+A Learn Card after the final allowed incorrect attempt
+No mascots or code required — follow the contracts and flows below.
+A. Data Contracts (what the UI reads)
+Every step object must expose the following (augment your existing step model if needed):
+id: string
+type: "mcq" | "true_false" | "match" | "order" | "multi"
+question: string
+options / pairs / items: as appropriate for type
+successFeedback: string (shown on success page only)
+Retry config (new / required):
+retry.maxAttempts: number (e.g., 2) → number of incorrect submissions before learn card
+retry.messages.tryAgain1: string (hint after 1st incorrect)
+retry.messages.tryAgain2 (optional): string (hint after 2nd incorrect, if maxAttempts >= 2)
+retry.messages.learnCard: string | string[] (short explanation; allow array for bullets)
+XP config (existing or add):
+xp.firstTry: number
+xp.secondTry: number (optional; default 50% of first)
+xp.learnCard: number (usually 0)
+Hearts config (global or per step):
+heartPenaltyOnIncorrect: boolean (default true)
+✅ Populate these fields in your lesson seed. The UI must not infer hints from xpAwarded.
+B. UI States (per step)
+Define and render four mutually exclusive states:
+ASK — default question view
+TRY_AGAIN — same view with a red/pink banner + hint (after incorrect submit)
+LEARN_CARD — interstitial explainer card (after final incorrect)
+SUCCESS — your existing green success screen
+✅ Only show the green success screen when correct === true.
+✅ Never auto-advance from TRY_AGAIN or LEARN_CARD — require a button press.
+C. Component Responsibilities
+1) QuestionSurface (shared for ASK / TRY_AGAIN)
+Displays prompt, answer controls, and the CHECK button.
+Accepts optional banner prop:
+banner.variant: "tryAgain"
+banner.text: string (from retry.messages.tryAgainX)
+Visual: soft red/pink background; warning icon; max 2 lines; ≤ 100 chars.
+Disable CHECK if:
+No selection yet, or
+We are in TRY_AGAIN and the user hasn’t changed the answer since the last incorrect submit.
+2) LearnCard
+Full-width card that replaces the question surface for this step.
+Props:
+title: short string, e.g., “Learn this” or “Why this matters”
+body: string or bullet array (use retry.messages.learnCard)
+actionLabel: “Continue”
+On action: advance to next step (no success screen here).
+Visual: soft blue background; info icon; concise copy.
+3) SuccessSurface (unchanged)
+Green banner ✔ “Nice!”
+Shows successFeedback
+Continue button → next step
+Award XP based on attempt count (see E).
+D. State Machine (per step)
+Inputs:
+answerResponse.correct (from /api/lessons/answer)
+attempts (client-side counter per step, start at 0)
+retry.maxAttempts (from data contract)
+Transitions:
+From ASK → on CHECK:
+If correct === true → SUCCESS
+Else:
+Increment attempts
+If attempts < retry.maxAttempts → TRY_AGAIN with tryAgain1 or tryAgain2
+Else → LEARN_CARD
+From TRY_AGAIN → on CHECK:
+If correct === true → SUCCESS
+Else:
+Increment attempts
+If attempts < retry.maxAttempts → remain TRY_AGAIN with next hint
+Else → LEARN_CARD
+From LEARN_CARD → on “Continue” → next step
+From SUCCESS → on “Continue” → next step
+Important UX rules:
+On entering TRY_AGAIN, lock CHECK until the selection changes (selectionChangedSinceError = true).
+For match/order types, evaluate only when all slots are filled; otherwise show a neutral helper “Complete all matches first”.
+E. XP & Hearts Logic
+On incorrect submission:
+If heartPenaltyOnIncorrect → decrement hearts by 1.
+Award XP when leaving a step via SUCCESS only:
+attempts === 0 → xp.firstTry
+attempts === 1 → xp.secondTry (or 50% of first if missing)
+attempts >= retry.maxAttempts (i.e., Learn Card path) → xp.learnCard (usually 0)
+F. Event & Analytics Hooks
+Emit the following events (names are indicative; wire to your analytics):
+lesson_attempt_submitted — { stepId, correct, attempts, heartsRemaining }
+lesson_try_again_shown — { stepId, attemptNumber, messageKey }
+lesson_learn_card_shown — { stepId }
+lesson_success — { stepId, attempts, xpAwarded }
+G. Error Handling & Caching
+If /api/lessons/fetch is cached (HTTP 304) and the retry config is missing, append a cache-buster param to force a fresh pull for now (?ts=${epoch}) and add proper cache headers later.
+If retry.messages keys are missing, fallback to safe defaults:
+tryAgain1: "Try again — look for steady energy or clear thinking."
+learnCard: "Here’s the idea to remember…", but log a warning.
+If /api/lessons/answer fails, show a neutral toast and keep state unchanged.
+H. Visual Tokens (for consistency)
+Try Again banner: background #FDEBEC (or equivalent), text #9B1C1C
+Learn Card: background #E8F2FF, text #0B4C8C
+Success banner: existing green
+Banner max width: content width; 12–16px vertical padding; rounded corners
+Copy length: ≤ 100 chars for banners; Learn Card ≤ 2 short lines or ≤ 4 bullets
+I. Acceptance Criteria (QA checklist)
+After the first incorrect submit, a pink Try Again banner displays with retry.messages.tryAgain1.
+After the second incorrect submit (when maxAttempts ≥ 2), Try Again banner updates to tryAgain2.
+After the final allowed incorrect, a Learn Card replaces the question surface with retry.messages.learnCard.
+CHECK is disabled in TRY_AGAIN until the learner changes the selection.
+Hearts decrement on each incorrect submit; XP awarded only on SUCCESS, scaled by attempts.
+Match/Order steps only evaluate when all positions are filled; otherwise show helper text.
+Analytics events fire for attempt, try again shown, learn card shown, and success.
+Works across MCQ, True/False, Match, Order, Multi-select.
+If retry.* keys are missing, fallback messages are shown and a warning is logged.
+J. Test Scenarios (run all)
+MCQ: wrong → banner1; change option; wrong → banner2; change option; wrong → learnCard; Continue → next step.
+True/False: wrong → banner1; right → success (XP = secondTry).
+Match: submit with incomplete slots → helper message, no banner. Complete all slots → wrong → banner1.
+Order: drag order wrong twice → learnCard.
+Cache: hard refresh; confirm retry messages load (no 304 issue).
+K. Example Strings (to seed quickly)
+Use these if your step lacks retry copy (you can override per lesson):
+tryAgain1: “Not quite — think steady energy that lasts.”
+tryAgain2: “Almost! Pick the option that helps you focus longer.”
+learnCard:
+“Carbs like oats/wholegrains give slow energy.”
+“Protein helps muscles and brain repair.”
+“Water keeps you cool and thinking clearly.”
+Deliverable: Update the lesson renderer to support the state machine and props above. Confirm all Acceptance Criteria and Test Scenarios pass for both Fuel for Football (KS2) and BrainFuel (KS3) lessons.
