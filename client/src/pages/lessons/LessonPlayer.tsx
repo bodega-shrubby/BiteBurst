@@ -12,7 +12,7 @@ interface LessonPlayerProps {
   lessonId: string;
 }
 
-type LessonState = 'ASK' | 'TRY_AGAIN' | 'LEARN_CARD' | 'SUCCESS' | 'COMPLETE';
+type LessonState = 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
 
 interface LessonStep {
   id: string;
@@ -53,7 +53,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [, setLocation] = useLocation();
   
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [lessonState, setLessonState] = useState<LessonState>('ASK');
+  const [lessonState, setLessonState] = useState<LessonState>('asking');
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
   const [lives, setLives] = useState(5);
@@ -143,7 +143,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }
         
         // Transition to SUCCESS state
-        setLessonState('SUCCESS');
+        setLessonState('success');
         // Show continue button after a delay
         setTimeout(() => setShowContinueButton(true), 1500);
       } else {
@@ -172,7 +172,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         if (!currentStep?.retryConfig) {
           // Fallback behavior for steps without retryConfig: ASK → TRY_AGAIN → LEARN_CARD
           if (currentAttempt === 1) {
-            setLessonState('TRY_AGAIN');
+            setLessonState('incorrect');
             setTryAgainMessage('Try again!');
             setCurrentAttempt(2);
             setSelectedAnswer(null);
@@ -208,7 +208,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         // State transitions based on current attempt and config
         if (currentAttempt === 1) {
           // First incorrect: ASK → TRY_AGAIN
-          setLessonState('TRY_AGAIN');
+          setLessonState('incorrect');
           setTryAgainMessage(currentStep.retryConfig.messages.tryAgain1 || 'Try again!');
           setCurrentAttempt(2);
           setSelectedAnswer(null);
@@ -217,7 +217,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         } else if (currentAttempt === 2 && maxAttempts >= 3) {
           // Second incorrect and max attempts allows third: TRY_AGAIN → TRY_AGAIN (with different message) or LEARN_CARD
           if (currentStep.retryConfig.messages.tryAgain2) {
-            setLessonState('TRY_AGAIN');
+            setLessonState('incorrect');
             setTryAgainMessage(currentStep.retryConfig.messages.tryAgain2);
             setCurrentAttempt(3);
             setSelectedAnswer(null);
@@ -451,7 +451,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
-        {(lessonState === 'ASK' || lessonState === 'TRY_AGAIN') && currentStep && (
+        {lessonState === 'asking' && currentStep && (
           <LessonAsking
             step={currentStep}
             selectedAnswer={selectedAnswer}
@@ -459,10 +459,14 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             onCheck={handleCheckAnswer}
             isSubmitting={submitAnswerMutation.isPending}
             canCheck={getCanCheck()}
-            banner={lessonState === 'TRY_AGAIN' ? {
-              variant: 'tryAgain',
-              text: tryAgainMessage
-            } : undefined}
+          />
+        )}
+        
+        {lessonState === 'incorrect' && currentStep && (
+          <LessonIncorrect
+            message={tryAgainMessage || "Not quite right. Try again!"}
+            onTryAgain={() => setLessonState('asking')}
+            canTryAgain={true}
           />
         )}
         
