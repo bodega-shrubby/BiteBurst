@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, ProgressBar } from './components';
+import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
 
 interface LessonPlayerProps {
   lessonId: string;
@@ -451,7 +452,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-100 to-white flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center space-y-6">
-          <div className="text-6xl">🏆</div>
+          <div className="flex justify-center">
+            <img 
+              src={sunnyCelebrateImage} 
+              alt="Sunny Celebrating" 
+              className="w-24 h-24 object-contain animate-bounce"
+            />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900">Lesson Complete!</h1>
           <p className="text-gray-600">
             You earned {totalXpEarned} XP completing "{lessonData.title}"
