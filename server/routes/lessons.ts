@@ -405,14 +405,17 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const fuelForFootballAnswers: Record<string, string | boolean> = {
         'step-1': 'porridge',
         'step-2': true,
-        // step-3 (matching) handled by special logic below
-        'step-4': 'banana'
+        // step-3 (matching) and step-5 (ordering) handled by special logic below
+        'step-4': 'banana',
+        'step-6': 'muscles'
       };
       
       const brainFuelAnswers: Record<string, string | boolean> = {
         'step-1-brain': 'porridge-berries',
         'step-2-brain': true,
-        // step-3 (matching) handled by special logic below
+        // step-3 (matching) and step-5 (ordering) handled by special logic below
+        'step-4-brain': 'banana-nuts',
+        'step-6-brain': 'tiredness-focus'
       };
 
       let expectedAnswer;
@@ -460,7 +463,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         }
       }
       // Special handling for ordering questions (step-5)
-      else if (validatedData.stepId.includes('step-5') && 
+      else if ((validatedData.stepId.includes('step-5') || validatedData.stepId.includes('step-5-brain')) && 
           (validatedData.lessonId === 'brainfuel-for-school' || validatedData.lessonId === 'fuel-for-football')) {
         try {
           const submittedOrder = JSON.parse(validatedData.answer);

@@ -1,0 +1,66 @@
+Replit Agent Instructions — Fuel for Football Lesson
+Lesson type: Interactive, KS2 (ages 7–11)
+Format: 6 steps → each with question, answer options, success feedback, 2 try-again hints, learn card feedback
+Gamification: XP awards, hearts, final wrap-up badge
+Step 1 – Warm-up: Energy Foods (Carbs)
+Question: “Before a football match, which food gives you the best long-lasting energy?”
+Options:
+🍬 Sweets
+🍞 White bread
+🥣 Oats ✅
+Success feedback: “Correct! Oats give slow-release energy so you don’t run out of steam — just like Lionel Messi keeps moving all game.”
+Try again 1: “Not quite — think steady energy for the whole game.”
+Try again 2: “Almost! Which breakfast keeps you running past half-time?”
+Learn card: “Oats give steady energy. That’s why top players eat porridge before matches.”
+Step 2 – Hydration
+Question: “Drinking water helps footballers play their best.”
+Options: True ✅ / False
+Success feedback: “Yes! Even Cristiano Ronaldo is known for choosing water over fizzy drinks — it keeps muscles working and the brain sharp.”
+Try again 1: “Try again — players drink water so they don’t slow down.”
+Try again 2: “Hint: the best choice keeps you cool and thinking clearly.”
+Learn card: “Without water, players slow down. Staying hydrated helps you play like the pros.”
+Step 3 – Matching (Food → Benefit)
+Question: “Match the food to what it does for your body when playing football.”
+Pairs:
+🥣 Oats → Long-lasting energy for running
+🥛 Yogurt → Repairs muscles and strengthens bones
+🍟 Crisps → Extra fat, not much help on the pitch
+Success feedback:
+“Oats = steady energy, like Erling Haaland powering through defenders.”
+“Yogurt = repairs muscles, like Alexia Putellas staying strong in midfield.”
+“Crisps = tasty, but won’t fuel you like Sam Kerr sprinting for a goal.”
+Try again 1: “Some matches aren’t right — think energy, repair, and ‘not much help’.”
+Try again 2: “Check again: oats = energy. Which one repairs muscles and bones?”
+Learn card: “Correct matches: Oats → energy, Yogurt → muscles & bones, Crisps → not much help.”
+Step 4 – Half-time Snack
+Question: “Which of these is the best half-time snack to keep your energy up?”
+Options:
+🍌 Banana ✅
+🍫 Chocolate bar
+🥤 Fizzy drink
+Success feedback: “Spot on! Bananas give quick, clean energy. That’s why Kylian Mbappé often eats fruit to stay sharp in matches.”
+Try again 1: “That’s a quick burst… it fades fast. Pick one for the second half.”
+Try again 2: “Hint: choose the snack with clean energy for sprinting.”
+Learn card: “Bananas = quick, clean energy. They keep you running in the second half like the pros.”
+Step 5 – Balanced Plate (Ordering)
+Question: “Put these foods in order to make a balanced footballer’s plate.”
+Items to order: 🍝 Pasta → 🥛 Yogurt → 🥦 Broccoli
+Success feedback: “Nice! Pasta = energy, Yogurt = muscle repair, Broccoli = vitamins. That’s how players like Lucy Bronze and Neymar fuel before big games.”
+Try again 1: “Nearly — start with energy, then repair, then vitamins.”
+Try again 2: “Think: carbs → protein/dairy → fruit/veg.”
+Learn card: “Balanced plate: Pasta (energy), Yogurt (repair), Broccoli (health).”
+Step 6 – Cool-down (Protein Repair)
+Question: “After a football match, eating protein helps your ______ recover.”
+Options: Brain / Muscles ✅ / Hair
+Success feedback: “Exactly! Protein repairs muscles so you’re ready to train again — just like Sam Kerr or Harry Kane preparing for the next match.”
+Try again 1: “Think about what works hardest in football.”
+Try again 2: “Hint: protein helps the part that kicks, runs, and jumps.”
+Learn card: “Protein = muscle repair. That’s why players eat yogurt, eggs, or beans after matches.”
+Wrap-up
+Award XP: +55 XP
+Badge unlocked: Energy Explorer
+Unlock next lesson: BrainFuel for School
+👉 This is ready for your devs to build:
+6 steps, each with question, options, success feedback, 2 try-again messages, and learn card.
+XP system: full XP on first try, half XP on second, none if learn card shown.
+Hearts: lose 1 heart on each incorrect submission.
