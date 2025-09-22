@@ -411,8 +411,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       };
       
       const brainFuelAnswers: Record<string, string | boolean> = {
-        'step-1-brain': 'porridge-berries',
-        'step-2-brain': true,
+        'step-1-brain': 'brown-rice',
+        'step-2-brain': false,
         // step-3 (matching) and step-5 (ordering) handled by special logic below
         'step-4-brain': 'banana-nuts',
         'step-6-brain': 'tiredness-focus'
@@ -436,12 +436,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           let correctMatches: Record<string, string> = {};
           
           if (validatedData.lessonId === 'brainfuel-for-school') {
-            // BrainFuel step-3 matching pairs (updated to match actual lesson content)
+            // BrainFuel step-3 matching pairs (updated to match specification)
             correctMatches = {
-              '🐟 Salmon': 'Stronger memory for tests',
-              '🥚 Eggs': 'Energy to focus in lessons',
-              '🥦 Broccoli': 'Vitamins to stay healthy',
-              '🫘 Beans': 'Oxygen for clear thinking'
+              '🧠 Omega-3 fats': 'Supports memory & learning (cell membranes)',
+              '⚡ B vitamins': 'Helps release energy from food for focus',
+              '🩸 Iron': 'Carries oxygen to the brain (clear thinking)',
+              '🛡️ Vitamin C': 'Helps protect cells (antioxidant)'
             };
           } else if (validatedData.lessonId === 'fuel-for-football') {
             // Fuel for Football step-3 matching pairs (updated to match actual lesson content)
