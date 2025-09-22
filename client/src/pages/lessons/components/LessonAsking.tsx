@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
 
 interface LessonStep {
@@ -19,6 +20,11 @@ interface LessonStep {
   mascotAction?: string;
 }
 
+interface BannerProps {
+  variant: 'tryAgain';
+  text: string;
+}
+
 interface LessonAskingProps {
   step: LessonStep;
   selectedAnswer: string | null;
@@ -26,6 +32,7 @@ interface LessonAskingProps {
   onCheck: () => void;
   isSubmitting: boolean;
   canCheck: boolean;
+  banner?: BannerProps;
 }
 
 export default function LessonAsking({
@@ -34,7 +41,8 @@ export default function LessonAsking({
   onAnswerSelect,
   onCheck,
   isSubmitting,
-  canCheck
+  canCheck,
+  banner
 }: LessonAskingProps) {
   // Matching game state
   const [matches, setMatches] = useState<Record<string, string>>({});
@@ -576,6 +584,33 @@ export default function LessonAsking({
 
   return (
     <div className="max-w-md mx-auto space-y-6">
+      {/* Try Again Banner */}
+      {banner && banner.variant === 'tryAgain' && (
+        <div 
+          className="p-4 rounded-2xl border border-red-200"
+          style={{ backgroundColor: '#FDEBEC' }}
+          role="alert"
+          aria-live="assertive"
+          data-testid="try-again-banner"
+        >
+          <div className="flex items-start space-x-3">
+            <AlertTriangle 
+              className="w-5 h-5 mt-0.5 flex-shrink-0" 
+              style={{ color: '#9B1C1C' }} 
+              aria-hidden="true" 
+            />
+            <div className="flex-1">
+              <p 
+                className="font-medium text-sm leading-relaxed" 
+                style={{ color: '#9B1C1C' }}
+              >
+                {banner.text}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Captain Carrot Mascot */}
       <div className="flex justify-center">
         <img 

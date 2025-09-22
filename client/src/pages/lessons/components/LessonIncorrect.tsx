@@ -16,18 +16,26 @@ export default function LessonIncorrect({
     <div className="space-y-4">
       {/* Try-again banner */}
       <div 
-        className="p-4 rounded-2xl border border-red-200 bg-red-50"
+        className="p-4 rounded-2xl border border-red-200"
+        style={{ backgroundColor: '#FDEBEC' }}
         role="alert"
         aria-live="assertive"
         data-testid="incorrect-banner"
       >
         <div className="flex items-start space-x-3">
           {/* Warning icon */}
-          <AlertTriangle className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" aria-hidden="true" />
+          <AlertTriangle 
+            className="w-6 h-6 mt-1 flex-shrink-0" 
+            style={{ color: '#9B1C1C' }}
+            aria-hidden="true" 
+          />
           
           {/* Message content */}
           <div className="flex-1">
-            <p className="text-red-800 font-medium text-base leading-relaxed">
+            <p 
+              className="font-medium text-base leading-relaxed"
+              style={{ color: '#9B1C1C' }}
+            >
               {message}
             </p>
           </div>
