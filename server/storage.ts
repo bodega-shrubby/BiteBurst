@@ -7,8 +7,6 @@ import {
   avatars,
   goals,
   lessonAttempts,
-  lessons,
-  lessonSteps,
   type User,
   type InsertUser,
   type Log,
@@ -19,11 +17,9 @@ import {
   type Goal,
   type LessonAttempt,
   type InsertLessonAttempt,
-  type Lesson,
-  type LessonStep,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -53,12 +49,9 @@ export interface IStorage {
   // XP operations
   updateUserXP(userId: string, updates: { totalXp: number; level: number; streak: number; lastLogAt: Date }): Promise<User>;
   logXPEvent(event: { userId: string; amount: number; reason: string; refLog?: string }): Promise<any>;
-
+  
   // Lesson attempt operations
   logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt>;
-
-  // Lesson data
-  getLessonWithSteps(lessonId: string): Promise<(Lesson & { steps: LessonStep[] }) | null>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -198,21 +191,6 @@ export class DatabaseStorage implements IStorage {
       .values(insertAttempt as any)
       .returning();
     return attempt;
-  }
-
-  async getLessonWithSteps(lessonId: string): Promise<(Lesson & { steps: LessonStep[] }) | null> {
-    const [lesson] = await db.select().from(lessons).where(eq(lessons.id, lessonId));
-    if (!lesson) {
-      return null;
-    }
-
-    const steps = await db
-      .select()
-      .from(lessonSteps)
-      .where(eq(lessonSteps.lessonId, lessonId))
-      .orderBy(asc(lessonSteps.stepNumber));
-
-    return { ...lesson, steps };
   }
 }
 
