@@ -315,7 +315,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   // Reset state for next step
   const resetForNextStep = () => {
     setCurrentStepIndex(prev => prev + 1);
-    setLessonState('ASK');
+    setLessonState('asking');
     setSelectedAnswer(null);
     setShowContinueButton(false);
     setCurrentAttempt(1);
@@ -344,9 +344,9 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     }
   };
 
-  // Handle "Try Again" from TRY_AGAIN state
+  // Handle "Try Again" from incorrect state
   const handleTryAgain = () => {
-    setLessonState('ASK');
+    setLessonState('asking');
     setSelectedAnswer(null);
     setHasSelectionChanged(false);
     setLastSelectedAnswer(null);
