@@ -616,7 +616,7 @@ export default function Feedback() {
                 <p className="text-lg text-gray-700 leading-8 text-center" 
                    data-testid="coach-default-message"
                    role="status">
-                  Keep up the great work! Every healthy choice helps you grow stronger and smarter.
+                  Way to go! Fruit gives you the energy to sprint, veggies keep you healthy so you don't get tired, and yogurt helps your muscles recover. With that combo, you're ready to pass, tackle, and score with your team! ⚽⭐
                 </p>
               )}
             </div>
