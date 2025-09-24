@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
+import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
 
 interface LessonStep {
   id: string;
@@ -33,6 +34,7 @@ interface LessonAskingProps {
   isSubmitting: boolean;
   canCheck: boolean;
   banner?: BannerProps;
+  lessonId?: string;
 }
 
 export default function LessonAsking({
@@ -42,7 +44,8 @@ export default function LessonAsking({
   onCheck,
   isSubmitting,
   canCheck,
-  banner
+  banner,
+  lessonId
 }: LessonAskingProps) {
   // Matching game state
   const [matches, setMatches] = useState<Record<string, string>>({});
@@ -611,11 +614,11 @@ export default function LessonAsking({
         </div>
       )}
 
-      {/* Captain Carrot Mascot */}
+      {/* Mascot - conditional based on lesson */}
       <div className="flex justify-center">
         <img 
-          src={captainCarrotImage} 
-          alt="Captain Carrot Mascot" 
+          src={lessonId === 'brainfuel-for-school' ? brainyBoltImage : captainCarrotImage} 
+          alt={lessonId === 'brainfuel-for-school' ? "Brainy Bolt Mascot" : "Captain Carrot Mascot"} 
           className="w-24 h-24 object-contain"
         />
       </div>

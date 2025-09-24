@@ -461,6 +461,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             onCheck={handleCheckAnswer}
             isSubmitting={submitAnswerMutation.isPending}
             canCheck={getCanCheck()}
+            lessonId={lessonId}
           />
         )}
         
