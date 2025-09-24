@@ -592,7 +592,7 @@ export default function Feedback() {
             {/* Content - Mobile Optimized Typography */}
             <div>
               <h3 className="font-bold text-gray-800 mb-4 text-xl text-center">
-                Your nutrition coach says:
+                Coach Flex says:
               </h3>
               
               {isLoading ? (
