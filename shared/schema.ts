@@ -58,7 +58,9 @@ export const users = pgTable("users", {
   leaderboardOptOut: boolean("leaderboard_opt_out").notNull().default(false),
   leagueTier: text("league_tier").notNull().default("bronze"),
   isMock: boolean("is_mock").notNull().default(false),
-});
+}, (table) => ({
+  emailIdx: index("users_email_idx").on(table.email),
+}));
 
 // Logs table with UUID and proper types
 export const logs = pgTable("logs", {
@@ -74,7 +76,11 @@ export const logs = pgTable("logs", {
   xpAwarded: integer("xp_awarded").notNull().default(0),
   durationMin: integer("duration_min"), // For activity logs: duration in minutes
   mood: varchar("mood", { length: 10 }), // For activity logs: 'happy', 'ok', 'tired'
-});
+}, (table) => ({
+  userIdIdx: index("logs_user_id_idx").on(table.userId),
+  logDateIdx: index("logs_log_date_idx").on(table.logDate),
+  userDateIdx: index("logs_user_date_idx").on(table.userId, table.logDate),
+}));
 
 // Streaks table
 export const streaks = pgTable("streaks", {
@@ -117,7 +123,9 @@ export const xpEvents = pgTable("xp_events", {
   reason: text("reason"),
   refLog: varchar("ref_log").references(() => logs.id),
   ts: timestamp("ts").notNull().defaultNow(),
-});
+}, (table) => ({
+  userIdIdx: index("xp_events_user_id_idx").on(table.userId),
+}));
 
 // League Boards table for weekly groupings
 export const leagueBoards = pgTable("league_boards", {
