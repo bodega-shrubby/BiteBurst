@@ -51,21 +51,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: 'Failed to create auth user' });
       }
       
-      // Create user profile in our database with Supabase user ID
-      const userData = {
-        id: authData.user.id,
-        displayName,
-        ageBracket: ageBracket as '6-8' | '9-11' | '12-14',
-        goal: goal as 'energy' | 'focus' | 'strength',
-        email,
-        parentEmail,
-        parentConsent: false,
-        authProvider: 'supabase',
-        avatarId: avatarId || null,
-        tz: timezone || null,
-      };
+      // Check if user already exists in our database (e.g., from a previous failed signup)
+      let existingUser = await storage.getUserByEmail(email);
+      let newUser;
       
-      const newUser = await storage.createUserWithId(userData);
+      if (existingUser) {
+        // User exists locally - update with new Supabase ID and info
+        newUser = await storage.updateUser(existingUser.id, {
+          displayName,
+          ageBracket: ageBracket as '6-8' | '9-11' | '12-14',
+          goal: goal as 'energy' | 'focus' | 'strength',
+          parentEmail,
+          authProvider: 'supabase',
+          avatarId: avatarId || null,
+          tz: timezone || null,
+        });
+        if (!newUser) {
+          newUser = existingUser;
+        }
+      } else {
+        // Create new user profile in our database with Supabase user ID
+        const userData = {
+          id: authData.user.id,
+          displayName,
+          ageBracket: ageBracket as '6-8' | '9-11' | '12-14',
+          goal: goal as 'energy' | 'focus' | 'strength',
+          email,
+          parentEmail,
+          parentConsent: false,
+          authProvider: 'supabase',
+          avatarId: avatarId || null,
+          tz: timezone || null,
+        };
+        
+        newUser = await storage.createUserWithId(userData);
+      }
       
       console.log("User created successfully:", newUser.id);
       
