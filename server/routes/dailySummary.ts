@@ -16,7 +16,7 @@ export function registerDailySummaryRoutes(app: Express, requireAuth: any) {
       const userId = req.params.id;
       
       // Only allow users to access their own summary
-      if (req.user.userId !== userId) {
+      if (req.userId !== userId) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       

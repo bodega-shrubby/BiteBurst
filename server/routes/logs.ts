@@ -20,7 +20,7 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
       const validatedData = createLogSchema.parse(req.body);
       
       // Verify user matches authenticated user
-      if (validatedData.userId !== req.user.userId) {
+      if (validatedData.userId !== req.userId) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
@@ -118,7 +118,7 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
   // Get user logs
   app.get('/api/logs', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.userId;
       const limit = parseInt(req.query.limit as string) || 50;
       
       const logs = await storage.getUserLogs(userId, limit);
@@ -142,7 +142,7 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
   // Get specific log
   app.get('/api/logs/:id', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.userId;
       const logId = req.params.id;
       
       const logs = await storage.getUserLogs(userId, 1);

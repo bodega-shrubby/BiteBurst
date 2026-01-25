@@ -6,6 +6,7 @@ interface OnboardingProfile {
   goal: string;
   avatar: string;
   email?: string;
+  parentEmail?: string;
   password?: string;
   hasParentConsent: boolean;
   favorite_fruits?: string[];
@@ -26,6 +27,7 @@ const defaultProfile: OnboardingProfile = {
   goal: "",
   avatar: "",
   email: "",
+  parentEmail: "",
   password: "",
   hasParentConsent: false,
   favorite_fruits: [],

@@ -22,20 +22,9 @@ export function registerBadgeRoutes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Debug: log the req.user object to see what properties are available
-      console.log('DEBUG - req.user object:', JSON.stringify(req.user, null, 2));
-      console.log('DEBUG - userId from params:', userId);
-      
-      // Try different possible user ID properties
-      const userIdFromAuth = req.user.id || req.user.userId || req.user.sessionData?.userId;
-      console.log('DEBUG - userIdFromAuth:', userIdFromAuth);
-      
       // Only allow users to access their own badges
-      if (userIdFromAuth !== userId) {
-        return res.status(403).json({ 
-          error: 'Cannot access other user data',
-          debug: { userIdFromAuth, userId }
-        });
+      if (req.userId !== userId) {
+        return res.status(403).json({ error: 'Cannot access other user data' });
       }
       
       const badgeData = await getUserBadgesWithProgress(userId);
@@ -52,8 +41,8 @@ export function registerBadgeRoutes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Only allow users to evaluate their own badges (fix: use req.user.id instead of userId)
-      if (req.user.id !== userId) {
+      // Only allow users to evaluate their own badges
+      if (req.userId !== userId) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       

@@ -5,7 +5,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
   // Get dashboard data
   app.get('/api/dashboard', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.userId;
       
       // Get user data
       const user = await storage.getUser(userId);
@@ -45,7 +45,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
           id: user.id,
           displayName: user.displayName,
           goal: user.goal,
-          xp: user.xp,
+          xp: user.totalXp,
           streak: user.streak,
           avatarId: user.avatarId
         },
@@ -57,8 +57,8 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
           lastActive: streakData.lastActive
         },
         badges: badges.map(badge => ({
-          badgeId: badge.badgeId,
-          awardedAt: badge.awardedAt.toISOString()
+          badgeId: badge.badgeCode,
+          awardedAt: badge.earnedAt.toISOString()
         })),
         todayLogs: todayLogsFiltered.map(log => ({
           id: log.id,
@@ -79,7 +79,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
   // Quick log endpoint
   app.post('/api/dashboard/quick-log', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.userId;
       const { type, content, entryMethod } = req.body;
 
       if (!type || !content || !entryMethod) {
@@ -108,7 +108,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
       // Update user XP
       if (user) {
         await storage.updateUser(userId, {
-          xp: user.xp + xpAwarded
+          totalXp: (user.totalXp || 0) + xpAwarded
         });
       }
 
@@ -120,7 +120,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
         const newCurrent = streakData ? streakData.current + 1 : 1;
         const newLongest = Math.max(newCurrent, streakData?.longest || 0);
         
-        await storage.updateStreak(userId, newCurrent, newLongest);
+        await storage.updateStreak(userId, { current: newCurrent, longest: newLongest, lastActive: new Date() });
       }
 
       // Simple feedback based on type
@@ -144,7 +144,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
   // Complete journey task
   app.post('/api/dashboard/complete-task', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.userId;
       const { taskId, xpReward } = req.body;
 
       if (!taskId || !xpReward) {
@@ -159,7 +159,7 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
 
       // Update user XP
       await storage.updateUser(userId, {
-        xp: user.xp + xpReward
+        totalXp: (user.totalXp || 0) + xpReward
       });
 
       // Create XP event for tracking

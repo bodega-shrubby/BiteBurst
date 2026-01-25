@@ -6,28 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
-
-interface LoginResponse {
-  success: boolean;
-  sessionId: string;
-  user: {
-    id: number;
-    username: string;
-    displayName: string;
-    email: string;
-    ageBracket: string;
-    goal: string;
-    avatar: string;
-    xp: number;
-    streak: number;
-    badges: string[];
-  };
-}
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
   const [, setLocation] = useLocation();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: ""
   });
   const [loading, setLoading] = useState(false);
@@ -47,35 +32,12 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Store session ID
-        localStorage.setItem("sessionId", data.sessionId);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        
-        console.log("Login successful:", data.user);
-        
-        // Redirect to dashboard
-        setLocation("/dashboard");
-      } else {
-        if (data.onboardingRequired) {
-          setError("Please complete your profile setup first.");
-        } else {
-          setError(data.error || "Login failed");
-        }
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Network error. Please try again.");
+      await login(formData.email, formData.password);
+      console.log("Login successful");
+      setLocation("/dashboard");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,14 +60,14 @@ export default function Login() {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                name="username"
-                type="text"
-                value={formData.username}
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
                 disabled={loading}
               />

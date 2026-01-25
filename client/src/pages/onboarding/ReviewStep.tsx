@@ -26,59 +26,48 @@ export default function ReviewStep() {
 
   const createProfileMutation = useMutation({
     mutationFn: async () => {
-      // Capture user's timezone
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       
-      // Step 1: Create the account
-      await apiRequest("/api/profile/create", {
-        method: "POST",
-        body: {
-          username: profile.displayName,
-          email: profile.email,
-          password: profile.password,
-          name: profile.displayName,
-          ageBracket: profile.ageBracket,
-          goal: profile.goal,
-          avatar: profile.avatar,
-          timezone,
-          onboardingCompleted: true
-        }
-      });
-
-      // Step 2: Auto-login the user
-      const loginResponse = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: profile.displayName,
-          password: profile.password
+          email: profile.email,
+          password: profile.password,
+          displayName: profile.displayName,
+          ageBracket: profile.ageBracket,
+          goal: profile.goal,
+          parentEmail: profile.parentEmail,
+          avatarId: profile.avatar,
+          timezone,
         }),
       });
 
-      const loginData = await loginResponse.json();
+      const data = await response.json();
       
-      if (!loginResponse.ok || !loginData.success) {
-        throw new Error(loginData.error || "Auto-login failed");
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Signup failed");
       }
 
-      return loginData;
+      return data;
     },
-    onSuccess: (loginData) => {
-      // Store session data for auto-login
-      localStorage.setItem("sessionId", loginData.sessionId);
-      localStorage.setItem("user", JSON.stringify(loginData.user));
+    onSuccess: async (data) => {
+      if (data.session) {
+        const { supabase } = await import("@/lib/supabase");
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+      }
       
       resetProfile();
-      
-      // Redirect to dashboard
       setLocation("/dashboard");
     },
     onError: (error) => {
       console.error("Account creation failed:", error);
       setIsCreating(false);
-      // Handle error - maybe show a toast or error message
     }
   });
 

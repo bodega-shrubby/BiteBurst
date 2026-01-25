@@ -11,119 +11,129 @@ import { registerBadgeRoutes } from "./routes/badges";
 import { registerLeaderboardRoutes } from "./routes/leaderboard";
 import { registerLessonRoutes } from "./routes/lessons";
 import { updateStreak, getCurrentTime } from "./utils/streakTracker";
-// Replit Auth completely removed
+import { requireAuth } from "./middleware/auth";
+import { supabaseAdmin } from "./lib/supabase";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Simple session middleware (in-memory for development)
-  const sessions = new Map<string, { userId: string; displayName: string; createdAt: Date }>();
-  
-  // Session middleware
-  app.use((req: any, res, next) => {
-    const sessionId = req.headers['x-session-id'];
-    if (sessionId && sessions.has(sessionId as string)) {
-      const session = sessions.get(sessionId as string);
-      if (session && Date.now() - session.createdAt.getTime() < 24 * 60 * 60 * 1000) { // 24 hours
-        req.user = session;
-      } else {
-        sessions.delete(sessionId as string);
-      }
-    }
-    next();
-  });
 
-  // Authentication middleware
-  const requireAuth = (req: any, res: any, next: any) => {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-    next();
-  };
-
-  // BiteBurst profile creation endpoint (for onboarding)
-  app.post("/api/profile/create", async (req: any, res) => {
+  // Supabase Auth: Signup endpoint
+  app.post("/api/auth/signup", async (req: any, res) => {
     try {
-      const { username, email, password, name, ageBracket, goal, avatar, timezone, onboardingCompleted } = req.body;
+      const { email, password, displayName, ageBracket, goal, parentEmail, avatarId, timezone } = req.body;
       
-      // Create BiteBurst profile with new schema
+      // Validate required fields
+      if (!email || !password || !displayName || !ageBracket || !goal || !parentEmail) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+      
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+      }
+      
+      console.log("Signup attempt for:", email);
+      
+      // Create user in Supabase Auth
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Skip email verification for MVP
+      });
+      
+      if (authError) {
+        console.error("Supabase auth error:", authError.message);
+        if (authError.message.includes('already registered')) {
+          return res.status(409).json({ error: 'Email already registered' });
+        }
+        return res.status(400).json({ error: authError.message });
+      }
+      
+      if (!authData.user) {
+        return res.status(500).json({ error: 'Failed to create auth user' });
+      }
+      
+      // Create user profile in our database with Supabase user ID
       const userData = {
-        displayName: name,
+        id: authData.user.id,
+        displayName,
         ageBracket: ageBracket as '6-8' | '9-11' | '12-14',
         goal: goal as 'energy' | 'focus' | 'strength',
-        avatarId: avatar,
         email,
-        tz: timezone, // Store user timezone for streak calculations
-        parentConsent: true, // Default for onboarding
+        parentEmail,
+        parentConsent: false,
+        authProvider: 'supabase',
+        avatarId: avatarId || null,
+        tz: timezone || null,
       };
       
-      console.log("Creating BiteBurst profile for:", name);
+      const newUser = await storage.createUserWithId(userData);
       
-      // Check if user already exists by email
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        console.log("User already exists, returning success");
-        return res.json({ 
-          success: true, 
-          message: "Profile already exists"
-        });
-      }
+      console.log("User created successfully:", newUser.id);
       
-      // Create user using storage interface
-      const newUser = await storage.createUser(userData);
+      // Sign in the user to get a session
+      const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      console.log("BiteBurst profile created for user:", newUser.id);
-      
-      res.json({ 
-        success: true, 
-        message: "Profile created successfully",
+      res.json({
+        success: true,
         user: {
           id: newUser.id,
           displayName: newUser.displayName,
           email: newUser.email,
           ageBracket: newUser.ageBracket,
           goal: newUser.goal,
-          avatarId: newUser.avatarId
-        }
+          avatarId: newUser.avatarId,
+          totalXp: newUser.totalXp || 0,
+          level: newUser.level || 1,
+          streak: newUser.streak || 0,
+        },
+        session: signInData?.session || null,
       });
+      
     } catch (error) {
-      console.error("Profile creation error:", error);
-      res.status(500).json({ error: "Failed to create profile" });
+      console.error("Signup error:", error);
+      res.status(500).json({ error: "Failed to create account" });
     }
   });
 
-  // Authentication routes
+  // Supabase Auth: Login endpoint
   app.post("/api/auth/login", async (req: any, res) => {
     try {
-      const { username, password } = req.body;
+      const { email, password } = req.body;
       
-      if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password required' });
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password required' });
       }
       
-      console.log("Login attempt for:", username);
+      console.log("Login attempt for:", email);
       
-      // Find user by display name (treating it as username)
-      const user = await storage.getUserByDisplayName(username);
-      if (!user) {
-        console.log("User not found:", username);
-        return res.status(401).json({ error: 'Invalid username or password' });
-      }
-      
-      // For now, accept any password (development only)
-      // TODO: Add proper password field and hashing
-      
-      // Create session
-      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessions.set(sessionId, {
-        userId: user.id,
-        displayName: user.displayName,
-        createdAt: new Date()
+      // Sign in with Supabase
+      const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+        email,
+        password,
       });
+      
+      if (error) {
+        console.error("Supabase login error:", error.message);
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+      
+      if (!data.user || !data.session) {
+        return res.status(401).json({ error: 'Login failed' });
+      }
+      
+      // Get user profile from our database
+      const user = await storage.getUser(data.user.id);
+      if (!user) {
+        console.error("User not found in database:", data.user.id);
+        return res.status(404).json({ error: 'User profile not found' });
+      }
       
       console.log("Login successful for user:", user.id);
       
       res.json({
         success: true,
-        sessionId,
         user: {
           id: user.id,
           displayName: user.displayName,
@@ -133,8 +143,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           avatarId: user.avatarId,
           totalXp: user.totalXp || 0,
           level: user.level || 1,
-          streak: user.streak
-        }
+          streak: user.streak || 0,
+        },
+        session: data.session,
       });
       
     } catch (error) {
@@ -143,17 +154,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/logout", (req: any, res) => {
-    const sessionId = req.headers['x-session-id'];
-    if (sessionId && sessions.has(sessionId)) {
-      sessions.delete(sessionId);
+  // Supabase Auth: Logout endpoint
+  app.post("/api/auth/logout", async (req: any, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        await supabaseAdmin.auth.admin.signOut(token);
+      }
+      res.json({ success: true, message: 'Logged out successfully' });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.json({ success: true, message: 'Logged out successfully' });
     }
-    res.json({ success: true, message: 'Logged out successfully' });
   });
 
+  // Supabase Auth: Get current user
   app.get("/api/auth/me", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.userId);
+      const user = await storage.getUser(req.userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -165,9 +184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ageBracket: user.ageBracket,
         goal: user.goal,
         avatarId: user.avatarId,
+        parentEmail: user.parentEmail,
         totalXp: user.totalXp || 0,
         level: user.level || 1,
-        streak: user.streak
+        streak: user.streak || 0,
       });
     } catch (error) {
       console.error("Get user error:", error);
@@ -187,7 +207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Only allow users to update their own XP
-      if (req.user.userId !== userId) {
+      if (req.userId !== userId) {
         return res.status(403).json({ error: 'Cannot update XP for other users' });
       }
       
@@ -259,7 +279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get avatars
+  // Get avatars - PUBLIC endpoint (needed for onboarding before auth)
   app.get('/api/avatars', async (req: any, res: any) => {
     try {
       const avatars = await storage.getAvatars();
@@ -270,7 +290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get goals
+  // Get goals - PUBLIC endpoint (needed for onboarding before auth)
   app.get('/api/goals', async (req: any, res: any) => {
     try {
       const goals = await storage.getGoals();
@@ -287,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.params.id;
       
       // Only allow users to access their own streak data
-      if (req.user.userId !== userId) {
+      if (req.userId !== userId) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       

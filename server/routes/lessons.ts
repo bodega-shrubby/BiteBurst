@@ -396,7 +396,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const validatedData = answerSubmissionSchema.parse(req.body);
       
       // Verify user matches authenticated user
-      if (validatedData.userId !== req.user.userId) {
+      if (validatedData.userId !== req.userId) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
@@ -560,7 +560,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const validatedData = insertLessonAttemptSchema.parse(req.body);
       
       // Verify user matches authenticated user
-      if (validatedData.userId !== req.user.userId) {
+      if (validatedData.userId !== req.userId) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 

@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import OnboardingLayout from "./OnboardingLayout";
 import { useOnboardingContext } from "./OnboardingContext";
 
-export default function EmailStep() {
+export default function ParentEmailStep() {
   const [, setLocation] = useLocation();
   const { updateProfile, profile } = useOnboardingContext();
-  const [email, setEmail] = useState(profile.email || "");
+  const [parentEmail, setParentEmail] = useState(profile.parentEmail || "");
   const [error, setError] = useState("");
-  const [isValid, setIsValid] = useState(false); // Required field, so invalid by default
+  const [isValid, setIsValid] = useState(false);
 
   const validateEmail = (value: string) => {
-    if (!value.trim()) return "Email is required";
+    if (!value.trim()) return "Parent email is required";
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
@@ -22,15 +22,15 @@ export default function EmailStep() {
   };
 
   useEffect(() => {
-    const errorMessage = validateEmail(email);
+    const errorMessage = validateEmail(parentEmail);
     setError(errorMessage);
     setIsValid(!errorMessage);
-  }, [email]);
+  }, [parentEmail]);
 
   const handleNext = () => {
     if (isValid) {
-      updateProfile({ email: email.trim() });
-      setLocation("/profile/parent-email");
+      updateProfile({ parentEmail: parentEmail.trim() });
+      setLocation("/profile/password");
     }
   };
 
@@ -41,36 +41,32 @@ export default function EmailStep() {
   };
 
   return (
-    <OnboardingLayout step={11} totalSteps={14}>
+    <OnboardingLayout step={12} totalSteps={15}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
-        {/* Main Content */}
         <div className="flex-1 space-y-8">
-          {/* Title */}
           <h1 
             className="font-extrabold text-3xl leading-tight"
             style={{ color: 'var(--bb-text, #000000)' }}
           >
-            What's your email?
+            Parent's Email
           </h1>
 
-          {/* Description */}
           <p className="text-lg text-gray-600 leading-relaxed">
-            We'll send you updates about your progress and new features.
+            We need a parent or guardian's email to keep them updated on your progress.
           </p>
 
-          {/* Email Input */}
           <div className="space-y-2">
             <div className="relative">
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={parentEmail}
+                onChange={(e) => setParentEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="your@email.com"
+                placeholder="parent@email.com"
                 className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors duration-200"
                 style={{ height: '56px' }}
-                aria-describedby={error ? "email-error" : undefined}
+                aria-describedby={error ? "parent-email-error" : undefined}
               />
               {isValid && (
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
@@ -85,7 +81,7 @@ export default function EmailStep() {
             
             {error && (
               <p 
-                id="email-error"
+                id="parent-email-error"
                 className="text-red-500 text-sm"
                 role="alert"
                 aria-live="polite"
@@ -94,9 +90,14 @@ export default function EmailStep() {
               </p>
             )}
           </div>
+
+          <div className="bg-orange-50 p-4 rounded-xl">
+            <p className="text-sm text-orange-700">
+              Your parent will receive updates about your achievements and can help you on your health journey!
+            </p>
+          </div>
         </div>
 
-        {/* Next Button - Fixed at Bottom */}
         <div className="mt-auto pb-6 flex justify-center">
           <Button
             onClick={handleNext}

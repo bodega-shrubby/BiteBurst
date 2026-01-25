@@ -35,6 +35,7 @@ import FoodsStep from "@/pages/onboarding/FoodsStep";
 import SportsStep from "@/pages/onboarding/SportsStep";
 import AvatarStep from "@/pages/onboarding/AvatarStep";
 import EmailStep from "@/pages/onboarding/EmailStep";
+import ParentEmailStep from "@/pages/onboarding/ParentEmailStep";
 import PasswordStep from "@/pages/onboarding/PasswordStep";
 import ConsentStep from "@/pages/onboarding/ConsentStep";
 import ReviewStep from "@/pages/onboarding/ReviewStep";
@@ -54,6 +55,7 @@ function OnboardingRoutes() {
         <Route path="/profile/preferences/sports" component={SportsStep} />
         <Route path="/profile/avatar" component={AvatarStep} />
         <Route path="/profile/email" component={EmailStep} />
+        <Route path="/profile/parent-email" component={ParentEmailStep} />
         <Route path="/profile/password" component={PasswordStep} />
         <Route path="/profile/consent" component={ConsentStep} />
         <Route path="/profile/review" component={ReviewStep} />
@@ -94,6 +96,7 @@ function Router() {
       <Route path="/profile/preferences/sports" component={OnboardingRoutes} />
       <Route path="/profile/avatar" component={OnboardingRoutes} />
       <Route path="/profile/email" component={OnboardingRoutes} />
+      <Route path="/profile/parent-email" component={OnboardingRoutes} />
       <Route path="/profile/password" component={OnboardingRoutes} />
       <Route path="/profile/consent" component={OnboardingRoutes} />
       <Route path="/profile/review" component={OnboardingRoutes} />
