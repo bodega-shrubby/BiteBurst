@@ -36,8 +36,10 @@ import SportsStep from "@/pages/onboarding/SportsStep";
 import AvatarStep from "@/pages/onboarding/AvatarStep";
 import EmailStep from "@/pages/onboarding/EmailStep";
 import ParentEmailStep from "@/pages/onboarding/ParentEmailStep";
+import ParentAccountStep from "@/pages/onboarding/ParentAccountStep";
 import PasswordStep from "@/pages/onboarding/PasswordStep";
 import ConsentStep from "@/pages/onboarding/ConsentStep";
+import CurriculumStep from "@/pages/onboarding/CurriculumStep";
 import ReviewStep from "@/pages/onboarding/ReviewStep";
 
 function OnboardingRoutes() {
@@ -45,9 +47,11 @@ function OnboardingRoutes() {
     <OnboardingProvider>
       <Switch>
         <Route path="/profile/intro" component={MascotIntroStep} />
+        <Route path="/profile/account" component={ParentAccountStep} />
         <Route path="/profile/questions" component={QuickQuestionsStep} />
         <Route path="/profile/name" component={NameStep} />
         <Route path="/profile/age" component={AgeStep} />
+        <Route path="/profile/curriculum" component={CurriculumStep} />
         <Route path="/profile/goal" component={GoalStep} />
         <Route path="/profile/preferences/fruits" component={FruitsStep} />
         <Route path="/profile/preferences/veggies" component={VeggiesStep} />
@@ -86,9 +90,11 @@ function Router() {
       
       {/* Onboarding Flow - Single Provider */}
       <Route path="/profile/intro" component={OnboardingRoutes} />
+      <Route path="/profile/account" component={OnboardingRoutes} />
       <Route path="/profile/questions" component={OnboardingRoutes} />
       <Route path="/profile/name" component={OnboardingRoutes} />
       <Route path="/profile/age" component={OnboardingRoutes} />
+      <Route path="/profile/curriculum" component={OnboardingRoutes} />
       <Route path="/profile/goal" component={OnboardingRoutes} />
       <Route path="/profile/preferences/fruits" component={OnboardingRoutes} />
       <Route path="/profile/preferences/veggies" component={OnboardingRoutes} />

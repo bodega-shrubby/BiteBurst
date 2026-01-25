@@ -109,6 +109,31 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 
 ## Changelog
 
+- January 25, 2026: **Parent-First Onboarding Flow with Curriculum Selection**
+  - Implemented parent-first authentication architecture:
+    - Parent creates Supabase auth account with email/password
+    - Child profiles linked via parent_auth_id column
+    - Future-proofed for multiple children per parent account
+  - Added curriculum selection (US Common Core / UK KS2-KS3):
+    - New curriculum column in users table
+    - CurriculumSelector component with flag icons
+    - Curriculum displayed in profile summary
+  - Restructured onboarding flow (11 steps total):
+    1. Welcome/Mascot Intro
+    2. Parent Account (email + password + consent combined)
+    3. Child Name
+    4. Child Age
+    5. Curriculum Selection
+    6. Goal Selection
+    7-10. Food Preferences (Fruits, Veggies, Foods, Sports)
+    11. Account Summary/Review
+  - Backend updates:
+    - /api/auth/signup now accepts parentEmail, childName, age, curriculum, goal
+    - /api/auth/login fetches child profiles by parent_auth_id with fallback
+    - /api/auth/me returns child profile based on parent auth
+    - Added getUserByParentAuthId storage method
+  - Database indexes added for performance (logs, users, xp_events)
+
 - August 31, 2025: **Phase 2 Complete - Database Schema Upgraded to Specification**
   - Successfully migrated to UUID primary keys for all tables
   - Implemented proper PostgreSQL ENUMs (age_bracket, goal_enum, log_type, entry_method)

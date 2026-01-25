@@ -4,6 +4,7 @@ interface OnboardingProfile {
   displayName: string;
   ageBracket: string;
   goal: string;
+  curriculum: string;
   avatar: string;
   email?: string;
   parentEmail?: string;
@@ -25,6 +26,7 @@ const defaultProfile: OnboardingProfile = {
   displayName: "",
   ageBracket: "",
   goal: "",
+  curriculum: "",
   avatar: "",
   email: "",
   parentEmail: "",

@@ -31,6 +31,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByDisplayName(displayName: string): Promise<User | undefined>;
+  getUserByParentAuthId(parentAuthId: string): Promise<User | undefined>;
   createUser(insertUser: Partial<InsertUser>): Promise<User>;
   createUserWithId(userData: Partial<InsertUser> & { id: string }): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User>;
@@ -76,6 +77,12 @@ export class DatabaseStorage implements IStorage {
   // Add method for finding user by display name (used as username)
   async getUserByDisplayName(displayName: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.displayName, displayName));
+    return user || undefined;
+  }
+
+  // Find child profile by parent's Supabase auth ID
+  async getUserByParentAuthId(parentAuthId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.parentAuthId, parentAuthId));
     return user || undefined;
   }
 

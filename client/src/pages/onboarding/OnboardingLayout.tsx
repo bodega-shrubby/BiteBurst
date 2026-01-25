@@ -11,18 +11,15 @@ interface OnboardingLayoutProps {
 
 const STEPS = [
   { path: "/profile/intro", name: "Intro" },
-  { path: "/profile/questions", name: "Questions" },
+  { path: "/profile/account", name: "Parent Account" },
   { path: "/profile/name", name: "Name" },
   { path: "/profile/age", name: "Age" },
+  { path: "/profile/curriculum", name: "Curriculum" },
   { path: "/profile/goal", name: "Goal" },
   { path: "/profile/preferences/fruits", name: "Fruits" },
   { path: "/profile/preferences/veggies", name: "Veggies" },
   { path: "/profile/preferences/foods", name: "Foods" },
   { path: "/profile/preferences/sports", name: "Sports" },
-  { path: "/profile/avatar", name: "Avatar" },
-  { path: "/profile/email", name: "Email" },
-  { path: "/profile/password", name: "Password" },
-  { path: "/profile/consent", name: "Consent" },
   { path: "/profile/review", name: "Review" }
 ];
 

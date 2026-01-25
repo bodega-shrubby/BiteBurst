@@ -21,7 +21,7 @@ export default function AgeStep() {
   };
 
   return (
-    <OnboardingLayout step={4} totalSteps={14}>
+    <OnboardingLayout step={4} totalSteps={11}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}
@@ -70,7 +70,7 @@ export default function AgeStep() {
             <Button
               onClick={() => {
                 updateProfile({ ageBracket: selectedAge });
-                setLocation("/profile/goal");
+                setLocation("/profile/curriculum");
               }}
               className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
               style={{ borderRadius: '13px' }}

@@ -47,7 +47,7 @@ export default function SportsStep() {
   const handleNext = () => {
     if (selectedSports.length > 0) {
       updateProfile({ favorite_sports: selectedSports });
-      setLocation("/profile/avatar");
+      setLocation("/profile/review");
     }
   };
 
@@ -57,7 +57,7 @@ export default function SportsStep() {
   };
 
   return (
-    <OnboardingLayout step={9} totalSteps={14}>
+    <OnboardingLayout step={10} totalSteps={11}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content */}

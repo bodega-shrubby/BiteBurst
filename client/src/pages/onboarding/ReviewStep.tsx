@@ -19,6 +19,19 @@ const AGE_LABELS = {
   "12-14": "12–14 years old"
 };
 
+const CURRICULUM_LABELS = {
+  "us-common-core": "🇺🇸 American",
+  "uk-ks2-ks3": "🇬🇧 British"
+};
+
+const maskEmail = (email: string) => {
+  if (!email) return "";
+  const [localPart, domain] = email.split("@");
+  if (!localPart || !domain) return email;
+  const masked = localPart.charAt(0) + "***";
+  return `${masked}@${domain}`;
+};
+
 export default function ReviewStep() {
   const [, setLocation] = useLocation();
   const { profile, resetProfile } = useOnboardingContext();
@@ -28,18 +41,20 @@ export default function ReviewStep() {
     mutationFn: async () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       
+      // Parent-first signup: parent email for auth, child profile data
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: profile.email,
+          parentEmail: profile.parentEmail || profile.email,
           password: profile.password,
-          displayName: profile.displayName,
-          ageBracket: profile.ageBracket,
+          parentConsent: profile.hasParentConsent,
+          childName: profile.displayName,
+          age: profile.ageBracket,
+          curriculum: profile.curriculum || "us-common-core",
           goal: profile.goal,
-          parentEmail: profile.parentEmail,
           avatarId: profile.avatar,
           timezone,
         }),
@@ -77,7 +92,7 @@ export default function ReviewStep() {
   };
 
   return (
-    <OnboardingLayout step={14} totalSteps={14} canGoBack={!isCreating}>
+    <OnboardingLayout step={11} totalSteps={11} canGoBack={!isCreating}>
       <div className="space-y-8">
         
         {/* Title */}
@@ -85,7 +100,7 @@ export default function ReviewStep() {
           className="font-extrabold text-3xl leading-tight text-center"
           style={{ color: 'var(--bb-text, #000000)' }}
         >
-          Create your account
+          You're all set!
         </h1>
 
         {/* Profile Summary Card */}
@@ -109,6 +124,11 @@ export default function ReviewStep() {
               <span className="text-gray-600">Age</span>
               <span className="font-medium">{AGE_LABELS[profile.ageBracket as keyof typeof AGE_LABELS]}</span>
             </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">Curriculum</span>
+              <span className="font-medium">{CURRICULUM_LABELS[profile.curriculum as keyof typeof CURRICULUM_LABELS] || "Not set"}</span>
+            </div>
             
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-gray-600">Goal</span>
@@ -117,7 +137,7 @@ export default function ReviewStep() {
             
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-gray-600">Email</span>
-              <span className="font-medium text-sm">{profile.email}</span>
+              <span className="font-medium text-sm">{maskEmail(profile.parentEmail || profile.email || "")}</span>
             </div>
             
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -130,7 +150,7 @@ export default function ReviewStep() {
         {/* Welcome Message */}
         <div className="text-center">
           <p className="text-lg text-gray-600 leading-relaxed">
-            You're all set! Let's start building healthy habits together.
+            Let's start building healthy habits together!
           </p>
         </div>
 

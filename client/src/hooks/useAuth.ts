@@ -8,6 +8,7 @@ interface User {
   email: string;
   ageBracket: string;
   goal: string;
+  curriculum?: string;
   avatarId: string | null;
   parentEmail?: string;
   totalXp: number;
@@ -16,12 +17,13 @@ interface User {
 }
 
 interface SignupData {
-  email: string;
-  password: string;
-  displayName: string;
-  ageBracket: string;
-  goal: string;
   parentEmail: string;
+  password: string;
+  parentConsent: boolean;
+  childName: string;
+  age: string;
+  curriculum: string;
+  goal: string;
   avatarId?: string;
   timezone?: string;
 }

@@ -7,11 +7,11 @@ export default function MascotIntroStep() {
   const [, setLocation] = useLocation();
 
   const handleContinue = () => {
-    setLocation("/profile/questions");
+    setLocation("/profile/account");
   };
 
   return (
-    <OnboardingLayout step={1} totalSteps={14}>
+    <OnboardingLayout step={1} totalSteps={11}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
         {/* Main Content - Centered */}
