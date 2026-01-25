@@ -56,7 +56,7 @@ export default function NameStep() {
             className="font-extrabold text-3xl leading-tight"
             style={{ color: 'var(--bb-text, #000000)' }}
           >
-            What's your name?
+            What's your child's name?
           </h1>
 
           {/* Name Input */}
@@ -67,7 +67,7 @@ export default function NameStep() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Enter your name"
+                placeholder="Enter their first name"
                 className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors duration-200"
                 style={{ height: '56px' }}
                 maxLength={20}
@@ -85,7 +85,7 @@ export default function NameStep() {
               )}
             </div>
             
-            {error && (
+            {error ? (
               <p 
                 id="name-error"
                 className="text-red-500 text-sm"
@@ -93,6 +93,10 @@ export default function NameStep() {
                 aria-live="polite"
               >
                 {error}
+              </p>
+            ) : (
+              <p className="text-gray-500 text-sm">
+                Just their first name is fine!
               </p>
             )}
           </div>

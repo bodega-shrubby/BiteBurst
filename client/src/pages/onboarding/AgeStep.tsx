@@ -5,9 +5,9 @@ import OnboardingLayout from "./OnboardingLayout";
 import { useOnboardingContext } from "./OnboardingContext";
 
 const AGE_OPTIONS = [
-  { value: "6-8", label: "6–8", emoji: "🧒" },
-  { value: "9-11", label: "9–11", emoji: "👦" },
-  { value: "12-14", label: "12–14", emoji: "👧" }
+  { value: "6-8", label: "6-8 years old", emoji: "🧒" },
+  { value: "9-11", label: "9-11 years old", emoji: "👦" },
+  { value: "12-14", label: "12-14 years old", emoji: "👧" }
 ];
 
 export default function AgeStep() {
@@ -31,7 +31,7 @@ export default function AgeStep() {
             className="font-extrabold text-3xl leading-tight"
             style={{ color: 'var(--bb-text, #000000)' }}
           >
-            How old are you?
+            How old is {profile.displayName || 'your child'}?
           </h1>
 
           {/* Age Selection Chips */}
