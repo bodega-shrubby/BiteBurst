@@ -1,0 +1,274 @@
+TASK: Implement Supabase Authentication for BiteBurst (Auth Only - Keep Existing Database)
+
+CONTEXT:
+- We're migrating from in-memory sessions to Supabase Auth
+- Keep existing Replit PostgreSQL database for ALL app data (users, logs, lessons, etc.)
+- Use Supabase ONLY for authentication (login/signup/sessions)
+- Environment variables are already set: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+- Skip email verification for MVP
+- Require parent email field but no verification yet
+
+ARCHITECTURE OVERVIEW:
+- Supabase handles: Password hashing, session management, JWT tokens
+- Replit DB handles: User profiles, logs, lessons, achievements, all app data
+- User ID sync: Supabase auth.uid() will be stored as userId in our Replit users table
+
+IMPLEMENTATION STEPS:
+
+1. INSTALL DEPENDENCIES
+   npm install @supabase/supabase-js
+   
+   Remove these if present:
+   - express-session
+   - Any other session management libraries
+
+2. CREATE SUPABASE CLIENT FILES
+
+   File: client/src/lib/supabase.ts
+   - Export a Supabase client using SUPABASE_URL and SUPABASE_ANON_KEY
+   - This is for frontend auth operations
+   
+   File: server/lib/supabase.ts
+   - Export admin Supabase client using SUPABASE_SERVICE_ROLE_KEY
+   - This is for backend user verification
+
+   Example structure:
+```typescript
+   import { createClient } from '@supabase/supabase-js'
+   
+   export const supabase = createClient(
+     process.env.SUPABASE_URL!,
+     process.env.SUPABASE_ANON_KEY!
+   )
+```
+
+3. UPDATE DATABASE SCHEMA (shared/schema.ts)
+
+   DO NOT change existing tables structure
+   
+   ONLY update users table:
+   - Change id from varchar() to text("id").primaryKey()
+   - Add password_hash: text("password_hash") (will be NULL, kept for schema completeness)
+   - Ensure email: text("email").unique().notNull() exists
+   - Add parent_email: text("parent_email").notNull()
+   - Add auth_provider: text("auth_provider").default("supabase")
+   
+   Update foreign keys in other tables:
+   - Ensure all userId fields are text() to match users.id
+
+4. UPDATE AUTH ROUTES (server/routes.ts)
+
+   DELETE:
+   - The in-memory sessions Map (line 18)
+   - All old session management code
+   - Old login logic (lines 111-133)
+   - Old signup logic (lines 55-107)
+
+   CREATE NEW ENDPOINTS:
+
+   POST /api/auth/signup
+   Request body: { email, password, displayName, age, goal, parentEmail }
+   Steps:
+   1. Validate input with Zod
+   2. Call supabase.auth.signUp({ email, password })
+   3. Get the user.id from Supabase response
+   4. Create user record in OUR users table with:
+      - id: user.id from Supabase
+      - email: email
+      - displayName: displayName
+      - age: age
+      - goal: goal
+      - parent_email: parentEmail
+      - parent_consent: false (default)
+      - created_at: now()
+   5. Return { user, session } from Supabase
+
+   POST /api/auth/login
+   Request body: { email, password }
+   Steps:
+   1. Call supabase.auth.signInWithPassword({ email, password })
+   2. Return the session
+   3. Frontend will store session automatically
+
+   POST /api/auth/logout
+   Steps:
+   1. Get session from Authorization header
+   2. Call supabase.auth.signOut()
+   3. Return success
+
+   GET /api/auth/user
+   Steps:
+   1. Get JWT from Authorization header: Bearer <token>
+   2. Verify token with server Supabase client
+   3. If valid, fetch user profile from OUR users table
+   4. Return combined user data: { id, email, displayName, age, goal, xp, streak, etc. }
+
+5. CREATE AUTH MIDDLEWARE (server/middleware/auth.ts)
+
+   Create new file with requireAuth middleware:
+```typescript
+   import { Request, Response, NextFunction } from 'express';
+   import { supabase } from '../lib/supabase';
+
+   export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+     const authHeader = req.headers.authorization;
+     
+     if (!authHeader?.startsWith('Bearer ')) {
+       return res.status(401).json({ error: 'No token provided' });
+     }
+
+     const token = authHeader.substring(7);
+     
+     try {
+       const { data: { user }, error } = await supabase.auth.getUser(token);
+       
+       if (error || !user) {
+         return res.status(401).json({ error: 'Invalid token' });
+       }
+       
+       // Attach user ID to request
+       req.userId = user.id;
+       next();
+     } catch (error) {
+       return res.status(401).json({ error: 'Authentication failed' });
+     }
+   }
+```
+
+   Add TypeScript declaration:
+```typescript
+   declare global {
+     namespace Express {
+       interface Request {
+         userId?: string;
+       }
+     }
+   }
+```
+
+6. PROTECT EXISTING ROUTES
+
+   Add requireAuth middleware to these route groups:
+   - app.use('/api/logs', requireAuth)
+   - app.use('/api/lessons', requireAuth)
+   - app.use('/api/achievements', requireAuth)
+   - app.use('/api/profile', requireAuth)
+   - app.use('/api/leaderboard', requireAuth)
+
+   Update route handlers to use req.userId instead of session:
+   - Replace all instances of: req.session?.userId
+   - With: req.userId
+
+7. UPDATE FRONTEND AUTH (client/src/hooks/useAuth.ts)
+
+   Rewrite to use Supabase client:
+   
+   Key changes:
+   - Import supabase from '@/lib/supabase'
+   - Use supabase.auth.signUp() for signup
+   - Use supabase.auth.signInWithPassword() for login
+   - Use supabase.auth.signOut() for logout
+   - Use supabase.auth.getSession() to get current session
+   - Use supabase.auth.onAuthStateChange() to listen for auth changes
+   - Store session token in localStorage (Supabase does this automatically)
+   
+   On component mount:
+   - Check for existing session
+   - If session exists, fetch user profile from /api/auth/user
+   
+   Return from hook:
+```typescript
+   {
+     user: User | null,
+     login: (email: string, password: string) => Promise<void>,
+     signup: (data: SignupData) => Promise<void>,
+     logout: () => Promise<void>,
+     isLoading: boolean
+   }
+```
+
+8. UPDATE API CLIENT (client/src/lib/api.ts)
+
+   Add Authorization header to all requests:
+```typescript
+   const getAuthHeaders = async () => {
+     const { data: { session } } = await supabase.auth.getSession();
+     return {
+       'Content-Type': 'application/json',
+       ...(session?.access_token && { 
+         'Authorization': `Bearer ${session.access_token}` 
+       })
+     };
+   };
+```
+
+9. UPDATE LOGIN/SIGNUP FORMS
+
+   File: client/src/components/Login.tsx
+   - Add parentEmail field to signup form
+   - Use updated useAuth hook
+   - Handle Supabase error messages
+   
+   File: client/src/components/Onboarding.tsx
+   - Collect parentEmail during onboarding
+   - Pass to signup function
+
+10. DATABASE MIGRATION
+
+    Since we're in MVP with no production users:
+    
+    1. Generate new migration:
+       npx drizzle-kit generate
+    
+    2. Apply migration:
+       npx drizzle-kit push
+    
+    3. Clear any test data if needed
+
+11. ERROR HANDLING
+
+    Add proper error responses:
+    - 400: Invalid input (email format, weak password)
+    - 401: Invalid credentials, token expired
+    - 409: Email already exists
+    - 500: Server error
+    
+    Supabase error messages to handle:
+    - "User already registered"
+    - "Invalid login credentials"
+    - "Password should be at least 6 characters"
+
+TESTING CHECKLIST AFTER IMPLEMENTATION:
+
+Backend:
+- [ ] POST /api/auth/signup creates Supabase user AND database record
+- [ ] POST /api/auth/login returns valid session
+- [ ] GET /api/auth/user returns user data with valid token
+- [ ] GET /api/auth/user returns 401 with invalid token
+- [ ] POST /api/auth/logout clears session
+- [ ] Protected routes (e.g., /api/logs) require auth
+
+Frontend:
+- [ ] Signup form creates new user
+- [ ] Login form authenticates user
+- [ ] Session persists on page reload
+- [ ] Logout clears session
+- [ ] Protected pages redirect to login when not authenticated
+- [ ] User data displays correctly after login
+
+Data Flow:
+- [ ] Supabase auth user ID matches users.id in database
+- [ ] Parent email is required and saved
+- [ ] User profile data is correctly synced
+
+IMPORTANT NOTES:
+1. DO NOT migrate database to Supabase - keep using Replit PostgreSQL
+2. Supabase is ONLY for auth - all app data stays in Replit DB
+3. User IDs must match between Supabase auth and our users table
+4. Keep all existing database tables (logs, lessons, achievements, etc.)
+5. Remove ALL session-related code (sessions Map, express-session)
+6. Use TypeScript throughout with proper types
+7. Skip email verification for MVP
+8. Parent consent verification can be added later
+
+Start with Steps 1-2 (dependencies and Supabase clients), then confirm before proceeding to schema changes.
