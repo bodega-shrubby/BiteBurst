@@ -21,6 +21,7 @@ export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
 export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
 export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching']);
+export const curriculumEnum = pgEnum('curriculum', ['us-common-core', 'uk-ks2-ks3']);
 
 // Catalog tables
 export const avatars = pgTable("avatars", {
@@ -35,11 +36,15 @@ export const goals = pgTable("goals", {
 });
 
 // Users table with UUID and proper types
+// Note: id is the child profile ID (auto-generated), NOT the Supabase auth ID
+// parent_auth_id links to the parent's Supabase auth.users account
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  parentAuthId: text("parent_auth_id"), // Links to parent's Supabase auth user ID (nullable for migration)
   displayName: text("display_name").notNull(),
   ageBracket: ageBracketEnum("age_bracket").notNull(),
   goal: goalEnum("goal").notNull().references(() => goals.id),
+  curriculum: text("curriculum").default('us-common-core'), // "us-common-core" | "uk-ks2-ks3"
   email: text("email").unique().notNull(),
   parentEmail: text("parent_email"),
   parentConsent: boolean("parent_consent").notNull().default(false),
@@ -60,6 +65,7 @@ export const users = pgTable("users", {
   isMock: boolean("is_mock").notNull().default(false),
 }, (table) => ({
   emailIdx: index("users_email_idx").on(table.email),
+  parentAuthIdx: index("users_parent_auth_idx").on(table.parentAuthId),
 }));
 
 // Logs table with UUID and proper types
@@ -237,9 +243,11 @@ export type InsertLessonAttempt = typeof lessonAttempts.$inferInsert;
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
+  parentAuthId: true,
   displayName: true,
   ageBracket: true,
   goal: true,
+  curriculum: true,
   email: true,
   parentEmail: true,
   parentConsent: true,
