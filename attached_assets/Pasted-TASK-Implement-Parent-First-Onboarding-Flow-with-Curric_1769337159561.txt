@@ -1,0 +1,279 @@
+TASK: Implement Parent-First Onboarding Flow with Curriculum Selection
+
+CONTEXT:
+- Supabase auth is working
+- Current onboarding flow exists but needs restructuring
+- We need parent email for Supabase auth (COPPA compliance)
+- Child profiles are stored separately from parent auth accounts
+- Need to collect curriculum (American or British) for lesson alignment
+
+ARCHITECTURE OVERVIEW:
+- Parent creates ONE Supabase auth account (email + password)
+- Parent can have multiple child profiles (future-proof for siblings)
+- Each child profile has: name, age, curriculum, goal, preferences
+- parent_auth_id in users table links child profile to parent's Supabase auth account
+
+DATABASE CHANGES:
+
+1. Update users table schema (shared/schema.ts):
+   - Add: parent_auth_id: uuid("parent_auth_id").references(() => authUsers.id).notNull()
+   - Add: curriculum: text("curriculum").notNull() // "us-common-core" | "uk-ks2-ks3"
+   - Change: id should NOT be the Supabase auth ID (it's the child profile ID)
+   - Keep: display_name, age, goal, and all existing fields
+   
+   Example structure:
+```typescript
+   export const users = pgTable("users", {
+     id: uuid("id").primaryKey().defaultRandom(), // child profile ID
+     parent_auth_id: uuid("parent_auth_id").notNull(), // links to Supabase auth.users
+     display_name: text("display_name").notNull(),
+     age: text("age").notNull(), // "6-8" | "9-11" | "12-14"
+     curriculum: text("curriculum").notNull(), // "us-common-core" | "uk-ks2-ks3"
+     goal: text("goal").notNull(), // "energy" | "focus" | "strength"
+     // ... keep other existing fields
+   });
+```
+
+2. Run migration:
+   - Generate migration: npx drizzle-kit generate
+   - Apply migration: npx drizzle-kit push
+
+ONBOARDING FLOW (Screen Order):
+
+Screen 1: Welcome/Landing
+- Current welcome screens with mascot (keep existing)
+- "Get Started" button → Screen 2
+
+Screen 2: Parent Email & Password (NEW - FIRST)
+- Title: "Let's create your account"
+- Input: "Parent/Guardian Email" (email validation)
+- Input: "Create Password" (min 6 chars, show/hide toggle)
+- Checkbox: "☑ I am the parent/guardian and give consent for my child to use BiteBurst"
+- Small text: "We'll use this email to keep your child's account safe and send important updates"
+- Button: "Next" (disabled until form valid + checkbox checked)
+- Link: "Already have an account? Log in"
+
+Screen 3: Child Name
+- Title: "What's your child's name?"
+- Input: Text field for first name
+- Subtext: "Just their first name is fine!"
+- Button: "Next"
+
+Screen 4: Child Age
+- Title: "How old is [ChildName]?"
+- Three large buttons:
+  - "6-8 years old"
+  - "9-11 years old"
+  - "12-14 years old"
+- Store as: "6-8", "9-11", or "12-14"
+
+Screen 5: Curriculum Selection (NEW)
+- Title: "Which curriculum does [ChildName] follow in school?"
+- Two large cards with icons:
+  
+  Card 1:
+  - Icon: 🇺🇸
+  - Title: "American Curriculum"
+  - Subtitle: "Common Core & NGSS"
+  - Description: "Used in the US and many international schools"
+  - Value: "us-common-core"
+  
+  Card 2:
+  - Icon: 🇬🇧
+  - Title: "British Curriculum"  
+  - Subtitle: "Key Stage 2 & 3"
+  - Description: "Used in the UK and many international schools"
+  - Value: "uk-ks2-ks3"
+  
+- Small text: "💡 We'll show lessons that match what [ChildName] learns at school!"
+- Small text: "Don't worry, you can change this later in settings"
+
+Screen 6: Goal Selection
+- Title: "What's [ChildName]'s goal?"
+- Keep existing goal selection (Energy, Focus, Strength)
+
+Screen 7: Food Preferences
+- Keep existing food preference selection screens
+
+Screen 8: Account Creation Summary
+- Title: "You're all set!"
+- Show summary:
+  - Child's name
+  - Age group
+  - Curriculum
+  - Goal
+  - Parent email (partially hidden: p***@email.com)
+- Message: "Let's start building healthy habits together!"
+- Button: "Create Account" (this triggers the signup)
+
+BACKEND CHANGES:
+
+1. Update signup endpoint (server/routes.ts):
+
+POST /api/auth/signup
+Request body: {
+  // Parent auth credentials
+  parentEmail: string,
+  password: string,
+  parentConsent: boolean,
+  
+  // Child profile data
+  childName: string,
+  age: string, // "6-8" | "9-11" | "12-14"
+  curriculum: string, // "us-common-core" | "uk-ks2-ks3"
+  goal: string, // "energy" | "focus" | "strength"
+  foodPreferences: string[], // existing
+}
+
+Steps:
+1. Validate all inputs with Zod
+2. Call supabase.auth.signUp({ email: parentEmail, password })
+3. Get parent's Supabase auth user ID from response
+4. Create child profile in users table with:
+   - id: auto-generated UUID (NOT Supabase auth ID)
+   - parent_auth_id: parent's Supabase auth user ID
+   - display_name: childName
+   - age: age
+   - curriculum: curriculum
+   - goal: goal
+   - parent_consent: true
+   - created_at: now()
+   - xp: 0
+   - streak: 0
+   - level: 1
+5. Return { success: true, session, childProfile }
+
+Error handling:
+- Email already exists → "This email is already registered"
+- Weak password → "Password must be at least 6 characters"
+- Missing parent consent → "Parent consent is required"
+- Invalid curriculum → "Please select a valid curriculum"
+
+2. Update login endpoint (server/routes.ts):
+
+POST /api/auth/login
+Request body: {
+  email: string,
+  password: string,
+}
+
+Steps:
+1. Call supabase.auth.signInWithPassword({ email, password })
+2. Get parent's auth user ID
+3. Fetch child profile(s) from users table WHERE parent_auth_id = parent's auth ID
+4. If 1 child: return that child's profile
+5. If 2+ children: return array of profiles (future: show profile selector)
+6. Return { success: true, session, childProfile(s) }
+
+3. Update GET /api/auth/user endpoint:
+- Verify JWT token
+- Get parent's Supabase auth user ID from token
+- Fetch child profile from users table WHERE parent_auth_id = auth ID
+- Return child profile data
+
+FRONTEND CHANGES:
+
+1. Update onboarding component (client/src/components/Onboarding.tsx):
+- Restructure screens in correct order (1-8 as listed above)
+- Add parent email/password screen (Screen 2)
+- Add parent consent checkbox validation
+- Add curriculum selection screen (Screen 5)
+- Update form state to collect all new fields
+- Move account creation API call to final screen (Screen 8)
+- Show progress indicator (e.g., "Step 2 of 8")
+
+2. Update useAuth hook (client/src/hooks/useAuth.ts):
+- Handle signup with new data structure
+- Store child profile data in state
+- Handle parent auth vs child profile separation
+
+3. Add curriculum selection component:
+- Create client/src/components/CurriculumSelector.tsx
+- Two large, tappable cards
+- Visual design: flag icons, clear text, descriptions
+- Selected state highlighting
+
+4. Update form validation:
+- Email format validation
+- Password strength (min 6 chars)
+- Parent consent required
+- All fields required before allowing "Create Account"
+
+UI/UX REQUIREMENTS:
+
+1. Visual Design:
+- Use existing orange theme (#FF6B35 or similar)
+- Large, kid-friendly cards for curriculum selection
+- Clear typography
+- Flag emojis: 🇺🇸 and 🇬🇧
+- Progress indicator at top of screens
+
+2. Mobile-first:
+- Large tap targets (min 44px)
+- Cards should be full-width on mobile
+- Readable font sizes
+- Proper spacing
+
+3. Accessibility:
+- Proper labels for all inputs
+- ARIA labels where needed
+- Focus states
+- Error messages clearly displayed
+
+4. Loading states:
+- Show spinner on "Create Account" button
+- Disable button while processing
+- Show success message before redirect
+
+VALIDATION & ERROR HANDLING:
+
+1. Form validation:
+- Email: must be valid email format
+- Password: min 6 characters (Supabase requirement)
+- Parent consent: must be checked
+- Child name: required, max 50 chars
+- Curriculum: must select one option
+- All fields required before proceeding
+
+2. Error messages:
+- "Please enter a valid email address"
+- "Password must be at least 6 characters"
+- "Please confirm you are the parent/guardian"
+- "Please select a curriculum"
+- "This email is already registered. Try logging in instead."
+
+3. Success flow:
+- Create account successfully
+- Show brief success message
+- Redirect to dashboard/home
+
+TESTING CHECKLIST:
+
+After implementation, verify:
+- [ ] Parent can create account with email/password
+- [ ] Parent consent checkbox is required
+- [ ] Child profile data is collected correctly
+- [ ] Curriculum selection works (both options)
+- [ ] Account created in Supabase auth
+- [ ] Child profile created in users table with correct parent_auth_id
+- [ ] Login works with parent email/password
+- [ ] Child profile data loads after login
+- [ ] Proper error messages for validation failures
+- [ ] Progress indicator shows correct step
+- [ ] Can navigate back through onboarding screens
+- [ ] Email already exists error handled
+- [ ] Weak password error handled
+
+IMPORTANT NOTES:
+
+1. Parent email is used for Supabase auth (NOT child email)
+2. One parent account can have multiple child profiles (future-proof)
+3. Curriculum field is required (no default value)
+4. Store curriculum as: "us-common-core" or "uk-ks2-ks3"
+5. Keep all existing user fields (xp, streak, level, badges, etc.)
+6. Parent consent must be explicitly checked (COPPA compliance)
+7. Use proper TypeScript types throughout
+8. Follow existing code patterns and style
+
+START IMPLEMENTATION:
+Begin with database schema changes, then backend endpoints, then frontend components. Test each piece before moving to the next. Let me know if you encounter any issues or need clarification.
