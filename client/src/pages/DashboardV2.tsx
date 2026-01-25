@@ -105,7 +105,7 @@ function BadgeToast({ badge, isVisible, onClose }: BadgeToastProps) {
 const SECTION_HEADER = "text-xl font-bold text-gray-900";
 
 export default function DashboardV2() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, session, loading: authLoading } = useAuth();
   const [location, setLocation] = useLocation();
   const [mascotState, setMascotState] = useState<'idle' | 'goalReached' | 'badgeUnlocked'>('idle');
   const [showConfetti, setShowConfetti] = useState(false);
@@ -115,17 +115,17 @@ export default function DashboardV2() {
   const { data: dailySummary, isLoading, error } = useQuery<DailySummaryV2>({
     queryKey: ['/api/user', user?.id, 'daily-summary'],
     queryFn: async () => {
-      if (!user?.id) throw new Error('No user ID');
+      if (!user?.id || !session?.access_token) throw new Error('No user ID or session');
       const response = await fetch(`/api/user/${user.id}/daily-summary`, {
         credentials: 'include',
         headers: {
-          'x-session-id': localStorage.getItem('sessionId') || ''
+          'Authorization': `Bearer ${session.access_token}`,
         }
       });
       if (!response.ok) throw new Error('Failed to fetch daily summary');
       return response.json();
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!session?.access_token,
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
@@ -133,17 +133,17 @@ export default function DashboardV2() {
   const { data: badgeData } = useQuery({
     queryKey: ['/api/user', user?.id, 'badges'],
     queryFn: async () => {
-      if (!user?.id) throw new Error('No user ID');
+      if (!user?.id || !session?.access_token) throw new Error('No user ID or session');
       const response = await fetch(`/api/user/${user.id}/badges`, {
         credentials: 'include',
         headers: {
-          'x-session-id': localStorage.getItem('sessionId') || ''
+          'Authorization': `Bearer ${session.access_token}`,
         }
       });
       if (!response.ok) throw new Error('Failed to fetch badges');
       return response.json();
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!session?.access_token,
   });
 
   // Get all badge catalog for locked badges

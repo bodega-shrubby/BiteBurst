@@ -4,6 +4,7 @@
 
 import type { Express } from "express";
 import { getAllBadges, getUserBadgesWithProgress, buildBadgeContext, evaluateBadges } from "../lib/badges";
+import { storage } from "../storage";
 
 export function registerBadgeRoutes(app: Express, requireAuth: any) {
   // GET /api/badges - Get all badge catalog items (for showing locked badges)
@@ -22,8 +23,11 @@ export function registerBadgeRoutes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Only allow users to access their own badges
-      if (req.userId !== userId) {
+      // Verify access: user must be the parent (via parent_auth_id) or direct match (legacy)
+      const user = await storage.getUser(userId);
+      const isParent = user?.parentAuthId === req.userId;
+      const isDirectMatch = req.userId === userId;
+      if (!isParent && !isDirectMatch) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       
@@ -41,8 +45,11 @@ export function registerBadgeRoutes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Only allow users to evaluate their own badges
-      if (req.userId !== userId) {
+      // Verify access: user must be the parent (via parent_auth_id) or direct match (legacy)
+      const user = await storage.getUser(userId);
+      const isParent = user?.parentAuthId === req.userId;
+      const isDirectMatch = req.userId === userId;
+      if (!isParent && !isDirectMatch) {
         return res.status(403).json({ error: 'Cannot access other user data' });
       }
       

@@ -61,13 +61,15 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
     try {
       const userId = req.params.id;
       
-      // Only allow users to access their own summary
-      if (req.userId !== userId) {
-        return res.status(403).json({ error: 'Cannot access other user data' });
-      }
-      
       // Get user for timezone and goal
       const user = await storage.getUser(userId);
+      
+      // Verify access: user must be the parent (via parent_auth_id) or direct match (legacy)
+      const isParent = user?.parentAuthId === req.userId;
+      const isDirectMatch = req.userId === userId;
+      if (!isParent && !isDirectMatch) {
+        return res.status(403).json({ error: 'Cannot access other user data' });
+      }
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
