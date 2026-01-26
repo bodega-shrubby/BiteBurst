@@ -1,4 +1,4 @@
-import { CheckCircle, Circle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Milestone {
   id: string;
@@ -10,16 +10,72 @@ interface Milestone {
 interface TodaysJourneyProps {
   milestones: Milestone[];
   className?: string;
+  onTaskComplete?: (xpReward: number) => void;
 }
 
-export default function TodaysJourney({ milestones, className = '' }: TodaysJourneyProps) {
+export default function TodaysJourney({ milestones, className = '', onTaskComplete }: TodaysJourneyProps) {
   const completedCount = milestones.filter(m => m.completed).length;
   const totalCount = milestones.length;
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  const allComplete = completedCount === totalCount && totalCount > 0;
+  
+  // Track if we've initialized with the initial completed state
+  const hasInitializedRef = useRef(false);
+  const prevCompletedRef = useRef<Set<string>>(new Set());
+  const [bonusAwarded, setBonusAwarded] = useState(false);
+  
+  // Initialize with current completed milestones on first render
+  useEffect(() => {
+    if (!hasInitializedRef.current) {
+      // Initialize with currently completed milestones - don't trigger XP for these
+      prevCompletedRef.current = new Set(milestones.filter(m => m.completed).map(m => m.id));
+      hasInitializedRef.current = true;
+      // Also check if bonus should be considered as already awarded
+      if (allComplete) {
+        setBonusAwarded(true);
+      }
+      return;
+    }
+    
+    const currentCompleted = new Set(milestones.filter(m => m.completed).map(m => m.id));
+    const prevCompleted = prevCompletedRef.current;
+    
+    // Find newly completed milestones (not in previous set)
+    milestones.forEach(milestone => {
+      if (milestone.completed && !prevCompleted.has(milestone.id)) {
+        // This milestone was just completed!
+        if (onTaskComplete) {
+          onTaskComplete(milestone.reward);
+        }
+      }
+    });
+    
+    // Update ref for next comparison
+    prevCompletedRef.current = currentCompleted;
+  }, [milestones, onTaskComplete, allComplete]);
+
+  // Trigger bonus when ALL tasks complete (only once)
+  useEffect(() => {
+    if (allComplete && !bonusAwarded && hasInitializedRef.current) {
+      setBonusAwarded(true);
+      // Small delay for the bonus burst
+      const timer = setTimeout(() => {
+        if (onTaskComplete) {
+          onTaskComplete(50); // Daily Journey bonus
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [allComplete, bonusAwarded, onTaskComplete]);
   
   return (
-    <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
-      <h2 className="text-xl font-bold text-black mb-4">Today's Journey</h2>
+    <div className={`bg-white rounded-2xl border-2 border-gray-200 p-6 ${className}`}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Today's Journey</h2>
+        <div className="text-sm font-semibold text-gray-600">
+          {completedCount}/{totalCount} tasks
+        </div>
+      </div>
       
       <div className="space-y-3 mb-4">
         {milestones.map((milestone) => (
@@ -28,23 +84,27 @@ export default function TodaysJourney({ milestones, className = '' }: TodaysJour
             className={`
               flex items-center justify-between p-3 rounded-xl transition-all duration-300
               ${milestone.completed 
-                ? 'bg-green-50 border border-green-200' 
-                : 'bg-gray-50 border border-gray-200'
+                ? 'bg-green-50 border-2 border-green-200' 
+                : 'bg-gray-50 border-2 border-gray-200'
               }
             `}
           >
             <div className="flex items-center space-x-3">
-              {milestone.completed ? (
-                <CheckCircle 
-                  className="w-5 h-5 text-green-600 animate-in zoom-in duration-300" 
-                  aria-label="Completed"
-                />
-              ) : (
-                <Circle 
-                  className="w-5 h-5 text-gray-400" 
-                  aria-label="Not completed"
-                />
-              )}
+              {/* Animated Checkbox */}
+              <div className={`
+                w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
+                ${milestone.completed 
+                  ? 'bg-green-500 border-green-500 animate-check-pop' 
+                  : 'border-gray-300'
+                }
+              `}>
+                {milestone.completed && (
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+
               <span 
                 className={`font-medium transition-all duration-300 ${
                   milestone.completed 
@@ -56,7 +116,7 @@ export default function TodaysJourney({ milestones, className = '' }: TodaysJour
               </span>
             </div>
             <span 
-              className={`text-sm font-semibold ${
+              className={`text-sm font-bold ${
                 milestone.completed 
                   ? 'text-green-600' 
                   : 'text-orange-500'
@@ -72,16 +132,16 @@ export default function TodaysJourney({ milestones, className = '' }: TodaysJour
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">
-            {completedCount}/{totalCount} tasks completed
+            Progress
           </span>
           <span className="font-semibold text-gray-800">
             {Math.round(progressPercentage)}%
           </span>
         </div>
         
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
           <div 
-            className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500 ease-out"
+            className="bg-gradient-to-r from-orange-400 to-orange-600 h-3 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
             role="progressbar"
             aria-valuenow={completedCount}
@@ -92,16 +152,16 @@ export default function TodaysJourney({ milestones, className = '' }: TodaysJour
         </div>
       </div>
       
-      {/* Completion message */}
-      {completedCount === totalCount && totalCount > 0 && (
+      {/* Completion Bonus */}
+      {allComplete && (
         <div 
-          className="mt-4 p-3 bg-green-100 border border-green-200 rounded-xl text-center"
+          className="mt-4 p-4 bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300 rounded-xl text-center"
           role="status"
           aria-live="polite"
         >
-          <span className="text-green-800 font-semibold">
-            🎉 Amazing! You completed all your daily goals!
-          </span>
+          <p className="text-lg font-bold text-orange-800">
+            🎉 Daily Journey Complete! +50 XP Bonus!
+          </p>
         </div>
       )}
     </div>

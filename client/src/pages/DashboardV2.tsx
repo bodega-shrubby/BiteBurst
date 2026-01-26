@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
@@ -14,6 +14,10 @@ import BadgesShelf from "@/components/dashboard/BadgesShelf";
 import RecentLogsList from "@/components/dashboard/RecentLogsList";
 import BottomNavigation from "@/components/BottomNavigation";
 import { CharacterAvatar } from "@/components/dashboard/CharacterAvatar";
+
+// Mascot assets
+import sunnySliceImage from "@assets/Mascots/SunnySlice.png";
+import sunnyCelebrateImage from "@assets/Mascots/sunny_celebrate.png";
 
 interface DailySummaryV2 {
   xp_today: number;
@@ -101,6 +105,91 @@ function BadgeToast({ badge, isVisible, onClose }: BadgeToastProps) {
   );
 }
 
+// Hearts Display Component for Gamification
+function HeartsDisplay({ hearts = 3, maxHearts = 5 }: { hearts?: number; maxHearts?: number }) {
+  return (
+    <div className="flex items-center space-x-0.5" title="Hearts - keep learning!">
+      {Array.from({ length: maxHearts }).map((_, i) => (
+        <span 
+          key={i} 
+          className={`text-lg transition-all duration-200 ${
+            i < hearts ? 'opacity-100 scale-100' : 'opacity-30 scale-90'
+          }`}
+        >
+          {i < hearts ? '❤️' : '🤍'}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// XP Burst Animation Component
+interface XPBurstProps {
+  amount: number;
+  visible: boolean;
+  onComplete: () => void;
+}
+
+function XPBurst({ amount, visible, onComplete }: XPBurstProps) {
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(onComplete, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, onComplete]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+      <div className="xp-burst-animation">
+        <span className="text-5xl font-black text-orange-500 drop-shadow-lg">
+          +{amount} XP
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// Prominent Mascot Section
+interface MascotSectionProps {
+  state: 'idle' | 'goalReached' | 'badgeUnlocked';
+  displayName: string;
+}
+
+function MascotSection({ state, displayName }: MascotSectionProps) {
+  const getMascotMessage = () => {
+    switch (state) {
+      case 'goalReached':
+        return "Amazing job! 🎉";
+      case 'badgeUnlocked':
+        return "New badge! 🏆";
+      default:
+        return `Let's go, ${displayName}! 💪`;
+    }
+  };
+
+  return (
+    <div className="relative flex flex-col items-center py-2">
+      <div className={`
+        transition-all duration-500 ease-in-out
+        ${state === 'goalReached' ? 'animate-celebration-bounce' : 'animate-subtle-bounce'}
+      `}>
+        <img 
+          src={state === 'goalReached' || state === 'badgeUnlocked' ? sunnyCelebrateImage : sunnySliceImage}
+          alt="Sunny Slice mascot"
+          className="w-24 h-24 object-contain drop-shadow-lg"
+        />
+      </div>
+      
+      {/* Speech Bubble */}
+      <div className="mt-2 bg-white rounded-2xl px-4 py-2 shadow-md border-2 border-orange-100 animate-bubble-appear">
+        <p className="text-sm font-semibold text-gray-800">{getMascotMessage()}</p>
+      </div>
+    </div>
+  );
+}
+
 // Consistent header styling
 const SECTION_HEADER = "text-xl font-bold text-gray-900";
 
@@ -111,6 +200,12 @@ export default function DashboardV2() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [badgeToast, setBadgeToast] = useState<{ badge: { code: string; name: string }; visible: boolean } | null>(null);
   const [hasGoalCelebrated, setHasGoalCelebrated] = useState(false);
+  const [xpBurst, setXpBurst] = useState<{ amount: number; visible: boolean }>({ amount: 0, visible: false });
+
+  // XP Burst handler for task completion
+  const handleXpBurst = useCallback((amount: number) => {
+    setXpBurst({ amount, visible: true });
+  }, []);
 
   const { data: dailySummary, isLoading, error } = useQuery<DailySummaryV2>({
     queryKey: ['/api/user', user?.id, 'daily-summary'],
@@ -252,10 +347,23 @@ export default function DashboardV2() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Profile Header */}
+      {/* Greeting Header */}
+      <div className="bg-white px-4 py-3 border-b border-gray-100">
+        <div className="max-w-md mx-auto">
+          <p className="text-sm text-gray-500">{getCurrentDate()}</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {getCurrentGreeting()}, {dailySummary.user.display_name}! 
+            <span className="ml-2 inline-block animate-wave">🍊</span>
+          </h1>
+        </div>
+      </div>
+
+      {/* Profile Header with Hearts */}
       <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-3 relative">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between items-center mb-4">
+            {/* Hearts Display */}
+            <HeartsDisplay hearts={3} maxHearts={5} />
             {/* Settings Icon */}
             <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors" data-testid="button-settings">
               <Settings className="w-6 h-6 text-white" />
@@ -268,6 +376,13 @@ export default function DashboardV2() {
           </div>
         </div>
       </header>
+      
+      {/* Prominent Mascot Section */}
+      <div className="bg-gradient-to-b from-purple-400 to-white px-4 pb-2">
+        <div className="max-w-md mx-auto">
+          <MascotSection state={mascotState} displayName={dailySummary.user.display_name} />
+        </div>
+      </div>
 
       {/* Dark Profile Card */}
       <div className="relative z-10 mb-6">
@@ -382,7 +497,7 @@ export default function DashboardV2() {
         </div>
 
         {/* Today's Journey */}
-        <TodaysJourney milestones={dailySummary.milestones} />
+        <TodaysJourney milestones={dailySummary.milestones} onTaskComplete={handleXpBurst} />
 
         {/* Badges Shelf */}
         <BadgesShelf
@@ -497,6 +612,13 @@ export default function DashboardV2() {
           onClose={() => setBadgeToast(null)}
         />
       )}
+      
+      {/* XP Burst Animation */}
+      <XPBurst 
+        amount={xpBurst.amount} 
+        visible={xpBurst.visible}
+        onComplete={() => setXpBurst({ ...xpBurst, visible: false })}
+      />
     </div>
   );
 }

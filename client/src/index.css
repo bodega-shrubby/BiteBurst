@@ -435,3 +435,98 @@ html {
     transform: none !important;
   }
 }
+
+/* Dashboard Polish Animations - Week 1 */
+
+/* Subtle mascot bounce animation */
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-subtle-bounce {
+  animation: subtle-bounce 3s ease-in-out infinite;
+}
+
+/* Mascot celebration bounce */
+@keyframes celebration-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-20px) scale(1.1); }
+  50% { transform: translateY(-10px) scale(1.05); }
+  75% { transform: translateY(-15px) scale(1.08); }
+}
+
+.animate-celebration-bounce {
+  animation: celebration-bounce 0.8s ease-in-out;
+}
+
+/* XP Burst animation */
+@keyframes xp-burst {
+  0% {
+    transform: scale(0.5) translateY(0);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1.3) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(-80px);
+    opacity: 0;
+  }
+}
+
+.xp-burst-animation {
+  animation: xp-burst 1.5s ease-out forwards;
+}
+
+/* Heart pulse animation */
+@keyframes heart-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.animate-heart-pulse {
+  animation: heart-pulse 0.3s ease-in-out;
+}
+
+/* Speech bubble fade in */
+@keyframes bubble-appear {
+  0% { 
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-bubble-appear {
+  animation: bubble-appear 0.3s ease-out forwards;
+}
+
+/* Task complete checkmark */
+@keyframes check-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.animate-check-pop {
+  animation: check-pop 0.3s ease-out;
+}
+
+/* Greeting wave */
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-8deg); }
+  60% { transform: rotate(14deg); }
+  80% { transform: rotate(-4deg); }
+}
+
+.animate-wave {
+  animation: wave 2s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
