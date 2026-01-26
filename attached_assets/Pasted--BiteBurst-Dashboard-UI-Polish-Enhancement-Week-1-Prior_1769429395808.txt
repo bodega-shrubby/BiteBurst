@@ -1,0 +1,908 @@
+# 🎨 BiteBurst Dashboard UI Polish & Enhancement - Week 1 Priority
+
+## 📋 Overview
+Transform the DashboardV2 into a polished, engaging, Duolingo-inspired experience with smooth animations, mascot personality, and satisfying feedback loops. This implements all Week 1 dashboard requirements from the PRD.
+
+---
+
+## 🎯 Goals
+1. **Add personalized greeting header** with time-based messages and date
+2. **Display hearts system** (3-5 hearts) in header for gamification
+3. **Make Sunny Slice mascot prominent** with animated states and personality
+4. **Add XP burst animations** when users earn points
+5. **Auto-complete Daily Journey** tasks when users log matching items
+6. **Populate Recent Activity feed** with actual logs and AI feedback previews
+7. **Polish overall UI** with better spacing, colors, animations, and micro-interactions
+8. **Improve visual hierarchy** so key elements (streak, XP, Daily Journey) stand out
+
+---
+
+## 🔧 Implementation Tasks
+
+### **Task 1: Add Greeting Header**
+
+**File:** `client/src/pages/DashboardV2.tsx`
+
+**What to do:**
+1. The functions `getCurrentGreeting()` and `getCurrentDate()` already exist in the code
+2. Add a greeting section **above the purple profile header** with:
+   - Greeting text: "Good morning, [Name]!" (dynamic based on time)
+   - Current date: "Monday, January 26"
+   - Small Sunny Slice emoji or icon
+3. Style it to feel warm and welcoming
+
+**Example code to add:**
+```tsx
+{/* Greeting Header - Add this BEFORE the purple header */}
+<div className="bg-white px-4 py-3 border-b border-gray-100">
+  <div className="max-w-md mx-auto">
+    <p className="text-sm text-gray-500">{getCurrentDate()}</p>
+    <h1 className="text-2xl font-bold text-gray-900">
+      {getCurrentGreeting()}, {dailySummary.user.display_name}! 
+      <span className="ml-2">🍊</span>
+    </h1>
+  </div>
+</div>
+```
+
+---
+
+### **Task 2: Add Hearts Display in Header**
+
+**File:** `client/src/pages/DashboardV2.tsx`
+
+**What to do:**
+1. Create a hearts display component that shows 3-5 hearts
+2. Add it to the **top right of the purple profile header** (next to Settings icon)
+3. Hearts should be clickable and show tooltip: "Hearts let you keep learning! Premium = unlimited ♥️"
+4. For MVP, default to 3 hearts (later connect to user data for free vs premium)
+
+**Example component to create:**
+```tsx
+function HeartsDisplay({ hearts = 3, maxHearts = 5 }: { hearts?: number; maxHearts?: number }) {
+  return (
+    <div className="flex items-center space-x-1" title="Hearts - keep learning!">
+      {Array.from({ length: maxHearts }).map((_, i) => (
+        <span 
+          key={i} 
+          className={`text-xl transition-all duration-200 ${
+            i < hearts ? 'opacity-100 scale-100' : 'opacity-30 scale-90'
+          }`}
+        >
+          {i < hearts ? '❤️' : '🤍'}
+        </span>
+      ))}
+    </div>
+  );
+}
+```
+
+**Where to add it:**
+```tsx
+{/* In the purple header, modify the Settings row */}
+<div className="flex justify-between items-center mb-4">
+  <HeartsDisplay hearts={3} maxHearts={5} />
+  <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors">
+    <Settings className="w-6 h-6 text-white" />
+  </button>
+</div>
+```
+
+---
+
+### **Task 3: Make Sunny Slice Mascot Prominent**
+
+**Files:** 
+- `client/src/pages/DashboardV2.tsx`
+- `client/src/components/dashboard/MascotAvatar.tsx` (if exists)
+
+**What to do:**
+1. Add a **larger, animated Sunny Slice mascot** to the dashboard
+2. Position it either:
+   - **Option A:** Between greeting and profile card (floating/bouncing)
+   - **Option B:** In the profile card itself (replacing or next to CharacterAvatar)
+3. Mascot should have different states:
+   - **Idle:** Gentle bounce/sway animation
+   - **Celebration:** Jump + sparkles when goal reached
+   - **Encouraging:** Slight wave when streak is active
+4. Use the existing mascot images: `@assets/Mascots/SunnySlice.png` and `@assets/Mascots/sunny_celebrate.png`
+
+**Example mascot section:**
+```tsx
+{/* Mascot Section - Add between greeting and profile card */}
+<div className="relative flex justify-center py-4">
+  <div className={`
+    transition-all duration-500 ease-in-out
+    ${mascotState === 'goalReached' ? 'animate-bounce scale-110' : 'animate-subtle-bounce'}
+  `}>
+    <img 
+      src={mascotState === 'goalReached' ? sunnyCelebrateImage : sunnySliceImage}
+      alt="Sunny Slice mascot"
+      className="w-32 h-32 object-contain drop-shadow-lg"
+    />
+  </div>
+  
+  {/* Speech Bubble (optional) */}
+  {mascotState === 'goalReached' && (
+    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl px-4 py-2 shadow-lg border-2 border-orange-200">
+      <p className="text-sm font-semibold text-gray-800">Amazing! 🎉</p>
+    </div>
+  )}
+</div>
+```
+
+**Add animation to CSS/Tailwind:**
+```css
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-subtle-bounce {
+  animation: subtle-bounce 3s ease-in-out infinite;
+}
+```
+
+---
+
+### **Task 4: Add XP Burst Animation**
+
+**File:** `client/src/pages/DashboardV2.tsx`
+
+**What to do:**
+1. Create an XP burst animation component that shows "+10 XP", "+20 XP", etc.
+2. Trigger it when user completes Daily Journey tasks or when XP updates
+3. Animation should:
+   - Float upward and fade out
+   - Have orange color (#FF6A00)
+   - Show for 1.5 seconds then disappear
+
+**Create XPBurst component:**
+```tsx
+interface XPBurstProps {
+  amount: number;
+  visible: boolean;
+  onComplete: () => void;
+}
+
+function XPBurst({ amount, visible, onComplete }: XPBurstProps) {
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(onComplete, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, onComplete]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+      <div className="xp-burst-animation">
+        <span className="text-5xl font-black text-orange-500 drop-shadow-lg">
+          +{amount} XP
+        </span>
+      </div>
+    </div>
+  );
+}
+```
+
+**Add CSS animation:**
+```css
+@keyframes xp-burst {
+  0% {
+    transform: scale(0.5) translateY(0);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1.3) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(-80px);
+    opacity: 0;
+  }
+}
+
+.xp-burst-animation {
+  animation: xp-burst 1.5s ease-out forwards;
+}
+```
+
+**Add state management:**
+```tsx
+// In DashboardV2 component
+const [xpBurst, setXpBurst] = useState<{ amount: number; visible: boolean }>({
+  amount: 0,
+  visible: false
+});
+
+// Trigger when Daily Journey task completes
+const handleTaskComplete = (xpReward: number) => {
+  setXpBurst({ amount: xpReward, visible: true });
+};
+
+// In JSX
+<XPBurst 
+  amount={xpBurst.amount} 
+  visible={xpBurst.visible}
+  onComplete={() => setXpBurst({ ...xpBurst, visible: false })}
+/>
+```
+
+---
+
+### **Task 5: Auto-Complete Daily Journey Tasks**
+
+**File:** `client/src/components/dashboard/TodaysJourney.tsx`
+
+**What to do:**
+1. Daily Journey should auto-check tasks when user logs matching items
+2. Tasks are:
+   - ✅ Log one fruit (+10 XP)
+   - ✅ Move for 15 minutes (+20 XP)
+   - ✅ Drink water (+5 XP)
+3. Use the `dailySummary.milestones` data to determine completion
+4. When a task is completed:
+   - Check the checkbox with smooth animation
+   - Show green checkmark
+   - Trigger XP burst animation
+   - If ALL tasks complete, show +50 XP bonus burst
+
+**Improve TodaysJourney component:**
+```tsx
+interface TodaysJourneyProps {
+  milestones: Array<{
+    id: string;
+    title: string;
+    reward: number;
+    completed: boolean;
+  }>;
+  onTaskComplete?: (xpReward: number) => void;
+}
+
+function TodaysJourney({ milestones, onTaskComplete }: TodaysJourneyProps) {
+  const completedCount = milestones.filter(m => m.completed).length;
+  const allComplete = completedCount === milestones.length;
+  const progress = (completedCount / milestones.length) * 100;
+
+  // Trigger celebration when all tasks complete
+  useEffect(() => {
+    if (allComplete && onTaskComplete) {
+      onTaskComplete(50); // Daily Journey bonus
+    }
+  }, [allComplete]);
+
+  return (
+    <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-900">Today's Journey</h3>
+        <div className="text-sm font-semibold text-gray-600">
+          {completedCount}/{milestones.length} tasks
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-500 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      {/* Tasks */}
+      <div className="space-y-3">
+        {milestones.map((milestone) => (
+          <div 
+            key={milestone.id}
+            className={`
+              flex items-center justify-between p-3 rounded-xl transition-all duration-300
+              ${milestone.completed 
+                ? 'bg-green-50 border-2 border-green-200' 
+                : 'bg-gray-50 border-2 border-gray-200'
+              }
+            `}
+          >
+            <div className="flex items-center space-x-3">
+              {/* Checkbox */}
+              <div className={`
+                w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
+                ${milestone.completed 
+                  ? 'bg-green-500 border-green-500 scale-110' 
+                  : 'border-gray-300'
+                }
+              `}>
+                {milestone.completed && (
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+
+              <span className={`
+                font-medium transition-all duration-300
+                ${milestone.completed ? 'text-green-800 line-through' : 'text-gray-700'}
+              `}>
+                {milestone.title}
+              </span>
+            </div>
+
+            <span className="text-orange-600 font-bold text-sm">
+              +{milestone.reward} XP
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Completion Bonus */}
+      {allComplete && (
+        <div className="mt-4 p-4 bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300 rounded-xl text-center animate-pulse">
+          <p className="text-lg font-bold text-orange-800">
+            🎉 Daily Journey Complete! +50 XP Bonus!
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Connect to DashboardV2:**
+```tsx
+<TodaysJourney 
+  milestones={dailySummary.milestones} 
+  onTaskComplete={handleTaskComplete}
+/>
+```
+
+---
+
+### **Task 6: Populate Recent Activity Feed**
+
+**File:** `client/src/components/dashboard/RecentLogsList.tsx`
+
+**What to do:**
+1. Show last 3-5 logs (food + activity)
+2. Each log should display:
+   - Time ago (e.g., "2 hours ago")
+   - Log summary (e.g., "🍎 Logged apple")
+   - XP earned (e.g., "+10 XP")
+   - Preview of AI feedback (first 60 characters)
+3. If no logs today, show encouraging empty state with Sunny Slice
+
+**Improve RecentLogsList component:**
+```tsx
+interface Log {
+  id: string;
+  type: 'food' | 'activity';
+  summary: string;
+  ts: string;
+  xpAwarded?: number;
+  feedback?: string;
+}
+
+interface RecentLogsListProps {
+  logs: Log[];
+}
+
+function RecentLogsList({ logs }: RecentLogsListProps) {
+  const getTimeAgo = (timestamp: string) => {
+    const now = new Date();
+    const logTime = new Date(timestamp);
+    const diffMs = now.getTime() - logTime.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return 'Earlier';
+  };
+
+  const getIcon = (type: string) => {
+    return type === 'food' ? '🍽️' : '🏃';
+  };
+
+  if (!logs || logs.length === 0) {
+    return (
+      <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-8 text-center">
+        <div className="text-6xl mb-3">📝</div>
+        <h3 className="text-lg font-bold text-gray-900 mb-2">
+          No activity yet today
+        </h3>
+        <p className="text-gray-600 text-sm mb-4">
+          Tap the buttons below to log your first meal or activity!
+        </p>
+        <div className="flex justify-center">
+          <img 
+            src={sunnySliceImage} 
+            alt="Sunny Slice" 
+            className="w-20 h-20 animate-subtle-bounce"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+      
+      <div className="space-y-3">
+        {logs.slice(0, 5).map((log) => (
+          <div 
+            key={log.id}
+            className="bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-orange-200 hover:shadow-md transition-all duration-200"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl">{getIcon(log.type)}</span>
+                <div>
+                  <p className="font-semibold text-gray-900">{log.summary}</p>
+                  <p className="text-xs text-gray-500">{getTimeAgo(log.ts)}</p>
+                </div>
+              </div>
+              
+              {log.xpAwarded && (
+                <div className="bg-orange-100 px-3 py-1 rounded-full">
+                  <span className="text-orange-600 font-bold text-sm">
+                    +{log.xpAwarded} XP
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* AI Feedback Preview */}
+            {log.feedback && (
+              <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <p className="text-sm text-gray-700">
+                  💬 {log.feedback.substring(0, 100)}
+                  {log.feedback.length > 100 && '...'}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### **Task 7: Overall UI Polish & Visual Improvements**
+
+**Files:** 
+- `client/src/pages/DashboardV2.tsx`
+- `client/src/index.css` (global styles)
+
+**What to do:**
+
+#### **7.1 Improve Spacing & Layout**
+- Add consistent padding/margins (use 4, 6, 8 px increments)
+- Increase white space between major sections
+- Make cards feel more spacious with better padding
+
+```tsx
+// Add to main container
+<main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
+  {/* All dashboard sections */}
+</main>
+```
+
+#### **7.2 Improve Color Consistency**
+- Primary orange: `#FF6A00`
+- Secondary orange: `#FFB366`
+- Success green: `#4CAF50`
+- Background: White or very light orange tints
+- Cards: White with subtle borders
+
+```css
+/* Add to index.css */
+:root {
+  --bb-primary: #FF6A00;
+  --bb-primary-light: #FFB366;
+  --bb-success: #4CAF50;
+  --bb-background: #FFFBF7;
+}
+```
+
+#### **7.3 Add Micro-Interactions**
+- Buttons scale on hover: `hover:scale-105`
+- Cards lift on hover: `hover:shadow-lg`
+- Smooth transitions: `transition-all duration-200`
+
+```tsx
+// Example button style
+<button className="
+  px-6 py-3 
+  bg-gradient-to-r from-orange-500 to-orange-600 
+  text-white font-bold rounded-xl
+  hover:from-orange-600 hover:to-orange-700
+  hover:scale-105 hover:shadow-lg
+  active:scale-95
+  transition-all duration-200
+">
+  Log Your First Meal
+</button>
+```
+
+#### **7.4 Improve Typography**
+- Headers: Bold, dark gray `text-gray-900 font-bold`
+- Body: Medium weight, slightly lighter `text-gray-700 font-medium`
+- Small text: `text-sm text-gray-600`
+- XP/numbers: Orange bold `text-orange-600 font-bold`
+
+#### **7.5 Add Loading States**
+- Show skeleton screens while loading
+- Use shimmer effect for better UX
+
+```tsx
+// Improve DashboardSkeleton
+function DashboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-white animate-pulse">
+      <div className="h-48 bg-gradient-to-b from-purple-300 to-purple-400" />
+      <div className="px-4 py-6 space-y-6">
+        <div className="h-32 bg-gray-200 rounded-2xl" />
+        <div className="h-48 bg-gray-200 rounded-2xl" />
+        <div className="h-64 bg-gray-200 rounded-2xl" />
+      </div>
+    </div>
+  );
+}
+```
+
+#### **7.6 Add Smooth Scroll & Page Transitions**
+```css
+/* Add to index.css */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+```
+
+#### **7.7 Improve Badge Display**
+Make badges more prominent with better visuals:
+
+```tsx
+// In BadgesShelf component
+<div className="grid grid-cols-4 gap-3">
+  {badges.map((badge) => (
+    <div 
+      key={badge.code}
+      className={`
+        aspect-square flex flex-col items-center justify-center
+        rounded-2xl border-2 p-3 transition-all duration-300
+        ${badge.earned 
+          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 shadow-md' 
+          : 'bg-gray-50 border-gray-200 opacity-50'
+        }
+        hover:scale-105 cursor-pointer
+      `}
+    >
+      <span className="text-3xl mb-1">{badge.emoji}</span>
+      <span className="text-xs font-semibold text-gray-700 text-center">
+        {badge.name}
+      </span>
+    </div>
+  ))}
+</div>
+```
+
+#### **7.8 Improve XP Progress Bar**
+Make it more visual and satisfying:
+
+```tsx
+// In XPDayRing or equivalent
+<div className="space-y-2">
+  <div className="flex justify-between items-center">
+    <span className="text-sm font-semibold text-gray-700">Daily XP Goal</span>
+    <span className="text-sm font-bold text-orange-600">
+      {dailySummary.xp_today} / {dailySummary.xp_goal} XP
+    </span>
+  </div>
+  
+  <div className="h-4 bg-gray-100 rounded-full overflow-hidden relative">
+    <div 
+      className="h-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 transition-all duration-700 ease-out relative"
+      style={{ width: `${Math.min((dailySummary.xp_today / dailySummary.xp_goal) * 100, 100)}%` }}
+    >
+      {/* Shimmer effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer" />
+    </div>
+  </div>
+</div>
+```
+
+**Add shimmer animation:**
+```css
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+```
+
+---
+
+### **Task 8: Add Quick Action Buttons Polish**
+
+**File:** `client/src/components/dashboard/QuickLogGrid.tsx`
+
+**What to do:**
+1. Make food/activity quick log buttons larger and more tappable
+2. Add haptic feedback feel with animations
+3. Show recently logged items at top
+
+```tsx
+function QuickLogGrid() {
+  const [, setLocation] = useLocation();
+
+  const quickActions = [
+    { emoji: '🍎', label: 'Apple', type: 'food' },
+    { emoji: '🥦', label: 'Broccoli', type: 'food' },
+    { emoji: '🍞', label: 'Bread', type: 'food' },
+    { emoji: '🧃', label: 'Juice', type: 'food' },
+    { emoji: '⚽', label: 'Soccer', type: 'activity' },
+    { emoji: '🧘', label: 'Yoga', type: 'activity' },
+    { emoji: '🏃', label: 'Running', type: 'activity' },
+    { emoji: '🏀', label: 'Practice', type: 'activity' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-bold text-gray-900">Quick Log</h3>
+      <p className="text-sm text-gray-600">Tap, snap, go!</p>
+
+      {/* Food Section */}
+      <div>
+        <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Food</p>
+        <div className="grid grid-cols-4 gap-3">
+          {quickActions.filter(a => a.type === 'food').map((action) => (
+            <button
+              key={action.label}
+              onClick={() => {
+                // Quick log logic here
+                console.log('Quick log:', action.label);
+              }}
+              className="
+                aspect-square flex flex-col items-center justify-center
+                bg-white border-2 border-gray-200 rounded-2xl
+                hover:border-orange-400 hover:bg-orange-50
+                active:scale-95 active:shadow-inner
+                transition-all duration-200
+                min-h-[68px]
+              "
+            >
+              <span className="text-3xl mb-1">{action.emoji}</span>
+              <span className="text-xs font-medium text-gray-700">{action.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Activity Section */}
+      <div>
+        <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Activity</p>
+        <div className="grid grid-cols-4 gap-3">
+          {quickActions.filter(a => a.type === 'activity').map((action) => (
+            <button
+              key={action.label}
+              onClick={() => {
+                console.log('Quick log:', action.label);
+              }}
+              className="
+                aspect-square flex flex-col items-center justify-center
+                bg-white border-2 border-gray-200 rounded-2xl
+                hover:border-orange-400 hover:bg-orange-50
+                active:scale-95 active:shadow-inner
+                transition-all duration-200
+                min-h-[68px]
+              "
+            >
+              <span className="text-3xl mb-1">{action.emoji}</span>
+              <span className="text-xs font-medium text-gray-700">{action.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Full Log Buttons */}
+      <div className="flex flex-col gap-2 pt-2">
+        <button 
+          onClick={() => setLocation('/food-log')}
+          className="
+            w-full py-3 px-4
+            bg-gradient-to-r from-orange-500 to-orange-600
+            text-white font-bold rounded-xl
+            hover:from-orange-600 hover:to-orange-700
+            hover:shadow-lg
+            active:scale-98
+            transition-all duration-200
+            flex items-center justify-center space-x-2
+          "
+        >
+          <span>🍽️</span>
+          <span>LOG YOUR MEAL</span>
+        </button>
+        
+        <button 
+          onClick={() => setLocation('/activity-log')}
+          className="
+            w-full py-3 px-4
+            bg-white border-2 border-orange-500
+            text-orange-600 font-bold rounded-xl
+            hover:bg-orange-50
+            active:scale-98
+            transition-all duration-200
+            flex items-center justify-center space-x-2
+          "
+        >
+          <span>🏃</span>
+          <span>LOG ACTIVITY</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 📱 Testing Checklist
+
+After implementing all changes, test these scenarios:
+
+### **Visual Tests:**
+- [ ] Greeting shows correct time-based message (morning/afternoon/evening)
+- [ ] Date displays correctly
+- [ ] Hearts (3-5) visible in header
+- [ ] Sunny Slice mascot visible and bouncing gently
+- [ ] XP progress bar fills smoothly
+- [ ] Streak flame icon shows correct number
+- [ ] Cards have consistent spacing and shadows
+
+### **Interaction Tests:**
+- [ ] Clicking quick log buttons shows feedback
+- [ ] Hovering over cards shows lift effect
+- [ ] Buttons scale on press
+- [ ] Smooth scrolling works throughout page
+
+### **Animation Tests:**
+- [ ] XP burst shows when task completed (+10 XP floats up)
+- [ ] Mascot celebrates when daily goal reached
+- [ ] Confetti appears on goal completion
+- [ ] Daily Journey checkboxes animate when checked
+- [ ] Progress bars animate smoothly
+
+### **Functional Tests:**
+- [ ] Daily Journey auto-completes when user logs matching items
+- [ ] Recent Activity shows last 3-5 logs
+- [ ] Empty state shows when no logs exist
+- [ ] All links/buttons navigate correctly
+- [ ] Data refreshes every 30 seconds
+
+### **Responsive Tests:**
+- [ ] Layout works on mobile (375px width)
+- [ ] Layout works on tablet (768px width)
+- [ ] Layout works on desktop (1024px+ width)
+- [ ] Touch targets are at least 44x44px
+
+---
+
+## 🎨 Design Reference
+
+**Inspiration:** Duolingo dashboard
+- Clean white background
+- Pops of color (orange/green)
+- Generous spacing
+- Friendly rounded corners
+- Clear visual hierarchy
+- Satisfying micro-interactions
+
+**Key Principles:**
+1. **Clarity:** User should immediately see their progress
+2. **Motivation:** Visual feedback for every action
+3. **Personality:** Mascot brings warmth and fun
+4. **Simplicity:** Don't overwhelm with too much info at once
+
+---
+
+## 🚀 Deployment
+
+After completing all tasks:
+1. Test thoroughly on mobile device (primary platform)
+2. Take before/after screenshots
+3. Record 30-second video walkthrough
+4. Deploy to production
+5. Share with first test users for feedback
+
+---
+
+## ✅ Success Criteria
+
+Dashboard polish is complete when:
+- [ ] User sees personalized greeting every time they open app
+- [ ] Sunny Slice mascot feels alive with personality
+- [ ] Every action gives satisfying visual feedback
+- [ ] Daily Journey automatically tracks progress
+- [ ] Recent Activity shows meaningful log history
+- [ ] Overall UI feels polished, not rushed
+- [ ] First-time users say "wow, this looks professional!"
+
+---
+
+## 📚 Additional Resources
+
+**Import statements you'll need:**
+```tsx
+import sunnySliceImage from "@assets/Mascots/SunnySlice.png";
+import sunnyCelebrateImage from "@assets/Mascots/sunny_celebrate.png";
+```
+
+**Tailwind classes reference:**
+- Spacing: `space-y-4`, `gap-3`, `p-6`, `px-4`, `py-3`
+- Colors: `bg-orange-500`, `text-orange-600`, `border-orange-200`
+- Rounded: `rounded-xl`, `rounded-2xl`, `rounded-full`
+- Shadow: `shadow-md`, `shadow-lg`, `drop-shadow-lg`
+- Transitions: `transition-all duration-200`, `ease-in-out`
+- Hover: `hover:scale-105`, `hover:shadow-lg`, `hover:bg-orange-50`
+- Active: `active:scale-95`, `active:shadow-inner`
+
+**Animation timings:**
+- Quick feedback: 200ms
+- Smooth transitions: 300ms
+- Satisfying reveals: 500ms
+- Celebrations: 1500ms
+
+---
+
+## 🎯 Priority Order (if short on time)
+
+1. **Critical (Must Have):**
+   - Greeting header
+   - Mascot prominence
+   - Daily Journey auto-complete
+   - Recent Activity population
+
+2. **High (Should Have):**
+   - Hearts display
+   - XP burst animation
+   - Improved spacing/colors
+   - Badge display polish
+
+3. **Nice to Have:**
+   - Advanced micro-interactions
+   - Shimmer effects
+   - Elaborate empty states
+   - Complex animations
+
+---
+
+## 💡 Tips for Implementation
+
+1. **Work incrementally:** Implement one section at a time, test, commit
+2. **Use existing components:** Don't rebuild from scratch if components exist
+3. **Test on real device:** Mobile experience is #1 priority
+4. **Get feedback early:** Show progress after Task 3 or 4
+5. **Don't over-engineer:** Simple, working animations > complex, buggy ones
+6. **Prioritize performance:** Smooth 60fps animations matter more than fancy effects
+
+---
+
+## 🔥 Let's Build!
+
+This dashboard will be the first thing users see every day. Make it delightful! 🎉
+
+**Estimated Time:** 4-6 hours for full implementation
+**Week 1 Goal:** Have this completed by Friday Jan 30
+
+Good luck! 🍊✨
