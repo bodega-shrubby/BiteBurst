@@ -41,10 +41,13 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 - Interactive selection interface with personalized messaging
 - Goal-based content customization and feedback
 
-### 3. Food/Activity Logging Interface
-- **Emoji Bubble Selection**: Quick food logging through emoji interactions
-- **Text Input System**: Detailed manual entry for foods and activities
-- **Photo Upload**: Camera integration with Base64 conversion for image processing
+### 3. Meal-Based Food Logging System
+- **3-Step Flow**: Meal Type → Categories → Items (matches how kids think about eating)
+- **Meal Types**: Breakfast, Lunch, Dinner, Snack with time-based recommendations
+- **Multi-Category Support**: Add items from multiple categories (fruits + dairy + drinks) in one meal
+- **Running Total Display**: Shows all selected items and XP preview throughout flow
+- **Text Input Fallback**: Available as alternative for foods not in emoji list
+- **Touch-Optimized**: 72px+ touch targets for items, smooth framer-motion transitions
 - **Activity Selection**: Sports, meditation, and movement tracking
 
 ### 4. Gamification Engine
@@ -108,6 +111,21 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 - **OpenAI API Key**: For AI-powered feedback generation
 
 ## Changelog
+
+- January 27, 2026: **Meal-Based Food Logging System**
+  - Implemented 3-step flow: Meal Type → Categories → Items
+  - New TypeScript architecture:
+    - `client/src/types/food-logging.ts` - FoodItem, MealType, MealLog interfaces
+    - `client/src/constants/food-data.ts` - MEAL_TYPES, FOOD_CATEGORIES, FOOD_ITEMS with XP values
+    - `client/src/hooks/useFoodLogging.ts` - State management for multi-step flow
+  - New components:
+    - `MealTypeScreen.tsx` - Step 1 with time-based "Right now!" recommendations
+    - `CategoryScreen.tsx` - Step 2 with meal summary card and category grid
+    - `ItemSelectionScreen.tsx` - Step 3 with multi-select and running total
+    - `FoodLogBreadcrumb.tsx` - Navigation context (Breakfast > Fruits)
+    - `MealSummaryCard.tsx` - Running total of items and XP
+  - Features: Multi-category support, mealType in submission payload, text input clears selections
+  - UI: 72px touch targets, green checkmark animations, smooth framer-motion transitions
 
 - January 25, 2026: **Parent-First Onboarding Flow with Curriculum Selection**
   - Implemented parent-first authentication architecture:
