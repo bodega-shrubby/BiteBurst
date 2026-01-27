@@ -1,9 +1,16 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 
+interface RecentLogItem {
+  emoji: string;
+  label: string;
+  type: 'food' | 'activity';
+}
+
 interface QuickLogGridProps {
   className?: string;
   isFirstTimeUser?: boolean;
+  recentLogs?: RecentLogItem[];
 }
 
 const FOOD_OPTIONS = [
@@ -20,7 +27,7 @@ const ACTIVITY_OPTIONS = [
   { emoji: '🎯', label: 'Practice', query: 'drills' }
 ];
 
-export default function QuickLogGrid({ className = '', isFirstTimeUser = false }: QuickLogGridProps) {
+export default function QuickLogGrid({ className = '', isFirstTimeUser = false, recentLogs = [] }: QuickLogGridProps) {
   const [, setLocation] = useLocation();
   
   const TileButton = ({ 
@@ -70,6 +77,27 @@ export default function QuickLogGrid({ className = '', isFirstTimeUser = false }
         <h3 className="text-xl font-bold text-black mb-3">Quick Log</h3>
         <p className="text-sm text-gray-600 mb-4">Tap, snap, go!</p>
       </div>
+      
+      {/* Recently Logged Row */}
+      {recentLogs.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+            <span>🕐</span>
+            <span>Recently Logged</span>
+          </h4>
+          <div className="relative flex gap-3 overflow-x-auto pb-2">
+            {recentLogs.slice(0, 3).map((item, index) => (
+              <TileButton
+                key={`recent-${index}`}
+                emoji={item.emoji}
+                label={item.label}
+                query={item.label.toLowerCase()}
+                type={item.type}
+              />
+            ))}
+          </div>
+        </div>
+      )}
       
       {/* Food Row */}
       <div className="space-y-3">

@@ -440,7 +440,14 @@ export default function DashboardV2() {
 
         {/* 3. Quick Log Grid - Easy Logging */}
         <div className="relative z-50 bg-white rounded-2xl border border-gray-200 p-6">
-          <QuickLogGrid isFirstTimeUser={dailySummary.recent_logs.length === 0} />
+          <QuickLogGrid 
+            isFirstTimeUser={dailySummary.recent_logs.length === 0} 
+            recentLogs={dailySummary.recent_logs.slice(0, 3).map(log => ({
+              emoji: log.type === 'food' ? '🍽️' : '🏃',
+              label: log.summary.split(' ').slice(0, 2).join(' '),
+              type: log.type
+            }))}
+          />
         </div>
 
         {/* Invite Button */}
