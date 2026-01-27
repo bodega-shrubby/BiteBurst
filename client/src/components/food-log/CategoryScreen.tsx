@@ -3,12 +3,13 @@ import { ChevronLeft, MessageSquare } from 'lucide-react';
 import { FOOD_CATEGORIES } from '@/constants/food-data';
 import FoodLogBreadcrumb from './FoodLogBreadcrumb';
 import MealSummaryCard from './MealSummaryCard';
-import { FoodItem } from '@/types/food-logging';
+import { FoodItem, MealLog } from '@/types/food-logging';
 
 interface CategoryScreenProps {
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   selectedItems: FoodItem[];
   totalXP: number;
+  currentMealState: MealLog;
   onSelectCategory: (categoryId: string) => void;
   onBack: () => void;
   onFinish: () => void;
@@ -19,12 +20,17 @@ export default function CategoryScreen({
   mealType, 
   selectedItems, 
   totalXP,
+  currentMealState,
   onSelectCategory, 
   onBack,
   onFinish,
   onTextInput
 }: CategoryScreenProps) {
   const mealName = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+
+  const getCategoryItemCount = (categoryId: string): number => {
+    return currentMealState.categories[categoryId]?.length || 0;
+  };
 
   return (
     <motion.div
@@ -67,32 +73,52 @@ export default function CategoryScreen({
         )}
 
         <div className="grid grid-cols-2 gap-4">
-          {FOOD_CATEGORIES.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => onSelectCategory(category.id)}
-              className={`
-                flex flex-col items-center justify-center
-                p-6 rounded-2xl
-                bg-gradient-to-br ${category.color}
-                border-2 ${category.borderColor}
-                hover:scale-105 hover:shadow-lg
-                active:scale-95
-                transition-all duration-200
-                min-h-[140px]
-              `}
-            >
-              <span className="text-5xl mb-3">{category.emoji}</span>
-              <span className="text-base font-bold text-gray-900 text-center">
-                {category.name}
-              </span>
-              {category.description && (
-                <span className="text-xs text-gray-600 mt-1">
-                  {category.description}
+          {FOOD_CATEGORIES.map((category) => {
+            const itemCount = getCategoryItemCount(category.id);
+            const hasItems = itemCount > 0;
+
+            return (
+              <button
+                key={category.id}
+                onClick={() => onSelectCategory(category.id)}
+                className={`
+                  relative
+                  flex flex-col items-center justify-center
+                  p-6 rounded-2xl
+                  bg-gradient-to-br ${category.color}
+                  border-2 ${category.borderColor}
+                  hover:scale-105 hover:shadow-xl hover:-translate-y-1
+                  active:scale-95
+                  transition-all duration-200
+                  min-h-[140px]
+                  overflow-hidden
+                `}
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-0 hover:opacity-10 transition-opacity duration-500 pointer-events-none" />
+                
+                {hasItems && (
+                  <div className="absolute -top-2 -right-2 z-10 bg-green-500 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2 border-white">
+                    <span className="text-xs font-bold">{itemCount}</span>
+                  </div>
+                )}
+
+                <span className="text-5xl mb-3">{category.emoji}</span>
+                <span className="text-base font-bold text-gray-900 text-center">
+                  {category.name}
                 </span>
-              )}
-            </button>
-          ))}
+                
+                {hasItems ? (
+                  <span className="text-xs text-green-700 font-semibold mt-1">
+                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                  </span>
+                ) : category.description && (
+                  <span className="text-xs text-gray-600 mt-1">
+                    {category.description}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
@@ -110,7 +136,7 @@ export default function CategoryScreen({
       </div>
 
       {selectedItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20 animate-slide-up-fade">
           <div className="max-w-md mx-auto">
             <button
               onClick={onFinish}

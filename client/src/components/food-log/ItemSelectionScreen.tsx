@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Check, Plus } from 'lucide-react';
 import { FOOD_ITEMS, FOOD_CATEGORIES } from '@/constants/food-data';
@@ -14,6 +14,71 @@ interface ItemSelectionScreenProps {
   onAddMore: () => void;
   onFinish: () => void;
   onBack: () => void;
+}
+
+const MEAL_TIPS = {
+  breakfast: [
+    "Mix colorful foods for maximum nutrition!",
+    "Protein + carbs = lasting energy all morning!",
+    "Don't forget dairy for strong bones!",
+    "Fruit is nature's candy - sweet and healthy!"
+  ],
+  lunch: [
+    "Try to include a veggie in every lunch!",
+    "Water is the best drink for growing kids!",
+    "Eat a rainbow - different colors = different vitamins!",
+    "Balance is key - a bit of everything!"
+  ],
+  dinner: [
+    "Protein helps your muscles grow strong!",
+    "Veggies are superfoods - they make you super!",
+    "Grains give you energy for tomorrow!",
+    "Eating together makes food taste better!"
+  ],
+  snack: [
+    "Fresh fruit is the perfect snack!",
+    "Nuts give you brain power!",
+    "Yogurt is a great between-meal choice!",
+    "Thirsty? Water is always the best!"
+  ]
+};
+
+const CATEGORY_TIPS: Record<string, string> = {
+  fruits: "Fruits are packed with vitamins to keep you healthy!",
+  vegetables: "Veggies make you grow strong and fast!",
+  dairy: "Dairy builds super strong bones!",
+  bread: "Grains give you energy to play and learn!",
+  protein: "Protein builds muscles - you'll be so strong!",
+  drinks: "Water is the best drink for your body!",
+  snacks: "Healthy snacks give you power between meals!"
+};
+
+function MotivationalTip({ mealType, categoryId }: { mealType: string; categoryId: string }) {
+  const categoryTip = CATEGORY_TIPS[categoryId];
+  const mealTips = MEAL_TIPS[mealType as keyof typeof MEAL_TIPS] || MEAL_TIPS.snack;
+  const randomMealTip = useMemo(() => mealTips[Math.floor(Math.random() * mealTips.length)], [mealTips]);
+  
+  const tip = categoryTip || randomMealTip;
+
+  return (
+    <div className="mt-6 mb-4 text-center">
+      <div className="inline-block bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl px-5 py-3 max-w-sm">
+        <div className="flex items-center space-x-3">
+          <div className="flex-shrink-0">
+            <div className="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-lg">💡</span>
+            </div>
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-xs font-bold text-blue-900 mb-0.5">Quick Tip!</p>
+            <p className="text-sm text-gray-700 leading-snug">
+              {tip}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const triggerHaptic = () => {
@@ -102,7 +167,7 @@ export default function ItemSelectionScreen({
                 `}
               >
                 {isSelected && (
-                  <div className="absolute -top-2 -right-2 z-10 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-scale-in">
+                  <div className="absolute -top-2 -right-2 z-10 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-scale-bounce">
                     <Check className="w-4 h-4 text-white" strokeWidth={3} />
                   </div>
                 )}
@@ -120,6 +185,8 @@ export default function ItemSelectionScreen({
           })}
         </div>
 
+        <MotivationalTip mealType={mealType} categoryId={categoryId} />
+
         {items.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 mb-4">No items in this category yet!</p>
@@ -134,7 +201,10 @@ export default function ItemSelectionScreen({
       </div>
 
       {allSelectedItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20">
+        <div 
+          key={`floating-buttons-${allSelectedItems.length}`}
+          className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20 animate-slide-up-fade"
+        >
           <div className="max-w-md mx-auto space-y-3">
             <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
               <div className="flex items-center justify-between mb-3">

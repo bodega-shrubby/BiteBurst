@@ -210,6 +210,7 @@ export default function FoodLogNew() {
             mealType={state.currentMeal.mealType}
             selectedItems={getAllSelectedItems()}
             totalXP={getTotalXP()}
+            currentMealState={state.currentMeal}
             onSelectCategory={selectCategory}
             onBack={() => reset()}
             onFinish={handleFinishLogging}
