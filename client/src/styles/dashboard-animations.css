@@ -280,3 +280,63 @@
 .nav-press {
   animation: nav-press 0.15s ease-out;
 }
+
+/* Sparkle Animations for Badges */
+@keyframes sparkle-1 {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes sparkle-2 {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(-180deg);
+  }
+}
+
+.animate-sparkle-1 {
+  animation: sparkle-1 2s ease-in-out infinite;
+}
+
+.animate-sparkle-2 {
+  animation: sparkle-2 2s ease-in-out infinite 1s;
+}
+
+/* Slow Pulse for Badge Glow */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Safe Area for Navigation */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Subtle Bounce for Mascot */
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-subtle-bounce {
+  animation: subtle-bounce 2s ease-in-out infinite;
+}

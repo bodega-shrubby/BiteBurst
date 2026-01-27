@@ -122,18 +122,99 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
       // Get badges - simplified for MVP
       const userBadges = await storage.getUserBadges(userId);
       
-      const earnedBadges = userBadges.map((ub: any) => ({
-        code: ub.badgeCode,
-        name: ub.badgeCode.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase()),
-        description: `You earned this badge!`
-      }));
+      const earnedBadges = userBadges.map((ub: any) => {
+        const earnedAt = ub.ts || ub.createdAt || ub.earnedAt;
+        const isNew = earnedAt && (Date.now() - new Date(earnedAt).getTime()) < 86400000; // 24 hours
+        return {
+          code: ub.badgeCode,
+          name: ub.badgeCode.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase()),
+          description: `You earned this badge!`,
+          earnedAt: earnedAt ? new Date(earnedAt).toISOString() : null,
+          isNew
+        };
+      });
       
-      // Mock locked badges for now - will be enhanced later
+      // Get all-time logs for badge progress calculation
+      const allTimeLogs = await db
+        .select()
+        .from(logs)
+        .where(eq(logs.userId, userId));
+      
+      // Calculate badge progress for each badge type
+      const fruitEmojis = ['🍎', '🍌', '🍇', '🍓', '🍊', '🫐', '🍉', '🥝', '🍑', '🍒', '🥭', '🍍'];
+      const veggieEmojis = ['🥦', '🥕', '🥬', '🥒', '🌽', '🥗', '🫛', '🧅', '🧄'];
+      
+      const badgeProgress: Record<string, { current: number; total: number }> = {
+        'FIRST_LOG': {
+          current: Math.min(allTimeLogs.length, 1),
+          total: 1
+        },
+        'STREAK_3': {
+          current: Math.min(streakData?.current || 0, 3),
+          total: 3
+        },
+        'STREAK_7': {
+          current: Math.min(streakData?.current || 0, 7),
+          total: 7
+        },
+        'STREAK_30': {
+          current: Math.min(streakData?.current || 0, 30),
+          total: 30
+        },
+        'FRUIT_FIGHTER': {
+          current: allTimeLogs.filter(log => 
+            log.type === 'food' && 
+            log.content && 
+            typeof log.content === 'object' &&
+            (log.content as any).emojis?.some((e: string) => fruitEmojis.includes(e))
+          ).length,
+          total: 10
+        },
+        'VEGGIE_VICTOR': {
+          current: allTimeLogs.filter(log => 
+            log.type === 'food' && 
+            log.content && 
+            typeof log.content === 'object' &&
+            (log.content as any).emojis?.some((e: string) => veggieEmojis.includes(e))
+          ).length,
+          total: 10
+        },
+        'MOVE_MASTER': {
+          current: allTimeLogs.filter(log => log.type === 'activity').length,
+          total: 10
+        },
+        'COMBO_MASTER': {
+          current: (() => {
+            const dateMap = new Map<string, { food: boolean; activity: boolean }>();
+            allTimeLogs.forEach(log => {
+              const date = log.logDate;
+              if (!dateMap.has(date)) {
+                dateMap.set(date, { food: false, activity: false });
+              }
+              const entry = dateMap.get(date)!;
+              if (log.type === 'food') entry.food = true;
+              if (log.type === 'activity') entry.activity = true;
+            });
+            return Array.from(dateMap.values()).filter(d => d.food && d.activity).length;
+          })(),
+          total: 10
+        }
+      };
+      
+      // Locked badges with progress data
       const lockedBadges = [
-        { code: 'STREAK_7', name: 'One Week Streak', description: 'Log for 7 days in a row' },
-        { code: 'STREAK_30', name: 'One Month Streak', description: 'Log for 30 days in a row' },
-        { code: 'COMBO_MASTER', name: 'Combo Master', description: 'Log food and activity on the same day 10 times' }
-      ].filter((badge: any) => !userBadges.some((ub: any) => ub.badgeCode === badge.code));
+        { code: 'STREAK_7', name: 'One Week Streak', description: 'Log for 7 days in a row', emoji: '🔥' },
+        { code: 'STREAK_30', name: 'One Month Streak', description: 'Log for 30 days in a row', emoji: '🔥' },
+        { code: 'FRUIT_FIGHTER', name: 'Fruit Fighter', description: 'Log 10 fruits', emoji: '🍎' },
+        { code: 'VEGGIE_VICTOR', name: 'Veggie Victor', description: 'Log 10 vegetables', emoji: '🥦' },
+        { code: 'MOVE_MASTER', name: 'Move Master', description: 'Log 10 activities', emoji: '🏃' },
+        { code: 'COMBO_MASTER', name: 'Combo Master', description: 'Log food and activity on the same day 10 times', emoji: '⭐' }
+      ]
+        .filter((badge: any) => !userBadges.some((ub: any) => ub.badgeCode === badge.code))
+        .map(badge => ({
+          ...badge,
+          progress: badgeProgress[badge.code] || null
+        }));
       
       // Format recent logs for display
       const recentLogs = todaysLogs

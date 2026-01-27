@@ -1,12 +1,15 @@
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { useLocation } from 'wouter';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 
 interface RecentLog {
   id: string;
   type: 'food' | 'activity';
   summary: string;
+  content?: string;
+  emojis?: string[];
+  durationMin?: number;
   ts: string;
   xpAwarded?: number;
   feedback?: string | null;
@@ -25,36 +28,41 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
     try {
       const date = parseISO(timestamp);
       return formatDistanceToNow(date, { addSuffix: true });
-    } catch (error) {
-      return 'Just now';
+    } catch {
+      return 'Recently';
     }
   };
   
   const getTypeIcon = (type: string) => {
     return type === 'food' ? '🍽️' : '🏃';
   };
-  
-  const SUNNY_MESSAGES = [
-    "I'm so excited to see what yummy things you'll try today!",
-    "Ready to fuel up? Let's log something delicious!",
-    "Every healthy choice makes me so happy! What's on the menu?",
-    "Time to power up! What will you eat or do today?",
-  ];
-  
-  const randomMessage = SUNNY_MESSAGES[Math.floor(Math.random() * SUNNY_MESSAGES.length)];
+
+  const getLogSummary = (log: RecentLog) => {
+    if (log.emojis && log.emojis.length > 0) {
+      return log.emojis.join(' ');
+    }
+    if (log.content) {
+      return log.content.substring(0, 50);
+    }
+    if (log.summary) {
+      return log.summary;
+    }
+    if (log.type === 'activity' && log.durationMin) {
+      return `${log.durationMin} minutes of activity`;
+    }
+    return 'Logged';
+  };
   
   if (!logs || logs.length === 0) {
     return (
-      <div className={`bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-6 ${className}`}>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Today's Activity</h2>
-        <div className="text-center py-6 space-y-3">
-          <div className="text-5xl mb-2 mascot-idle">🍊</div>
-          <h3 className="text-lg font-bold text-gray-900">
-            Hi there, friend!
-          </h3>
-          <p className="text-gray-600 text-sm mb-4 px-4">
-            {randomMessage}
-          </p>
+      <div className={`space-y-4 ${className}`}>
+        <h2 className="text-xl font-bold text-gray-900">Today's Activity</h2>
+        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-8 text-center">
+          <div className="mb-4">
+            <div className="text-6xl animate-subtle-bounce">🍊</div>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No activity yet today</h3>
+          <p className="text-gray-600 text-sm mb-4">Time to fuel up! 🍎</p>
           <div className="flex flex-col gap-2 mt-4">
             <button 
               onClick={() => setLocation('/food-log')}
@@ -89,12 +97,12 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
           return (
             <div 
               key={log.id}
-              className="bg-white border-2 border-gray-200 rounded-xl hover:border-orange-200 hover:shadow-md transition-all duration-200"
+              className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-orange-200 hover:shadow-md transition-all duration-200"
             >
-              {/* Main Log Card - Always Visible */}
               <button
                 onClick={() => hasFeedback && setExpandedLogId(isExpanded ? null : log.id)}
-                className="w-full p-4 text-left min-h-[44px]"
+                className="w-full p-4 text-left"
+                disabled={!hasFeedback}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3 flex-1">
@@ -104,7 +112,7 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
                     
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 text-base">
-                        {log.summary}
+                        {getLogSummary(log)}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         <p className="text-xs text-gray-500">
@@ -113,16 +121,18 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
                         {hasFeedback && (
                           <>
                             <span className="text-gray-300">•</span>
-                            <p className="text-xs text-blue-600 font-medium">
-                              Coach's tip
-                            </p>
+                            <div className="flex items-center space-x-1">
+                              <MessageCircle className="w-3 h-3 text-blue-500" />
+                              <p className="text-xs text-blue-600 font-medium">
+                                Coach's tip
+                              </p>
+                            </div>
                           </>
                         )}
                       </div>
                     </div>
                   </div>
                   
-                  {/* Right Side: XP Badge + Expand Arrow */}
                   <div className="flex items-center space-x-2 ml-2">
                     {log.xpAwarded && log.xpAwarded > 0 && (
                       <div className="bg-orange-100 px-3 py-1.5 rounded-full flex-shrink-0">
@@ -133,7 +143,7 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
                     )}
                     
                     {hasFeedback && (
-                      <div className="flex-shrink-0 min-w-[24px] min-h-[24px] flex items-center justify-center">
+                      <div className="flex-shrink-0">
                         {isExpanded ? (
                           <ChevronUp className="w-5 h-5 text-gray-400" />
                         ) : (
@@ -145,21 +155,18 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
                 </div>
               </button>
 
-              {/* AI Feedback - Expandable */}
               {hasFeedback && isExpanded && (
-                <div className="px-4 pb-4 animate-slide-down">
-                  <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-100">
-                    {/* Coach Header */}
+                <div className="px-4 pb-4">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200 animate-slide-down">
                     <div className="flex items-center space-x-2 mb-3">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-lg">💪</span>
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xl">💪</span>
                       </div>
                       <div>
                         <p className="text-sm font-bold text-gray-900">Coach Flex says:</p>
                       </div>
                     </div>
                     
-                    {/* Feedback Text */}
                     <p className="text-sm text-gray-700 leading-relaxed">
                       {log.feedback}
                     </p>
@@ -171,10 +178,9 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
         })}
       </div>
 
-      {/* Show More Button */}
       {logs.length > 5 && (
         <button 
-          onClick={() => setLocation('/logs')}
+          onClick={() => setLocation('/activity-history')}
           className="w-full py-3 text-orange-600 font-semibold rounded-xl border-2 border-orange-200 hover:bg-orange-50 transition-colors min-h-[44px]"
         >
           View all {logs.length} logs →

@@ -1,208 +1,149 @@
-import { useLocation } from 'wouter';
-import { useState, MouseEvent as ReactMouseEvent } from 'react';
 import { Home, BookOpen, Trophy, Medal, Plus } from 'lucide-react';
-import { triggerHaptic } from './RippleButton';
+import { useLocation } from 'wouter';
 
-interface BottomNavigationProps {
-  className?: string;
+interface NavItem {
+  id: string;
+  label: string;
+  icon: typeof Home;
+  path: string;
+  color: 'orange' | 'green' | 'purple' | 'yellow';
 }
 
-const NAV_COLORS = {
-  home: { bg: '#FF6A00', light: '#FFF7ED' },
-  lessons: { bg: '#22C55E', light: '#F0FDF4' },
-  achievements: { bg: '#A855F7', light: '#FAF5FF' },
-  champs: { bg: '#EAB308', light: '#FEFCE8' },
+const NAV_ITEMS = {
+  left: [
+    { id: 'home', label: 'Home', icon: Home, path: '/dashboard', color: 'orange' as const }
+  ],
+  right: [
+    { id: 'lesson', label: 'Learn', icon: BookOpen, path: '/lessons', color: 'green' as const },
+    { id: 'achievements', label: 'Badges', icon: Trophy, path: '/achievements', color: 'purple' as const },
+    { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard', color: 'yellow' as const }
+  ]
 };
 
-interface Ripple {
-  x: number;
-  y: number;
-  id: number;
-}
+const COLOR_THEMES = {
+  orange: {
+    active: 'bg-orange-100',
+    text: 'text-orange-600',
+    icon: 'text-orange-600',
+    inactive: 'text-gray-400',
+    dot: 'bg-orange-600'
+  },
+  green: {
+    active: 'bg-green-100',
+    text: 'text-green-600',
+    icon: 'text-green-600',
+    inactive: 'text-gray-400',
+    dot: 'bg-green-600'
+  },
+  purple: {
+    active: 'bg-purple-100',
+    text: 'text-purple-600',
+    icon: 'text-purple-600',
+    inactive: 'text-gray-400',
+    dot: 'bg-purple-600'
+  },
+  yellow: {
+    active: 'bg-yellow-100',
+    text: 'text-yellow-600',
+    icon: 'text-yellow-600',
+    inactive: 'text-gray-400',
+    dot: 'bg-yellow-600'
+  }
+};
 
-export default function BottomNavigation({ className = '' }: BottomNavigationProps) {
+export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
-  const [pressedId, setPressedId] = useState<string | null>(null);
-  const [ripples, setRipples] = useState<(Ripple & { buttonId: string })[]>([]);
-  
-  const navItems = [
-    {
-      id: 'home',
-      label: 'Home',
-      icon: Home,
-      path: '/dashboard',
-      color: NAV_COLORS.home,
-      isActive: location === '/dashboard' || location === '/home'
-    },
-    {
-      id: 'lessons',
-      label: 'Learn',
-      icon: BookOpen,
-      path: '/lessons',
-      color: NAV_COLORS.lessons,
-      isActive: location === '/lessons' || location.startsWith('/lesson/')
-    },
-    {
-      id: 'log',
-      label: 'Log',
-      icon: Plus,
-      path: '/food-log',
-      color: NAV_COLORS.home,
-      isActive: location.includes('/log'),
-      isHero: true
-    },
-    {
-      id: 'achievements',
-      label: 'Badges',
-      icon: Medal,
-      path: '/achievements',
-      color: NAV_COLORS.achievements,
-      isActive: location === '/achievements'
-    },
-    {
-      id: 'champs',
-      label: 'Champs',
-      icon: Trophy,
-      path: '/leaderboard',
-      color: NAV_COLORS.champs,
-      isActive: location === '/leaderboard'
+
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return location === '/' || location === '/dashboard' || location === '/home';
     }
-  ];
-  
-  const handleNavPress = (item: typeof navItems[0], e: ReactMouseEvent<HTMLButtonElement>) => {
-    setPressedId(item.id);
-    triggerHaptic('light');
-    
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const newRipple = { x, y, id: Date.now(), buttonId: item.id };
-    setRipples(prev => [...prev, newRipple]);
-    
-    setTimeout(() => {
-      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
-    }, 600);
-    
-    setTimeout(() => {
-      setPressedId(null);
-      setLocation(item.path);
-    }, 100);
+    return location.startsWith(path);
   };
-  
+
+  const NavButton = ({ item }: { item: NavItem }) => {
+    const active = isActive(item.path);
+    const Icon = item.icon;
+    const colors = COLOR_THEMES[item.color];
+
+    return (
+      <button
+        onClick={() => setLocation(item.path)}
+        className={`
+          relative flex flex-col items-center justify-center
+          px-3 py-2 rounded-2xl min-w-[64px]
+          transition-all duration-200
+          ${active 
+            ? `${colors.active} scale-110 shadow-lg` 
+            : 'hover:bg-gray-50 scale-100'
+          }
+          active:scale-95
+        `}
+        aria-label={item.label}
+      >
+        {active && (
+          <div className="absolute -top-1 left-1/2 transform -translate-x-1/2">
+            <div className={`w-1.5 h-1.5 rounded-full ${colors.dot} animate-pulse`} />
+          </div>
+        )}
+
+        <Icon 
+          className={`
+            transition-all duration-200
+            ${active ? `w-7 h-7 ${colors.icon}` : `w-6 h-6 ${colors.inactive}`}
+          `}
+          strokeWidth={active ? 3 : 2}
+        />
+        <span className={`
+          text-xs mt-1 transition-all duration-200
+          ${active ? `font-bold ${colors.text}` : 'font-medium text-gray-500'}
+        `}>
+          {item.label}
+        </span>
+      </button>
+    );
+  };
+
+  const isLogActive = location.includes('/log') || location === '/food-log' || location === '/activity-log';
+
   return (
-    <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 safe-area-bottom ${className}`}>
-      <div className="max-w-md mx-auto">
-        <nav className="grid grid-cols-5 px-2 py-2 items-end">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isPressed = pressedId === item.id;
-            
-            const buttonRipples = ripples.filter(r => r.buttonId === item.id);
-            
-            if (item.isHero) {
-              return (
-                <button
-                  key={item.id}
-                  onClick={(e) => handleNavPress(item, e)}
-                  className={`
-                    flex flex-col items-center justify-center -mt-6 relative overflow-visible
-                    transition-all duration-200
-                    ${isPressed ? 'scale-90' : 'hover:scale-110'}
-                  `}
-                  aria-label={item.label}
-                  data-testid={`nav-${item.id}`}
-                >
-                  <div className={`
-                    w-14 h-14 rounded-full flex items-center justify-center relative overflow-hidden
-                    bg-gradient-to-br from-orange-400 to-orange-600
-                    shadow-lg shadow-orange-300/50
-                    border-4 border-white
-                    transition-transform duration-150
-                    ${isPressed ? 'scale-90' : ''}
-                    ${item.isActive ? 'ring-4 ring-orange-200' : ''}
-                  `}>
-                    <Icon className="w-7 h-7 text-white stroke-[2.5]" />
-                    {buttonRipples.map((ripple) => (
-                      <span
-                        key={ripple.id}
-                        className="absolute bg-white/40 rounded-full animate-ripple pointer-events-none"
-                        style={{
-                          left: '50%',
-                          top: '50%',
-                          width: 20,
-                          height: 20,
-                          transform: 'translate(-50%, -50%)',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs font-bold text-orange-600 mt-1">
-                    {item.label}
-                  </span>
-                </button>
-              );
-            }
-            
-            return (
-              <button
-                key={item.id}
-                onClick={(e) => handleNavPress(item, e)}
-                className={`
-                  flex flex-col items-center justify-center space-y-1 py-2 px-1 rounded-xl relative overflow-hidden
-                  transition-all duration-200 min-h-[56px] w-full
-                  ${isPressed ? 'scale-90' : ''}
-                  ${item.isActive 
-                    ? 'bg-opacity-100' 
-                    : 'hover:bg-gray-50'
-                  }
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
-                `}
-                style={item.isActive ? { backgroundColor: item.color.light } : {}}
-                aria-label={item.label}
-                data-testid={`nav-${item.id}`}
-              >
-                {buttonRipples.map((ripple) => (
-                  <span
-                    key={ripple.id}
-                    className="absolute bg-gray-400/30 rounded-full animate-ripple pointer-events-none"
-                    style={{
-                      left: ripple.x,
-                      top: ripple.y,
-                      width: 20,
-                      height: 20,
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                  />
-                ))}
-                <div className={`
-                  p-2 rounded-xl transition-all duration-200
-                  ${item.isActive ? '' : ''}
-                `}
-                style={item.isActive ? { backgroundColor: item.color.bg } : {}}
-                >
-                  <Icon 
-                    className={`w-6 h-6 transition-all duration-200 ${
-                      item.isActive 
-                        ? 'text-white scale-110' 
-                        : 'text-gray-500'
-                    }`}
-                    strokeWidth={item.isActive ? 2.5 : 2}
-                  />
-                </div>
-                <span 
-                  className={`text-xs font-semibold transition-colors ${
-                    item.isActive ? 'font-bold' : 'text-gray-600'
-                  }`}
-                  style={item.isActive ? { color: item.color.bg } : {}}
-                >
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50 pb-safe">
+      <div className="max-w-md mx-auto relative flex items-center justify-between px-4 h-20">
+        
+        <div className="flex items-center space-x-2">
+          {NAV_ITEMS.left.map((item) => (
+            <NavButton key={item.id} item={item} />
+          ))}
+        </div>
+
+        <button
+          onClick={() => setLocation('/food-log')}
+          className={`
+            absolute left-1/2 transform -translate-x-1/2 -top-8
+            flex flex-col items-center justify-center
+            w-16 h-16
+            bg-gradient-to-br from-orange-500 to-orange-600
+            rounded-2xl
+            shadow-2xl shadow-orange-300
+            hover:scale-110 hover:from-orange-600 hover:to-orange-700
+            active:scale-95
+            transition-all duration-200
+            border-4 border-white
+            ${isLogActive ? 'ring-4 ring-orange-200' : ''}
+          `}
+          aria-label="Log food or activity"
+        >
+          <Plus className="w-8 h-8 text-white" strokeWidth={3} />
+          <span className="text-[10px] font-bold text-white mt-0.5">LOG</span>
+        </button>
+
+        <div className="flex items-center space-x-2">
+          {NAV_ITEMS.right.map((item) => (
+            <NavButton key={item.id} item={item} />
+          ))}
+        </div>
+
       </div>
-    </div>
+    </nav>
   );
 }
