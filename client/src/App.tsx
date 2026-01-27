@@ -10,6 +10,7 @@ import DashboardV2 from "@/pages/DashboardV2";
 import FoodLog from "@/pages/FoodLog";
 import FoodLogNew from "@/pages/FoodLogNew";
 import ActivityLog from "@/pages/ActivityLog";
+import ActivityLogNew from "@/pages/ActivityLogNew";
 import Success from "@/pages/Success";
 import Feedback from "@/pages/Feedback";
 import Leaderboard from "@/pages/Leaderboard";
@@ -77,7 +78,7 @@ function Router() {
       <Route path="/home" component={DashboardV2} />
       <Route path="/dashboard-v1" component={Dashboard} />
       <Route path="/food-log" component={FoodLogNew} />
-      <Route path="/activity-log" component={ActivityLog} />
+      <Route path="/activity-log" component={ActivityLogNew} />
       <Route path="/success" component={Success} />
       <Route path="/feedback" component={Feedback} />
       <Route path="/leaderboard" component={Leaderboard} />
