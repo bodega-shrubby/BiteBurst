@@ -1,4 +1,5 @@
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import { useLocation } from 'wouter';
 
 interface RecentLog {
   id: string;
@@ -15,6 +16,8 @@ interface RecentLogsListProps {
 }
 
 export default function RecentLogsList({ logs, className = '' }: RecentLogsListProps) {
+  const [, setLocation] = useLocation();
+  
   const getTimeAgo = (timestamp: string) => {
     try {
       const date = parseISO(timestamp);
@@ -55,13 +58,13 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
           </p>
           <div className="flex flex-col gap-2 mt-4">
             <button 
-              onClick={() => window.location.href = '/food-log'}
+              onClick={() => setLocation('/food-log')}
               className="px-4 py-3 bg-[#FF6A00] text-white rounded-xl font-bold hover:bg-[#E55A00] transition-colors min-h-[48px] pulse-cta"
             >
               🍎 Log Your First Meal
             </button>
             <button 
-              onClick={() => window.location.href = '/activity-log'}
+              onClick={() => setLocation('/activity-log')}
               className="px-4 py-3 border-2 border-[#FF6A00] text-[#FF6A00] rounded-xl font-bold hover:bg-orange-50 transition-colors min-h-[48px]"
             >
               ⚽ Log Your First Activity
@@ -127,8 +130,8 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
       {logs.length >= 3 && (
         <div className="mt-4 text-center">
           <button 
-            onClick={() => window.location.href = '/logs'}
-            className="text-sm text-[#FF6A00] font-bold hover:text-[#E55A00] transition-colors"
+            onClick={() => setLocation('/logs')}
+            className="text-sm text-[#FF6A00] font-bold hover:text-[#E55A00] transition-colors min-h-[44px] min-w-[44px] px-4 py-2"
           >
             View all activity →
           </button>
