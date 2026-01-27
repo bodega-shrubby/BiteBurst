@@ -1,0 +1,1283 @@
+# 🏃‍♂️ BiteBurst Activity Logging - Complete Implementation
+
+## 📋 Overview
+This prompt implements **activity logging** following the exact same UI/UX pattern as food logging. Users select Time Period → Activity Type → Duration, with all the same polish and features.
+
+**Architecture:** Time Periods (Morning/Afternoon/Evening) → Activity Types → Duration Selection
+
+---
+
+## 🎯 Goals - Complete Activity Logging System
+
+### **CORE FLOW (3 screens):**
+1. ✅ Time Period Selection (Morning/Afternoon/Evening/Anytime)
+2. ✅ Activity Type Selection (multi-select support)
+3. ✅ Duration Input (quick presets + custom)
+
+### **FEATURES (matching food logging):**
+4. ✅ Smart Time-Based Period Recommendations
+5. ✅ Multi-Activity Support (log multiple activities in one session)
+6. ✅ Running Total Display (activities + XP preview)
+7. ✅ Breadcrumb Navigation (Morning > Soccer)
+8. ✅ Smooth Transitions Between Screens
+9. ✅ Activity Balance Indicator (types of movement)
+10. ✅ Visit Count Badges (which types logged)
+11. ✅ Motivational Tips (fitness education)
+12. ✅ Slide-Up Button Animation
+
+---
+
+## 🗂️ File Structure
+
+```
+client/src/pages/
+  ActivityLogNew.tsx              (Main flow orchestrator)
+
+client/src/components/activity-log/
+  TimePeriodScreen.tsx            (Step 1: Time period selection)
+  ActivityTypeScreen.tsx          (Step 2: Activity type selection)
+  DurationSelectionScreen.tsx     (Step 3: Duration + multi-activity)
+  ActivityLogBreadcrumb.tsx       (Navigation breadcrumb)
+  ActivitySummaryCard.tsx         (Running total display)
+
+client/src/hooks/
+  useActivityLogging.ts           (State management)
+
+client/src/types/
+  activity-logging.ts             (TypeScript interfaces)
+
+client/src/constants/
+  activity-data.ts                (Time periods, activity types, durations)
+```
+
+---
+
+## 🔧 Implementation
+
+### **Step 1: TypeScript Interfaces**
+
+**File:** `client/src/types/activity-logging.ts`
+
+```typescript
+export interface Activity {
+  id: string;
+  name: string;
+  emoji: string;
+  typeId: string;
+  xpPerMinute: number; // XP earned per minute
+  description?: string;
+}
+
+export interface ActivityType {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string; // Tailwind gradient classes
+  borderColor: string;
+  description: string;
+  examples: string[]; // Example activities
+}
+
+export interface TimePeriod {
+  id: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  name: string;
+  emoji: string;
+  timeRange: string;
+  color: string;
+  borderColor: string;
+  motivation: string; // Why this time is good
+}
+
+export interface ActivityLog {
+  timePeriod: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  activities: {
+    activityId: string;
+    durationMinutes: number;
+  }[];
+  timestamp: string;
+  totalXP: number;
+  totalMinutes: number;
+}
+
+export interface ActivityLoggingState {
+  currentLog: ActivityLog | null;
+  step: 'time-period' | 'activity-types' | 'duration';
+  currentActivityType: string | null;
+  selectedActivities: Array<{
+    activityId: string;
+    activityName: string;
+    activityEmoji: string;
+    durationMinutes: number;
+  }>;
+}
+```
+
+---
+
+### **Step 2: Constants & Data**
+
+**File:** `client/src/constants/activity-data.ts`
+
+```typescript
+import { TimePeriod, ActivityType, Activity } from '@/types/activity-logging';
+
+export const TIME_PERIODS: TimePeriod[] = [
+  {
+    id: 'morning',
+    name: 'Morning',
+    emoji: '🌅',
+    timeRange: '6am-12pm',
+    color: 'from-yellow-100 to-orange-100',
+    borderColor: 'border-yellow-400',
+    motivation: 'Start your day with energy!'
+  },
+  {
+    id: 'afternoon',
+    name: 'Afternoon',
+    emoji: '☀️',
+    timeRange: '12pm-6pm',
+    color: 'from-orange-100 to-red-100',
+    borderColor: 'border-orange-400',
+    motivation: 'Perfect time to move and play!'
+  },
+  {
+    id: 'evening',
+    name: 'Evening',
+    emoji: '🌙',
+    timeRange: '6pm-10pm',
+    color: 'from-purple-100 to-indigo-100',
+    borderColor: 'border-purple-400',
+    motivation: 'Wind down with gentle movement!'
+  },
+  {
+    id: 'anytime',
+    name: 'Anytime',
+    emoji: '⚡',
+    timeRange: 'Any time',
+    color: 'from-blue-100 to-cyan-100',
+    borderColor: 'border-blue-400',
+    motivation: 'Every moment counts!'
+  }
+];
+
+export const ACTIVITY_TYPES: ActivityType[] = [
+  {
+    id: 'sports',
+    name: 'Sports',
+    emoji: '⚽',
+    color: 'from-green-100 to-green-200',
+    borderColor: 'border-green-300',
+    description: 'Team & ball games',
+    examples: ['Soccer', 'Basketball', 'Tennis']
+  },
+  {
+    id: 'exercise',
+    name: 'Exercise',
+    emoji: '🏃',
+    color: 'from-blue-100 to-blue-200',
+    borderColor: 'border-blue-300',
+    description: 'Cardio & fitness',
+    examples: ['Running', 'Jumping', 'Dancing']
+  },
+  {
+    id: 'play',
+    name: 'Active Play',
+    emoji: '🎮',
+    color: 'from-purple-100 to-purple-200',
+    borderColor: 'border-purple-300',
+    description: 'Fun & games',
+    examples: ['Tag', 'Hide & Seek', 'Playground']
+  },
+  {
+    id: 'strength',
+    name: 'Strength',
+    emoji: '💪',
+    color: 'from-red-100 to-red-200',
+    borderColor: 'border-red-300',
+    description: 'Build muscles',
+    examples: ['Climbing', 'Push-ups', 'Pull-ups']
+  },
+  {
+    id: 'flexibility',
+    name: 'Flexibility',
+    emoji: '🧘',
+    color: 'from-pink-100 to-pink-200',
+    borderColor: 'border-pink-300',
+    description: 'Stretch & balance',
+    examples: ['Yoga', 'Stretching', 'Dance']
+  },
+  {
+    id: 'outdoor',
+    name: 'Outdoor',
+    emoji: '🌳',
+    color: 'from-teal-100 to-teal-200',
+    borderColor: 'border-teal-300',
+    description: 'Nature activities',
+    examples: ['Hiking', 'Biking', 'Swimming']
+  }
+];
+
+export const ACTIVITIES: Activity[] = [
+  // Sports
+  { id: 'soccer', name: 'Soccer', emoji: '⚽', typeId: 'sports', xpPerMinute: 2 },
+  { id: 'basketball', name: 'Basketball', emoji: '🏀', typeId: 'sports', xpPerMinute: 2 },
+  { id: 'tennis', name: 'Tennis', emoji: '🎾', typeId: 'sports', xpPerMinute: 2 },
+  { id: 'volleyball', name: 'Volleyball', emoji: '🏐', typeId: 'sports', xpPerMinute: 2 },
+  { id: 'baseball', name: 'Baseball', emoji: '⚾', typeId: 'sports', xpPerMinute: 2 },
+  
+  // Exercise
+  { id: 'running', name: 'Running', emoji: '🏃', typeId: 'exercise', xpPerMinute: 3 },
+  { id: 'jumping', name: 'Jumping Jacks', emoji: '🤸', typeId: 'exercise', xpPerMinute: 2 },
+  { id: 'dancing', name: 'Dancing', emoji: '💃', typeId: 'exercise', xpPerMinute: 2 },
+  { id: 'skipping', name: 'Jump Rope', emoji: '🪢', typeId: 'exercise', xpPerMinute: 3 },
+  
+  // Active Play
+  { id: 'tag', name: 'Tag', emoji: '🏃‍♂️', typeId: 'play', xpPerMinute: 2 },
+  { id: 'playground', name: 'Playground', emoji: '🛝', typeId: 'play', xpPerMinute: 2 },
+  { id: 'hide-seek', name: 'Hide & Seek', emoji: '🙈', typeId: 'play', xpPerMinute: 2 },
+  { id: 'trampoline', name: 'Trampoline', emoji: '🤾', typeId: 'play', xpPerMinute: 2 },
+  
+  // Strength
+  { id: 'climbing', name: 'Climbing', emoji: '🧗', typeId: 'strength', xpPerMinute: 3 },
+  { id: 'pushups', name: 'Push-ups', emoji: '💪', typeId: 'strength', xpPerMinute: 3 },
+  { id: 'pullups', name: 'Pull-ups', emoji: '🏋️', typeId: 'strength', xpPerMinute: 3 },
+  
+  // Flexibility
+  { id: 'yoga', name: 'Yoga', emoji: '🧘', typeId: 'flexibility', xpPerMinute: 2 },
+  { id: 'stretching', name: 'Stretching', emoji: '🤸‍♀️', typeId: 'flexibility', xpPerMinute: 2 },
+  
+  // Outdoor
+  { id: 'hiking', name: 'Hiking', emoji: '🥾', typeId: 'outdoor', xpPerMinute: 3 },
+  { id: 'biking', name: 'Biking', emoji: '🚴', typeId: 'outdoor', xpPerMinute: 3 },
+  { id: 'swimming', name: 'Swimming', emoji: '🏊', typeId: 'outdoor', xpPerMinute: 3 },
+  { id: 'walking', name: 'Walking', emoji: '🚶', typeId: 'outdoor', xpPerMinute: 1 },
+];
+
+export const DURATION_PRESETS = [
+  { minutes: 5, label: '5 min', emoji: '⚡' },
+  { minutes: 10, label: '10 min', emoji: '💪' },
+  { minutes: 15, label: '15 min', emoji: '🔥' },
+  { minutes: 20, label: '20 min', emoji: '⭐' },
+  { minutes: 30, label: '30 min', emoji: '🏆' },
+  { minutes: 45, label: '45 min', emoji: '💎' },
+  { minutes: 60, label: '1 hour', emoji: '👑' },
+];
+
+export const getRecommendedTimePeriod = (): 'morning' | 'afternoon' | 'evening' | 'anytime' => {
+  const hour = new Date().getHours();
+  
+  if (hour >= 6 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 18) return 'afternoon';
+  if (hour >= 18 && hour < 22) return 'evening';
+  return 'anytime';
+};
+
+export const ACTIVITY_TIPS = {
+  morning: [
+    "🌅 Morning movement wakes up your brain!",
+    "💪 Exercise before school = better focus!",
+    "🏃 Start your day with energy!",
+    "☀️ Morning sunshine makes you stronger!"
+  ],
+  afternoon: [
+    "⚡ Perfect time for high-energy activities!",
+    "🏃 Afternoon play helps you learn better!",
+    "💪 Active breaks = happy brain!",
+    "🌞 Get outside and move!"
+  ],
+  evening: [
+    "🌙 Gentle movement helps you sleep better!",
+    "🧘 Evening stretches calm your body!",
+    "🚶 A walk after dinner is perfect!",
+    "💤 Light activity = better rest!"
+  ],
+  sports: "⚽ Team sports teach cooperation and build friendships!",
+  exercise: "🏃 Cardio makes your heart super strong!",
+  play: "🎮 Active play is the best kind of fun!",
+  strength: "💪 Strong muscles help you in everything you do!",
+  flexibility: "🧘 Stretching prevents injuries and feels great!",
+  outdoor: "🌳 Nature activities are good for body AND mind!"
+};
+```
+
+---
+
+### **Step 3: State Management Hook**
+
+**File:** `client/src/hooks/useActivityLogging.ts`
+
+```typescript
+import { useState, useCallback } from 'useState';
+import { ActivityLoggingState, ActivityLog } from '@/types/activity-logging';
+import { ACTIVITIES } from '@/constants/activity-data';
+
+export const useActivityLogging = () => {
+  const [state, setState] = useState<ActivityLoggingState>({
+    currentLog: null,
+    step: 'time-period',
+    currentActivityType: null,
+    selectedActivities: []
+  });
+
+  const startLog = useCallback((timePeriod: 'morning' | 'afternoon' | 'evening' | 'anytime') => {
+    setState(prev => ({
+      ...prev,
+      currentLog: {
+        timePeriod,
+        activities: [],
+        timestamp: new Date().toISOString(),
+        totalXP: 0,
+        totalMinutes: 0
+      },
+      step: 'activity-types',
+      selectedActivities: []
+    }));
+  }, []);
+
+  const selectActivityType = useCallback((typeId: string) => {
+    setState(prev => ({
+      ...prev,
+      currentActivityType: typeId,
+      step: 'duration'
+    }));
+  }, []);
+
+  const addActivity = useCallback((activityId: string, durationMinutes: number) => {
+    setState(prev => {
+      if (!prev.currentLog) return prev;
+
+      const activity = ACTIVITIES.find(a => a.id === activityId);
+      if (!activity) return prev;
+
+      const xpEarned = activity.xpPerMinute * durationMinutes;
+      const newActivity = {
+        activityId,
+        activityName: activity.name,
+        activityEmoji: activity.emoji,
+        durationMinutes
+      };
+
+      const updatedActivities = [...prev.selectedActivities, newActivity];
+      const totalMinutes = updatedActivities.reduce((sum, a) => sum + a.durationMinutes, 0);
+      const totalXP = updatedActivities.reduce((sum, a) => {
+        const act = ACTIVITIES.find(ac => ac.id === a.activityId);
+        return sum + (act ? act.xpPerMinute * a.durationMinutes : 0);
+      }, 0);
+
+      return {
+        ...prev,
+        currentLog: {
+          ...prev.currentLog,
+          activities: updatedActivities.map(a => ({
+            activityId: a.activityId,
+            durationMinutes: a.durationMinutes
+          })),
+          totalXP,
+          totalMinutes
+        },
+        selectedActivities: updatedActivities
+      };
+    });
+  }, []);
+
+  const backToActivityTypes = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      step: 'activity-types',
+      currentActivityType: null
+    }));
+  }, []);
+
+  const getAllActivities = useCallback(() => {
+    return state.selectedActivities;
+  }, [state.selectedActivities]);
+
+  const getTotalXP = useCallback((): number => {
+    return state.currentLog?.totalXP || 0;
+  }, [state.currentLog]);
+
+  const getTotalMinutes = useCallback((): number => {
+    return state.currentLog?.totalMinutes || 0;
+  }, [state.currentLog]);
+
+  const reset = useCallback(() => {
+    setState({
+      currentLog: null,
+      step: 'time-period',
+      currentActivityType: null,
+      selectedActivities: []
+    });
+  }, []);
+
+  return {
+    state,
+    startLog,
+    selectActivityType,
+    addActivity,
+    backToActivityTypes,
+    getAllActivities,
+    getTotalXP,
+    getTotalMinutes,
+    reset
+  };
+};
+```
+
+---
+
+### **Step 4: Activity Summary Card**
+
+**File:** `client/src/components/activity-log/ActivitySummaryCard.tsx`
+
+```tsx
+import { Zap, CheckCircle } from 'lucide-react';
+import { ACTIVITY_TYPES } from '@/constants/activity-data';
+
+interface ActivitySummaryCardProps {
+  activities: Array<{
+    activityId: string;
+    activityName: string;
+    activityEmoji: string;
+    durationMinutes: number;
+  }>;
+  totalXP: number;
+  totalMinutes: number;
+  periodName: string;
+}
+
+export default function ActivitySummaryCard({ 
+  activities, 
+  totalXP, 
+  totalMinutes,
+  periodName 
+}: ActivitySummaryCardProps) {
+  if (activities.length === 0) return null;
+
+  // Calculate activity type diversity (similar to food balance)
+  const activityTypes = new Set(
+    activities.map(a => {
+      const fullActivity = ACTIVITIES.find(act => act.id === a.activityId);
+      return fullActivity?.typeId;
+    }).filter(Boolean)
+  );
+
+  const typeInfo = Array.from(activityTypes).map(typeId => {
+    const type = ACTIVITY_TYPES.find(t => t.id === typeId);
+    return type;
+  }).filter(Boolean);
+
+  const isDiverse = activityTypes.size >= 2; // 2+ different activity types
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 border-2 border-blue-200 shadow-md">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center space-x-2">
+          <Zap className="w-5 h-5 text-blue-600" />
+          <h3 className="font-bold text-gray-900">Your {periodName} Activity</h3>
+        </div>
+        <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+          +{totalXP} XP
+        </div>
+      </div>
+
+      {/* Activities List */}
+      <div className="space-y-2 mb-3">
+        {activities.map((activity, idx) => (
+          <div 
+            key={`${activity.activityId}-${idx}`}
+            className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-blue-200 shadow-sm"
+          >
+            <div className="flex items-center space-x-2">
+              <span className="text-xl">{activity.activityEmoji}</span>
+              <span className="text-sm font-medium text-gray-700 capitalize">
+                {activity.activityName}
+              </span>
+            </div>
+            <span className="text-xs font-bold text-blue-600">
+              {activity.durationMinutes} min
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Activity Balance Indicator */}
+      {typeInfo.length > 0 && (
+        <div className="pt-3 border-t border-blue-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-1.5">
+              <span className="text-xs font-semibold text-gray-700">Types:</span>
+              <div className="flex items-center space-x-1">
+                {typeInfo.map((type, idx) => (
+                  <div key={type!.id} className="flex items-center">
+                    <span className="text-sm">{type!.emoji}</span>
+                    <span className="text-xs text-gray-600 ml-0.5">{type!.name}</span>
+                    {idx < typeInfo.length - 1 && (
+                      <span className="text-gray-400 mx-1">•</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Diverse Activity Badge */}
+            {isDiverse && (
+              <div className="flex items-center space-x-1 bg-green-100 px-2 py-1 rounded-full">
+                <CheckCircle className="w-3 h-3 text-green-600" />
+                <span className="text-xs font-bold text-green-700">Diverse!</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Total Minutes */}
+      <p className="text-xs text-gray-600 mt-3 text-center">
+        {totalMinutes} total minutes • {activities.length} {activities.length === 1 ? 'activity' : 'activities'}
+      </p>
+    </div>
+  );
+}
+```
+
+---
+
+### **Step 5: Time Period Selection Screen**
+
+**File:** `client/src/components/activity-log/TimePeriodScreen.tsx`
+
+```tsx
+import { motion } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
+import { useLocation } from 'wouter';
+import { TIME_PERIODS, getRecommendedTimePeriod } from '@/constants/activity-data';
+
+interface TimePeriodScreenProps {
+  onSelect: (period: 'morning' | 'afternoon' | 'evening' | 'anytime') => void;
+}
+
+export default function TimePeriodScreen({ onSelect }: TimePeriodScreenProps) {
+  const [, setLocation] = useLocation();
+  const recommendedPeriod = getRecommendedTimePeriod();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="min-h-screen bg-white"
+    >
+      {/* Header */}
+      <header className="bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-6 text-white">
+        <div className="max-w-md mx-auto">
+          <button 
+            onClick={() => setLocation('/dashboard')}
+            className="mb-4 p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          
+          <h1 className="text-3xl font-black mb-2">Log Activity 🏃</h1>
+          <p className="text-blue-100 text-sm">When were you active?</p>
+        </div>
+      </header>
+
+      {/* Content */}
+      <div className="p-4 max-w-md mx-auto">
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {TIME_PERIODS.map((period) => {
+            const isRecommended = period.id === recommendedPeriod;
+            
+            return (
+              <button
+                key={period.id}
+                onClick={() => onSelect(period.id)}
+                className={`
+                  relative p-6 rounded-2xl border-2
+                  bg-gradient-to-br ${period.color}
+                  ${period.borderColor}
+                  hover:scale-105 hover:shadow-xl
+                  active:scale-95
+                  transition-all duration-200
+                  min-h-[180px]
+                  flex flex-col items-center justify-center
+                `}
+              >
+                {/* Recommended Badge */}
+                {isRecommended && (
+                  <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
+                    Right now!
+                  </div>
+                )}
+                
+                {/* Emoji */}
+                <span className="text-6xl mb-3">{period.emoji}</span>
+                
+                {/* Name */}
+                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                  {period.name}
+                </h3>
+                
+                {/* Time Range */}
+                <p className="text-sm text-gray-600 mb-2">
+                  {period.timeRange}
+                </p>
+                
+                {/* Motivation */}
+                <p className="text-xs text-gray-500 text-center">
+                  {period.motivation}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Skip Option */}
+        <div className="text-center">
+          <p className="text-sm text-gray-500 mb-3">Not sure when?</p>
+          <button
+            onClick={() => onSelect('anytime')}
+            className="text-blue-600 font-semibold text-sm hover:text-blue-700 underline"
+          >
+            Just log activity without time →
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+```
+
+---
+
+### **Step 6: Activity Type Selection Screen**
+
+**File:** `client/src/components/activity-log/ActivityTypeScreen.tsx`
+
+```tsx
+import { motion } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
+import { ACTIVITY_TYPES } from '@/constants/activity-data';
+import ActivityLogBreadcrumb from './ActivityLogBreadcrumb';
+import ActivitySummaryCard from './ActivitySummaryCard';
+
+interface ActivityTypeScreenProps {
+  timePeriod: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  selectedActivities: Array<{
+    activityId: string;
+    activityName: string;
+    activityEmoji: string;
+    durationMinutes: number;
+  }>;
+  totalXP: number;
+  totalMinutes: number;
+  currentLogState: any;
+  onSelectType: (typeId: string) => void;
+  onBack: () => void;
+  onFinish: () => void;
+}
+
+export default function ActivityTypeScreen({ 
+  timePeriod, 
+  selectedActivities, 
+  totalXP,
+  totalMinutes,
+  currentLogState,
+  onSelectType, 
+  onBack,
+  onFinish 
+}: ActivityTypeScreenProps) {
+  const periodName = timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1);
+
+  // Count activities per type
+  const getTypeActivityCount = (typeId: string): number => {
+    return selectedActivities.filter(a => {
+      const activity = ACTIVITIES.find(act => act.id === a.activityId);
+      return activity?.typeId === typeId;
+    }).length;
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="min-h-screen bg-white pb-32"
+    >
+      {/* Header */}
+      <header className="bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-4 text-white sticky top-0 z-10">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <button 
+            onClick={onBack}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-bold">{periodName}</h2>
+          <div className="w-10" />
+        </div>
+      </header>
+
+      {/* Breadcrumb */}
+      <ActivityLogBreadcrumb timePeriod={timePeriod} />
+
+      {/* Content */}
+      <div className="p-4 max-w-md mx-auto space-y-4">
+        {/* Instructions */}
+        <div className="text-center">
+          <p className="text-lg text-gray-700 mb-1">
+            ⚡ What did you do?
+          </p>
+          <p className="text-sm text-gray-500">
+            Pick an activity type
+          </p>
+        </div>
+
+        {/* Current Activity Summary (if activities logged) */}
+        {selectedActivities.length > 0 && (
+          <ActivitySummaryCard 
+            activities={selectedActivities}
+            totalXP={totalXP}
+            totalMinutes={totalMinutes}
+            periodName={periodName}
+          />
+        )}
+
+        {/* Activity Types Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {ACTIVITY_TYPES.map((type) => {
+            const activityCount = getTypeActivityCount(type.id);
+            const hasActivities = activityCount > 0;
+
+            return (
+              <button
+                key={type.id}
+                onClick={() => onSelectType(type.id)}
+                className={`
+                  relative
+                  flex flex-col items-center justify-center
+                  p-6 rounded-2xl
+                  bg-gradient-to-br ${type.color}
+                  border-2 ${type.borderColor}
+                  hover:scale-105 hover:shadow-lg hover:-translate-y-1
+                  active:scale-95
+                  transition-all duration-200
+                  min-h-[140px]
+                `}
+              >
+                {/* Visit Count Badge */}
+                {hasActivities && (
+                  <div className="absolute -top-2 -right-2 z-10 bg-green-500 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2 border-white">
+                    <span className="text-xs font-bold">{activityCount}</span>
+                  </div>
+                )}
+
+                <span className="text-5xl mb-3">{type.emoji}</span>
+                <span className="text-base font-bold text-gray-900 text-center">
+                  {type.name}
+                </span>
+                
+                {hasActivities ? (
+                  <span className="text-xs text-green-700 font-semibold mt-1">
+                    ✓ {activityCount} logged
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-600 mt-1">
+                    {type.description}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Floating Finish Button */}
+      {selectedActivities.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20 animate-slide-up-fade">
+          <div className="max-w-md mx-auto">
+            <button
+              onClick={onFinish}
+              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all text-lg"
+            >
+              ✓ Done with {periodName}
+            </button>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+```
+
+---
+
+### **Step 7: Duration Selection Screen**
+
+**File:** `client/src/components/activity-log/DurationSelectionScreen.tsx`
+
+```tsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronLeft, Check, Plus, Clock } from 'lucide-react';
+import { ACTIVITIES, DURATION_PRESETS, ACTIVITY_TIPS } from '@/constants/activity-data';
+import ActivityLogBreadcrumb from './ActivityLogBreadcrumb';
+
+interface DurationSelectionScreenProps {
+  timePeriod: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  activityTypeId: string;
+  selectedActivities: any[];
+  totalXP: number;
+  totalMinutes: number;
+  onAddActivity: (activityId: string, duration: number) => void;
+  onAddMore: () => void;
+  onFinish: () => void;
+  onBack: () => void;
+}
+
+export default function DurationSelectionScreen({
+  timePeriod,
+  activityTypeId,
+  selectedActivities,
+  totalXP,
+  totalMinutes,
+  onAddActivity,
+  onAddMore,
+  onFinish,
+  onBack
+}: DurationSelectionScreenProps) {
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
+  const [customDuration, setCustomDuration] = useState<string>('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
+  const activities = ACTIVITIES.filter(a => a.typeId === activityTypeId);
+  const periodName = timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1);
+  const activityType = ACTIVITY_TYPES.find(t => t.id === activityTypeId);
+
+  const handleSelectActivity = (activityId: string) => {
+    setSelectedActivity(activityId);
+    setSelectedDuration(null);
+    setShowCustomInput(false);
+  };
+
+  const handleSelectDuration = (minutes: number) => {
+    setSelectedDuration(minutes);
+    setShowCustomInput(false);
+  };
+
+  const handleAddActivity = () => {
+    if (!selectedActivity || !selectedDuration) return;
+    
+    onAddActivity(selectedActivity, selectedDuration);
+    
+    // Reset selections for next activity
+    setSelectedActivity(null);
+    setSelectedDuration(null);
+    setCustomDuration('');
+    setShowCustomInput(false);
+  };
+
+  const handleCustomDurationSubmit = () => {
+    const minutes = parseInt(customDuration);
+    if (minutes > 0 && minutes <= 240) { // Max 4 hours
+      setSelectedDuration(minutes);
+      setShowCustomInput(false);
+    }
+  };
+
+  const canAddActivity = selectedActivity && selectedDuration;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="min-h-screen bg-white pb-64"
+    >
+      {/* Header */}
+      <header className="bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-4 text-white sticky top-0 z-10">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <button 
+            onClick={onBack}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-bold">{activityType?.name}</h2>
+          <div className="w-10" />
+        </div>
+      </header>
+
+      {/* Breadcrumb */}
+      <ActivityLogBreadcrumb 
+        timePeriod={timePeriod} 
+        currentActivityType={activityTypeId}
+      />
+
+      {/* Content */}
+      <div className="p-4 max-w-md mx-auto space-y-6">
+        {/* Step 1: Select Activity */}
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-3">
+            1️⃣ What activity?
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {activities.map((activity) => (
+              <button
+                key={activity.id}
+                onClick={() => handleSelectActivity(activity.id)}
+                className={`
+                  aspect-square rounded-2xl p-3
+                  transition-all duration-200
+                  ${selectedActivity === activity.id
+                    ? 'bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-blue-500 scale-105 shadow-lg'
+                    : 'bg-white border-2 border-gray-200 hover:border-blue-300 hover:scale-105'
+                  }
+                  active:scale-95
+                `}
+              >
+                <div className="flex flex-col items-center justify-center h-full">
+                  <span className="text-3xl mb-1">{activity.emoji}</span>
+                  <span className={`text-xs font-medium text-center line-clamp-2 ${
+                    selectedActivity === activity.id ? 'text-blue-800 font-bold' : 'text-gray-700'
+                  }`}>
+                    {activity.name}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Step 2: Select Duration */}
+        {selectedActivity && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-3">
+              2️⃣ How long?
+            </h3>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {DURATION_PRESETS.map((preset) => (
+                <button
+                  key={preset.minutes}
+                  onClick={() => handleSelectDuration(preset.minutes)}
+                  className={`
+                    py-3 px-2 rounded-xl
+                    transition-all duration-200
+                    ${selectedDuration === preset.minutes
+                      ? 'bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-500 scale-105 shadow-lg'
+                      : 'bg-white border-2 border-gray-200 hover:border-green-300'
+                    }
+                    active:scale-95
+                  `}
+                >
+                  <div className="text-xl mb-1">{preset.emoji}</div>
+                  <div className={`text-xs font-bold ${
+                    selectedDuration === preset.minutes ? 'text-green-800' : 'text-gray-700'
+                  }`}>
+                    {preset.label}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Custom Duration Input */}
+            {!showCustomInput ? (
+              <button
+                onClick={() => setShowCustomInput(true)}
+                className="w-full py-3 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-98 transition-all flex items-center justify-center space-x-2"
+              >
+                <Clock className="w-5 h-5" />
+                <span>Custom time</span>
+              </button>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Enter minutes (1-240)
+                </label>
+                <div className="flex space-x-2">
+                  <input
+                    type="number"
+                    min="1"
+                    max="240"
+                    value={customDuration}
+                    onChange={(e) => setCustomDuration(e.target.value)}
+                    placeholder="30"
+                    className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-center text-lg font-bold"
+                  />
+                  <button
+                    onClick={handleCustomDurationSubmit}
+                    className="px-6 py-3 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 active:scale-95 transition-all"
+                  >
+                    ✓
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Motivational Tip */}
+        {selectedActivity && (
+          <div className="mt-6 text-center">
+            <div className="inline-block bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl px-6 py-4 max-w-sm">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-xl">💡</span>
+                  </div>
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-bold text-blue-900 mb-1">Did you know?</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {ACTIVITY_TIPS[activityTypeId as keyof typeof ACTIVITY_TIPS]}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Floating Action Buttons */}
+      {selectedActivities.length > 0 || canAddActivity ? (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20 animate-slide-up-fade">
+          <div className="max-w-md mx-auto space-y-3">
+            {/* Activity Summary (if already logged activities) */}
+            {selectedActivities.length > 0 && (
+              <ActivitySummaryCard 
+                activities={selectedActivities}
+                totalXP={totalXP}
+                totalMinutes={totalMinutes}
+                periodName={periodName}
+              />
+            )}
+
+            {/* Action Buttons */}
+            <div className="space-y-2">
+              {/* Add This Activity Button */}
+              {canAddActivity && (
+                <button
+                  onClick={handleAddActivity}
+                  className="w-full py-3 px-4 bg-white border-2 border-blue-500 text-blue-600 font-bold rounded-xl hover:bg-blue-50 active:scale-98 transition-all flex items-center justify-center space-x-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Add This Activity</span>
+                </button>
+              )}
+
+              {/* Add More Activities Button */}
+              {selectedActivities.length > 0 && (
+                <button
+                  onClick={onAddMore}
+                  className="w-full py-3 px-4 bg-white border-2 border-orange-500 text-orange-600 font-bold rounded-xl hover:bg-orange-50 active:scale-98 transition-all flex items-center justify-center space-x-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Add Different Activity</span>
+                </button>
+              )}
+              
+              {/* Finish Button */}
+              {selectedActivities.length > 0 && (
+                <button
+                  onClick={onFinish}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all flex items-center justify-center space-x-3 text-lg"
+                >
+                  <Check className="w-6 h-6" />
+                  <span>Done with {periodName}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </motion.div>
+  );
+}
+```
+
+---
+
+### **Step 8: Main Flow Orchestrator**
+
+**File:** `client/src/pages/ActivityLogNew.tsx`
+
+```tsx
+import { AnimatePresence } from 'framer-motion';
+import { useLocation } from 'wouter';
+import { useActivityLogging } from '@/hooks/useActivityLogging';
+import TimePeriodScreen from '@/components/activity-log/TimePeriodScreen';
+import ActivityTypeScreen from '@/components/activity-log/ActivityTypeScreen';
+import DurationSelectionScreen from '@/components/activity-log/DurationSelectionScreen';
+
+export default function ActivityLogNew() {
+  const [, setLocation] = useLocation();
+  const {
+    state,
+    startLog,
+    selectActivityType,
+    addActivity,
+    backToActivityTypes,
+    getAllActivities,
+    getTotalXP,
+    getTotalMinutes,
+    reset
+  } = useActivityLogging();
+
+  const handleFinishLogging = async () => {
+    if (!state.currentLog) return;
+
+    try {
+      const response = await fetch('/api/activity-log/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timePeriod: state.currentLog.timePeriod,
+          activities: state.currentLog.activities,
+          timestamp: state.currentLog.timestamp
+        })
+      });
+
+      if (response.ok) {
+        setLocation('/activity-log/success');
+        reset();
+      }
+    } catch (error) {
+      console.error('Failed to submit activity log:', error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <AnimatePresence mode="wait">
+        {/* Step 1: Time Period Selection */}
+        {state.step === 'time-period' && (
+          <TimePeriodScreen
+            key="time-period"
+            onSelect={startLog}
+          />
+        )}
+
+        {/* Step 2: Activity Type Selection */}
+        {state.step === 'activity-types' && state.currentLog && (
+          <ActivityTypeScreen
+            key="activity-types"
+            timePeriod={state.currentLog.timePeriod}
+            selectedActivities={getAllActivities()}
+            totalXP={getTotalXP()}
+            totalMinutes={getTotalMinutes()}
+            currentLogState={state.currentLog}
+            onSelectType={selectActivityType}
+            onBack={() => {
+              reset();
+              setLocation('/dashboard');
+            }}
+            onFinish={handleFinishLogging}
+          />
+        )}
+
+        {/* Step 3: Duration Selection */}
+        {state.step === 'duration' && state.currentLog && state.currentActivityType && (
+          <DurationSelectionScreen
+            key={`duration-${state.currentActivityType}`}
+            timePeriod={state.currentLog.timePeriod}
+            activityTypeId={state.currentActivityType}
+            selectedActivities={getAllActivities()}
+            totalXP={getTotalXP()}
+            totalMinutes={getTotalMinutes()}
+            onAddActivity={addActivity}
+            onAddMore={backToActivityTypes}
+            onFinish={handleFinishLogging}
+            onBack={backToActivityTypes}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+```
+
+---
+
+## 📱 Complete User Flow
+
+```
+Dashboard
+   ↓
+[Tap LOG Button → Activity]
+   ↓
+┌───────────────────────────┐
+│ When were you active?     │
+│                           │
+│ [🌅 Morning] "Right now!" │
+│ [☀️ Afternoon]           │
+│ [🌙 Evening]             │
+│ [⚡ Anytime]             │
+└───────────────────────────┘
+   ↓ [Select Morning]
+┌───────────────────────────┐
+│ 🌅 Morning                │
+│ What did you do?          │
+│                           │
+│ [⚽ Sports] [🏃 Exercise] │
+│ [🎮 Play] [💪 Strength]  │
+│ [🧘 Flexibility]         │
+└───────────────────────────┘
+   ↓ [Select Sports]
+┌───────────────────────────┐
+│ Morning > Sports          │
+│                           │
+│ 1️⃣ What activity?        │
+│ [⚽ Soccer] [🏀 Basketball]│
+│                           │
+│ 2️⃣ How long?             │
+│ [5min] [10min] [15min]   │
+│ [20min] [30min] [Custom] │
+│                           │
+│ [+ Add This Activity]     │
+│ [✓ Done with Morning]     │
+└───────────────────────────┘
+```
+
+---
+
+## ✅ Success Criteria
+
+Activity logging is complete when:
+
+1. ✅ Time period selection works (Morning/Afternoon/Evening)
+2. ✅ Multi-activity support (log multiple activities)
+3. ✅ Duration presets + custom input
+4. ✅ Running total shows XP + minutes
+5. ✅ Balance indicator (activity type diversity)
+6. ✅ Visit count badges on activity types
+7. ✅ Motivational tips
+8. ✅ Smooth transitions
+9. ✅ Matches food logging UI/UX exactly
+10. ✅ Ready for success screens
+
+---
+
+## 🚀 Implementation Timeline
+
+**Total: ~45-50 minutes**
+
+**Phase 1:** Core Flow (20 mins)
+**Phase 2:** Polish (15 mins)
+**Phase 3:** Backend (10 mins)
+
+---
+
+## 🎊 After This, Activity Logging is Complete!
+
+You'll have a **complete activity logging system** that perfectly matches food logging:
+- ✅ Same visual design
+- ✅ Same interaction patterns
+- ✅ Same polish level
+- ✅ Consistent UX
+- ✅ Production-ready
+
+Let's build it! 🏃‍♂️✨
