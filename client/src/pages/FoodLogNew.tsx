@@ -25,6 +25,7 @@ export default function FoodLogNew() {
   
   const [showTextInput, setShowTextInput] = useState(false);
   const [textInput, setTextInput] = useState('');
+  const [textMealType, setTextMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack' | null>(null);
   
   const {
     state,
@@ -43,6 +44,12 @@ export default function FoodLogNew() {
     }
   }, [showTextInput]);
 
+  const handleShowTextInput = () => {
+    setTextMealType(state.currentMeal?.mealType || null);
+    reset();
+    setShowTextInput(true);
+  };
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('User not authenticated');
@@ -50,6 +57,7 @@ export default function FoodLogNew() {
       const allItems = getAllSelectedItems();
       let content: any = {};
       let entryMethod = 'emoji';
+      const mealType = showTextInput ? textMealType : state.currentMeal?.mealType;
       
       if (showTextInput && textInput.trim().length >= 2) {
         content = { text: textInput.trim() };
@@ -57,7 +65,6 @@ export default function FoodLogNew() {
       } else if (allItems.length > 0) {
         content = { 
           emojis: allItems.map(item => item.emoji),
-          mealType: state.currentMeal?.mealType,
           items: allItems.map(item => ({ id: item.id, name: item.name, emoji: item.emoji }))
         };
         entryMethod = 'emoji';
@@ -71,6 +78,7 @@ export default function FoodLogNew() {
           userId: user.id,
           type: 'food',
           entryMethod,
+          mealType: mealType || 'snack',
           content,
           timestamp: new Date().toISOString()
         }
@@ -208,7 +216,7 @@ export default function FoodLogNew() {
               setLocation('/dashboard');
             }}
             onFinish={handleFinishLogging}
-            onTextInput={() => setShowTextInput(true)}
+            onTextInput={handleShowTextInput}
           />
         )}
 
