@@ -176,7 +176,9 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
             id: log.id,
             type: log.type,
             summary,
-            ts: log.ts.toISOString()
+            ts: log.ts.toISOString(),
+            xpAwarded: log.xpAwarded || 0,
+            feedback: log.aiFeedback || null
           };
         });
       

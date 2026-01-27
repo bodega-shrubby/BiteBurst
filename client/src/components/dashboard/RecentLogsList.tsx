@@ -6,7 +6,7 @@ interface RecentLog {
   summary: string;
   ts: string;
   xpAwarded?: number;
-  feedback?: string;
+  feedback?: string | null;
 }
 
 interface RecentLogsListProps {

@@ -276,15 +276,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'delta_xp is required and must be a number' });
       }
       
-      // Only allow users to update their own XP
-      if (req.userId !== userId) {
-        return res.status(403).json({ error: 'Cannot update XP for other users' });
-      }
-      
       // Get current user data
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Verify parent owns the child profile
+      // req.userId is the Supabase parent auth ID
+      // userId (from URL) is the child profile ID
+      const isParentOwned = user.parentAuthId === req.userId;
+      const isDirectMatch = userId === req.userId;
+      
+      if (!isParentOwned && !isDirectMatch) {
+        return res.status(403).json({ error: 'Cannot update XP for other users' });
       }
       
       // Calculate new totals

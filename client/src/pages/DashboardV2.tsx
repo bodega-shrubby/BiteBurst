@@ -49,6 +49,8 @@ interface DailySummaryV2 {
     type: 'food' | 'activity';
     summary: string;
     ts: string;
+    xpAwarded?: number;
+    feedback?: string | null;
   }>;
   user: {
     lifetime_xp: number;
