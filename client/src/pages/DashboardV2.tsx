@@ -154,23 +154,93 @@ function XPBurst({ amount, visible, onComplete }: XPBurstProps) {
   );
 }
 
+// Context-Aware Mascot Message Generator
+interface MascotMessageContext {
+  userName: string;
+  xpToday: number;
+  xpGoal: number;
+  streakDays: number;
+  hasLoggedToday: boolean;
+  state: 'idle' | 'goalReached' | 'badgeUnlocked';
+}
+
+function getMascotMessage(context: MascotMessageContext): string {
+  const { userName, xpToday, xpGoal, streakDays, hasLoggedToday, state } = context;
+  const hour = new Date().getHours();
+  const percentToGoal = (xpToday / xpGoal) * 100;
+  const isNearMidnight = hour >= 22;
+  
+  // Special states first
+  if (state === 'goalReached') {
+    return `Amazing work, ${userName}! You crushed today's goal! 🎉`;
+  }
+  if (state === 'badgeUnlocked') {
+    return `Wow! New badge unlocked! 🏆`;
+  }
+  
+  // Streak at risk (near midnight, no logs today)
+  if (isNearMidnight && !hasLoggedToday && streakDays > 0) {
+    return `Quick, ${userName}! Save your ${streakDays}-day streak! 🔥`;
+  }
+  
+  // Goal completed
+  if (xpToday >= xpGoal) {
+    return `You did it, ${userName}! Goal crushed! 🎉`;
+  }
+  
+  // Very close to goal (80%+)
+  if (percentToGoal >= 80) {
+    return `So close! Just ${xpGoal - xpToday} XP to go! 🎯`;
+  }
+  
+  // Good progress (50-79%)
+  if (percentToGoal >= 50) {
+    return `You're halfway there! Keep it up! 💪`;
+  }
+  
+  // Some progress (1-49%)
+  if (xpToday > 0) {
+    return `Great start! Let's keep going! 🚀`;
+  }
+  
+  // No logs yet - time-based greeting
+  if (hour < 12) {
+    return `Good morning, ${userName}! Ready to start? ☀️`;
+  } else if (hour < 17) {
+    return `Hey ${userName}! Time for a healthy snack? 🍎`;
+  } else if (hour < 22) {
+    return `Evening, ${userName}! How was your day? 🌙`;
+  } else {
+    return `Still up? Log before bed! 😴`;
+  }
+}
+
 // Prominent Mascot Section
 interface MascotSectionProps {
   state: 'idle' | 'goalReached' | 'badgeUnlocked';
   displayName: string;
+  xpToday?: number;
+  xpGoal?: number;
+  streakDays?: number;
+  hasLoggedToday?: boolean;
 }
 
-function MascotSection({ state, displayName }: MascotSectionProps) {
-  const getMascotMessage = () => {
-    switch (state) {
-      case 'goalReached':
-        return "Amazing job! 🎉";
-      case 'badgeUnlocked':
-        return "New badge! 🏆";
-      default:
-        return `Let's go, ${displayName}! 💪`;
-    }
-  };
+function MascotSection({ 
+  state, 
+  displayName,
+  xpToday = 0,
+  xpGoal = 80,
+  streakDays = 0,
+  hasLoggedToday = false
+}: MascotSectionProps) {
+  const message = getMascotMessage({
+    userName: displayName,
+    xpToday,
+    xpGoal,
+    streakDays,
+    hasLoggedToday,
+    state
+  });
 
   return (
     <div className="relative flex flex-col items-center py-2">
@@ -186,8 +256,8 @@ function MascotSection({ state, displayName }: MascotSectionProps) {
       </div>
       
       {/* Speech Bubble */}
-      <div className="mt-2 bg-white rounded-2xl px-4 py-2 shadow-md border-2 border-orange-100 animate-bubble-appear">
-        <p className="text-sm font-semibold text-gray-800">{getMascotMessage()}</p>
+      <div className="mt-2 bg-white rounded-2xl px-4 py-2 shadow-md border-2 border-orange-100 animate-bubble-appear max-w-[280px]">
+        <p className="text-sm font-semibold text-gray-800 text-center">{message}</p>
       </div>
     </div>
   );
@@ -365,17 +435,30 @@ export default function DashboardV2() {
       <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-3 relative">
         <div className="max-w-md mx-auto">
           <div className="flex justify-between items-center mb-4">
-            {/* Hearts Display */}
-            <HeartsDisplay hearts={3} maxHearts={5} />
-            {/* Streak Flame */}
-            <div className="flex items-center space-x-1 bg-white/20 px-3 py-1.5 rounded-full">
-              <span className="text-xl flame-flicker">🔥</span>
-              <span className="text-white font-bold text-sm">{dailySummary.streak_days}</span>
+            {/* LEFT: Streak Flame with Frosted Glass Backdrop */}
+            <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 shadow-lg">
+              <span className="text-2xl flame-flicker">🔥</span>
+              <div className="text-white">
+                <span className="text-xl font-black">{dailySummary.streak_days}</span>
+                <span className="text-xs ml-1 font-medium">day streak</span>
+              </div>
             </div>
-            {/* Settings Icon */}
-            <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" data-testid="button-settings">
-              <Settings className="w-6 h-6 text-white" />
-            </button>
+            
+            {/* RIGHT: Hearts + Settings */}
+            <div className="flex items-center space-x-3">
+              {/* Hearts Display with Frosted Glass */}
+              <div className="flex items-center space-x-1 bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full border border-white/30 shadow-lg">
+                <HeartsDisplay hearts={3} maxHearts={5} />
+              </div>
+              
+              {/* Settings Icon */}
+              <button 
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" 
+                data-testid="button-settings"
+              >
+                <Settings className="w-6 h-6 text-white" />
+              </button>
+            </div>
           </div>
           
           {/* Large Centered Character Avatar */}
@@ -388,44 +471,54 @@ export default function DashboardV2() {
       {/* Prominent Mascot Section */}
       <div className="bg-gradient-to-b from-purple-400 to-white px-4 pb-2">
         <div className="max-w-md mx-auto">
-          <MascotSection state={mascotState} displayName={dailySummary.user.display_name} />
+          <MascotSection 
+            state={mascotState} 
+            displayName={dailySummary.user.display_name}
+            xpToday={dailySummary.xp_today}
+            xpGoal={dailySummary.xp_goal}
+            streakDays={dailySummary.streak_days}
+            hasLoggedToday={dailySummary.recent_logs.length > 0}
+          />
         </div>
       </div>
 
-      {/* Dark Profile Card */}
+      {/* Dark Profile Card - Clean Version (Only Level Badge) */}
       <div className="relative z-10 mb-6">
         <div className="bg-neutral-900 rounded-none sm:rounded-2xl px-5 py-4 text-white shadow-xl" data-testid="profile-card">
           <h1 className="text-2xl font-bold text-center mb-2" data-testid="text-username">
             {dailySummary.user.display_name}
           </h1>
-          <p className="text-neutral-400 text-center text-sm mb-3">
+          <p className="text-neutral-400 text-center text-sm mb-4">
             @{dailySummary.user.display_name.toLowerCase()}
           </p>
           
-          {/* Level Progress Bar */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-orange-400 font-semibold">Level {dailySummary.user.level}</span>
-              <span className="text-neutral-400">
-                {dailySummary.user.lifetime_xp % 100} / 100 XP to Level {dailySummary.user.level + 1}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-neutral-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-500"
-                style={{ width: `${(dailySummary.user.lifetime_xp % 100)}%` }}
-              />
+          {/* Single Level Chip - Centered */}
+          <div className="flex justify-center mb-4">
+            <div className="bg-orange-500 px-4 py-2 rounded-full text-sm font-bold">
+              Level {dailySummary.user.level}
             </div>
           </div>
           
-          {/* Stats Chips */}
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            <div className="bg-orange-500 px-3 py-1.5 rounded-full text-xs font-semibold min-h-[28px] flex items-center">
-              {dailySummary.streak_days} day streak
+          {/* Level Progress Bar */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-neutral-400">Level {dailySummary.user.level}</span>
+              <span className="text-neutral-400">
+                {dailySummary.user.lifetime_xp % 100} / 100 XP
+              </span>
+              <span className="text-neutral-400">Level {dailySummary.user.level + 1}</span>
             </div>
-            <div className="bg-orange-500 px-3 py-1.5 rounded-full text-xs font-semibold min-h-[28px] flex items-center">
-              {dailySummary.xp_today} XP today
+            
+            <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-700"
+                style={{ width: `${(dailySummary.user.lifetime_xp % 100)}%` }}
+              />
             </div>
+            
+            <p className="text-xs text-center text-neutral-400">
+              {100 - (dailySummary.user.lifetime_xp % 100)} XP to Level {dailySummary.user.level + 1}
+            </p>
           </div>
         </div>
       </div>
@@ -491,15 +584,15 @@ export default function DashboardV2() {
               <div className="text-sm text-gray-600 font-medium">League</div>
             </div>
             
-            {/* Lesson Score */}
+            {/* Top Streak */}
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
               <div className="flex items-center space-x-2 mb-1">
-                <span className="text-2xl">🎯</span>
+                <span className="text-2xl">🏅</span>
                 <span className="text-2xl font-bold text-orange-500">
-                  {Math.round((dailySummary.xp_today / dailySummary.xp_goal) * 100)}
+                  {dailySummary.best_streak}
                 </span>
               </div>
-              <div className="text-sm text-gray-600 font-medium">Health Score</div>
+              <div className="text-sm text-gray-600 font-medium">Best Streak</div>
             </div>
           </div>
         </div>

@@ -1,5 +1,7 @@
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { useLocation } from 'wouter';
+import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface RecentLog {
   id: string;
@@ -17,6 +19,7 @@ interface RecentLogsListProps {
 
 export default function RecentLogsList({ logs, className = '' }: RecentLogsListProps) {
   const [, setLocation] = useLocation();
+  const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
   
   const getTimeAgo = (timestamp: string) => {
     try {
@@ -29,10 +32,6 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
   
   const getTypeIcon = (type: string) => {
     return type === 'food' ? '🍽️' : '🏃';
-  };
-
-  const getTypeLabel = (type: string) => {
-    return type === 'food' ? 'Food log' : 'Activity';
   };
   
   const SUNNY_MESSAGES = [
@@ -76,66 +75,110 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
   }
   
   return (
-    <div className={`bg-white rounded-2xl border-2 border-gray-200 p-6 ${className}`}>
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-      
-      <div className="space-y-3">
-        {logs.slice(0, 5).map((log, index) => (
-          <div 
-            key={log.id}
-            className={`
-              p-4 rounded-xl border-2 transition-all duration-200
-              ${index === 0 
-                ? 'bg-orange-50 border-orange-200' 
-                : 'bg-gray-50 border-gray-100 hover:border-gray-200'
-              }
-            `}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-3 flex-1 min-w-0">
-                <span className="text-2xl flex-shrink-0" role="img" aria-hidden="true">
-                  {getTypeIcon(log.type)}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-gray-900">
-                    {log.summary}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                      {getTypeLabel(log.type)}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {getTimeAgo(log.ts)}
-                    </span>
-                  </div>
-                  {/* AI Feedback Preview */}
-                  {log.feedback && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2 italic">
-                      "{log.feedback.slice(0, 80)}{log.feedback.length > 80 ? '...' : ''}"
-                    </p>
-                  )}
-                </div>
-              </div>
-              {/* XP Badge */}
-              {log.xpAwarded && log.xpAwarded > 0 && (
-                <span className="text-sm font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-full flex-shrink-0 ml-2">
-                  +{log.xpAwarded} XP
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
+    <div className={`space-y-4 ${className}`}>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+        <span className="text-sm text-gray-500">{logs.length} logs today</span>
       </div>
       
-      {logs.length >= 3 && (
-        <div className="mt-4 text-center">
-          <button 
-            onClick={() => setLocation('/logs')}
-            className="text-sm text-[#FF6A00] font-bold hover:text-[#E55A00] transition-colors min-h-[44px] min-w-[44px] px-4 py-2"
-          >
-            View all activity →
-          </button>
-        </div>
+      <div className="space-y-3">
+        {logs.slice(0, 5).map((log) => {
+          const isExpanded = expandedLogId === log.id;
+          const hasFeedback = log.feedback && log.feedback.length > 0;
+          
+          return (
+            <div 
+              key={log.id}
+              className="bg-white border-2 border-gray-200 rounded-xl hover:border-orange-200 hover:shadow-md transition-all duration-200"
+            >
+              {/* Main Log Card - Always Visible */}
+              <button
+                onClick={() => hasFeedback && setExpandedLogId(isExpanded ? null : log.id)}
+                className="w-full p-4 text-left min-h-[44px]"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3 flex-1">
+                    <div className="text-3xl flex-shrink-0">
+                      {getTypeIcon(log.type)}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-base">
+                        {log.summary}
+                      </p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <p className="text-xs text-gray-500">
+                          {getTimeAgo(log.ts)}
+                        </p>
+                        {hasFeedback && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <p className="text-xs text-blue-600 font-medium">
+                              Coach's tip
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right Side: XP Badge + Expand Arrow */}
+                  <div className="flex items-center space-x-2 ml-2">
+                    {log.xpAwarded && log.xpAwarded > 0 && (
+                      <div className="bg-orange-100 px-3 py-1.5 rounded-full flex-shrink-0">
+                        <span className="text-orange-600 font-bold text-sm">
+                          +{log.xpAwarded} XP
+                        </span>
+                      </div>
+                    )}
+                    
+                    {hasFeedback && (
+                      <div className="flex-shrink-0 min-w-[24px] min-h-[24px] flex items-center justify-center">
+                        {isExpanded ? (
+                          <ChevronUp className="w-5 h-5 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </button>
+
+              {/* AI Feedback - Expandable */}
+              {hasFeedback && isExpanded && (
+                <div className="px-4 pb-4 animate-slide-down">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-100">
+                    {/* Coach Header */}
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-lg">💪</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">Coach Flex says:</p>
+                      </div>
+                    </div>
+                    
+                    {/* Feedback Text */}
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {log.feedback}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Show More Button */}
+      {logs.length > 5 && (
+        <button 
+          onClick={() => setLocation('/logs')}
+          className="w-full py-3 text-orange-600 font-semibold rounded-xl border-2 border-orange-200 hover:bg-orange-50 transition-colors min-h-[44px]"
+        >
+          View all {logs.length} logs →
+        </button>
       )}
     </div>
   );

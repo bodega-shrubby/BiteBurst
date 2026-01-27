@@ -1,18 +1,24 @@
 import { useState } from 'react';
-import { Lock, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
 
 interface Badge {
   code: string;
   name: string;
+  emoji?: string;
   description: string;
+  progress?: {
+    current: number;
+    total: number;
+  };
 }
 
 interface BadgesShelfProps {
   earnedBadges: Badge[];
   lockedBadges: Badge[];
   className?: string;
-  onBadgeUnlock?: (badge: Badge) => void; // For celebration animations
+  onBadgeUnlock?: (badge: Badge) => void;
 }
 
 interface BadgeModalProps {
@@ -22,8 +28,32 @@ interface BadgeModalProps {
   onClose: () => void;
 }
 
+const BADGE_EMOJIS: Record<string, string> = {
+  'first-log': '🌟',
+  'streak-3': '🔥',
+  'streak-7': '🔥',
+  'streak-30': '🔥',
+  'fruit-fighter': '🍎',
+  'veggie-victor': '🥦',
+  'water-warrior': '💧',
+  'move-master': '🏃',
+  'breakfast-champion': '🍳',
+  'snack-smart': '🥜',
+  'rainbow-eater': '🌈',
+  'super-logger': '📝',
+};
+
+function getBadgeEmoji(code: string, emoji?: string): string {
+  return emoji || BADGE_EMOJIS[code] || '🏆';
+}
+
 function BadgeModal({ badge, isEarned, isOpen, onClose }: BadgeModalProps) {
   if (!isOpen) return null;
+  
+  const emoji = getBadgeEmoji(badge.code, badge.emoji);
+  const progressPercent = badge.progress 
+    ? (badge.progress.current / badge.progress.total) * 100 
+    : 0;
   
   return (
     <div 
@@ -39,8 +69,11 @@ function BadgeModal({ badge, isEarned, isOpen, onClose }: BadgeModalProps) {
       >
         <div className="flex justify-between items-start mb-4">
           <div className="text-center flex-1">
-            <div className={`text-6xl mb-3 ${isEarned ? '' : 'grayscale opacity-50'}`}>
-              🏆
+            <div className={`text-6xl mb-3 relative inline-block ${isEarned ? 'animate-bounce-in' : ''}`}>
+              <span style={{ opacity: isEarned ? 1 : 0.4 }}>{emoji}</span>
+              {isEarned && (
+                <div className="absolute inset-0 bg-yellow-300 rounded-full blur-xl opacity-40 -z-10 animate-pulse-glow" />
+              )}
             </div>
             <h3 id="badge-title" className="text-xl font-bold text-gray-900">
               {badge.name}
@@ -61,12 +94,24 @@ function BadgeModal({ badge, isEarned, isOpen, onClose }: BadgeModalProps) {
           </p>
           
           {isEarned ? (
-            <div className="text-green-600 font-semibold">
-              ✅ Earned!
+            <div className="text-green-600 font-bold flex items-center justify-center gap-1">
+              <span className="text-lg">✓</span> Earned!
+            </div>
+          ) : badge.progress ? (
+            <div className="space-y-2">
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-700"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <p className="text-sm text-orange-600 font-bold">
+                {badge.progress.current}/{badge.progress.total} completed
+              </p>
             </div>
           ) : (
-            <div className="text-gray-500 font-semibold">
-              🔒 Locked
+            <div className="text-gray-500 font-semibold flex items-center justify-center gap-1">
+              <span>🔒</span> Locked
             </div>
           )}
         </div>
@@ -82,55 +127,154 @@ function BadgeModal({ badge, isEarned, isOpen, onClose }: BadgeModalProps) {
   );
 }
 
+function BadgeCard({ badge, isEarned, onClick }: { badge: Badge; isEarned: boolean; onClick: () => void }) {
+  const emoji = getBadgeEmoji(badge.code, badge.emoji);
+  const hasProgress = badge.progress && badge.progress.total > 0;
+  const progressPercent = hasProgress ? (badge.progress!.current / badge.progress!.total) * 100 : 0;
+  const hasAnyProgress = hasProgress && badge.progress!.current > 0;
+
+  return (
+    <button 
+      onClick={onClick}
+      className={`
+        aspect-square flex flex-col items-center justify-center
+        rounded-2xl border-2 p-2 transition-all duration-300 relative
+        min-h-[72px] min-w-[72px]
+        ${isEarned 
+          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 shadow-md' 
+          : 'bg-gray-50 border-gray-200'
+        }
+        hover:scale-105 active:scale-95
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
+      `}
+      aria-label={`${badge.name} badge${isEarned ? ' - earned' : ' - locked'}`}
+    >
+      {/* Badge Icon */}
+      <div className="relative mb-1">
+        {isEarned ? (
+          <div className="relative">
+            <span className="text-2xl block animate-bounce-in">
+              {emoji}
+            </span>
+            <div className="absolute inset-0 bg-yellow-300 rounded-full blur-xl opacity-40 -z-10 animate-pulse-glow" />
+          </div>
+        ) : (
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <span 
+              className="text-2xl block" 
+              style={{ opacity: hasAnyProgress ? 0.4 : 0.2 }}
+            >
+              {emoji}
+            </span>
+            
+            {/* Circular Progress Ring - Always shown for locked badges */}
+            <svg 
+              className="absolute inset-0 w-full h-full -rotate-90" 
+              viewBox="0 0 36 36"
+            >
+              {/* Background ring */}
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="#E5E7EB"
+                strokeWidth="2"
+              />
+              {/* Progress ring - only visible if progress > 0 */}
+              {hasAnyProgress && (
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  stroke="#FF6A00"
+                  strokeWidth="2"
+                  strokeDasharray={`${progressPercent} 100`}
+                  strokeLinecap="round"
+                  className="transition-all duration-500"
+                />
+              )}
+            </svg>
+            
+            {/* Lock Icon Overlay for no progress */}
+            {!hasAnyProgress && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs opacity-60">🔒</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Badge Name */}
+      <span className={`
+        text-xs font-semibold text-center line-clamp-1 mb-0.5
+        ${isEarned ? 'text-gray-900' : 'text-gray-600'}
+      `}>
+        {badge.name.split(' ')[0]}
+      </span>
+
+      {/* Progress Text or Status */}
+      {isEarned ? (
+        <span className="text-xs text-green-600 font-bold">✓</span>
+      ) : hasProgress ? (
+        <span className="text-xs font-bold text-orange-600">
+          {badge.progress!.current}/{badge.progress!.total}
+        </span>
+      ) : (
+        <span className="text-xs text-gray-400 font-medium">Locked</span>
+      )}
+    </button>
+  );
+}
+
 export default function BadgesShelf({ 
   earnedBadges, 
   lockedBadges, 
   className = '',
   onBadgeUnlock 
 }: BadgesShelfProps) {
+  const [, setLocation] = useLocation();
   const [selectedBadge, setSelectedBadge] = useState<{ badge: Badge; isEarned: boolean } | null>(null);
   
   const handleBadgeClick = (badge: Badge, isEarned: boolean) => {
     setSelectedBadge({ badge, isEarned });
   };
   
-  const BadgeItem = ({ badge, isEarned }: { badge: Badge; isEarned: boolean }) => (
-    <button
-      onClick={() => handleBadgeClick(badge, isEarned)}
-      className={`
-        flex-shrink-0 w-16 h-20 rounded-2xl border-2 transition-all duration-200
-        flex flex-col items-center justify-center p-2 space-y-1
-        min-h-[44px] min-w-[44px]
-        ${isEarned 
-          ? 'border-orange-200 bg-gradient-to-b from-orange-50 to-orange-100 hover:shadow-lg hover:scale-105' 
-          : 'border-gray-300 border-dashed bg-gray-50 hover:bg-gray-100'
-        }
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
-      `}
-      aria-label={`${badge.name} badge${isEarned ? ' - earned' : ' - locked'}`}
-    >
-      <div className={`text-2xl ${isEarned ? '' : 'grayscale opacity-50'}`}>
-        🏆
-      </div>
-      {!isEarned && <Lock size={12} className="text-gray-400" />}
-      <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-        {badge.name.split(' ')[0]} {/* Show first word */}
-      </span>
-    </button>
-  );
-  
   const hasAnyBadges = earnedBadges.length > 0 || lockedBadges.length > 0;
+  const allBadges = [...earnedBadges.map(b => ({ ...b, earned: true })), ...lockedBadges.map(b => ({ ...b, earned: false }))].slice(0, 8);
   
   return (
     <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
-      <h2 className="text-xl font-bold text-black mb-4">Badges & Rewards</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Badges & Rewards</h2>
+        <button 
+          onClick={() => setLocation('/achievements')}
+          className="text-orange-600 font-semibold text-sm hover:text-orange-700 min-h-[44px] px-2 flex items-center"
+        >
+          View All →
+        </button>
+      </div>
       
-      {/* Badge Progress Indicator */}
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-gray-600">Progress</span>
-        <span className="text-sm font-bold text-orange-600">
-          {earnedBadges.length} / {earnedBadges.length + lockedBadges.length}
-        </span>
+      {/* Progress Bar */}
+      <div className="space-y-2 mb-4">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Progress</span>
+          <span className="font-bold text-gray-900">
+            {earnedBadges.length}/{earnedBadges.length + lockedBadges.length}
+          </span>
+        </div>
+        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-700"
+            style={{ 
+              width: `${earnedBadges.length + lockedBadges.length > 0 
+                ? (earnedBadges.length / (earnedBadges.length + lockedBadges.length)) * 100 
+                : 0}%` 
+            }}
+          />
+        </div>
       </div>
       
       {!hasAnyBadges ? (
@@ -142,17 +286,23 @@ export default function BadgesShelf({
         </div>
       ) : (
         <div className="grid grid-cols-4 gap-3">
-          {/* Earned badges first */}
-          {earnedBadges.map((badge) => (
-            <BadgeItem key={badge.code} badge={badge} isEarned={true} />
-          ))}
-          
-          {/* Then locked badges */}
-          {lockedBadges.slice(0, 8).map((badge) => (
-            <BadgeItem key={badge.code} badge={badge} isEarned={false} />
+          {allBadges.map((badge) => (
+            <BadgeCard 
+              key={badge.code} 
+              badge={badge} 
+              isEarned={badge.earned}
+              onClick={() => handleBadgeClick(badge, badge.earned)}
+            />
           ))}
         </div>
       )}
+
+      {/* Encouragement Text */}
+      <div className="text-center pt-4">
+        <p className="text-sm text-gray-600">
+          🎯 Keep logging to unlock more badges!
+        </p>
+      </div>
       
       {/* Badge Modal */}
       <BadgeModal
