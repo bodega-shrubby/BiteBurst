@@ -211,10 +211,7 @@ export default function FoodLogNew() {
             selectedItems={getAllSelectedItems()}
             totalXP={getTotalXP()}
             onSelectCategory={selectCategory}
-            onBack={() => {
-              reset();
-              setLocation('/dashboard');
-            }}
+            onBack={() => reset()}
             onFinish={handleFinishLogging}
             onTextInput={handleShowTextInput}
           />
