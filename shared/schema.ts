@@ -199,7 +199,7 @@ export const userLessonProgress = pgTable("user_lesson_progress", {
 // Lesson attempt analytics table  
 export const lessonAttempts = pgTable("lesson_attempts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   lessonId: varchar("lesson_id").notNull().references(() => lessons.id, { onDelete: 'cascade' }),
   stepId: varchar("step_id").notNull().references(() => lessonSteps.id, { onDelete: 'cascade' }),
   stepNumber: integer("step_number").notNull(),
