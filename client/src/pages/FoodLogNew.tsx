@@ -119,7 +119,7 @@ function FoodItemButton({ item, isSelected, onToggle }: FoodItemButtonProps) {
         transition-all duration-200
         ${isSelected
           ? 'bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-500 scale-105 shadow-lg'
-          : 'bg-white border-2 border-gray-200 hover:border-orange-300 hover:scale-102'
+          : 'bg-white border-2 border-gray-200 hover:border-orange-300 hover:scale-105'
         }
         active:scale-95
       `}
@@ -337,7 +337,7 @@ export default function FoodLogNew() {
                   </p>
                   <button
                     onClick={goToText}
-                    className="w-full py-4 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-98 transition-all flex items-center justify-center space-x-2 min-h-[56px]"
+                    className="w-full py-4 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[56px]"
                   >
                     <MessageSquare className="w-5 h-5" />
                     <span>Type what you ate</span>
@@ -499,24 +499,6 @@ export default function FoodLogNew() {
           'Text input ready to submit'
         }
       </div>
-
-      <style>{`
-        @keyframes scale-in {
-          0% { transform: scale(0); opacity: 0; }
-          50% { transform: scale(1.2); }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-scale-in {
-          animation: scale-in 0.3s ease-out;
-        }
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }
