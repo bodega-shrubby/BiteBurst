@@ -1,170 +1,188 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft, MessageSquare, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import foodEmojis from '@/config/food-emojis.json';
-import '../styles/tokens.css';
 import mascotImage from '@assets/9ef8e8fe-158e-4518-bd1c-1325863aebca_1756365757940.png';
 
-type InputMethod = 'emoji' | 'text' | 'photo';
+type Step = 'category' | 'items' | 'text';
 
-interface LogState {
-  method: InputMethod;
-  selectedEmojis: string[];
-  textInput: string;
-  photoFile: File | null;
-  photoPreview: string | null;
-  selectedCategory: string | null;
+interface FoodItem {
+  emoji: string;
+  name: string;
+  healthy: boolean;
 }
 
-// Haptic feedback helper
 const triggerHaptic = () => {
   if ('vibrate' in navigator) {
     navigator.vibrate(10);
   }
 };
 
-// Photo compression utility
-const compressImage = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    
-    img.onload = () => {
-      const maxSize = 1280;
-      const { width, height } = img;
-      
-      let newWidth = width;
-      let newHeight = height;
-      
-      if (width > height && width > maxSize) {
-        newWidth = maxSize;
-        newHeight = (height * maxSize) / width;
-      } else if (height > maxSize) {
-        newHeight = maxSize;
-        newWidth = (width * maxSize) / height;
-      }
-      
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-      
-      ctx?.drawImage(img, 0, 0, newWidth, newHeight);
-      
-      canvas.toBlob((blob) => {
-        if (blob && blob.size <= 256 * 1024) {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(blob);
-        } else {
-          // If still too large, reduce quality
-          canvas.toBlob((smallerBlob) => {
-            if (smallerBlob) {
-              const reader = new FileReader();
-              reader.onload = () => resolve(reader.result as string);
-              reader.readAsDataURL(smallerBlob);
-            } else {
-              reject(new Error('Failed to compress image'));
-            }
-          }, 'image/jpeg', 0.7);
-        }
-      }, 'image/jpeg', 0.8);
-    };
-    
-    img.onerror = () => reject(new Error('Failed to load image'));
-    img.src = URL.createObjectURL(file);
-  });
+const CATEGORY_ORDER = [
+  { id: 'Fruits', name: 'Fruits', emoji: '🍎', color: 'from-red-100 to-red-200', border: 'border-red-300' },
+  { id: 'Snacks', name: 'Snacks', emoji: '🍪', color: 'from-yellow-100 to-yellow-200', border: 'border-yellow-300' },
+  { id: 'Vegetables', name: 'Veggies', emoji: '🥦', color: 'from-green-100 to-green-200', border: 'border-green-300' },
+  { id: 'Drinks', name: 'Drinks', emoji: '💧', color: 'from-blue-100 to-blue-200', border: 'border-blue-300' },
+  { id: 'Bread', name: 'Bread & Grains', emoji: '🍞', color: 'from-amber-100 to-amber-200', border: 'border-amber-300' },
+  { id: 'Dairy', name: 'Dairy', emoji: '🥛', color: 'from-purple-100 to-purple-200', border: 'border-purple-300' },
+  { id: 'Protein', name: 'Protein', emoji: '🍗', color: 'from-orange-100 to-orange-200', border: 'border-orange-300' },
+];
+
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0
+  }),
+  center: {
+    x: 0,
+    opacity: 1
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? '-100%' : '100%',
+    opacity: 0
+  })
 };
 
-export default function FoodLog() {
+function CategorySkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-4 p-4 animate-pulse">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-gray-100 h-32">
+          <div className="w-16 h-16 bg-gray-200 rounded-full mb-3" />
+          <div className="w-20 h-4 bg-gray-200 rounded" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ItemSkeleton() {
+  return (
+    <div className="grid grid-cols-4 gap-3 p-4 animate-pulse">
+      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <div key={i} className="aspect-square rounded-2xl bg-gray-100 p-3">
+          <div className="w-full aspect-square bg-gray-200 rounded-xl mb-2" />
+          <div className="w-12 h-3 bg-gray-200 rounded mx-auto" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyState({ categoryName, onBack }: { categoryName: string; onBack: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
+      <img 
+        src={mascotImage}
+        alt="Sunny Slice"
+        className="w-32 h-32 mb-6 animate-bounce-slow"
+      />
+      <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+        Hmm, this category is empty!
+      </h3>
+      <p className="text-gray-600 text-center mb-6 max-w-xs">
+        Try another category or use text input to log what you ate! 🍎
+      </p>
+      <button
+        onClick={onBack}
+        className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl hover:from-orange-600 hover:to-orange-700 active:scale-95 transition-all min-h-[48px]"
+      >
+        ← Try Another Category
+      </button>
+    </div>
+  );
+}
+
+interface FoodItemButtonProps {
+  item: FoodItem;
+  isSelected: boolean;
+  onToggle: () => void;
+}
+
+function FoodItemButton({ item, isSelected, onToggle }: FoodItemButtonProps) {
+  const handleClick = () => {
+    triggerHaptic();
+    onToggle();
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`
+        relative flex flex-col items-center justify-center
+        min-w-[72px] min-h-[72px] aspect-square rounded-2xl p-2
+        transition-all duration-200
+        ${isSelected
+          ? 'bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-500 scale-105 shadow-lg'
+          : 'bg-white border-2 border-gray-200 hover:border-orange-300 hover:scale-102'
+        }
+        active:scale-95
+      `}
+    >
+      {isSelected && (
+        <div className="absolute -top-2 -right-2 z-10 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-scale-in">
+          <Check className="w-4 h-4 text-white" strokeWidth={3} />
+        </div>
+      )}
+      <span className={`text-3xl mb-1 transition-transform duration-200 ${isSelected ? 'scale-110' : 'scale-100'}`}>
+        {item.emoji}
+      </span>
+      <span className={`text-[10px] font-medium text-center line-clamp-1 ${isSelected ? 'text-green-800 font-bold' : 'text-gray-600'}`}>
+        {item.name}
+      </span>
+    </button>
+  );
+}
+
+export default function FoodLogNew() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  const [state, setState] = useState<LogState>({
-    method: 'emoji',
-    selectedEmojis: [],
-    textInput: '',
-    photoFile: null,
-    photoPreview: null,
-    selectedCategory: null,
-  });
+  const [step, setStep] = useState<Step>('category');
+  const [direction, setDirection] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
+  const [textInput, setTextInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-focus textarea when switching to text method
   useEffect(() => {
-    if (state.method === 'text' && textareaRef.current) {
+    if (step === 'text' && textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [state.method]);
+  }, [step]);
 
-  // Category icons mapping
-  const categoryIcons = {
-    'Fruits': '🍎',
-    'Vegetables': '🥦',
-    'Dairy': '🥛',
-    'Bread': '🍞',
-    'Drinks': '💧',
-    'Snacks': '🍪',
-    'Protein': '🥚'
-  };
+  const currentItems = useMemo(() => {
+    if (!selectedCategory) return [];
+    const category = foodEmojis.categories.find(cat => cat.name === selectedCategory);
+    return category?.emojis || [];
+  }, [selectedCategory]);
 
-  // Get emojis for selected category
-  const getCategoryEmojis = (categoryName: string) => {
-    const category = foodEmojis.categories.find(cat => cat.name === categoryName);
-    return category ? category.emojis.map(item => ({
-      emoji: item.emoji,
-      name: item.name,
-      healthy: item.healthy,
-      category: categoryName
-    })) : [];
-  };
-
-  // Current emojis to display (either all or filtered by category)
-  const currentEmojis = useMemo(() => {
-    if (state.selectedCategory) {
-      return getCategoryEmojis(state.selectedCategory);
-    }
-    return [];
-  }, [state.selectedCategory]);
-
-  // Check if current state has valid content
   const hasValidContent = () => {
-    switch (state.method) {
-      case 'emoji':
-        return state.selectedEmojis.length > 0;
-      case 'text':
-        return state.textInput.trim().length >= 2;
-      case 'photo':
-        return state.photoFile !== null;
-      default:
-        return false;
-    }
+    if (step === 'items') return selectedEmojis.length > 0;
+    if (step === 'text') return textInput.trim().length >= 2;
+    return false;
   };
 
-  // Submit mutation
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('User not authenticated');
       
       let content: any = {};
+      let entryMethod = 'emoji';
       
-      switch (state.method) {
-        case 'emoji':
-          content = { emojis: state.selectedEmojis };
-          break;
-        case 'text':
-          content = { text: state.textInput.trim() };
-          break;
-        case 'photo':
-          if (state.photoPreview) {
-            content = { photo: state.photoPreview };
-          }
-          break;
+      if (step === 'items') {
+        content = { emojis: selectedEmojis };
+        entryMethod = 'emoji';
+      } else if (step === 'text') {
+        content = { text: textInput.trim() };
+        entryMethod = 'text';
       }
 
       return await apiRequest('/api/logs', {
@@ -172,7 +190,7 @@ export default function FoodLog() {
         body: {
           userId: user.id,
           type: 'food',
-          entryMethod: state.method,
+          entryMethod,
           content,
           timestamp: new Date().toISOString()
         }
@@ -180,13 +198,9 @@ export default function FoodLog() {
     },
     onSuccess: (data) => {
       triggerHaptic();
-      
-      // Store log data for feedback page
       if (data && typeof data === 'object' && 'id' in data) {
         localStorage.setItem('lastLogData', JSON.stringify(data));
       }
-      
-      // Navigate immediately to success page for confetti animation
       const successUrl = `/success?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || 0}`;
       setLocation(successUrl);
     },
@@ -199,119 +213,48 @@ export default function FoodLog() {
     },
   });
 
-  // Method selection handlers
-  const selectMethod = (method: InputMethod) => {
+  const goToItems = (categoryId: string) => {
     triggerHaptic();
-    setState(prev => ({ 
-      ...prev, 
-      method,
-      selectedCategory: null,
-      selectedEmojis: [],
-      textInput: '',
-      photoFile: null,
-      photoPreview: null
-    }));
+    setIsLoading(true);
+    setDirection(1);
+    setSelectedCategory(categoryId);
+    setTimeout(() => {
+      setStep('items');
+      setIsLoading(false);
+    }, 150);
   };
 
-  const selectCategory = (categoryName: string) => {
-    setState(prev => ({
-      ...prev,
-      selectedCategory: categoryName
-    }));
+  const goToText = () => {
     triggerHaptic();
+    setDirection(1);
+    setStep('text');
   };
 
-  const goBackToCategories = () => {
-    setState(prev => ({
-      ...prev,
-      selectedCategory: null
-    }));
+  const goBack = () => {
     triggerHaptic();
+    setDirection(-1);
+    if (step === 'items') {
+      setStep('category');
+      setSelectedEmojis([]);
+    } else if (step === 'text') {
+      setStep('category');
+      setTextInput('');
+    } else {
+      setLocation('/dashboard');
+    }
   };
 
-  // Emoji selection handlers
   const toggleEmoji = (emoji: string) => {
     triggerHaptic();
-    setState(prev => ({
-      ...prev,
-      selectedEmojis: prev.selectedEmojis.includes(emoji)
-        ? prev.selectedEmojis.filter(e => e !== emoji)
-        : [...prev.selectedEmojis, emoji]
-    }));
+    setSelectedEmojis(prev =>
+      prev.includes(emoji)
+        ? prev.filter(e => e !== emoji)
+        : [...prev, emoji]
+    );
   };
 
-  const removeEmojiChip = (emoji: string) => {
-    triggerHaptic();
-    setState(prev => ({
-      ...prev,
-      selectedEmojis: prev.selectedEmojis.filter(e => e !== emoji)
-    }));
-  };
-
-  const clearEmojis = () => {
-    triggerHaptic();
-    setState(prev => ({ ...prev, selectedEmojis: [] }));
-  };
-
-  // Text input handlers
   const handleTextChange = (value: string) => {
-    // Strip emojis in text mode - simplified approach
-    const textOnly = value.replace(/[^\w\s.,!?]/g, '');
-    setState(prev => ({ ...prev, textInput: textOnly.slice(0, 160) }));
-  };
-
-  // Photo handlers
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file",
-        description: "Please select an image file",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file size (before compression)
-    if (file.size > 10 * 1024 * 1024) { // 10MB
-      toast({
-        title: "File too large",
-        description: "Please select an image smaller than 10MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const compressedDataUrl = await compressImage(file);
-      setState(prev => ({
-        ...prev,
-        photoFile: file,
-        photoPreview: compressedDataUrl
-      }));
-      triggerHaptic();
-    } catch (error) {
-      toast({
-        title: "Image processing failed",
-        description: "Please try a different image",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const removePhoto = () => {
-    setState(prev => ({
-      ...prev,
-      photoFile: null,
-      photoPreview: null
-    }));
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    triggerHaptic();
+    setTextInput(value.slice(0, 160));
   };
 
   const handleSubmit = () => {
@@ -322,187 +265,258 @@ export default function FoodLog() {
   };
 
   return (
-    <div className="bb-container">
-      {/* Header */}
-      <header className="bb-appbar">
-        <button 
-          className="bb-back" 
-          onClick={() => setLocation('/dashboard')}
-          aria-label="Back to dashboard"
-        >
-          ←
-        </button>
-        <h1>Log your meal</h1>
-        <img src={mascotImage} alt="BiteBurst mascot" className="bb-mascot" />
+    <div className="min-h-screen bg-white flex flex-col">
+      <header className="bg-gradient-to-b from-orange-500 to-orange-600 px-4 py-4 text-white sticky top-0 z-20">
+        <div className="max-w-md mx-auto flex items-center">
+          <button 
+            onClick={goBack}
+            className="p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div className="flex-1 text-center">
+            <h1 className="text-xl font-bold">
+              {step === 'category' && 'Log Your Meal 🍽️'}
+              {step === 'items' && selectedCategory}
+              {step === 'text' && 'Type What You Ate'}
+            </h1>
+          </div>
+          <div className="w-10" />
+        </div>
       </header>
 
-      {/* Intro */}
-      <p className="bb-helper">Choose how you want to log</p>
-
-      {/* Method Selection */}
-      <section className="bb-methods" role="tablist">
-        <button
-          id="optEmoji"
-          className={`bb-card-select ${state.method === 'emoji' ? 'is-active' : ''}`}
-          onClick={() => selectMethod('emoji')}
-          role="tab"
-          aria-selected={state.method === 'emoji'}
-          aria-controls="panelEmoji"
-        >
-          <div className="bb-emoji-peek">🍎 🥦 🍞 🧃</div>
-          <span>Emojis</span>
-        </button>
-        
-        <button
-          id="optText"
-          className={`bb-card-select ${state.method === 'text' ? 'is-active' : ''}`}
-          onClick={() => selectMethod('text')}
-          role="tab"
-          aria-selected={state.method === 'text'}
-          aria-controls="panelText"
-        >
-          <div className="bb-icon">💬</div>
-          <span>Text</span>
-        </button>
-      </section>
-
-      {/* Emoji Panel */}
-      <section 
-        id="panelEmoji" 
-        className="bb-panel" 
-        hidden={state.method !== 'emoji'}
-        role="tabpanel"
-        aria-labelledby="optEmoji"
-      >
-        {!state.selectedCategory ? (
-          // Category Selection View
-          <>
-            <h2 className="bb-section">Pick a food category</h2>
-            <div className="bb-category-grid" role="listbox" aria-label="Food categories">
-              {foodEmojis.categories.map((category) => (
-                <button
-                  key={category.name}
-                  className="bb-category-tile"
-                  onClick={() => selectCategory(category.name)}
-                  role="option"
-                  aria-label={`Select ${category.name} category`}
-                >
-                  <div className="bb-category-icon">
-                    {categoryIcons[category.name as keyof typeof categoryIcons]}
+      <div className="flex-1 overflow-hidden relative">
+        <AnimatePresence initial={false} custom={direction} mode="wait">
+          {step === 'category' && (
+            <motion.div
+              key="category"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="absolute inset-0 overflow-y-auto"
+            >
+              <div className="p-4 max-w-md mx-auto pb-32">
+                <p className="text-sm text-gray-600 mb-4 text-center font-medium">
+                  🎯 Pick a category to get started!
+                </p>
+                
+                {isLoading ? (
+                  <CategorySkeleton />
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    {CATEGORY_ORDER.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => goToItems(category.id)}
+                        className={`
+                          flex flex-col items-center justify-center
+                          p-5 rounded-2xl min-h-[120px]
+                          bg-gradient-to-br ${category.color}
+                          border-2 ${category.border}
+                          hover:scale-105 hover:shadow-lg
+                          active:scale-95
+                          transition-all duration-200
+                        `}
+                      >
+                        <span className="text-5xl mb-2">{category.emoji}</span>
+                        <span className="text-sm font-bold text-gray-800 text-center">
+                          {category.name}
+                        </span>
+                      </button>
+                    ))}
                   </div>
-                  <span className="bb-category-name">{category.name}</span>
-                </button>
-              ))}
-            </div>
-          </>
-        ) : (
-          // Emoji Selection View for selected category
-          <>
-            <div className="bb-section-header">
-              <button 
-                className="bb-back-category"
-                onClick={goBackToCategories}
-                aria-label="Back to categories"
-              >
-                ←
-              </button>
-              <h2 className="bb-section">{state.selectedCategory}</h2>
-            </div>
-            <div className="bb-emoji-grid" role="listbox" aria-label={`${state.selectedCategory} emojis`}>
-              {currentEmojis.map((item, index) => (
-                <button
-                  key={index}
-                  className={`bb-emoji-tile ${state.selectedEmojis.includes(item.emoji) ? 'selected' : ''}`}
-                  onClick={() => toggleEmoji(item.emoji)}
-                  aria-pressed={state.selectedEmojis.includes(item.emoji)}
-                  title={item.name}
-                  role="option"
-                  aria-selected={state.selectedEmojis.includes(item.emoji)}
-                >
-                  {item.emoji}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-        
-        {/* Selection Shelf */}
-        <div 
-          id="emojiShelf" 
-          className="bb-shelf" 
-          hidden={state.selectedEmojis.length === 0}
-          aria-live="polite"
-        >
-          <div id="emojiChips" className="bb-chips">
-            {state.selectedEmojis.map((emoji, index) => (
-              <div key={index} className="bb-chip">
-                {emoji}
-                <button
-                  className="bb-chip-remove"
-                  onClick={() => removeEmojiChip(emoji)}
-                  aria-label={`Remove ${emoji}`}
-                >
-                  ×
-                </button>
+                )}
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 text-center mb-3">
+                    Can't find what you're looking for?
+                  </p>
+                  <button
+                    onClick={goToText}
+                    className="w-full py-4 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-98 transition-all flex items-center justify-center space-x-2 min-h-[56px]"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    <span>Type what you ate</span>
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-          <button id="emojiClear" className="bb-link-sm" onClick={clearEmojis}>
-            Clear
-          </button>
-        </div>
-      </section>
+            </motion.div>
+          )}
 
-      {/* Text Panel */}
-      <section 
-        id="panelText" 
-        className="bb-panel" 
-        hidden={state.method !== 'text'}
-        role="tabpanel"
-        aria-labelledby="optText"
-      >
-        <h2 className="bb-section">Type what you ate</h2>
-        <div className="bb-field">
-          <textarea
-            ref={textareaRef}
-            id="mealText"
-            value={state.textInput}
-            onChange={(e) => handleTextChange(e.target.value)}
-            maxLength={160}
-            placeholder="e.g., apple, yogurt, toast"
-            aria-describedby="charCount textHint"
-          />
-          <div className="bb-meta">
-            <span id="charCount">{state.textInput.length}</span>/160
-          </div>
-        </div>
-        {state.textInput.length > 0 && state.textInput.length < 2 && (
-          <p className="bb-error">Please add at least 2 characters</p>
+          {step === 'items' && (
+            <motion.div
+              key="items"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="absolute inset-0 overflow-y-auto"
+            >
+              <div className="p-4 max-w-md mx-auto pb-48">
+                {isLoading ? (
+                  <ItemSkeleton />
+                ) : currentItems.length === 0 ? (
+                  <EmptyState categoryName={selectedCategory || ''} onBack={goBack} />
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-600 mb-4 text-center font-medium">
+                      ✨ Tap everything you ate!
+                    </p>
+                    <div className="grid grid-cols-4 gap-3">
+                      {currentItems.map((item, index) => (
+                        <FoodItemButton
+                          key={index}
+                          item={item}
+                          isSelected={selectedEmojis.includes(item.emoji)}
+                          onToggle={() => toggleEmoji(item.emoji)}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-gray-200">
+                      <button
+                        onClick={goBack}
+                        className="w-full py-3 px-4 text-orange-600 font-medium rounded-xl hover:bg-orange-50 transition-all flex items-center justify-center space-x-2"
+                      >
+                        <span>← Pick different category</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {step === 'text' && (
+            <motion.div
+              key="text"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="absolute inset-0 overflow-y-auto"
+            >
+              <div className="p-4 max-w-md mx-auto pb-48">
+                <p className="text-sm text-gray-600 mb-4 text-center font-medium">
+                  📝 Tell me what you had!
+                </p>
+                
+                <div className="relative">
+                  <textarea
+                    ref={textareaRef}
+                    value={textInput}
+                    onChange={(e) => handleTextChange(e.target.value)}
+                    maxLength={160}
+                    placeholder="e.g., apple, yogurt, sandwich with cheese..."
+                    className="w-full p-4 border-2 border-gray-200 rounded-2xl text-base min-h-[120px] focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all resize-none"
+                  />
+                  <div className="absolute bottom-3 right-3 text-xs text-gray-400">
+                    {textInput.length}/160
+                  </div>
+                </div>
+
+                {textInput.length > 0 && textInput.length < 2 && (
+                  <p className="text-red-500 text-sm mt-2 text-center">
+                    Please add at least 2 characters
+                  </p>
+                )}
+
+                <p className="text-xs text-gray-500 text-center mt-4">
+                  💡 Tip: Keep it simple - just list what you ate!
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <AnimatePresence>
+        {hasValidContent() && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-30 pb-6"
+          >
+            <div className="max-w-md mx-auto space-y-3">
+              {step === 'items' && selectedEmojis.length > 0 && (
+                <div className="bg-orange-50 rounded-xl p-3 border border-orange-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-orange-800">
+                      {selectedEmojis.length} selected
+                    </span>
+                    <span className="text-xs text-orange-600 font-medium">
+                      +{Math.min(selectedEmojis.length * 5, 25)} XP
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedEmojis.slice(0, 8).map((emoji, idx) => (
+                      <span key={idx} className="text-2xl">{emoji}</span>
+                    ))}
+                    {selectedEmojis.length > 8 && (
+                      <span className="text-sm text-orange-600 flex items-center ml-1">
+                        +{selectedEmojis.length - 8} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={handleSubmit}
+                disabled={submitMutation.isPending}
+                className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all flex items-center justify-center space-x-3 min-h-[56px] disabled:opacity-50"
+              >
+                <Check className="w-6 h-6" />
+                <span>
+                  {submitMutation.isPending 
+                    ? 'Logging...' 
+                    : step === 'items' 
+                      ? `Log ${selectedEmojis.length} Item${selectedEmojis.length > 1 ? 's' : ''}`
+                      : 'Log Meal'
+                  }
+                </span>
+              </button>
+            </div>
+          </motion.div>
         )}
-        <p id="textHint" className="bb-hint">Tip: keep it simple.</p>
-      </section>
+      </AnimatePresence>
 
-      {/* Sticky Action Bar */}
-      <footer className={`bb-cta-bar ${hasValidContent() ? 'visible' : ''}`}>
-        <button
-          id="btnSubmit"
-          className="bb-cta"
-          disabled={!hasValidContent() || submitMutation.isPending}
-          onClick={handleSubmit}
-        >
-          <span>{submitMutation.isPending ? 'Logging meal...' : 'Log meal'}</span>
-        </button>
-      </footer>
-
-      {/* Screen reader announcements */}
-      <div aria-live="polite" aria-atomic="true" style={{ position: 'absolute', left: '-10000px' }}>
-        {state.method === 'emoji' && state.selectedEmojis.length > 0 && 
-          `Selected ${state.selectedEmojis.length} food${state.selectedEmojis.length > 1 ? 's' : ''}`
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {step === 'items' && selectedEmojis.length > 0 && 
+          `Selected ${selectedEmojis.length} food${selectedEmojis.length > 1 ? 's' : ''}`
         }
-        {state.method === 'text' && state.textInput.length >= 2 && 
+        {step === 'text' && textInput.length >= 2 && 
           'Text input ready to submit'
         }
       </div>
+
+      <style>{`
+        @keyframes scale-in {
+          0% { transform: scale(0); opacity: 0; }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out;
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
