@@ -165,7 +165,7 @@ export default function DurationSelectionScreen({
             {!showCustomInput ? (
               <button
                 onClick={() => setShowCustomInput(true)}
-                className="w-full py-3 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[48px]"
+                className="w-full py-4 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[72px]"
               >
                 <Clock className="w-5 h-5" />
                 <span>Custom time</span>

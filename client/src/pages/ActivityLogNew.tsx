@@ -2,6 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { useActivityLogging } from '@/hooks/useActivityLogging';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import TimePeriodScreen from '@/components/activity-log/TimePeriodScreen';
 import ActivityTypeScreen from '@/components/activity-log/ActivityTypeScreen';
 import DurationSelectionScreen from '@/components/activity-log/DurationSelectionScreen';
@@ -10,6 +11,7 @@ import { apiRequest } from '@/lib/queryClient';
 export default function ActivityLogNew() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { toast } = useToast();
   const {
     state,
     startLog,
@@ -28,6 +30,7 @@ export default function ActivityLogNew() {
     try {
       const activities = getAllActivities();
       const activitySummary = activities.map(a => `${a.activityEmoji} ${a.activityName} (${a.durationMinutes}min)`).join(', ');
+      const totalMinutes = getTotalMinutes();
       
       await apiRequest('/api/logs', {
         method: 'POST',
@@ -35,10 +38,11 @@ export default function ActivityLogNew() {
           userId: user.id,
           type: 'activity',
           entryMethod: 'emoji',
+          durationMin: totalMinutes,
           content: {
             timePeriod: state.currentLog.timePeriod,
             activities: state.currentLog.activities,
-            totalMinutes: state.currentLog.totalMinutes,
+            totalMinutes: totalMinutes,
             summary: activitySummary
           }
         })
@@ -55,10 +59,20 @@ export default function ActivityLogNew() {
         });
       }
 
+      toast({
+        title: "Activity logged!",
+        description: `You earned +${xpToAdd} XP for ${totalMinutes} minutes of activity!`,
+      });
+
       reset();
       setLocation('/dashboard');
     } catch (error) {
       console.error('Failed to submit activity log:', error);
+      toast({
+        title: "Oops!",
+        description: "Couldn't save your activity. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
