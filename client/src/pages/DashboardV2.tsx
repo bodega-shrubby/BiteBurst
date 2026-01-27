@@ -14,6 +14,7 @@ import BadgesShelf from "@/components/dashboard/BadgesShelf";
 import RecentLogsList from "@/components/dashboard/RecentLogsList";
 import BottomNavigation from "@/components/BottomNavigation";
 import { CharacterAvatar } from "@/components/dashboard/CharacterAvatar";
+import XPProgressBar from "@/components/dashboard/XPProgressBar";
 
 // Mascot assets
 import sunnySliceImage from "@assets/Mascots/SunnySlice.png";
@@ -366,8 +367,13 @@ export default function DashboardV2() {
           <div className="flex justify-between items-center mb-4">
             {/* Hearts Display */}
             <HeartsDisplay hearts={3} maxHearts={5} />
+            {/* Streak Flame */}
+            <div className="flex items-center space-x-1 bg-white/20 px-3 py-1.5 rounded-full">
+              <span className="text-xl flame-flicker">🔥</span>
+              <span className="text-white font-bold text-sm">{dailySummary.streak_days}</span>
+            </div>
             {/* Settings Icon */}
-            <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors" data-testid="button-settings">
+            <button className="p-2 rounded-lg hover:bg-purple-500 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" data-testid="button-settings">
               <Settings className="w-6 h-6 text-white" />
             </button>
           </div>
@@ -392,19 +398,32 @@ export default function DashboardV2() {
           <h1 className="text-2xl font-bold text-center mb-2" data-testid="text-username">
             {dailySummary.user.display_name}
           </h1>
-          <p className="text-neutral-400 text-center text-sm mb-4">
+          <p className="text-neutral-400 text-center text-sm mb-3">
             @{dailySummary.user.display_name.toLowerCase()}
           </p>
           
+          {/* Level Progress Bar */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-orange-400 font-semibold">Level {dailySummary.user.level}</span>
+              <span className="text-neutral-400">
+                {dailySummary.user.lifetime_xp % 100} / 100 XP to Level {dailySummary.user.level + 1}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-neutral-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-500"
+                style={{ width: `${(dailySummary.user.lifetime_xp % 100)}%` }}
+              />
+            </div>
+          </div>
+          
           {/* Stats Chips */}
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
-              Level {dailySummary.user.level}
-            </div>
-            <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+            <div className="bg-orange-500 px-3 py-1.5 rounded-full text-xs font-semibold min-h-[28px] flex items-center">
               {dailySummary.streak_days} day streak
             </div>
-            <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+            <div className="bg-orange-500 px-3 py-1.5 rounded-full text-xs font-semibold min-h-[28px] flex items-center">
               {dailySummary.xp_today} XP today
             </div>
           </div>
@@ -413,8 +432,19 @@ export default function DashboardV2() {
 
       {/* Main Content */}
       <main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
+        {/* 1. XP Progress Bar - Top Priority */}
+        <XPProgressBar xpToday={dailySummary.xp_today} xpGoal={dailySummary.xp_goal} />
+
+        {/* 2. Today's Journey - Primary Action Area */}
+        <TodaysJourney milestones={dailySummary.milestones} onTaskComplete={handleXpBurst} />
+
+        {/* 3. Quick Log Grid - Easy Logging */}
+        <div className="relative z-50 bg-white rounded-2xl border border-gray-200 p-6">
+          <QuickLogGrid isFirstTimeUser={dailySummary.recent_logs.length === 0} />
+        </div>
+
         {/* Invite Button */}
-        <button className="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
+        <button className="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors min-h-[56px]">
           <UserPlus className="w-5 h-5 text-orange-500" />
           <span className="text-orange-500 font-bold">Add Friends</span>
         </button>
@@ -492,14 +522,6 @@ export default function DashboardV2() {
             </div>
           </div>
         </div>
-
-        {/* Quick Log Grid */}
-        <div className="relative z-50 bg-white rounded-2xl border border-gray-200 p-6">
-          <QuickLogGrid />
-        </div>
-
-        {/* Today's Journey */}
-        <TodaysJourney milestones={dailySummary.milestones} onTaskComplete={handleXpBurst} />
 
         {/* Badges Shelf */}
         <BadgesShelf

@@ -32,28 +32,37 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
     return type === 'food' ? 'Food log' : 'Activity';
   };
   
+  const SUNNY_MESSAGES = [
+    "I'm so excited to see what yummy things you'll try today!",
+    "Ready to fuel up? Let's log something delicious!",
+    "Every healthy choice makes me so happy! What's on the menu?",
+    "Time to power up! What will you eat or do today?",
+  ];
+  
+  const randomMessage = SUNNY_MESSAGES[Math.floor(Math.random() * SUNNY_MESSAGES.length)];
+  
   if (!logs || logs.length === 0) {
     return (
       <div className={`bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-6 ${className}`}>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Today's Activity</h2>
         <div className="text-center py-6 space-y-3">
-          <div className="text-5xl mb-2">📝</div>
+          <div className="text-5xl mb-2 mascot-idle">🍊</div>
           <h3 className="text-lg font-bold text-gray-900">
-            No activity yet today
+            Hi there, friend!
           </h3>
-          <p className="text-gray-600 text-sm mb-4">
-            Tap the buttons below to log your first meal or activity!
+          <p className="text-gray-600 text-sm mb-4 px-4">
+            {randomMessage}
           </p>
           <div className="flex flex-col gap-2 mt-4">
             <button 
               onClick={() => window.location.href = '/food-log'}
-              className="px-4 py-3 bg-[#FF6A00] text-white rounded-xl font-bold hover:bg-[#E55A00] transition-colors"
+              className="px-4 py-3 bg-[#FF6A00] text-white rounded-xl font-bold hover:bg-[#E55A00] transition-colors min-h-[48px] pulse-cta"
             >
               🍎 Log Your First Meal
             </button>
             <button 
               onClick={() => window.location.href = '/activity-log'}
-              className="px-4 py-3 border-2 border-[#FF6A00] text-[#FF6A00] rounded-xl font-bold hover:bg-orange-50 transition-colors"
+              className="px-4 py-3 border-2 border-[#FF6A00] text-[#FF6A00] rounded-xl font-bold hover:bg-orange-50 transition-colors min-h-[48px]"
             >
               ⚽ Log Your First Activity
             </button>

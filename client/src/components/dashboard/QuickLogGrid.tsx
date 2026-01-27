@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 
 interface QuickLogGridProps {
   className?: string;
+  isFirstTimeUser?: boolean;
 }
 
 const FOOD_OPTIONS = [
@@ -19,7 +20,7 @@ const ACTIVITY_OPTIONS = [
   { emoji: '🎯', label: 'Practice', query: 'drills' }
 ];
 
-export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
+export default function QuickLogGrid({ className = '', isFirstTimeUser = false }: QuickLogGridProps) {
   const [, setLocation] = useLocation();
   
   const TileButton = ({ 
@@ -107,7 +108,7 @@ export default function QuickLogGrid({ className = '' }: QuickLogGridProps) {
         <Button
           onClick={() => setLocation('/food-log')}
           data-testid="button-log-meal"
-          className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"
+          className={`w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider ${isFirstTimeUser ? 'pulse-cta' : ''}`}
           style={{ borderRadius: '13px' }}
         >
           <span className="mr-2">🍎</span>

@@ -125,6 +125,14 @@ export default function BadgesShelf({
     <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
       <h2 className="text-xl font-bold text-black mb-4">Badges & Rewards</h2>
       
+      {/* Badge Progress Indicator */}
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-sm text-gray-600">Progress</span>
+        <span className="text-sm font-bold text-orange-600">
+          {earnedBadges.length} / {earnedBadges.length + lockedBadges.length}
+        </span>
+      </div>
+      
       {!hasAnyBadges ? (
         <div className="text-center py-8 space-y-3">
           <div className="text-4xl">✨</div>
