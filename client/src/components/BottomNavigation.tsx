@@ -108,7 +108,7 @@ export default function BottomNavigation() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50 pb-safe">
-      <div className="max-w-md mx-auto relative flex items-center justify-between px-4 h-20">
+      <div className="max-w-md mx-auto relative flex items-center justify-between px-4 h-24">
         
         <div className="flex items-center space-x-2">
           {NAV_ITEMS.left.map((item) => (
@@ -119,7 +119,7 @@ export default function BottomNavigation() {
         <button
           onClick={() => setLocation('/food-log')}
           className={`
-            absolute left-1/2 transform -translate-x-1/2 -top-8
+            absolute left-1/2 transform -translate-x-1/2 -top-12
             flex flex-col items-center justify-center
             w-16 h-16
             bg-gradient-to-br from-orange-500 to-orange-600

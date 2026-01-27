@@ -524,7 +524,7 @@ export default function DashboardV2() {
       </div>
 
       {/* Main Content */}
-      <main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
+      <main className="px-4 py-6 space-y-6 pb-32 max-w-md mx-auto">
         {/* 1. XP Progress Bar - Top Priority */}
         <XPProgressBar xpToday={dailySummary.xp_today} xpGoal={dailySummary.xp_goal} />
 
@@ -765,7 +765,7 @@ function DashboardSkeleton() {
         </div>
       </header>
 
-      <main className="px-4 py-6 space-y-6 pb-24 max-w-md mx-auto">
+      <main className="px-4 py-6 space-y-6 pb-32 max-w-md mx-auto">
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="bg-white rounded-2xl border border-gray-200 p-6">
             <div className="w-32 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>

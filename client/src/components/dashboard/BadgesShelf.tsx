@@ -232,7 +232,7 @@ function BadgeCard({ badge, isEarned, onClick }: { badge: Badge; isEarned: boole
 
       {/* Badge Name */}
       <span className={`
-        text-xs font-semibold text-center line-clamp-1 mb-1
+        text-xs font-semibold text-center line-clamp-2 px-1 mb-1
         ${isEarned ? 'text-gray-900' : 'text-gray-600'}
       `}>
         {badge.name}
