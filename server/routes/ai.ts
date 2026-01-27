@@ -107,8 +107,15 @@ export function registerAIRoutes(app: Express, requireAuth: any) {
         validatedData.mealLog
       );
 
-      // Note: For MVP, we don't store feedback in logs table
-      // Could be implemented later if needed
+      // Save feedback to log if logId provided
+      if (validatedData.logId) {
+        try {
+          await storage.updateLogFeedback(validatedData.logId, feedback);
+        } catch (updateError) {
+          console.error('Failed to save feedback to log:', updateError);
+          // Don't fail the request, just log the error
+        }
+      }
 
       res.json({ feedback });
 

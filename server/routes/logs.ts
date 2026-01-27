@@ -3,6 +3,31 @@ import { storage } from "../storage";
 import { z } from "zod";
 import { buildBadgeContext, evaluateBadges } from "../lib/badges";
 
+// Canned responses for quick feedback
+const CANNED_RESPONSES = {
+  energy: [
+    "Great choice! These foods will help keep your energy up throughout the day.",
+    "Awesome! Eating well is like putting the best fuel in your body's engine.",
+    "Nice work! Your body loves these nutritious foods that give you lasting energy."
+  ],
+  focus: [
+    "Excellent pick! These foods help your brain stay sharp and focused.",
+    "Smart choice! Good nutrition helps you think clearly and concentrate better.",
+    "Well done! Brain-boosting foods like these help you learn and remember more."
+  ],
+  strength: [
+    "Perfect! These foods help build strong muscles and bones.",
+    "Great job! Your body uses these nutrients to grow stronger every day.",
+    "Awesome choice! Eating well helps your body repair and build muscle."
+  ]
+};
+
+function getQuickFeedback(goal: string | null | undefined): string {
+  const goalKey = (goal as keyof typeof CANNED_RESPONSES) || 'energy';
+  const responses = CANNED_RESPONSES[goalKey] || CANNED_RESPONSES.energy;
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
 const createLogSchema = z.object({
   userId: z.string(),
   type: z.enum(['food', 'activity']),
@@ -69,7 +94,10 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
       const user = await storage.getUser(validatedData.userId);
       const goalContext = user?.goal;
 
-      // Create log entry
+      // Generate quick feedback for the log
+      const aiFeedback = getQuickFeedback(goalContext);
+
+      // Create log entry with feedback
       const logEntry = await storage.createLog({
         userId: validatedData.userId,
         type: validatedData.type,
@@ -78,7 +106,8 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
         goalContext,
         xpAwarded,
         durationMin: validatedData.durationMin,
-        mood: validatedData.mood
+        mood: validatedData.mood,
+        aiFeedback
       });
 
       // Note: XP and streak updates are now handled by the dedicated XP endpoint
@@ -110,7 +139,7 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
       res.json({
         id: logEntry.id,
         xpAwarded,
-        feedback: null, // Will be populated by AI endpoint
+        feedback: aiFeedback,
         content: validatedData.content,
         entryMethod: validatedData.entryMethod,
         badge_awarded: badgeAwarded

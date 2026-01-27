@@ -43,6 +43,7 @@ export interface IStorage {
   // Log operations
   createLog(insertLog: Partial<InsertLog>): Promise<Log>;
   getUserLogs(userId: string, limit?: number): Promise<Log[]>;
+  updateLogFeedback(logId: string, feedback: string): Promise<void>;
   
   // Streak operations
   getUserStreak(userId: string): Promise<Streak | undefined>;
@@ -134,6 +135,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(logs.userId, userId))
       .orderBy(desc(logs.ts))
       .limit(limit);
+  }
+
+  async updateLogFeedback(logId: string, feedback: string): Promise<void> {
+    await db
+      .update(logs)
+      .set({ aiFeedback: feedback })
+      .where(eq(logs.id, logId));
   }
 
   async getUserStreak(userId: string): Promise<Streak | undefined> {
