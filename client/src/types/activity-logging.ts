@@ -32,6 +32,7 @@ export interface SelectedActivity {
   activityName: string;
   activityEmoji: string;
   durationMinutes: number;
+  xpEarned: number;
 }
 
 export interface ActivityLog {

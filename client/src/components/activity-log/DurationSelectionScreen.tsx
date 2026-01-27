@@ -33,6 +33,7 @@ export default function DurationSelectionScreen({
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [customDuration, setCustomDuration] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   const activities = ACTIVITIES.filter(a => a.typeId === activityTypeId);
   const periodName = timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1);
@@ -42,6 +43,7 @@ export default function DurationSelectionScreen({
     setSelectedActivity(activityId);
     setSelectedDuration(null);
     setShowCustomInput(false);
+    setShowSummary(false);
   };
 
   const handleSelectDuration = (minutes: number) => {
@@ -58,6 +60,7 @@ export default function DurationSelectionScreen({
     setSelectedDuration(null);
     setCustomDuration('');
     setShowCustomInput(false);
+    setShowSummary(true);
   };
 
   const handleCustomDurationSubmit = () => {
@@ -218,7 +221,57 @@ export default function DurationSelectionScreen({
         )}
       </div>
 
-      {(selectedActivities.length > 0 || canAddActivity) && (
+      {showSummary && selectedActivities.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t-2 border-gray-100 shadow-2xl z-20"
+        >
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-4 border-2 border-green-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Your {periodName}:
+              </h3>
+              <div className="space-y-2">
+                {selectedActivities.map((activity, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className="text-base">
+                      {activity.activityEmoji} {activity.activityName} {activity.durationMinutes}min
+                    </span>
+                    <span className="text-green-600 font-bold">
+                      +{activity.xpEarned} XP
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-green-200 flex justify-between">
+                <span className="font-bold text-gray-700">Total:</span>
+                <span className="font-bold text-green-600">{totalMinutes}min • +{totalXP} XP</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={onAddMore}
+                className="w-full py-4 px-4 bg-white border-2 border-orange-500 text-orange-600 font-bold rounded-xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[72px]"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Add Different Activity</span>
+              </button>
+              
+              <button
+                onClick={onFinish}
+                className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all flex items-center justify-center space-x-3 text-lg min-h-[72px]"
+              >
+                <Check className="w-6 h-6" />
+                <span>Done with {periodName}</span>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {!showSummary && (selectedActivities.length > 0 || canAddActivity) && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20 animate-slide-up-fade">
           <div className="max-w-md mx-auto space-y-3">
             {selectedActivities.length > 0 && (
@@ -234,31 +287,31 @@ export default function DurationSelectionScreen({
               {canAddActivity && (
                 <button
                   onClick={handleAddActivity}
-                  className="w-full py-3 px-4 bg-white border-2 border-blue-500 text-blue-600 font-bold rounded-xl hover:bg-blue-50 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[48px]"
+                  className="w-full py-4 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[72px] shadow-lg"
                 >
                   <Plus className="w-5 h-5" />
                   <span>Add This Activity</span>
                 </button>
               )}
 
-              {selectedActivities.length > 0 && (
-                <button
-                  onClick={onAddMore}
-                  className="w-full py-3 px-4 bg-white border-2 border-orange-500 text-orange-600 font-bold rounded-xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[48px]"
-                >
-                  <Plus className="w-5 h-5" />
-                  <span>Add Different Activity</span>
-                </button>
-              )}
-              
-              {selectedActivities.length > 0 && (
-                <button
-                  onClick={onFinish}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all flex items-center justify-center space-x-3 text-lg min-h-[56px]"
-                >
-                  <Check className="w-6 h-6" />
-                  <span>Done with {periodName}</span>
-                </button>
+              {selectedActivities.length > 0 && !canAddActivity && (
+                <>
+                  <button
+                    onClick={() => setShowSummary(true)}
+                    className="w-full py-4 px-4 bg-white border-2 border-orange-500 text-orange-600 font-bold rounded-xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[72px]"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span>Add Different Activity</span>
+                  </button>
+                  
+                  <button
+                    onClick={onFinish}
+                    className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all flex items-center justify-center space-x-3 text-lg min-h-[72px]"
+                  >
+                    <Check className="w-6 h-6" />
+                    <span>Done with {periodName}</span>
+                  </button>
+                </>
               )}
             </div>
           </div>

@@ -40,11 +40,13 @@ export const useActivityLogging = () => {
       const activity = ACTIVITIES.find(a => a.id === activityId);
       if (!activity) return prev;
 
+      const xpEarned = activity.xpPerMinute * durationMinutes;
       const newActivity: SelectedActivity = {
         activityId,
         activityName: activity.name,
         activityEmoji: activity.emoji,
-        durationMinutes
+        durationMinutes,
+        xpEarned
       };
 
       const updatedActivities = [...prev.selectedActivities, newActivity];
