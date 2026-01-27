@@ -34,7 +34,7 @@ export default function ActivityLogNew() {
       
       await apiRequest('/api/logs', {
         method: 'POST',
-        body: JSON.stringify({
+        body: {
           userId: user.id,
           type: 'activity',
           entryMethod: 'emoji',
@@ -45,17 +45,17 @@ export default function ActivityLogNew() {
             totalMinutes: totalMinutes,
             summary: activitySummary
           }
-        })
+        }
       });
 
       const xpToAdd = getTotalXP();
       if (xpToAdd > 0) {
         await apiRequest(`/api/user/${user.id}/xp`, {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             amount: xpToAdd,
             source: 'activity_log'
-          })
+          }
         });
       }
 
