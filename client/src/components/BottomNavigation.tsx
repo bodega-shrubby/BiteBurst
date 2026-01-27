@@ -22,31 +22,39 @@ const NAV_ITEMS = {
 
 const COLOR_THEMES = {
   orange: {
-    active: 'bg-orange-100',
-    text: 'text-orange-600',
-    icon: 'text-orange-600',
-    inactive: 'text-gray-400',
+    activeBg: 'bg-orange-100',
+    activeText: 'text-orange-600',
+    activeIcon: 'text-orange-600',
+    inactiveBg: 'bg-orange-50',
+    inactiveText: 'text-orange-400',
+    inactiveIcon: 'text-orange-400',
     dot: 'bg-orange-600'
   },
   green: {
-    active: 'bg-green-100',
-    text: 'text-green-600',
-    icon: 'text-green-600',
-    inactive: 'text-gray-400',
+    activeBg: 'bg-green-100',
+    activeText: 'text-green-600',
+    activeIcon: 'text-green-600',
+    inactiveBg: 'bg-green-50',
+    inactiveText: 'text-green-400',
+    inactiveIcon: 'text-green-400',
     dot: 'bg-green-600'
   },
   purple: {
-    active: 'bg-purple-100',
-    text: 'text-purple-600',
-    icon: 'text-purple-600',
-    inactive: 'text-gray-400',
+    activeBg: 'bg-purple-100',
+    activeText: 'text-purple-600',
+    activeIcon: 'text-purple-600',
+    inactiveBg: 'bg-purple-50',
+    inactiveText: 'text-purple-400',
+    inactiveIcon: 'text-purple-400',
     dot: 'bg-purple-600'
   },
   yellow: {
-    active: 'bg-yellow-100',
-    text: 'text-yellow-600',
-    icon: 'text-yellow-600',
-    inactive: 'text-gray-400',
+    activeBg: 'bg-yellow-100',
+    activeText: 'text-yellow-600',
+    activeIcon: 'text-yellow-600',
+    inactiveBg: 'bg-yellow-50',
+    inactiveText: 'text-yellow-400',
+    inactiveIcon: 'text-yellow-400',
     dot: 'bg-yellow-600'
   }
 };
@@ -74,8 +82,8 @@ export default function BottomNavigation() {
           px-3 py-2 rounded-2xl min-w-[64px]
           transition-all duration-200
           ${active 
-            ? `${colors.active} scale-110 shadow-lg` 
-            : 'hover:bg-gray-50 scale-100'
+            ? `${colors.activeBg} scale-105 shadow-md` 
+            : `${colors.inactiveBg}`
           }
           active:scale-95
         `}
@@ -90,13 +98,19 @@ export default function BottomNavigation() {
         <Icon 
           className={`
             transition-all duration-200
-            ${active ? `w-7 h-7 ${colors.icon}` : `w-6 h-6 ${colors.inactive}`}
+            ${active 
+              ? `w-7 h-7 ${colors.activeIcon}` 
+              : `w-6 h-6 ${colors.inactiveIcon}`
+            }
           `}
-          strokeWidth={active ? 3 : 2}
+          strokeWidth={active ? 2.5 : 2}
         />
         <span className={`
           text-xs mt-1 transition-all duration-200
-          ${active ? `font-bold ${colors.text}` : 'font-medium text-gray-500'}
+          ${active 
+            ? `font-bold ${colors.activeText}` 
+            : `font-medium ${colors.inactiveText}`
+          }
         `}>
           {item.label}
         </span>
@@ -107,28 +121,34 @@ export default function BottomNavigation() {
   const isLogActive = location.includes('/log') || location === '/food-log' || location === '/activity-log';
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50 pb-safe">
-      <div className="max-w-md mx-auto relative flex items-center justify-between px-4 h-24">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50">
+      <div 
+        className="max-w-md mx-auto relative flex items-center justify-between px-4 h-20"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
+      >
         
+        {/* LEFT: Home */}
         <div className="flex items-center space-x-2">
           {NAV_ITEMS.left.map((item) => (
             <NavButton key={item.id} item={item} />
           ))}
         </div>
 
+        {/* CENTER: RAISED LOG BUTTON */}
         <button
           onClick={() => setLocation('/food-log')}
           className={`
-            absolute left-1/2 transform -translate-x-1/2 -top-12
+            absolute left-1/2 -translate-x-1/2 -top-10
             flex flex-col items-center justify-center
             w-16 h-16
             bg-gradient-to-br from-orange-500 to-orange-600
             rounded-2xl
-            shadow-2xl shadow-orange-300
+            shadow-2xl shadow-orange-300/50
             hover:scale-110 hover:from-orange-600 hover:to-orange-700
             active:scale-95
             transition-all duration-200
             border-4 border-white
+            z-50
             ${isLogActive ? 'ring-4 ring-orange-200' : ''}
           `}
           aria-label="Log food or activity"
@@ -137,6 +157,7 @@ export default function BottomNavigation() {
           <span className="text-[10px] font-bold text-white mt-0.5">LOG</span>
         </button>
 
+        {/* RIGHT: Learn, Badges, Champs */}
         <div className="flex items-center space-x-2">
           {NAV_ITEMS.right.map((item) => (
             <NavButton key={item.id} item={item} />
