@@ -1,0 +1,1575 @@
+# 🎨 BiteBurst Dashboard - Part 3: Critical Fixes & Bottom Navigation Overhaul
+
+## 📋 Overview
+This prompt addresses the final critical improvements to make the dashboard **production-ready and kid-friendly**. Focus on two key areas:
+1. **Critical Dashboard Fixes** - AI feedback, badge progress, UI cleanup
+2. **Bottom Navigation Redesign** - Duolingo-inspired, kid-optimized navigation
+
+---
+
+## 🎯 Goals - 12 Critical Improvements
+
+### **SECTION A: Critical Dashboard Fixes (5 tasks)**
+1. ✅ Add AI Feedback Previews to Recent Activity
+2. ✅ Individual Badge Progress Indicators ("3/10")
+3. ✅ Remove Health Score Metric
+4. ✅ Clean Up Profile Card (remove redundant stats)
+5. ✅ Add Backdrop to Streak Flame Pill
+
+### **SECTION B: Bottom Navigation Overhaul (7 tasks)**
+6. ✅ Make Active State MUCH More Obvious
+7. ✅ Raised "Log" Button (Primary Action)
+8. ✅ Color Coding Per Section
+9. ✅ Tap Animations & Feedback
+10. ✅ Context-Aware Mascot Messages
+11. ✅ Badge Visual Improvements (Faded Emojis)
+12. ✅ Polish & Micro-Interactions
+
+---
+
+## 🔧 SECTION A: Critical Dashboard Fixes
+
+### **Task 1: Add AI Feedback Previews to Recent Activity 💬**
+
+**File:** `client/src/components/dashboard/RecentLogsList.tsx`
+
+**Problem:** Recent Activity shows logs with XP earned but NO AI feedback preview. This is a critical engagement feature - users want to see what Coach Flex said about their food!
+
+**Solution:** Add collapsible AI feedback preview under each log entry.
+
+**Complete Implementation:**
+
+```tsx
+import { formatDistanceToNow } from 'date-fns';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
+
+interface Log {
+  id: string;
+  type: 'food' | 'activity';
+  content?: string;
+  emojis?: string[];
+  durationMin?: number;
+  xpAwarded?: number;
+  feedback?: string;
+  ts: string;
+}
+
+interface RecentLogsListProps {
+  logs: Log[];
+}
+
+export default function RecentLogsList({ logs }: RecentLogsListProps) {
+  const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
+
+  const getTimeAgo = (timestamp: string) => {
+    try {
+      return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+    } catch {
+      return 'Recently';
+    }
+  };
+
+  const getLogSummary = (log: Log) => {
+    if (log.emojis && log.emojis.length > 0) {
+      return log.emojis.join(' ');
+    }
+    if (log.content) {
+      return log.content.substring(0, 50);
+    }
+    if (log.type === 'activity' && log.durationMin) {
+      return `${log.durationMin} minutes of activity`;
+    }
+    return 'Logged';
+  };
+
+  const getIcon = (type: string) => {
+    return type === 'food' ? '🍽️' : '🏃';
+  };
+
+  // Empty state (same as before)
+  if (!logs || logs.length === 0) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900">Today's Activity</h2>
+        
+        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-8 text-center">
+          <div className="mb-4">
+            <img 
+              src="/assets/Mascots/SunnySlice.png"
+              alt="Sunny Slice" 
+              className="w-24 h-24 mx-auto animate-subtle-bounce"
+            />
+          </div>
+          
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            No activity yet today
+          </h3>
+          
+          <p className="text-gray-600 text-sm mb-4">
+            Time to fuel up! Your first log is always the tastiest! 🍎
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show recent logs with AI feedback
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+        <span className="text-sm text-gray-500">{logs.length} logs today</span>
+      </div>
+      
+      <div className="space-y-3">
+        {logs.slice(0, 5).map((log) => {
+          const isExpanded = expandedLogId === log.id;
+          const hasFeedback = log.feedback && log.feedback.length > 0;
+          
+          return (
+            <div 
+              key={log.id}
+              className="
+                bg-white border-2 border-gray-200 rounded-xl 
+                hover:border-orange-200 hover:shadow-md
+                transition-all duration-200
+              "
+            >
+              {/* Main Log Card - Always Visible */}
+              <button
+                onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
+                className="w-full p-4 text-left"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3 flex-1">
+                    {/* Icon */}
+                    <div className="text-3xl flex-shrink-0">
+                      {getIcon(log.type)}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-base">
+                        {getLogSummary(log)}
+                      </p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <p className="text-xs text-gray-500">
+                          {getTimeAgo(log.ts)}
+                        </p>
+                        {hasFeedback && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <p className="text-xs text-blue-600 font-medium">
+                              Coach's tip
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right Side: XP Badge + Expand Arrow */}
+                  <div className="flex items-center space-x-2 ml-2">
+                    {log.xpAwarded && log.xpAwarded > 0 && (
+                      <div className="bg-orange-100 px-3 py-1.5 rounded-full flex-shrink-0">
+                        <span className="text-orange-600 font-bold text-sm">
+                          +{log.xpAwarded} XP
+                        </span>
+                      </div>
+                    )}
+                    
+                    {hasFeedback && (
+                      <div className="flex-shrink-0">
+                        {isExpanded ? (
+                          <ChevronUp className="w-5 h-5 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </button>
+
+              {/* AI Feedback - Expandable */}
+              {hasFeedback && isExpanded && (
+                <div className="px-4 pb-4 animate-slide-down">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-100">
+                    {/* Coach Header */}
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-lg">💪</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">Coach Flex says:</p>
+                      </div>
+                    </div>
+                    
+                    {/* Feedback Text */}
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {log.feedback}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Show More Button */}
+      {logs.length > 5 && (
+        <button 
+          onClick={() => window.location.href = '/activity-history'}
+          className="
+            w-full py-3 text-orange-600 font-semibold rounded-xl
+            border-2 border-orange-200
+            hover:bg-orange-50 transition-colors
+          "
+        >
+          View all {logs.length} logs →
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+**Add Slide Down Animation:**
+
+In `client/src/index.css`:
+```css
+@keyframes slide-down {
+  0% {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    max-height: 300px;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+```
+
+---
+
+### **Task 2: Individual Badge Progress Indicators 📊**
+
+**File:** `client/src/components/dashboard/BadgesShelf.tsx` or wherever badges are displayed
+
+**Problem:** Locked badges show generic trophy icon with no indication of progress. Users can't see they're 3/10 toward unlocking "Fruit Fighter."
+
+**Solution:** Add progress text and circular progress indicator under each badge.
+
+**Complete Badge Component:**
+
+```tsx
+interface Badge {
+  code: string;
+  name: string;
+  emoji: string;
+  description?: string;
+  earned: boolean;
+  progress?: {
+    current: number;
+    total: number;
+  };
+}
+
+interface BadgeCardProps {
+  badge: Badge;
+  onClick?: () => void;
+}
+
+function BadgeCard({ badge, onClick }: BadgeCardProps) {
+  const progressPercent = badge.progress 
+    ? (badge.progress.current / badge.progress.total) * 100 
+    : 0;
+  
+  const hasProgress = badge.progress && badge.progress.current > 0;
+
+  return (
+    <button 
+      onClick={onClick}
+      className={`
+        aspect-square flex flex-col items-center justify-center
+        rounded-2xl border-2 p-3 transition-all duration-300 relative
+        ${badge.earned 
+          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 shadow-md scale-105' 
+          : 'bg-gray-50 border-gray-200'
+        }
+        hover:scale-110 active:scale-95
+      `}
+    >
+      {/* Badge Icon */}
+      <div className="relative mb-1">
+        {badge.earned ? (
+          // Earned: Full color emoji with glow
+          <div className="relative">
+            <span className="text-3xl block animate-bounce-in">
+              {badge.emoji}
+            </span>
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-yellow-300 rounded-full blur-xl opacity-40 -z-10" />
+          </div>
+        ) : (
+          // Locked: Faded emoji with progress ring
+          <div className="relative">
+            <span 
+              className="text-3xl block" 
+              style={{ opacity: hasProgress ? 0.4 : 0.2 }}
+            >
+              {badge.emoji}
+            </span>
+            
+            {/* Circular Progress Ring */}
+            {hasProgress && (
+              <svg 
+                className="absolute inset-0 w-full h-full -rotate-90" 
+                viewBox="0 0 36 36"
+              >
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  stroke="#E5E7EB"
+                  strokeWidth="2"
+                />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  stroke="#FF6A00"
+                  strokeWidth="2"
+                  strokeDasharray={`${progressPercent} 100`}
+                  className="transition-all duration-500"
+                />
+              </svg>
+            )}
+            
+            {/* Lock Icon Overlay */}
+            {!hasProgress && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg">🔒</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Badge Name */}
+      <span className={`
+        text-xs font-semibold text-center line-clamp-1 mb-1
+        ${badge.earned ? 'text-gray-900' : 'text-gray-600'}
+      `}>
+        {badge.name}
+      </span>
+
+      {/* Progress Text or Status */}
+      {badge.earned ? (
+        <span className="text-xs text-green-600 font-bold">✓ Earned</span>
+      ) : badge.progress ? (
+        <span className="text-xs font-bold text-orange-600">
+          {badge.progress.current}/{badge.progress.total}
+        </span>
+      ) : (
+        <span className="text-xs text-gray-400">Locked</span>
+      )}
+    </button>
+  );
+}
+
+// Main Badges Display Component
+interface BadgesShelfProps {
+  earnedBadges: Badge[];
+  lockedBadges: Badge[];
+}
+
+export default function BadgesShelf({ earnedBadges, lockedBadges }: BadgesShelfProps) {
+  const [, setLocation] = useLocation();
+  const allBadges = [...earnedBadges, ...lockedBadges].slice(0, 8); // Show 8 badges
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">Badges & Rewards</h2>
+        <button 
+          onClick={() => setLocation('/achievements')}
+          className="text-orange-600 font-semibold text-sm hover:text-orange-700"
+        >
+          View All →
+        </button>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Progress</span>
+          <span className="font-bold text-gray-900">
+            {earnedBadges.length}/{earnedBadges.length + lockedBadges.length}
+          </span>
+        </div>
+        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-700"
+            style={{ 
+              width: `${(earnedBadges.length / (earnedBadges.length + lockedBadges.length)) * 100}%` 
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Badge Grid */}
+      <div className="grid grid-cols-4 gap-3">
+        {allBadges.map((badge) => (
+          <BadgeCard 
+            key={badge.code} 
+            badge={badge}
+            onClick={() => {
+              // Show badge detail modal or navigate to achievements
+              console.log('Badge clicked:', badge.code);
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Encouragement Text */}
+      <div className="text-center pt-2">
+        <p className="text-sm text-gray-600">
+          🎯 Keep logging to unlock more badges!
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+**Backend: Calculate Badge Progress**
+
+Update `server/routes/dashboard.ts` to include progress data:
+
+```typescript
+// Calculate badge progress based on user activity
+const badgeProgress = {
+  'first-log': {
+    current: Math.min(todayLogsFiltered.length, 1),
+    total: 1
+  },
+  'streak-3': {
+    current: Math.min(streakData.current, 3),
+    total: 3
+  },
+  'streak-7': {
+    current: Math.min(streakData.current, 7),
+    total: 7
+  },
+  'fruit-fighter': {
+    current: todayLogsFiltered.filter(log => 
+      log.type === 'food' && 
+      (log.content?.toLowerCase().includes('fruit') || 
+       log.content?.toLowerCase().includes('apple') ||
+       log.content?.toLowerCase().includes('banana'))
+    ).length,
+    total: 10
+  },
+  'water-warrior': {
+    current: todayLogsFiltered.filter(log => 
+      log.type === 'food' && 
+      log.content?.toLowerCase().includes('water')
+    ).length,
+    total: 10
+  },
+  'move-master': {
+    current: todayLogsFiltered.filter(log => 
+      log.type === 'activity'
+    ).length,
+    total: 10
+  },
+  // Add more badge progress calculations...
+};
+
+// Attach progress to locked badges
+const lockedBadgesWithProgress = lockedBadges.map(badge => ({
+  ...badge,
+  progress: badgeProgress[badge.code] || null
+}));
+```
+
+---
+
+### **Task 3: Remove Health Score Metric ❌**
+
+**Files:** 
+- `client/src/pages/DashboardV2.tsx`
+- Any component showing Health Score
+
+**Problem:** "Health Score: 75" appears in Overview section with no context or explanation. User requested removal.
+
+**Solution:** Complete removal of Health Score metric.
+
+**Step 1: Remove from Overview Component**
+
+```tsx
+// In DashboardV2.tsx or Overview component
+// BEFORE (DELETE THIS):
+<div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
+  <div className="flex items-center space-x-2 mb-1">
+    <span className="text-2xl">🎯</span>
+    <span className="text-2xl font-bold text-orange-500">75</span>
+  </div>
+  <div className="text-sm text-gray-600 font-medium">Health Score</div>
+</div>
+
+// AFTER (REMOVE ENTIRELY - don't replace with anything)
+```
+
+**Step 2: Remove from Backend API Response**
+
+In `server/routes/dashboard.ts`:
+```typescript
+// REMOVE these lines:
+// health_score: calculateHealthScore(user),
+
+// REMOVE this function:
+// function calculateHealthScore(user: any) { ... }
+```
+
+**Step 3: Remove from TypeScript Interfaces**
+
+```typescript
+// In client/src/pages/DashboardV2.tsx or types file
+interface DailySummaryV2 {
+  xp_today: number;
+  xp_goal: number;
+  streak_days: number;
+  // health_score: number; ← DELETE THIS LINE
+  // ... rest of interface
+}
+```
+
+**That's it!** Health Score is completely removed.
+
+---
+
+### **Task 4: Clean Up Profile Card (Remove Redundant Stats) 🧹**
+
+**File:** `client/src/pages/DashboardV2.tsx`
+
+**Problem:** Profile card shows "0 day streak" and "60 XP today" when these are already displayed prominently in the header (🔥 0) and XP bar (60/80).
+
+**Solution:** Keep ONLY the Level badge. Remove redundant streak and XP badges.
+
+**BEFORE:**
+```tsx
+{/* Stats Chips */}
+<div className="flex items-center justify-center gap-3 flex-wrap mb-4">
+  <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+    Level {dailySummary.user.level}
+  </div>
+  <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+    {dailySummary.streak_days} day streak  {/* ← REMOVE THIS */}
+  </div>
+  <div className="bg-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+    {dailySummary.xp_today} XP today  {/* ← REMOVE THIS */}
+  </div>
+</div>
+```
+
+**AFTER:**
+```tsx
+{/* Dark Profile Card */}
+<div className="relative z-10 mb-6">
+  <div className="bg-neutral-900 rounded-none sm:rounded-2xl px-5 py-4 text-white shadow-xl">
+    <h1 className="text-2xl font-bold text-center mb-2">
+      {dailySummary.user.display_name}
+    </h1>
+    <p className="text-neutral-400 text-center text-sm mb-4">
+      @{dailySummary.user.display_name.toLowerCase()}
+    </p>
+    
+    {/* Single Level Chip - Centered */}
+    <div className="flex justify-center mb-4">
+      <div className="bg-orange-500 px-4 py-2 rounded-full text-sm font-bold">
+        Level {dailySummary.user.level}
+      </div>
+    </div>
+
+    {/* Level Progress Bar */}
+    <div className="mt-4 space-y-2">
+      <div className="flex justify-between items-center text-xs">
+        <span className="text-neutral-400">Level {dailySummary.user.level}</span>
+        <span className="text-neutral-400">
+          {dailySummary.user.lifetime_xp % 100} / 100 XP
+        </span>
+        <span className="text-neutral-400">Level {dailySummary.user.level + 1}</span>
+      </div>
+      
+      <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-700"
+          style={{ 
+            width: `${(dailySummary.user.lifetime_xp % 100)}%` 
+          }}
+        />
+      </div>
+      
+      <p className="text-xs text-center text-neutral-400">
+        {100 - (dailySummary.user.lifetime_xp % 100)} XP to Level {dailySummary.user.level + 1}
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+**Why This Is Better:**
+- No redundancy (streak is in header, XP is in daily goal)
+- Profile card focuses on long-term progression (Level)
+- Cleaner, less cluttered
+- Level progress bar shows meaningful milestone
+
+---
+
+### **Task 5: Add Backdrop to Streak Flame Pill 🔥**
+
+**File:** `client/src/pages/DashboardV2.tsx`
+
+**Problem:** Streak flame "🔥 0" sits directly on purple background without backdrop, while hearts have nice frosted glass effect.
+
+**Solution:** Match the hearts styling with backdrop blur and white tint.
+
+**BEFORE:**
+```tsx
+<div className="flex items-center space-x-2">
+  <span className="text-2xl">🔥</span>
+  <div className="text-white">
+    <span className="text-xl font-black">{dailySummary.streak_days}</span>
+    <span className="text-xs ml-1 opacity-90">day streak</span>
+  </div>
+</div>
+```
+
+**AFTER:**
+```tsx
+<header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-3 relative">
+  <div className="max-w-md mx-auto">
+    <div className="flex justify-between items-center mb-4">
+      
+      {/* LEFT: Streak Flame with Backdrop */}
+      <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 shadow-lg">
+        <span className="text-2xl">🔥</span>
+        <div className="text-white">
+          <span className="text-xl font-black">{dailySummary.streak_days}</span>
+          <span className="text-xs ml-1 font-medium">day streak</span>
+        </div>
+      </div>
+      
+      {/* RIGHT: Hearts + Settings */}
+      <div className="flex items-center space-x-3">
+        {/* Hearts Display (already has backdrop) */}
+        <div className="flex items-center space-x-1 bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full border border-white/30 shadow-lg">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span 
+              key={i} 
+              className={`text-xl transition-all duration-200 ${
+                i < 3 ? 'opacity-100 scale-100' : 'opacity-40 scale-90'
+              }`}
+            >
+              {i < 3 ? '❤️' : '🤍'}
+            </span>
+          ))}
+        </div>
+        
+        {/* Settings Button */}
+        <button 
+          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors" 
+          data-testid="button-settings"
+        >
+          <Settings className="w-6 h-6 text-white" />
+        </button>
+      </div>
+    </div>
+    
+    {/* Rest of header... */}
+  </div>
+</header>
+```
+
+**Visual Improvements:**
+- Frosted glass effect (`bg-white/20 backdrop-blur-sm`)
+- Subtle white border (`border-white/30`)
+- Shadow for depth (`shadow-lg`)
+- Matches hearts styling perfectly
+- More polished, professional look
+
+---
+
+## 🔧 SECTION B: Bottom Navigation Overhaul
+
+### **Task 6: Make Active State MUCH More Obvious 🎯**
+
+**File:** `client/src/components/BottomNavigation.tsx`
+
+**Problem:** Current active state (Home tab) is barely distinguishable from inactive tabs. Kids need SUPER clear visual feedback.
+
+**Solution:** Complete redesign with Duolingo-inspired active state.
+
+**Create New BottomNavigation Component:**
+
+```tsx
+import { Home, BookOpen, Trophy, Medal, Plus } from 'lucide-react';
+import { useLocation } from 'wouter';
+
+interface NavItem {
+  id: string;
+  label: string;
+  icon: any;
+  path: string;
+  color: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home', label: 'Home', icon: Home, path: '/dashboard', color: 'orange' },
+  { id: 'log', label: 'Log', icon: Plus, path: '/food-log', color: 'orange' },
+  { id: 'lesson', label: 'Lesson', icon: BookOpen, path: '/lessons', color: 'green' },
+  { id: 'achievements', label: 'Badges', icon: Trophy, path: '/achievements', color: 'purple' },
+  { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard', color: 'yellow' },
+];
+
+const COLOR_CLASSES = {
+  orange: {
+    active: 'bg-orange-100 text-orange-600',
+    icon: 'text-orange-600',
+    inactive: 'text-gray-400'
+  },
+  green: {
+    active: 'bg-green-100 text-green-600',
+    icon: 'text-green-600',
+    inactive: 'text-gray-400'
+  },
+  purple: {
+    active: 'bg-purple-100 text-purple-600',
+    icon: 'text-purple-600',
+    inactive: 'text-gray-400'
+  },
+  yellow: {
+    active: 'bg-yellow-100 text-yellow-600',
+    icon: 'text-yellow-600',
+    inactive: 'text-gray-400'
+  }
+};
+
+export default function BottomNavigation() {
+  const [location, setLocation] = useLocation();
+
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return location === '/' || location === '/dashboard' || location === '/home';
+    }
+    return location.startsWith(path);
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50 safe-area-bottom">
+      <div className="max-w-md mx-auto flex items-center justify-around px-2 h-20">
+        {NAV_ITEMS.map((item) => {
+          const active = isActive(item.path);
+          const colors = COLOR_CLASSES[item.color as keyof typeof COLOR_CLASSES];
+          const Icon = item.icon;
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => setLocation(item.path)}
+              className={`
+                flex flex-col items-center justify-center
+                px-3 py-2 rounded-2xl min-w-[64px]
+                transition-all duration-200
+                ${active 
+                  ? `${colors.active} scale-105 shadow-md` 
+                  : 'hover:bg-gray-50'
+                }
+                active:scale-95
+              `}
+            >
+              {/* Icon */}
+              <Icon 
+                className={`
+                  transition-all duration-200
+                  ${active ? 'w-7 h-7' : 'w-6 h-6'}
+                  ${active ? colors.icon : colors.inactive}
+                `}
+                strokeWidth={active ? 2.5 : 2}
+              />
+              
+              {/* Label */}
+              <span className={`
+                text-xs mt-1 transition-all duration-200
+                ${active ? 'font-bold' : 'font-medium text-gray-500'}
+              `}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+```
+
+**Key Improvements:**
+- Active tab has **colored background** (orange/green/purple/yellow)
+- Active tab icon is **bigger** (7 vs 6)
+- Active tab icon is **thicker** (strokeWidth 2.5 vs 2)
+- Active tab label is **bold**
+- Active tab has **scale + shadow**
+- Each section has its **own color theme**
+- Inactive tabs are **gray and subdued**
+
+---
+
+### **Task 7: Raised "Log" Button (Primary Action) 🎯**
+
+**Problem:** All 5 tabs have equal visual weight. "Log" should be THE hero action.
+
+**Solution:** Make "Log" button raised above nav bar, larger, and special.
+
+**Update BottomNavigation with Special Log Button:**
+
+```tsx
+export default function BottomNavigation() {
+  const [location, setLocation] = useLocation();
+
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return location === '/' || location === '/dashboard' || location === '/home';
+    }
+    return location.startsWith(path);
+  };
+
+  // Split nav items: Log button is special
+  const leftItems = NAV_ITEMS.slice(0, 2); // Home, Lesson
+  const rightItems = NAV_ITEMS.slice(2); // Achievements, Champs
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50 safe-area-bottom">
+      <div className="max-w-md mx-auto relative flex items-center justify-between px-6 h-20">
+        
+        {/* LEFT SIDE: Home + Lesson */}
+        <div className="flex items-center space-x-2">
+          {leftItems.map((item) => {
+            const active = isActive(item.path);
+            const colors = COLOR_CLASSES[item.color as keyof typeof COLOR_CLASSES];
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setLocation(item.path)}
+                className={`
+                  flex flex-col items-center justify-center
+                  px-3 py-2 rounded-2xl min-w-[64px]
+                  transition-all duration-200
+                  ${active 
+                    ? `${colors.active} scale-105 shadow-md` 
+                    : 'hover:bg-gray-50'
+                  }
+                  active:scale-95
+                `}
+              >
+                <Icon 
+                  className={`
+                    transition-all duration-200
+                    ${active ? 'w-7 h-7' : 'w-6 h-6'}
+                    ${active ? colors.icon : colors.inactive}
+                  `}
+                  strokeWidth={active ? 2.5 : 2}
+                />
+                <span className={`
+                  text-xs mt-1 transition-all duration-200
+                  ${active ? 'font-bold' : 'font-medium text-gray-500'}
+                `}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* CENTER: SPECIAL LOG BUTTON */}
+        <button
+          onClick={() => setLocation('/food-log')}
+          className="
+            absolute left-1/2 transform -translate-x-1/2 -top-6
+            flex flex-col items-center justify-center
+            w-16 h-16
+            bg-gradient-to-br from-orange-500 to-orange-600
+            rounded-2xl
+            shadow-2xl
+            hover:scale-110 hover:shadow-orange-300
+            active:scale-95
+            transition-all duration-200
+            border-4 border-white
+          "
+        >
+          <Plus className="w-8 h-8 text-white" strokeWidth={3} />
+          <span className="text-[10px] font-bold text-white mt-0.5">LOG</span>
+        </button>
+
+        {/* RIGHT SIDE: Achievements + Champs */}
+        <div className="flex items-center space-x-2">
+          {rightItems.map((item) => {
+            const active = isActive(item.path);
+            const colors = COLOR_CLASSES[item.color as keyof typeof COLOR_CLASSES];
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setLocation(item.path)}
+                className={`
+                  flex flex-col items-center justify-center
+                  px-3 py-2 rounded-2xl min-w-[64px]
+                  transition-all duration-200
+                  ${active 
+                    ? `${colors.active} scale-105 shadow-md` 
+                    : 'hover:bg-gray-50'
+                  }
+                  active:scale-95
+                `}
+              >
+                <Icon 
+                  className={`
+                    transition-all duration-200
+                    ${active ? 'w-7 h-7' : 'w-6 h-6'}
+                    ${active ? colors.icon : colors.inactive}
+                  `}
+                  strokeWidth={active ? 2.5 : 2}
+                />
+                <span className={`
+                  text-xs mt-1 transition-all duration-200
+                  ${active ? 'font-bold' : 'font-medium text-gray-500'}
+                `}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+      </div>
+    </nav>
+  );
+}
+```
+
+**What Makes This Special:**
+- Log button **raised above nav** (`-top-6`)
+- **Larger** (16x16 vs regular buttons)
+- **Orange gradient** background
+- **Giant shadow** (`shadow-2xl`)
+- **White border** separates from background
+- **Centered** between left/right groups
+- **Unmissable** - kids immediately know where to tap
+
+---
+
+### **Task 8: Color Coding Per Section 🎨**
+
+**Already Implemented in Task 6 & 7!**
+
+Each section now has its own color theme:
+- 🏠 **Home:** Orange
+- 📝 **Log:** Orange (primary action)
+- 📚 **Lesson:** Green
+- 🏆 **Badges:** Purple
+- 🥇 **Champs:** Yellow/Gold
+
+**Color Consistency Across App:**
+
+Make sure colors are used consistently throughout the app:
+
+```tsx
+// In each section, use matching colors:
+
+// Lessons Page Header
+<header className="bg-gradient-to-b from-green-400 to-green-500">
+  {/* Green theme */}
+</header>
+
+// Achievements Page Header
+<header className="bg-gradient-to-b from-purple-400 to-purple-500">
+  {/* Purple theme */}
+</header>
+
+// Champs/Leaderboard Header
+<header className="bg-gradient-to-b from-yellow-400 to-yellow-500">
+  {/* Yellow theme */}
+</header>
+```
+
+**Benefits:**
+- Kids quickly recognize sections by color
+- Creates visual consistency
+- Makes navigation more intuitive
+- Duolingo uses this pattern extensively
+
+---
+
+### **Task 9: Tap Animations & Feedback 👆**
+
+**Problem:** Buttons don't give satisfying visual feedback when tapped.
+
+**Solution:** Add scale animations, ripple effects, and visual feedback.
+
+**Already Partially Done:**
+- `active:scale-95` on all nav buttons ✓
+- `hover:scale-110` on Log button ✓
+
+**Add Ripple Effect:**
+
+Create a new `RippleButton` component:
+
+```tsx
+import { useState } from 'react';
+
+interface RippleButtonProps {
+  children: React.ReactNode;
+  onClick: () => void;
+  className?: string;
+}
+
+export function RippleButton({ children, onClick, className = '' }: RippleButtonProps) {
+  const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const newRipple = { x, y, id: Date.now() };
+    setRipples([...ripples, newRipple]);
+    
+    // Remove ripple after animation
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+    }, 600);
+    
+    onClick();
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`relative overflow-hidden ${className}`}
+    >
+      {children}
+      
+      {/* Ripple Effect */}
+      {ripples.map((ripple) => (
+        <span
+          key={ripple.id}
+          className="absolute bg-white/30 rounded-full animate-ripple"
+          style={{
+            left: ripple.x,
+            top: ripple.y,
+            width: 20,
+            height: 20,
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+      ))}
+    </button>
+  );
+}
+```
+
+**Add Ripple Animation CSS:**
+
+In `client/src/index.css`:
+```css
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 0.6s ease-out;
+}
+```
+
+**Use RippleButton in Navigation:**
+
+```tsx
+<RippleButton
+  onClick={() => setLocation(item.path)}
+  className={`flex flex-col items-center...`}
+>
+  <Icon />
+  <span>{item.label}</span>
+</RippleButton>
+```
+
+---
+
+### **Task 10: Context-Aware Mascot Messages 💬**
+
+**File:** `client/src/pages/DashboardV2.tsx`
+
+**Problem:** Mascot says "Let's go, Neet! 💪" every time. Should change based on context.
+
+**Solution:** Dynamic messages based on time, progress, and streak status.
+
+**Create Dynamic Mascot Message Component:**
+
+```tsx
+interface MascotMessageProps {
+  userName: string;
+  xpToday: number;
+  xpGoal: number;
+  streakDays: number;
+  hasLoggedToday: boolean;
+}
+
+function getMascotMessage({ 
+  userName, 
+  xpToday, 
+  xpGoal, 
+  streakDays,
+  hasLoggedToday 
+}: MascotMessageProps): string {
+  const hour = new Date().getHours();
+  const percentToGoal = (xpToday / xpGoal) * 100;
+  const isNearMidnight = hour >= 22;
+  
+  // Streak at risk (near midnight, no logs today)
+  if (isNearMidnight && !hasLoggedToday && streakDays > 0) {
+    return `Quick, ${userName}! Save your ${streakDays}-day streak! 🔥`;
+  }
+  
+  // Goal completed
+  if (xpToday >= xpGoal) {
+    return `Amazing work, ${userName}! You crushed today's goal! 🎉`;
+  }
+  
+  // Very close to goal (80%+)
+  if (percentToGoal >= 80) {
+    return `So close, ${userName}! Just ${xpGoal - xpToday} XP to go! 🎯`;
+  }
+  
+  // Good progress (50-79%)
+  if (percentToGoal >= 50) {
+    return `You're halfway there! Keep it up, ${userName}! 💪`;
+  }
+  
+  // Some progress (1-49%)
+  if (xpToday > 0) {
+    return `Great start, ${userName}! Let's keep the momentum going! 🚀`;
+  }
+  
+  // No logs yet - time-based greeting
+  if (hour < 12) {
+    return `Good morning, ${userName}! Ready to start the day? ☀️`;
+  } else if (hour < 17) {
+    return `Hey ${userName}! Time for a healthy snack? 🍎`;
+  } else if (hour < 22) {
+    return `Evening, ${userName}! How was your day? 🌙`;
+  } else {
+    return `Still up, ${userName}? Log before bed to keep your streak! 😴`;
+  }
+}
+
+function DynamicMascotMessage(props: MascotMessageProps) {
+  const message = getMascotMessage(props);
+  
+  return (
+    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-64 z-10">
+      <div className="relative bg-white rounded-2xl px-4 py-3 shadow-xl border-2 border-orange-200">
+        <p className="text-sm font-medium text-gray-800 text-center">
+          {message}
+        </p>
+        {/* Speech bubble tail */}
+        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+          <div className="w-4 h-4 bg-white border-r-2 border-b-2 border-orange-200 transform rotate-45"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**Use in Dashboard:**
+
+```tsx
+<div className="relative flex justify-center py-4">
+  {/* Mascot */}
+  <div className={`transition-all duration-500 ${
+    mascotState === 'goalReached' ? 'animate-bounce scale-110' : 'animate-subtle-bounce'
+  }`}>
+    <img 
+      src={mascotState === 'goalReached' ? sunnyCelebrateImage : sunnySliceImage}
+      alt="Sunny Slice"
+      className="w-32 h-32 object-contain drop-shadow-lg"
+    />
+  </div>
+  
+  {/* Dynamic Message */}
+  <DynamicMascotMessage 
+    userName={dailySummary.user.display_name}
+    xpToday={dailySummary.xp_today}
+    xpGoal={dailySummary.xp_goal}
+    streakDays={dailySummary.streak_days}
+    hasLoggedToday={dailySummary.recent_logs.length > 0}
+  />
+</div>
+```
+
+---
+
+### **Task 11: Badge Visual Improvements (Faded Emojis) 🎨**
+
+**Already Implemented in Task 2!**
+
+Locked badges now show:
+- Faded emoji (40% opacity if progress, 20% if no progress)
+- Circular progress ring
+- Lock icon overlay if no progress
+- Progress text underneath
+
+**Additional Enhancement - Add Glow to Earned Badges:**
+
+```tsx
+{badge.earned && (
+  <>
+    <span className="text-3xl block animate-bounce-in">
+      {badge.emoji}
+    </span>
+    {/* Glow effect */}
+    <div className="absolute inset-0 bg-yellow-300 rounded-full blur-xl opacity-40 -z-10 animate-pulse-glow" />
+  </>
+)}
+```
+
+**Add Pulse Glow Animation:**
+
+In `client/src/index.css`:
+```css
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+```
+
+---
+
+### **Task 12: Polish & Micro-Interactions ✨**
+
+**Final polish touches to make everything feel premium:**
+
+**A. Add Page Transition Animations:**
+
+In `client/src/App.tsx`:
+```tsx
+import { useEffect } from 'react';
+import { useLocation } from 'wouter';
+
+function App() {
+  const [location] = useLocation();
+  
+  useEffect(() => {
+    // Smooth page transitions
+    document.body.classList.add('page-transition');
+    const timer = setTimeout(() => {
+      document.body.classList.remove('page-transition');
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [location]);
+  
+  return (
+    // ... app content
+  );
+}
+```
+
+**B. Add Loading States with Skeletons:**
+
+```tsx
+function DashboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-white animate-pulse">
+      <div className="h-48 bg-gradient-to-b from-purple-200 to-purple-300" />
+      <div className="px-4 py-6 space-y-6 max-w-md mx-auto">
+        <div className="h-32 bg-gray-200 rounded-2xl" />
+        <div className="h-48 bg-gray-200 rounded-2xl" />
+        <div className="h-64 bg-gray-200 rounded-2xl" />
+      </div>
+    </div>
+  );
+}
+```
+
+**C. Add Smooth Scrolling:**
+
+In `client/src/index.css`:
+```css
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent pull-to-refresh on iOS */
+body {
+  overscroll-behavior-y: contain;
+}
+```
+
+**D. Add Safe Area Support (for iPhone notch):**
+
+```css
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+```
+
+**E. Add Subtle Hover Animations:**
+
+```tsx
+// Quick Log items
+<button className="
+  ...existing classes...
+  hover:scale-105 hover:-translate-y-1
+  hover:shadow-lg
+  transition-all duration-200
+">
+```
+
+**F. Add Success Haptic Feedback (Web Vibration API):**
+
+```tsx
+function triggerHaptic(type: 'light' | 'medium' | 'heavy' = 'light') {
+  if ('vibrate' in navigator) {
+    const patterns = {
+      light: [10],
+      medium: [20],
+      heavy: [30, 10, 30]
+    };
+    navigator.vibrate(patterns[type]);
+  }
+}
+
+// Use when logging, earning badges, completing tasks
+triggerHaptic('medium');
+```
+
+---
+
+## 📱 Testing Checklist
+
+After implementing all 12 improvements, test:
+
+### **Section A Tests:**
+- [ ] AI feedback expands/collapses on tap in Recent Activity
+- [ ] Locked badges show progress (e.g., "3/10")
+- [ ] Circular progress rings visible around locked badges
+- [ ] Health Score completely removed from Overview
+- [ ] Profile card shows ONLY Level badge
+- [ ] Streak flame has frosted glass backdrop matching hearts
+
+### **Section B Tests:**
+- [ ] Active nav tab is SUPER obvious (colored background + bigger icon)
+- [ ] Log button is raised above nav bar and unmissable
+- [ ] Each section uses its own color (orange/green/purple/yellow)
+- [ ] Tapping nav buttons has satisfying scale animation
+- [ ] Mascot message changes based on time and progress
+- [ ] Earned badges have glow effect
+- [ ] All animations are smooth (60fps)
+
+### **Visual Tests:**
+- [ ] Bottom nav looks like Duolingo (clear active state)
+- [ ] Log button stands out as THE primary action
+- [ ] Badge progress is immediately visible
+- [ ] Recent Activity feels interactive and engaging
+- [ ] Profile card is clean and uncluttered
+- [ ] Header elements are balanced and polished
+
+### **Interaction Tests:**
+- [ ] Tap navigation → Feels responsive
+- [ ] Tap Recent Activity log → Feedback expands smoothly
+- [ ] Tap badge → Shows detail or navigates
+- [ ] Scroll dashboard → Smooth, no jank
+- [ ] Switch tabs → Page transitions are smooth
+- [ ] All touch targets are 44x44px minimum
+
+---
+
+## 🎨 Design Consistency Checklist
+
+Ensure all components follow these standards:
+
+**Colors:**
+- Home/Log: `#FF6A00` (orange)
+- Lessons: `#4CAF50` (green)
+- Achievements: `#9333EA` (purple)
+- Champs: `#EAB308` (yellow)
+- Success: `#10B981` (green)
+- Text: `text-gray-900` (headers), `text-gray-700` (body)
+
+**Spacing:**
+- Section gaps: `space-y-6`
+- Card padding: `p-6` (large), `p-4` (medium)
+- Button padding: `px-4 py-3`
+
+**Typography:**
+- Headers: `text-xl font-bold text-gray-900`
+- Subheaders: `text-lg font-semibold`
+- Body: `text-base text-gray-700`
+- Small: `text-sm text-gray-600`
+- Tiny: `text-xs text-gray-500`
+
+**Animations:**
+- Quick: `duration-200` (taps, hovers)
+- Smooth: `duration-300` (transitions)
+- Slow: `duration-700` (progress bars)
+- Always: `ease-out` or `ease-in-out`
+
+---
+
+## 🚀 Deployment Steps
+
+1. **Test locally first:**
+   - Run through entire user journey
+   - Test on Chrome mobile emulator
+   - Check console for errors
+
+2. **Test on real mobile device:**
+   - Use your phone (not just emulator)
+   - Test all nav interactions
+   - Verify animations are smooth
+   - Check touch target sizes
+
+3. **Performance check:**
+   - Dashboard loads < 2 seconds
+   - Animations are 60fps
+   - No layout shifts
+   - Images load quickly
+
+4. **Deploy to staging:**
+   - Test with 2-3 beta users (kids if possible)
+   - Get feedback on navigation clarity
+   - Watch for confusion points
+
+5. **Deploy to production:**
+   - Monitor error logs for first hour
+   - Watch analytics for bounce rate
+   - Check completion rates
+
+---
+
+## ✅ Success Criteria
+
+Dashboard Part 3 is complete when:
+
+### **Critical Fixes:**
+1. ✅ AI feedback is visible and interactive in Recent Activity
+2. ✅ Badge progress is immediately visible on all locked badges
+3. ✅ Health Score is completely removed
+4. ✅ Profile card is clean (only Level badge)
+5. ✅ Streak flame matches hearts styling
+
+### **Navigation:**
+6. ✅ Active tab is SUPER obvious to kids
+7. ✅ Log button is the hero action (raised, bigger, special)
+8. ✅ Color coding helps kids recognize sections
+9. ✅ All interactions feel responsive and satisfying
+10. ✅ Mascot personality shines through
+11. ✅ Badges look polished with progress and glow
+12. ✅ Everything feels premium and kid-friendly
+
+### **Overall:**
+- Dashboard rivals Duolingo in polish and engagement
+- Kids immediately know where to tap
+- Every action gives satisfying feedback
+- Navigation is intuitive and delightful
+- Parents say "Wow, this looks professional!"
+
+---
+
+## 💡 Implementation Tips
+
+1. **Work in order:** Do Section A (fixes) first, then Section B (nav)
+2. **Test on real device:** Essential for touch feedback and animations
+3. **Show kids:** Get real feedback from 6-14 year olds if possible
+4. **Compare to Duolingo:** Keep app open side-by-side for reference
+5. **Don't over-engineer:** Simple, working animations > complex, buggy ones
+6. **Use console.log:** Debug state changes and animation timing
+7. **Take videos:** Record before/after for comparison
+
+---
+
+## 🎯 Priority Order (If Time-Constrained)
+
+**Phase 1 (Critical - 2 hours):**
+1. AI feedback in Recent Activity
+2. Badge progress indicators
+3. Remove Health Score
+4. Bottom nav active state
+
+**Phase 2 (High Priority - 2 hours):**
+5. Raised Log button
+6. Clean up profile card
+7. Color coding nav
+8. Streak flame backdrop
+
+**Phase 3 (Polish - 1-2 hours):**
+9. Context-aware mascot
+10. Badge visual improvements
+11. Tap animations
+12. Micro-interactions
+
+---
+
+## 🔥 This Is The Final Push!
+
+After Part 3, your dashboard will be **production-ready** and **kid-optimized**. It will:
+- Look as polished as Duolingo ✨
+- Feel incredibly responsive 👆
+- Guide kids naturally through the app 🎯
+- Create habit loops that drive retention 🔄
+- Make parents say "Wow!" 🤩
+
+**Estimated Time:** 5-7 hours total
+**Target Completion:** End of Week 1
+
+Let's finish strong! 🍊💪✨
