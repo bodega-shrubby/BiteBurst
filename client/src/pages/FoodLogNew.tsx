@@ -364,18 +364,6 @@ export default function FoodLog() {
           <div className="bb-icon">💬</div>
           <span>Text</span>
         </button>
-        
-        <button
-          id="optPhoto"
-          className={`bb-card-select ${state.method === 'photo' ? 'is-active' : ''}`}
-          onClick={() => selectMethod('photo')}
-          role="tab"
-          aria-selected={state.method === 'photo'}
-          aria-controls="panelPhoto"
-        >
-          <div className="bb-icon">📷</div>
-          <span>Photo</span>
-        </button>
       </section>
 
       {/* Emoji Panel */}
@@ -494,48 +482,6 @@ export default function FoodLog() {
         <p id="textHint" className="bb-hint">Tip: keep it simple.</p>
       </section>
 
-      {/* Photo Panel */}
-      <section 
-        id="panelPhoto" 
-        className="bb-panel" 
-        hidden={state.method !== 'photo'}
-        role="tabpanel"
-        aria-labelledby="optPhoto"
-      >
-        <h2 className="bb-section">Take or upload a photo</h2>
-        
-        {!state.photoPreview ? (
-          <label className="bb-drop" htmlFor="mealPhoto">
-            📸 Tap to choose a photo
-          </label>
-        ) : (
-          <div className="bb-photo" aria-live="polite">
-            <img src={state.photoPreview} alt="Selected meal" />
-            <div style={{ marginTop: '8px', textAlign: 'center' }}>
-              <button
-                onClick={removePhoto}
-                className="bb-link-sm"
-                style={{ color: '#dc2626' }}
-              >
-                Remove photo
-              </button>
-            </div>
-          </div>
-        )}
-        
-        <input
-          ref={fileInputRef}
-          id="mealPhoto"
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileSelect}
-          hidden
-        />
-        
-        <p className="bb-hint">Photos are processed locally and safely stored.</p>
-      </section>
-
       {/* Sticky Action Bar */}
       <footer className={`bb-cta-bar ${hasValidContent() ? 'visible' : ''}`}>
         <button
@@ -555,9 +501,6 @@ export default function FoodLog() {
         }
         {state.method === 'text' && state.textInput.length >= 2 && 
           'Text input ready to submit'
-        }
-        {state.method === 'photo' && state.photoPreview && 
-          'Photo selected and ready to submit'
         }
       </div>
     </div>
