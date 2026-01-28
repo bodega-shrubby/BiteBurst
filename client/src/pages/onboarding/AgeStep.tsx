@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import OnboardingLayout from "./OnboardingLayout";
@@ -38,6 +38,13 @@ export default function AgeStep() {
   const [, setLocation] = useLocation();
   const { updateProfile, profile } = useOnboardingContext();
   const [selectedAge, setSelectedAge] = useState(profile.ageBracket || "");
+
+  // Guard: Redirect to curriculum step if country not selected
+  useEffect(() => {
+    if (!profile.curriculumCountry) {
+      setLocation("/profile/curriculum");
+    }
+  }, [profile.curriculumCountry, setLocation]);
 
   const ageOptions = useMemo(() => {
     return profile.curriculumCountry === "uk" ? UK_AGE_OPTIONS : US_AGE_OPTIONS;

@@ -14,14 +14,18 @@ const GOAL_LABELS = {
 };
 
 const AGE_LABELS = {
-  "6-8": "6–8 years old",
-  "9-11": "9–11 years old", 
-  "12-14": "12–14 years old"
+  "5-7": "5–7 years old",
+  "7-11": "7–11 years old", 
+  "11-14": "11–14 years old"
 };
 
-const CURRICULUM_LABELS = {
-  "us-common-core": "🇺🇸 American",
-  "uk-ks2-ks3": "🇬🇧 British"
+const CURRICULUM_LABELS: Record<string, string> = {
+  "uk-ks1": "🇬🇧 UK Key Stage 1",
+  "uk-ks2": "🇬🇧 UK Key Stage 2",
+  "uk-ks3": "🇬🇧 UK Key Stage 3",
+  "us-k2": "🇺🇸 US Grades K-2",
+  "us-35": "🇺🇸 US Grades 3-5",
+  "us-68": "🇺🇸 US Grades 6-8"
 };
 
 const maskEmail = (email: string) => {
@@ -53,7 +57,7 @@ export default function ReviewStep() {
           parentConsent: profile.hasParentConsent,
           childName: profile.displayName,
           age: profile.ageBracket,
-          curriculum: profile.curriculum || "us-common-core",
+          curriculum: profile.curriculum || "us-35",
           goal: profile.goal,
           avatarId: profile.avatar,
           timezone,
