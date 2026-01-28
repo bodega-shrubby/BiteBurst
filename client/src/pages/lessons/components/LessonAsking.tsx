@@ -3,16 +3,25 @@ import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
 import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
+import oniTheOrangeImage from '@assets/Mascots/Oni_the_orange.png';
+import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
+import oniHintImage from '@assets/Mascots/Oni_hint.png';
+import oniOopsImage from '@assets/Mascots/Oni_oops.png';
+import oniProudImage from '@assets/Mascots/Oni_proud.png';
+import oniGrooveImage from '@assets/Mascots/Oni_groove.png';
+import oniLoveImage from '@assets/Mascots/Oni_love.png';
+import oniSadImage from '@assets/Mascots/Oni_sad.png';
 
 interface LessonStep {
   id: string;
   stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering';
+  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank';
   question: string;
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
-    feedback?: string;
+    correctPair?: string[];
+    feedback?: string | { success?: string; hint_after_2?: string; motivating_fail?: string };
     matchingPairs?: Array<{ left: string; right: string }>;
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
@@ -20,6 +29,26 @@ interface LessonStep {
   xpReward: number;
   mascotAction?: string;
 }
+
+// Map mascot action strings to images
+const getMascotImage = (mascotAction?: string, lessonId?: string): string => {
+  if (mascotAction) {
+    switch (mascotAction) {
+      case 'oni_celebrate': return oniCelebrateImage;
+      case 'oni_groove': return oniGrooveImage;
+      case 'oni_hint': return oniHintImage;
+      case 'oni_love': return oniLoveImage;
+      case 'oni_oops': return oniOopsImage;
+      case 'oni_proud': return oniProudImage;
+      case 'oni_sad': return oniSadImage;
+      default: break;
+    }
+  }
+  // Fallback to legacy mascots or default Oni
+  if (lessonId === 'brainfuel-for-school') return brainyBoltImage;
+  if (lessonId === 'fuel-for-football') return captainCarrotImage;
+  return oniTheOrangeImage;
+};
 
 interface BannerProps {
   variant: 'tryAgain';
@@ -585,6 +614,135 @@ export default function LessonAsking({
     );
   };
 
+  // Render tap-pair question type - select 2 matching items from options
+  const renderTapPair = () => {
+    if (!step.content.options) return null;
+    
+    // Track which items are selected (up to 2) - stored as JSON array
+    let selectedItems: string[] = [];
+    try {
+      if (selectedAnswer && selectedAnswer.startsWith('[')) {
+        selectedItems = JSON.parse(selectedAnswer);
+      }
+    } catch (e) {
+      selectedItems = [];
+    }
+    
+    const handleItemTap = (itemId: string) => {
+      if (isSubmitting) return;
+      
+      if (selectedItems.includes(itemId)) {
+        // Deselect if already selected
+        const newItems = selectedItems.filter(id => id !== itemId);
+        onAnswerSelect(JSON.stringify(newItems));
+      } else if (selectedItems.length < 2) {
+        // Add to selection (max 2)
+        const newItems = [...selectedItems, itemId];
+        onAnswerSelect(JSON.stringify(newItems));
+      } else {
+        // Replace the first selection
+        const newItems = [selectedItems[1], itemId];
+        onAnswerSelect(JSON.stringify(newItems));
+      }
+    };
+    
+    return (
+      <div className="space-y-4">
+        <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+          Tap 2 items that go together!
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {step.content.options.map((option) => {
+            const isSelected = selectedItems.includes(option.id);
+            return (
+              <button
+                key={option.id}
+                onClick={() => handleItemTap(option.id)}
+                disabled={isSubmitting}
+                className={`
+                  p-4 rounded-2xl border-2 transition-all duration-200
+                  ${isSelected
+                    ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-200'
+                    : 'border-gray-200 bg-white hover:border-orange-200'
+                  }
+                  ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+                `}
+                data-testid={`option-${option.id}`}
+              >
+                <div className="flex flex-col items-center space-y-2">
+                  {option.emoji && (
+                    <span className="text-3xl" role="img" aria-hidden="true">
+                      {option.emoji}
+                    </span>
+                  )}
+                  <span className="text-sm font-medium text-gray-900 text-center">
+                    {option.text}
+                  </span>
+                  {isSelected && (
+                    <span className="text-xs text-orange-600 font-bold">Selected ✓</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        
+        <div className="text-center text-sm text-gray-500">
+          {(!selectedAnswer || selectedItems.length === 0) && "Tap the first item"}
+          {selectedItems.length === 1 && "Now tap the matching item"}
+          {selectedItems.length >= 2 && "Ready to check!"}
+        </div>
+      </div>
+    );
+  };
+
+  // Render fill-blank question type - select word to complete sentence
+  const renderFillBlank = () => {
+    if (!step.content.options) return null;
+    
+    return (
+      <div className="space-y-4">
+        {/* Show the question with blank indicator */}
+        <div className="bg-gray-50 p-4 rounded-xl text-center">
+          <p className="text-lg text-gray-800 leading-relaxed">
+            {step.question.includes('______') 
+              ? step.question.replace('______', selectedAnswer ? `[${step.content.options.find(o => o.id === selectedAnswer)?.text || '___'}]` : '______')
+              : step.question
+            }
+          </p>
+        </div>
+        
+        <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+          Choose the word that fits!
+        </div>
+        
+        <div className="flex flex-wrap justify-center gap-3">
+          {step.content.options.map((option) => (
+            <button
+              key={option.id}
+              onClick={() => onAnswerSelect(option.id)}
+              disabled={isSubmitting}
+              className={`
+                px-6 py-3 rounded-full border-2 transition-all duration-200
+                ${selectedAnswer === option.id
+                  ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-200'
+                  : 'border-gray-200 bg-white hover:border-orange-200'
+                }
+                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+              `}
+              data-testid={`option-${option.id}`}
+            >
+              <span className="text-base font-medium text-gray-900">
+                {option.text}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-md mx-auto space-y-6">
       {/* Try Again Banner */}
@@ -614,11 +772,11 @@ export default function LessonAsking({
         </div>
       )}
 
-      {/* Mascot - conditional based on lesson */}
+      {/* Mascot - dynamic based on mascotAction or lesson */}
       <div className="flex justify-center">
         <img 
-          src={lessonId === 'brainfuel-for-school' ? brainyBoltImage : captainCarrotImage} 
-          alt={lessonId === 'brainfuel-for-school' ? "Brainy Bolt Mascot" : "Captain Carrot Mascot"} 
+          src={getMascotImage(step.mascotAction, lessonId)} 
+          alt="Lesson Mascot" 
           className="w-24 h-24 object-contain"
         />
       </div>
@@ -637,6 +795,8 @@ export default function LessonAsking({
         {step.questionType === 'matching' && renderMatching()}
         {step.questionType === 'label-reading' && renderLabelReading()}
         {step.questionType === 'ordering' && renderOrdering()}
+        {step.questionType === 'tap-pair' && renderTapPair()}
+        {step.questionType === 'fill-blank' && renderFillBlank()}
       </div>
 
       {/* Check Button */}

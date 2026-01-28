@@ -1,0 +1,134 @@
+## Task: Fix Lesson Loading - Lessons Not Displaying from Supabase
+
+### Problem
+Lessons are not loading from the database. The lesson data exists in Supabase but doesn't display in the app.
+
+### Database Structure (Already Set Up in Supabase)
+
+**Lesson in database:**
+- `id`: 'rocket-fuel-for-legs'
+- `title`: 'Rocket Fuel for Legs! 🚀'
+- `mascot_id`: 'coach-flex'
+- `curriculum_id`: 'uk-ks1'
+- `unit_id`: 'uk-ks1-energy'
+- `target_age_bracket`: '5-7'
+- `total_steps`: 5
+
+**5 lesson steps with these question types:**
+- Step 1: multiple-choice
+- Step 2: true-false
+- Step 3: tap-pair (NEW type)
+- Step 4: fill-blank (NEW type)
+- Step 5: multiple-choice
+
+### Schema Changes Needed
+
+**1. The `age_bracket` enum has changed from:**
+```
+['6-8', '9-11', '12-14']
+```
+**To:**
+```
+['5-7', '7-11', '11-14']
+```
+
+**2. The `question_type` enum has new values:**
+```
+['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading']
+```
+
+**3. The `lessons` table has new columns:**
+- `learning_takeaway` (text)
+- `mascot_id` (varchar, references mascots.id)
+- `mascot_intro` (text)
+- `curriculum_id` (varchar, references curriculums.id)
+- `unit_id` (varchar, references units.id)
+- `difficulty_level` (integer, default 1)
+- `order_in_unit` (integer)
+- `estimated_minutes` (integer, default 5)
+- `icon_emoji` (text)
+
+**4. The `users` table has a new column:**
+- `curriculum_id` (varchar, references curriculums.id)
+
+**5. New tables exist in Supabase:**
+- `mascots` (id, name, emoji, description, personality, image_path, is_active, created_at)
+- `curriculums` (id, name, country, age_bracket, description, is_active, created_at)
+- `units` (id, curriculum_id, title, description, icon_emoji, order_position, default_mascot_id, is_active, created_at, updated_at)
+
+### What to Fix
+
+1. **Update `shared/schema.ts`** to match the new database structure above
+
+2. **Update the lesson fetching logic** in `server/routes/lessons.ts`:
+   - Remove any hardcoded lesson data (like 'fuel-for-football')
+   - Fetch lessons from the database using the new schema
+   - Ensure it returns data in the format the frontend expects
+
+3. **Update the storage layer** in `server/storage.ts`:
+   - Add functions for new tables: `getMascots()`, `getMascotById()`, `getCurriculums()`, `getUnits()`, `getUnitsByCurriculum()`
+   - Update `getLessonWithSteps()` to include new columns
+
+4. **Update frontend components** if needed:
+   - `LessonAsking.tsx` needs to handle new question types: `tap-pair` and `fill-blank`
+   - Currently it may only handle: `multiple-choice`, `true-false`, `matching`, `ordering`, `label-reading`
+
+5. **Check the lesson route/page**:
+   - Ensure the lesson page can load lesson ID `rocket-fuel-for-legs`
+   - Check if there's any hardcoded reference to old lesson IDs like `fuel-for-football`
+
+### Content Structure for `tap-pair` Question Type
+```json
+{
+  "options": [
+    {"id": "apple", "text": "Apple", "emoji": "🍎"},
+    {"id": "pasta", "text": "Pasta", "emoji": "🍝"},
+    {"id": "toy", "text": "Toy", "emoji": "🧸"},
+    {"id": "rice", "text": "Rice", "emoji": "🍚"}
+  ],
+  "correctPair": ["pasta", "rice"],
+  "feedback": {
+    "success": "Great job!",
+    "hint_after_2": "Hint text",
+    "motivating_fail": "Try again message"
+  }
+}
+```
+
+### Content Structure for `fill-blank` Question Type
+```json
+{
+  "options": [
+    {"id": "sleep", "text": "Sleep"},
+    {"id": "run", "text": "Run"}
+  ],
+  "correctAnswer": "run",
+  "feedback": {
+    "success": "Correct!",
+    "hint_after_2": "Hint text",
+    "motivating_fail": "Try again message"
+  }
+}
+```
+
+### Mascot Actions (for `mascot_action` field in lesson_steps)
+
+These reference Oni the Orange's emotional states:
+- `oni_celebrate` - Correct answer / lesson complete
+- `oni_groove` - Fun moments
+- `oni_hint` - Showing a hint
+- `oni_love` - Encouragement
+- `oni_oops` - Wrong answer
+- `oni_proud` - Achievement
+- `oni_sad` - Streak lost
+
+Mascot images are stored at: `attached_assets/Mascots/`
+
+### Testing
+
+After making changes:
+1. Navigate to the lesson at `/lessons/rocket-fuel-for-legs`
+2. Verify all 5 steps load correctly
+3. Test each question type works (multiple-choice, true-false, tap-pair, fill-blank)
+4. Verify mascot images display
+5. Check that Oni's emotional reactions show based on `mascot_action`

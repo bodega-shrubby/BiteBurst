@@ -435,6 +435,10 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         submittedAnswer: validatedData.answer
       });
 
+      // Define legacy hardcoded lesson IDs
+      const LEGACY_LESSON_IDS = ['fuel-for-football', 'brainfuel-for-school'];
+      const isLegacyLesson = LEGACY_LESSON_IDS.includes(validatedData.lessonId);
+
       let expectedAnswer;
       if (validatedData.lessonId === 'fuel-for-football') {
         expectedAnswer = fuelForFootballAnswers[validatedData.stepId];
@@ -502,7 +506,113 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           isCorrect = false;
         }
       } 
-      // Handle other question types
+      // For DB-based lessons (non-legacy), validate using database
+      else if (!isLegacyLesson) {
+        try {
+          // Try to get lesson from DB to validate any question type
+          const lessonData = await storage.getLessonWithSteps(validatedData.lessonId);
+          if (lessonData) {
+            const step = lessonData.steps.find(s => s.id === validatedData.stepId);
+            if (step) {
+              console.log('DEBUG - DB lesson step validation:', {
+                questionType: step.questionType,
+                hasCorrectPair: !!step.content?.correctPair,
+                hasCorrectAnswer: !!step.content?.correctAnswer,
+                hasOptions: !!step.content?.options
+              });
+              
+              switch (step.questionType) {
+                case 'tap-pair':
+                  // Validate tap-pair: answer is JSON array of 2 IDs
+                  if (step.content?.correctPair) {
+                    try {
+                      const selectedIds = JSON.parse(validatedData.answer) as string[];
+                      const correctPair = step.content.correctPair as string[];
+                      // Check if both selected IDs are in correctPair (order doesn't matter)
+                      isCorrect = Array.isArray(selectedIds) && 
+                        selectedIds.length === 2 && 
+                        correctPair.includes(selectedIds[0]) && 
+                        correctPair.includes(selectedIds[1]);
+                    } catch (e) {
+                      console.error('Failed to parse tap-pair answer:', e);
+                      isCorrect = false;
+                    }
+                  }
+                  break;
+                  
+                case 'fill-blank':
+                  // Validate fill-blank: answer matches correctAnswer
+                  if (step.content?.correctAnswer) {
+                    isCorrect = validatedData.answer === step.content.correctAnswer;
+                  }
+                  break;
+                  
+                case 'multiple-choice':
+                  // Validate multiple-choice: answer matches correct option ID
+                  if (step.content?.options) {
+                    const correctOption = step.content.options.find((o: any) => o.correct === true);
+                    isCorrect = correctOption && validatedData.answer === correctOption.id;
+                  }
+                  break;
+                  
+                case 'true-false':
+                  // Validate true-false: answer matches correctAnswer as string
+                  if (step.content?.correctAnswer !== undefined) {
+                    isCorrect = validatedData.answer === String(step.content.correctAnswer);
+                  }
+                  break;
+                  
+                case 'matching':
+                  // Validate matching: answer is JSON object of left->right pairs
+                  if (step.content?.matchingPairs) {
+                    try {
+                      const submittedMatches = JSON.parse(validatedData.answer);
+                      const pairs = step.content.matchingPairs as Array<{left: string; right: string}>;
+                      const correctMatches: Record<string, string> = {};
+                      pairs.forEach(p => { correctMatches[p.left] = p.right; });
+                      isCorrect = Object.keys(correctMatches).every(left => 
+                        submittedMatches[left] === correctMatches[left]
+                      ) && Object.keys(submittedMatches).length === Object.keys(correctMatches).length;
+                    } catch (e) {
+                      console.error('Failed to parse matching answer:', e);
+                      isCorrect = false;
+                    }
+                  }
+                  break;
+                  
+                case 'ordering':
+                  // Validate ordering: answer is JSON array in correct order
+                  if (step.content?.orderingItems) {
+                    try {
+                      const submittedOrder = JSON.parse(validatedData.answer);
+                      const items = step.content.orderingItems as Array<{id: string; correctOrder: number}>;
+                      const correctOrderIds = items
+                        .sort((a, b) => a.correctOrder - b.correctOrder)
+                        .map(item => item.id);
+                      isCorrect = JSON.stringify(submittedOrder) === JSON.stringify(correctOrderIds);
+                    } catch (e) {
+                      console.error('Failed to parse ordering answer:', e);
+                      isCorrect = false;
+                    }
+                  }
+                  break;
+                  
+                default:
+                  console.warn('Unknown question type:', step.questionType);
+                  isCorrect = false;
+              }
+            } else {
+              console.error('Step not found in lesson:', validatedData.stepId);
+            }
+          } else {
+            console.error('Lesson not found in DB:', validatedData.lessonId);
+          }
+        } catch (e) {
+          console.error('Failed to validate DB lesson answer:', e);
+          isCorrect = false;
+        }
+      }
+      // Handle hardcoded lesson question types
       else if (typeof expectedAnswer === 'boolean') {
         isCorrect = validatedData.answer === String(expectedAnswer);
       } else {
@@ -511,6 +621,21 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
 
       // Award XP based on lesson and step
       let xpReward = 10; // default
+      
+      // Try to get XP from DB first
+      try {
+        const lessonData = await storage.getLessonWithSteps(validatedData.lessonId);
+        if (lessonData) {
+          const step = lessonData.steps.find(s => s.id === validatedData.stepId);
+          if (step && step.xpReward) {
+            xpReward = step.xpReward;
+          }
+        }
+      } catch (e) {
+        console.log('Using default XP, DB lookup failed:', e);
+      }
+      
+      // Fallback to hardcoded for legacy lessons
       if (validatedData.lessonId === 'fuel-for-football') {
         const fuelXpRewards: Record<string, number> = {
           'step-1': 10,
@@ -520,7 +645,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           'step-5': 10,
           'step-6': 10
         };
-        xpReward = fuelXpRewards[validatedData.stepId] || 10;
+        xpReward = fuelXpRewards[validatedData.stepId] || xpReward;
       } else if (validatedData.lessonId === 'brainfuel-for-school') {
         const brainXpRewards: Record<string, number> = {
           'step-1': 10,
@@ -530,7 +655,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           'step-5': 15,
           'step-6': 10
         };
-        xpReward = brainXpRewards[validatedData.stepId] || 10;
+        xpReward = brainXpRewards[validatedData.stepId] || xpReward;
       }
 
       const xpAwarded = isCorrect ? xpReward : 0;
