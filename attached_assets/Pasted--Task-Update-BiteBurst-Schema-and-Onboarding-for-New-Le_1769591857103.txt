@@ -1,0 +1,118 @@
+## Task: Update BiteBurst Schema and Onboarding for New Lesson System
+
+### Part 1: Update Drizzle Schema (`shared/schema.ts`)
+
+The Supabase database has been updated. Please update the Drizzle schema to match:
+
+**1. Update `age_bracket` enum:**
+```typescript
+export const ageBracketEnum = pgEnum('age_bracket', ['5-7', '7-11', '11-14']);
+```
+
+**2. Update `question_type` enum:**
+```typescript
+export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading']);
+```
+
+**3. Add `curriculum_id` to users table:**
+```typescript
+// Add this column to the users table definition:
+curriculumId: varchar("curriculum_id").references(() => curriculums.id),
+```
+
+**4. Add new `mascots` table:**
+```typescript
+export const mascots = pgTable("mascots", {
+  id: varchar("id").primaryKey(),
+  name: text("name").notNull(),
+  emoji: text("emoji").notNull(),
+  description: text("description"),
+  personality: text("personality"),
+  imagePath: text("image_path"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+```
+
+**5. Add new `curriculums` table:**
+```typescript
+export const curriculums = pgTable("curriculums", {
+  id: varchar("id").primaryKey(),
+  name: text("name").notNull(),
+  country: text("country").notNull(),
+  ageBracket: ageBracketEnum("age_bracket").notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+```
+
+**6. Add new `units` table:**
+```typescript
+export const units = pgTable("units", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id, { onDelete: 'cascade' }),
+  title: text("title").notNull(),
+  description: text("description"),
+  iconEmoji: text("icon_emoji"),
+  orderPosition: integer("order_position").notNull(),
+  defaultMascotId: varchar("default_mascot_id").references(() => mascots.id),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+```
+
+**7. Update `lessons` table - add these new columns:**
+```typescript
+// Add these columns to existing lessons table:
+learningTakeaway: text("learning_takeaway"),
+mascotId: varchar("mascot_id").references(() => mascots.id),
+mascotIntro: text("mascot_intro"),
+curriculumId: varchar("curriculum_id").references(() => curriculums.id),
+unitId: varchar("unit_id").references(() => units.id),
+difficultyLevel: integer("difficulty_level").default(1),
+orderInUnit: integer("order_in_unit"),
+estimatedMinutes: integer("estimated_minutes").default(5),
+iconEmoji: text("icon_emoji"),
+```
+
+**8. Add type exports for new tables:**
+```typescript
+export type Mascot = typeof mascots.$inferSelect;
+export type Curriculum = typeof curriculums.$inferSelect;
+export type Unit = typeof units.$inferSelect;
+```
+
+### Part 2: Update Onboarding Flow
+
+Update the onboarding to collect curriculum preference:
+
+**New onboarding order:**
+1. Welcome screen
+2. Child's name
+3. **Curriculum selection (NEW):** "Which curriculum does your child follow?" → UK or US buttons
+4. **Age bracket:** Show age-appropriate labels based on curriculum choice:
+   - If UK: "Key Stage 1 (Ages 5-7)", "Key Stage 2 (Ages 7-11)", "Key Stage 3 (Ages 11-14)"
+   - If US: "Grades K-2 (Ages 5-7)", "Grades 3-5 (Ages 7-11)", "Grades 6-8 (Ages 11-14)"
+5. Goal selection
+6. Avatar selection
+7. Parent consent
+
+**When saving user:**
+- Store `curriculum_id` based on the combination: e.g., "uk-ks1", "us-k2"
+- Store `age_bracket` as just the age range: "5-7", "7-11", or "11-14"
+
+**Curriculum IDs in database:**
+- UK: `uk-ks1`, `uk-ks2`, `uk-ks3`
+- US: `us-k2`, `us-35`, `us-68`
+
+### Part 3: Update Storage/API Layer
+
+Add functions to fetch:
+- `getMascots()` - get all active mascots
+- `getMascotById(id)` - get single mascot
+- `getCurriculums()` - get all curriculums
+- `getCurriculumsByCountry(country)` - get curriculums for UK or US
+- `getUnitsByCurriculum(curriculumId)` - get units for a curriculum
+- `getLessonsByUnit(unitId)` - get lessons in a unit
