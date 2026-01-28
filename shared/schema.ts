@@ -16,11 +16,11 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Create enums to match database
-export const ageBracketEnum = pgEnum('age_bracket', ['6-8', '9-11', '12-14']);
+export const ageBracketEnum = pgEnum('age_bracket', ['5-7', '7-11', '11-14']);
 export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
 export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
-export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching']);
+export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading']);
 export const curriculumEnum = pgEnum('curriculum', ['us-common-core', 'uk-ks2-ks3']);
 
 // Catalog tables
@@ -35,6 +35,43 @@ export const goals = pgTable("goals", {
   label: text("label").notNull(),
 });
 
+// Mascots table for lesson characters
+export const mascots = pgTable("mascots", {
+  id: varchar("id").primaryKey(),
+  name: text("name").notNull(),
+  emoji: text("emoji").notNull(),
+  description: text("description"),
+  personality: text("personality"),
+  imagePath: text("image_path"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Curriculums table for UK/US educational standards
+export const curriculums = pgTable("curriculums", {
+  id: varchar("id").primaryKey(),
+  name: text("name").notNull(),
+  country: text("country").notNull(),
+  ageBracket: ageBracketEnum("age_bracket").notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Units table for organizing lessons within a curriculum
+export const units = pgTable("units", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id, { onDelete: 'cascade' }),
+  title: text("title").notNull(),
+  description: text("description"),
+  iconEmoji: text("icon_emoji"),
+  orderPosition: integer("order_position").notNull(),
+  defaultMascotId: varchar("default_mascot_id").references(() => mascots.id),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Users table with UUID and proper types
 // Note: id is the child profile ID (auto-generated), NOT the Supabase auth ID
 // parent_auth_id links to the parent's Supabase auth.users account
@@ -44,7 +81,8 @@ export const users = pgTable("users", {
   displayName: text("display_name").notNull(),
   ageBracket: ageBracketEnum("age_bracket").notNull(),
   goal: goalEnum("goal").notNull().references(() => goals.id),
-  curriculum: text("curriculum").default('us-common-core'), // "us-common-core" | "uk-ks2-ks3"
+  curriculum: text("curriculum").default('us-common-core'), // Legacy field - "us-common-core" | "uk-ks2-ks3"
+  curriculumId: varchar("curriculum_id").references(() => curriculums.id), // New FK to curriculums table
   email: text("email").unique().notNull(),
   parentEmail: text("parent_email"),
   parentConsent: boolean("parent_consent").notNull().default(false),
@@ -163,6 +201,16 @@ export const lessons = pgTable("lessons", {
   totalSteps: integer("total_steps").notNull(),
   category: text("category").notNull().default('nutrition'),
   isActive: boolean("is_active").notNull().default(true),
+  // New columns for curriculum-aware lesson system
+  learningTakeaway: text("learning_takeaway"),
+  mascotId: varchar("mascot_id").references(() => mascots.id),
+  mascotIntro: text("mascot_intro"),
+  curriculumId: varchar("curriculum_id").references(() => curriculums.id),
+  unitId: varchar("unit_id").references(() => units.id),
+  difficultyLevel: integer("difficulty_level").default(1),
+  orderInUnit: integer("order_in_unit"),
+  estimatedMinutes: integer("estimated_minutes").default(5),
+  iconEmoji: text("icon_emoji"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -232,6 +280,9 @@ export type XpEvent = typeof xpEvents.$inferSelect;
 export type LeagueBoard = typeof leagueBoards.$inferSelect;
 export type InsertLeagueBoard = typeof leagueBoards.$inferInsert;
 export type LeaderboardCache = typeof leaderboardCache.$inferSelect;
+export type Mascot = typeof mascots.$inferSelect;
+export type Curriculum = typeof curriculums.$inferSelect;
+export type Unit = typeof units.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 export type InsertLesson = typeof lessons.$inferInsert;
 export type LessonStep = typeof lessonSteps.$inferSelect;
@@ -248,6 +299,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   ageBracket: true,
   goal: true,
   curriculum: true,
+  curriculumId: true,
   email: true,
   parentEmail: true,
   parentConsent: true,
@@ -276,6 +328,15 @@ export const insertLessonSchema = createInsertSchema(lessons).pick({
   totalSteps: true,
   category: true,
   isActive: true,
+  learningTakeaway: true,
+  mascotId: true,
+  mascotIntro: true,
+  curriculumId: true,
+  unitId: true,
+  difficultyLevel: true,
+  orderInUnit: true,
+  estimatedMinutes: true,
+  iconEmoji: true,
 });
 
 export const insertLessonStepSchema = createInsertSchema(lessonSteps).pick({
