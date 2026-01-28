@@ -22,6 +22,88 @@ const setLessonCacheHeaders = (res: any) => {
 };
 
 export function registerLessonRoutes(app: Express, requireAuth: any) {
+  // Get all lessons for a curriculum (combines units + lessons)
+  app.get('/api/curriculum/:curriculumId/lessons', requireAuth, async (req: any, res: any) => {
+    try {
+      let { curriculumId } = req.params;
+      const userId = req.userId;
+      
+      // Get units for this curriculum
+      let units = await storage.getUnitsByCurriculum(curriculumId);
+      
+      // If no units found, fall back to uk-ks1 which has sample lessons
+      if (units.length === 0 && curriculumId !== 'uk-ks1') {
+        console.log(`No units found for curriculum ${curriculumId}, falling back to uk-ks1`);
+        curriculumId = 'uk-ks1';
+        units = await storage.getUnitsByCurriculum('uk-ks1');
+      }
+      
+      // Get lessons for each unit
+      const allLessons: any[] = [];
+      for (const unit of units) {
+        const unitLessons = await storage.getLessonsByUnit(unit.id);
+        for (const lesson of unitLessons) {
+          allLessons.push({
+            id: lesson.id,
+            title: lesson.title,
+            icon: lesson.iconEmoji || '📚',
+            unitId: unit.id,
+            unitTitle: unit.title,
+            sortOrder: lesson.orderInUnit ?? 0,
+            description: lesson.description
+          });
+        }
+      }
+      
+      // Sort by unit order then lesson order
+      allLessons.sort((a, b) => a.sortOrder - b.sortOrder);
+      
+      // Get user's completed lessons from lesson_attempts
+      const completedLessons = await storage.getCompletedLessonIds(userId);
+      const completedLessonIds = new Set(completedLessons);
+      
+      // Assign states: first incomplete is 'current', completed ones are 'completed', rest locked
+      let foundCurrent = false;
+      const lessonsWithState = allLessons.map((lesson, index) => {
+        const isCompleted = completedLessonIds.has(lesson.id);
+        let state: 'current' | 'unlocked' | 'locked' | 'completed' = 'locked';
+        
+        if (isCompleted) {
+          state = 'completed';
+        } else if (!foundCurrent) {
+          state = 'current';
+          foundCurrent = true;
+        } else if (index > 0 && completedLessonIds.has(allLessons[index - 1]?.id)) {
+          state = 'unlocked';
+        }
+        
+        return {
+          ...lesson,
+          state
+        };
+      });
+      
+      // If no lessons found from DB, return empty array
+      setLessonCacheHeaders(res);
+      res.json(lessonsWithState);
+    } catch (error) {
+      console.error('Failed to get curriculum lessons:', error);
+      res.status(500).json({ error: 'Failed to load lessons' });
+    }
+  });
+
+  // Get units for a curriculum
+  app.get('/api/curriculum/:curriculumId/units', requireAuth, async (req: any, res: any) => {
+    try {
+      const { curriculumId } = req.params;
+      const units = await storage.getUnitsByCurriculum(curriculumId);
+      res.json(units);
+    } catch (error) {
+      console.error('Failed to get curriculum units:', error);
+      res.status(500).json({ error: 'Failed to load units' });
+    }
+  });
+
   // Get lesson by ID
   app.get('/api/lessons/:lessonId', requireAuth, async (req: any, res: any) => {
     try {

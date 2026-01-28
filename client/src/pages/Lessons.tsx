@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import BottomNavigation from '@/components/BottomNavigation';
 import LessonCircle from '@/components/LessonCircle';
@@ -8,19 +9,56 @@ import StarBadge from '@/components/StarBadge';
 import { cleanLessons, type CleanLesson } from '@/data/clean-lessons';
 import mascotImage from '@/assets/mascot-teacher.png';
 
+type LessonState = 'current' | 'unlocked' | 'locked' | 'completed';
+
+interface ApiLesson {
+  id: string;
+  title: string;
+  icon: string;
+  unitId: string;
+  unitTitle: string;
+  sortOrder: number;
+  description: string | null;
+  state: LessonState;
+}
+
 export default function Lessons() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
-  const [lessons, setLessons] = useState<CleanLesson[]>(cleanLessons);
+  
+  // Get user's curriculum ID
+  const curriculumId = user?.curriculum || 'uk-ks2'; // Default fallback
+  
+  // Fetch lessons from API based on user's curriculum
+  const { data: apiLessons, isLoading: lessonsLoading, error } = useQuery<ApiLesson[]>({
+    queryKey: [`/api/curriculum/${curriculumId}/lessons`],
+    enabled: !!user && !!curriculumId,
+  });
+  
+  // Use API lessons if available, otherwise fall back to hardcoded lessons
+  const lessons: CleanLesson[] = apiLessons && apiLessons.length > 0 
+    ? apiLessons.map(l => ({
+        id: l.id,
+        title: l.title.replace(' ', '\n'), // Add line break for display
+        icon: l.icon,
+        state: l.state
+      }))
+    : cleanLessons;
 
   // Handle lesson completion from URL params
+  const [localLessons, setLocalLessons] = useState<CleanLesson[]>(lessons);
+  
+  useEffect(() => {
+    setLocalLessons(lessons);
+  }, [apiLessons]);
+  
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const justCompleted = urlParams.get('completed');
     
     if (justCompleted) {
       // Mark lesson as completed, unlock next
-      setLessons(prev => prev.map((lesson, index) => {
+      setLocalLessons(prev => prev.map((lesson, index) => {
         if (lesson.id === justCompleted) {
           return { ...lesson, state: 'completed' as const };
         }
@@ -37,9 +75,10 @@ export default function Lessons() {
     }
   }, []);
 
-  // Calculate progress
-  const completed = lessons.filter(l => l.state === 'completed').length;
-  const progressPercent = (completed / lessons.length) * 100;
+  // Calculate progress using localLessons
+  const displayLessons = localLessons.length > 0 ? localLessons : lessons;
+  const completed = displayLessons.filter(l => l.state === 'completed').length;
+  const progressPercent = displayLessons.length > 0 ? (completed / displayLessons.length) * 100 : 0;
 
   // Mobile-centered layout
   const containerWidth = 360; // Mobile-friendly width
@@ -54,7 +93,7 @@ export default function Lessons() {
   > = [];
   let currentY = startY;
 
-  lessons.forEach((lesson, index) => {
+  displayLessons.forEach((lesson, index) => {
     allElements.push({
       type: 'lesson',
       lesson,
@@ -73,29 +112,25 @@ export default function Lessons() {
     }
   });
 
-  // Handle lesson click
+  // Handle lesson click - navigate to lesson player for any lesson
   const handleLessonClick = (lesson: CleanLesson) => {
     if (lesson.state === 'current' || lesson.state === 'unlocked') {
-      if (lesson.id === 'fuel-for-football') {
-        setLocation('/lesson/fuel-for-football');
-      } else if (lesson.id === 'brainfuel-for-school') {
-        setLocation('/lesson/brainfuel-for-school');
-      } else {
-        setLocation(`/lesson/demo?id=${lesson.id}`);
-      }
+      // All lessons use the same lesson player route
+      setLocation(`/lesson/${lesson.id}`);
     }
   };
 
   // Progress hint text
   const getProgressHint = () => {
-    if (completed === 0) {
-      return 'Tap "Fuel for Football" to start your journey!';
+    if (completed === 0 && displayLessons.length > 0) {
+      const firstLesson = displayLessons[0];
+      return `Tap "${firstLesson.title.replace('\n', ' ')}" to start your journey!`;
     }
     return 'Great progress! Keep going to unlock more lessons!';
   };
 
-  // Show loading spinner while auth is checking
-  if (loading) {
+  // Show loading spinner while auth or lessons are loading
+  if (loading || lessonsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -153,7 +188,7 @@ export default function Lessons() {
           <div className="mt-6 mb-8">
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="text-lg font-semibold text-gray-900 mb-2">
-                {completed} of {lessons.length} lessons complete
+                {completed} of {displayLessons.length} lessons complete
               </div>
               
               {/* Progress Bar */}

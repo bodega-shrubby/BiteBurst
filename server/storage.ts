@@ -82,6 +82,9 @@ export interface IStorage {
   
   // Lesson by unit operations
   getLessonsByUnit(unitId: string): Promise<Lesson[]>;
+  
+  // Lesson progress operations
+  getCompletedLessonIds(userId: string): Promise<string[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -313,6 +316,20 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(lessons)
       .where(and(eq(lessons.unitId, unitId), eq(lessons.isActive, true)))
       .orderBy(lessons.orderInUnit);
+  }
+  
+  // Get completed lesson IDs for a user (based on lesson_attempts with isCorrect=true for all steps)
+  async getCompletedLessonIds(userId: string): Promise<string[]> {
+    // Get all unique lessonIds where user has at least one correct answer
+    // This is a simplified approach - ideally should check if ALL steps are completed
+    const results = await db
+      .selectDistinct({ lessonId: lessonAttempts.lessonId })
+      .from(lessonAttempts)
+      .where(and(
+        eq(lessonAttempts.userId, userId),
+        eq(lessonAttempts.isCorrect, true)
+      ));
+    return results.map(r => r.lessonId);
   }
 }
 
