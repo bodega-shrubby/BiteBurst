@@ -25,8 +25,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password, 
         parentConsent,
         childName,    // Child's display name
-        age,          // "6-8" | "9-11" | "12-14"
-        curriculum,   // "us-common-core" | "uk-ks2-ks3"
+        age,          // "5-7" | "7-11" | "11-14"
+        curriculum,   // "uk-ks1" | "uk-ks2" | "uk-ks3" | "us-k2" | "us-35" | "us-68"
         goal,         // "energy" | "focus" | "strength"
         avatarId, 
         timezone 
@@ -45,9 +45,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Password must be at least 6 characters' });
       }
       
-      // Validate curriculum
-      const validCurriculums = ['us-common-core', 'uk-ks2-ks3'];
-      const selectedCurriculum = curriculum || 'us-common-core';
+      // Validate curriculum (supports both UK Key Stages and US Grades)
+      const validCurriculums = ['uk-ks1', 'uk-ks2', 'uk-ks3', 'us-k2', 'us-35', 'us-68'];
+      const selectedCurriculum = curriculum || 'us-35';
       if (!validCurriculums.includes(selectedCurriculum)) {
         return res.status(400).json({ error: 'Please select a valid curriculum' });
       }
@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         childProfile = await storage.updateUser(existingUser.id, {
           parentAuthId,
           displayName: childName,
-          ageBracket: age as '6-8' | '9-11' | '12-14',
+          ageBracket: age as '5-7' | '7-11' | '11-14',
           goal: goal as 'energy' | 'focus' | 'strength',
           curriculum: selectedCurriculum,
           parentConsent: true,
@@ -100,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         childProfile = await storage.createUser({
           parentAuthId,
           displayName: childName,
-          ageBracket: age as '6-8' | '9-11' | '12-14',
+          ageBracket: age as '5-7' | '7-11' | '11-14',
           goal: goal as 'energy' | 'focus' | 'strength',
           curriculum: selectedCurriculum,
           email: parentEmail, // Use parent email as unique identifier

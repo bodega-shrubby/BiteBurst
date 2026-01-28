@@ -4,7 +4,8 @@ interface OnboardingProfile {
   displayName: string;
   ageBracket: string;
   goal: string;
-  curriculum: string;
+  curriculumCountry: string; // 'uk' or 'us'
+  curriculum: string; // derived curriculum ID (e.g., 'uk-ks1', 'us-k2')
   avatar: string;
   email?: string;
   parentEmail?: string;
@@ -26,6 +27,7 @@ const defaultProfile: OnboardingProfile = {
   displayName: "",
   ageBracket: "",
   goal: "",
+  curriculumCountry: "",
   curriculum: "",
   avatar: "",
   email: "",
