@@ -17,8 +17,8 @@ import { CharacterAvatar } from "@/components/dashboard/CharacterAvatar";
 import XPProgressBar from "@/components/dashboard/XPProgressBar";
 
 // Mascot assets
-import sunnySliceImage from "@assets/Mascots/SunnySlice.png";
-import sunnyCelebrateImage from "@assets/Mascots/sunny_celebrate.png";
+import oniTheOrangeImage from "@assets/Mascots/Oni_the_orange.png";
+import oniCelebrateImage from "@assets/Mascots/Oni_the_orange.png"; // Placeholder for celebration
 
 interface DailySummaryV2 {
   xp_today: number;
@@ -207,7 +207,7 @@ function getMascotMessage(context: MascotMessageContext): string {
   if (hour < 12) {
     return `Good morning, ${userName}! Ready to start? ☀️`;
   } else if (hour < 17) {
-    return `Hey ${userName}! Time for a healthy snack? 🍎`;
+    return `Hey ${userName}! I'm Oni the Orange! Ready for a healthy snack? 🍎`;
   } else if (hour < 22) {
     return `Evening, ${userName}! How was your day? 🌙`;
   } else {
@@ -249,8 +249,8 @@ function MascotSection({
         ${state === 'goalReached' ? 'animate-celebration-bounce' : 'animate-subtle-bounce'}
       `}>
         <img 
-          src={state === 'goalReached' || state === 'badgeUnlocked' ? sunnyCelebrateImage : sunnySliceImage}
-          alt="Sunny Slice mascot"
+          src={state === 'goalReached' || state === 'badgeUnlocked' ? oniCelebrateImage : oniTheOrangeImage}
+          alt="Oni the Orange mascot"
           className="w-24 h-24 object-contain drop-shadow-lg"
         />
       </div>
