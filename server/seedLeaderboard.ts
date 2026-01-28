@@ -68,12 +68,16 @@ async function checkCurrentWeekLeague(): Promise<boolean> {
 async function createMockUsers(): Promise<string[]> {
   const userIds: string[] = [];
   
-  for (const userData of DEMO_USERS) {
+  for (let i = 0; i < DEMO_USERS.length; i++) {
+    const userData = DEMO_USERS[i];
+    // Generate unique mock email for each demo user
+    const mockEmail = `mock-${userData.name.toLowerCase().replace(/[^a-z]/g, '')}-${i}@biteburst.mock`;
+    
     const [user] = await db.insert(users).values({
       displayName: userData.name,
-      ageBracket: '9-11',
+      ageBracket: '7-11',
       goal: 'energy',
-      email: null,
+      email: mockEmail,
       parentConsent: true,
       avatarId: 'mascot-01',
       locale: 'en-GB',

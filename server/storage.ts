@@ -9,6 +9,9 @@ import {
   lessons,
   lessonSteps,
   lessonAttempts,
+  mascots,
+  curriculums,
+  units,
   type User,
   type InsertUser,
   type Log,
@@ -21,6 +24,9 @@ import {
   type LessonStep,
   type LessonAttempt,
   type InsertLessonAttempt,
+  type Mascot,
+  type Curriculum,
+  type Unit,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -62,6 +68,20 @@ export interface IStorage {
   
   // Lesson operations
   getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined>;
+  
+  // Mascot operations
+  getMascots(): Promise<Mascot[]>;
+  getMascotById(id: string): Promise<Mascot | undefined>;
+  
+  // Curriculum operations  
+  getCurriculums(): Promise<Curriculum[]>;
+  getCurriculumsByCountry(country: string): Promise<Curriculum[]>;
+  
+  // Unit operations
+  getUnitsByCurriculum(curriculumId: string): Promise<Unit[]>;
+  
+  // Lesson by unit operations
+  getLessonsByUnit(unitId: string): Promise<Lesson[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -258,6 +278,41 @@ export class DatabaseStorage implements IStorage {
         retryConfig: step.retryConfig || undefined,
       }))
     };
+  }
+  
+  // Mascot operations
+  async getMascots(): Promise<Mascot[]> {
+    return await db.select().from(mascots).where(eq(mascots.isActive, true));
+  }
+  
+  async getMascotById(id: string): Promise<Mascot | undefined> {
+    const [mascot] = await db.select().from(mascots).where(eq(mascots.id, id));
+    return mascot || undefined;
+  }
+  
+  // Curriculum operations
+  async getCurriculums(): Promise<Curriculum[]> {
+    return await db.select().from(curriculums).where(eq(curriculums.isActive, true));
+  }
+  
+  async getCurriculumsByCountry(country: string): Promise<Curriculum[]> {
+    return await db.select().from(curriculums).where(
+      and(eq(curriculums.country, country), eq(curriculums.isActive, true))
+    );
+  }
+  
+  // Unit operations
+  async getUnitsByCurriculum(curriculumId: string): Promise<Unit[]> {
+    return await db.select().from(units)
+      .where(and(eq(units.curriculumId, curriculumId), eq(units.isActive, true)))
+      .orderBy(units.orderPosition);
+  }
+  
+  // Lesson by unit operations
+  async getLessonsByUnit(unitId: string): Promise<Lesson[]> {
+    return await db.select().from(lessons)
+      .where(and(eq(lessons.unitId, unitId), eq(lessons.isActive, true)))
+      .orderBy(lessons.orderInUnit);
   }
 }
 
