@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import OnboardingLayout from "./OnboardingLayout";
-import sunnySliceImage from "@assets/Mascots/SunnySlice.png";
+import oniTheOrangeImage from "@assets/Mascots/Oni_the_orange.png";
 
 export default function MascotIntroStep() {
   const [, setLocation] = useLocation();
@@ -21,7 +21,7 @@ export default function MascotIntroStep() {
           <div className="flex justify-center mb-4">
             <div className="relative bg-white border-2 border-gray-200 rounded-3xl p-6 max-w-xs shadow-lg">
               <p className="text-lg font-medium text-gray-800">
-                Hi, I'm Sunny Slice!
+                Hi, I'm Oni the Orange!
               </p>
               {/* Speech bubble tail */}
               <div className="absolute bottom-[-12px] left-1/2 transform -translate-x-1/2">
@@ -33,8 +33,8 @@ export default function MascotIntroStep() {
           {/* Mascot Image - 2x Larger */}
           <div className="flex justify-center">
             <img 
-              src={sunnySliceImage} 
-              alt="Sunny Slice mascot" 
+              src={oniTheOrangeImage} 
+              alt="Oni the Orange mascot" 
               className="w-64 h-64 object-contain"
             />
           </div>
