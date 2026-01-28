@@ -2,7 +2,7 @@
 
 ## Overview
 
-BiteBurst is a web-based MVP designed to help children aged 6–14 build healthy eating and movement habits through a fun, gamified experience. The app uses AI to provide personalized, age-appropriate feedback and educational content. The platform addresses the gap in the market where most nutrition and fitness apps are built for adults and fail to engage children effectively.
+BiteBurst is a web-based MVP designed to help children aged 5–14 build healthy eating and movement habits through a fun, gamified experience. The app uses AI to provide personalized, age-appropriate feedback and educational content. The platform addresses the gap in the market where most nutrition and fitness apps are built for adults and fail to engage children effectively.
 
 The application follows a Duolingo-inspired design philosophy with clean layouts, scroll-triggered animations, friendly mascots (orange slice character), and engaging micro-interactions. The core user experience revolves around making nutrition fun, motivating, and educational through simple visual interfaces.
 
@@ -126,6 +126,25 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
     - `MealSummaryCard.tsx` - Running total of items and XP
   - Features: Multi-category support, mealType in submission payload, text input clears selections
   - UI: 72px touch targets, green checkmark animations, smooth framer-motion transitions
+
+- January 28, 2026: **Curriculum-Aware Lesson Delivery System**
+  - Updated age brackets from 6-8/9-11/12-14 to 5-7/7-11/11-14 to match UK/US educational stages
+  - Enhanced onboarding flow with country-first curriculum selection:
+    - Step 4: Select curriculum country (UK or US) with flag icons
+    - Step 5: Age bracket selection with curriculum-specific labels (Key Stages vs Grades)
+  - New curriculum IDs mapping:
+    - UK: uk-ks1 (5-7), uk-ks2 (7-11), uk-ks3 (11-14)
+    - US: us-k2 (5-7), us-35 (7-11), us-68 (11-14)
+  - Database schema additions:
+    - `mascots` table for lesson mascot characters
+    - `curriculums` table for UK/US curriculum definitions
+    - `units` table for lesson grouping within curriculums
+    - Extended `lessons` table with curriculum/unit/mascot integration
+  - Storage layer updates:
+    - getMascots, getMascotById for mascot management
+    - getCurriculums, getCurriculumsByCountry for curriculum filtering
+    - getUnitsByCurriculum, getLessonsByUnit for curriculum-aware lesson retrieval
+  - Guard added to AgeStep to ensure curriculum country is selected first
 
 - January 25, 2026: **Parent-First Onboarding Flow with Curriculum Selection**
   - Implemented parent-first authentication architecture:
