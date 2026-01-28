@@ -395,8 +395,19 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       const validatedData = answerSubmissionSchema.parse(req.body);
       
-      // Verify user matches authenticated user
-      if (validatedData.userId !== req.userId) {
+      // Verify parent owns the child profile
+      // req.userId is the Supabase parent auth ID
+      // validatedData.userId is the child profile ID
+      const childProfile = await storage.getUser(validatedData.userId);
+      if (!childProfile) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Allow if parentAuthId matches OR direct ID match (legacy users)
+      const isParentOwned = childProfile.parentAuthId === req.userId;
+      const isDirectMatch = validatedData.userId === req.userId;
+      
+      if (!isParentOwned && !isDirectMatch) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
