@@ -183,8 +183,9 @@ export default function PathNode({
 
       {!isInteractive && (
         <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-          <div className="bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
-            Complete earlier lessons first
+          <div className="bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg text-center max-w-32">
+            <div className="font-medium whitespace-pre-line">{title}</div>
+            <div className="text-gray-400 text-[10px] mt-0.5">Complete earlier lessons first</div>
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-900" />
           </div>
         </div>

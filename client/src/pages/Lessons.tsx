@@ -6,7 +6,8 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ConnectingPath from '@/components/lessons/ConnectingPath';
 import PathNode, { type NodeState } from '@/components/lessons/PathNode';
 import PathDecorations from '@/components/lessons/PathDecorations';
-import StarBadge from '@/components/StarBadge';
+import TreasureChest from '@/components/lessons/TreasureChest';
+import NextTopicBanner from '@/components/lessons/NextTopicBanner';
 import { cleanLessons, type CleanLesson } from '@/data/clean-lessons';
 import mascotImage from '@/assets/mascot-teacher.png';
 
@@ -281,19 +282,25 @@ export default function Lessons() {
               </div>
             ))}
 
-            {[2, 5, 7].map((afterIndex) => {
-              if (afterIndex >= displayLessons.length || !nodePositions[afterIndex]) return null;
-              const y = (nodePositions[afterIndex].y + (nodePositions[afterIndex + 1]?.y || nodePositions[afterIndex].y + 100)) / 2;
+            {displayLessons.map((_, index) => {
+              if ((index + 1) % 3 !== 0) return null;
+              if (!nodePositions[index]) return null;
+              
+              const nextY = nodePositions[index + 1]?.y ?? nodePositions[index].y + 110;
+              const chestY = (nodePositions[index].y + nextY) / 2;
+              const chestX = containerWidth / 2;
               
               return (
-                <StarBadge
-                  key={`star-${afterIndex}`}
-                  y={y}
-                  isUnlocked={completed > afterIndex}
+                <TreasureChest
+                  key={`chest-${index}`}
+                  x={chestX}
+                  y={chestY}
                 />
               );
             })}
           </div>
+          
+          <NextTopicBanner topicName="Hydration Heroes" />
         </div>
       </main>
 
