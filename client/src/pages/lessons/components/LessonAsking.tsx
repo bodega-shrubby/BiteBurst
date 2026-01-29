@@ -76,6 +76,9 @@ export default function LessonAsking({
   banner,
   lessonId
 }: LessonAskingProps) {
+  // DEBUG: Log received banner prop
+  console.log('DEBUG LessonAsking - received banner prop:', banner);
+  
   // Matching game state
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [draggedItem, setDraggedItem] = useState<string | null>(null);

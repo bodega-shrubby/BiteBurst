@@ -408,12 +408,14 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Handle "Try Again" from incorrect state
   const handleTryAgain = () => {
+    console.log('DEBUG FRONTEND - handleTryAgain called, current tryAgainMessage:', tryAgainMessage);
     setLessonState('asking');
     setSelectedAnswer(null);
     setHasSelectionChanged(false);
     setLastSelectedAnswer(null);
     setStepStartTime(Date.now()); // Reset timing for retry attempt analytics
     setShowRetryBanner(true); // Show hint banner when returning to asking state
+    console.log('DEBUG FRONTEND - handleTryAgain complete, showRetryBanner set to true');
   };
 
   // Handle "Continue" from LEARN_CARD state (skip to next step, award XP)
@@ -524,19 +526,26 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
         {lessonState === 'asking' && currentStep && (
-          <LessonAsking
-            step={currentStep}
-            selectedAnswer={selectedAnswer}
-            onAnswerSelect={handleAnswerSelect}
-            onCheck={handleCheckAnswer}
-            isSubmitting={submitAnswerMutation.isPending}
-            canCheck={getCanCheck()}
-            lessonId={lessonId}
-            banner={showRetryBanner && tryAgainMessage ? {
-              variant: 'tryAgain',
-              text: tryAgainMessage
-            } : undefined}
-          />
+          <>
+            {console.log('DEBUG FRONTEND - Rendering LessonAsking with banner:', {
+              showRetryBanner,
+              tryAgainMessage,
+              bannerProp: showRetryBanner && tryAgainMessage ? { variant: 'tryAgain', text: tryAgainMessage } : undefined
+            })}
+            <LessonAsking
+              step={currentStep}
+              selectedAnswer={selectedAnswer}
+              onAnswerSelect={handleAnswerSelect}
+              onCheck={handleCheckAnswer}
+              isSubmitting={submitAnswerMutation.isPending}
+              canCheck={getCanCheck()}
+              lessonId={lessonId}
+              banner={showRetryBanner && tryAgainMessage ? {
+                variant: 'tryAgain',
+                text: tryAgainMessage
+              } : undefined}
+            />
+          </>
         )}
         
         {lessonState === 'incorrect' && currentStep && (
