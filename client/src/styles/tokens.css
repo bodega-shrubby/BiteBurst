@@ -770,8 +770,8 @@ html {
   outline-offset: 2px;
 }
 
-/* Live region styling for screen readers - but NOT for our XP card or try-again banner */
-[aria-live]:not(.bb-xp-card):not([data-testid="try-again-banner"]) {
+/* Live region styling for screen readers - but NOT for our visible lesson components */
+[aria-live]:not(.bb-xp-card):not([data-testid="try-again-banner"]):not([data-testid="learn-card"]):not([data-testid="incorrect-banner"]) {
   position: absolute;
   left: -10000px;
   width: 1px;
