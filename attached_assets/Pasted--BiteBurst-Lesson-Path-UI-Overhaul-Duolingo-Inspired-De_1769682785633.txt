@@ -1,0 +1,356 @@
+# BiteBurst Lesson Path UI Overhaul - Duolingo-Inspired Design
+
+## Project Context
+BiteBurst is a gamified nutrition app for kids (ages 6-14). We need to redesign the lesson path screen to be more visually engaging, playful, and polished—inspired by Duolingo's lesson UI. The current implementation uses React + TypeScript with Tailwind CSS.
+
+## Reference Design (Duolingo)
+- 3D coin-like lesson nodes with depth, shadows, and vibrant fruit/veggie colors
+- Nodes zigzag dramatically across the screen creating a winding "adventure path"
+- Decorative food illustrations appear along the path
+- Active/unlocked nodes are larger and more vibrant with a pulsing "START" indicator
+- Completed nodes show a satisfying checkmark with celebration colors
+- Progress shown through an animated colored path line
+
+## Brand Colors (Fruit & Veggie Theme)
+Use these vibrant colors for lesson nodes based on their order/theme:
+- Tomato Red: #FF6B6B
+- Carrot Orange: #FF8E3C (also --bb-orange)
+- Banana Yellow: #FFD93D
+- Apple Green: #6BCB77
+- Blueberry Blue: #4D96FF
+- Grape Purple: #9B59B6
+- Watermelon Pink: #FF6B9D
+
+---
+
+## PART 1: Update CurvySpine.tsx
+
+Replace the entire CurvySpine.tsx with this enhanced version that creates a more dramatic winding path:
+
+### Changes needed:
+1. Increase amplitude from 100 to 140 for wider zigzags
+2. Add a subtle gradient to the progress path
+3. Add floating particle dots along the path for visual interest
+4. Make the path thicker (10px instead of 8px)
+5. Add a glowing effect to the progress portion
+
+### Updated sampleSpinePoint function:
+- Increase horizontal movement amplitude
+- Make the zigzag more pronounced with wider swings
+- Ensure nodes alternate clearly left-center-right-center pattern
+
+### New features to add:
+- Animated dots that travel along the completed portion of the path
+- Subtle pulsing glow on the "current" position of progress
+- The path should have a slight 3D embossed look (darker stroke behind, lighter on top)
+
+---
+
+## PART 2: Completely Redesign PathNode.tsx
+
+Transform the flat circular nodes into 3D "coin-like" buttons similar to Duolingo:
+
+### Visual Design Changes:
+
+1. **3D Coin Effect:**
+   - Add a thick colored "edge" at the bottom (6-8px) to create depth
+   - Use CSS box-shadow layers: inner highlight on top, darker shadow on bottom
+   - Add subtle inner radial gradient for a glossy/spherical look
+
+2. **Size Variations:**
+   - Locked nodes: 64px diameter (smaller, muted)
+   - Completed nodes: 72px diameter (normal)
+   - Unlocked/Active node: 84px diameter (larger, prominent)
+
+3. **Color Assignment by Node Order:**
+   Create a function that assigns colors based on node index:
+```typescript
+   const nodeColors = [
+     { bg: 'from-red-400 to-red-500', edge: '#DC2626', glow: 'rgba(239, 68, 68, 0.4)' },      // Tomato
+     { bg: 'from-orange-400 to-orange-500', edge: '#EA580C', glow: 'rgba(249, 115, 22, 0.4)' }, // Carrot
+     { bg: 'from-yellow-400 to-yellow-500', edge: '#CA8A04', glow: 'rgba(234, 179, 8, 0.4)' },  // Banana
+     { bg: 'from-green-400 to-green-500', edge: '#16A34A', glow: 'rgba(34, 197, 94, 0.4)' },    // Apple
+     { bg: 'from-blue-400 to-blue-500', edge: '#2563EB', glow: 'rgba(59, 130, 246, 0.4)' },     // Blueberry
+     { bg: 'from-purple-400 to-purple-500', edge: '#9333EA', glow: 'rgba(168, 85, 247, 0.4)' }, // Grape
+     { bg: 'from-pink-400 to-pink-500', edge: '#DB2777', glow: 'rgba(236, 72, 153, 0.4)' },     // Watermelon
+   ];
+   // Cycle through colors: nodeColors[order % nodeColors.length]
+```
+
+4. **Locked State Styling:**
+   - Grayscale the node completely
+   - Add a semi-transparent dark overlay
+   - Show a small lock icon in the center
+   - Reduce opacity to 0.6
+   - No hover effects
+
+5. **Completed State Styling:**
+   - Full vibrant color with the assigned fruit/veggie color
+   - Golden star badge in top-right corner (keep existing but make it 3D too)
+   - Subtle golden glow around the node
+   - Checkmark overlay that fades in
+
+6. **Unlocked/Active State Styling:**
+   - Largest size (84px)
+   - Bright, saturated color
+   - Pulsing glow animation (subtle, not distracting)
+   - "START" button below with bounce animation
+   - The node should slightly "float" with a subtle up-down animation
+
+### Animation Specifications:
+
+1. **Idle Pulse for Unlocked Node:**
+```css
+   @keyframes gentle-pulse {
+     0%, 100% { 
+       transform: scale(1);
+       box-shadow: 0 0 0 0 rgba(var(--node-color), 0.4);
+     }
+     50% { 
+       transform: scale(1.02);
+       box-shadow: 0 0 20px 10px rgba(var(--node-color), 0.2);
+     }
+   }
+```
+
+2. **START Button Bounce:**
+```css
+   @keyframes bounce-subtle {
+     0%, 100% { transform: translateX(-50%) translateY(0); }
+     50% { transform: translateX(-50%) translateY(-4px); }
+   }
+```
+
+3. **Hover Effect (for interactive nodes):**
+   - Scale up to 1.08
+   - Increase shadow spread
+   - Slight rotation (2-3 degrees)
+   - Transition duration: 200ms
+
+4. **Click/Tap Effect:**
+   - Quick scale down to 0.95 then back to 1
+   - Brief color brightening
+
+5. **Newly Unlocked Animation:**
+   - Pop in with overshoot (scale from 0 to 1.2 to 1)
+   - Burst of small particles/confetti around the node
+   - Golden shimmer sweep across the surface
+
+---
+
+## PART 3: Add Decorative Path Elements
+
+Create a new component: `PathDecorations.tsx`
+
+This component renders small decorative food illustrations along the lesson path:
+
+### Decorations to include:
+- Small fruit/veggie emojis or simple SVG icons scattered along the path
+- Position them between nodes, offset from the main path
+- Examples: 🍎 🥕 🥦 🍇 🍌 🫐 🍓 🥬 🍊
+- Make them small (24-32px), slightly transparent (0.3-0.5 opacity)
+- Add subtle floating animation (gentle up-down bob)
+
+### Implementation:
+```typescript
+interface Decoration {
+  emoji: string;
+  x: number;
+  y: number;
+  size: number;
+  delay: number; // Animation delay for staggered floating
+}
+
+// Generate decorations based on node positions
+// Place 2-3 decorations between each pair of nodes
+// Offset them 40-80px from the path line
+// Alternate sides (left/right of path)
+```
+
+### Floating Animation:
+```css
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(3deg); }
+  75% { transform: translateY(4px) rotate(-3deg); }
+}
+```
+
+---
+
+## PART 4: Update the Lesson Path Container/Page
+
+Modify the parent component that renders the lesson path:
+
+### Background Improvements:
+1. Change from plain gray to a subtle gradient:
+```css
+   background: linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%);
+```
+
+2. Add subtle pattern overlay (optional - food-themed pattern)
+
+### Header Card Improvements:
+1. Make the orange header more dynamic with a subtle gradient
+2. Add a small illustration or icon related to the week's theme
+3. Show progress as "X of Y lessons complete" with a mini progress bar
+
+### Scroll Behavior:
+1. When user completes a lesson and returns, auto-scroll to the newly unlocked node
+2. Add smooth scroll behavior
+3. Consider a "Jump to current lesson" floating button if user scrolls far
+
+---
+
+## PART 5: Enhanced Animations in CSS/Tailwind
+
+Add these keyframe animations to your global CSS or Tailwind config:
+```css
+/* Lesson Node Animations */
+@keyframes node-pop-in {
+  0% { 
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  60% { 
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes node-glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 4px 15px -3px var(--glow-color),
+                0 8px 0 -2px var(--edge-color),
+                inset 0 -4px 8px rgba(0,0,0,0.1),
+                inset 0 4px 8px rgba(255,255,255,0.2);
+  }
+  50% { 
+    box-shadow: 0 4px 25px 5px var(--glow-color),
+                0 8px 0 -2px var(--edge-color),
+                inset 0 -4px 8px rgba(0,0,0,0.1),
+                inset 0 4px 8px rgba(255,255,255,0.3);
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% { 
+    background-position: -200% center;
+  }
+  100% { 
+    background-position: 200% center;
+  }
+}
+
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes bounce-in {
+  0% { transform: translateX(-50%) scale(0); }
+  60% { transform: translateX(-50%) scale(1.1); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes confetti-burst {
+  0% { 
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1) rotate(180deg) translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* Utility classes */
+.animate-node-pop { animation: node-pop-in 0.5s ease-out forwards; }
+.animate-glow-pulse { animation: node-glow-pulse 2s ease-in-out infinite; }
+.animate-shimmer { 
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer-sweep 2s linear infinite;
+}
+.animate-float { animation: float-bob 3s ease-in-out infinite; }
+.animate-bounce-in { animation: bounce-in 0.4s ease-out forwards; }
+```
+
+---
+
+## PART 6: Update Confetti.tsx for Lesson Completion
+
+Enhance the confetti effect with fruit/veggie themed particles:
+
+### Changes:
+1. Use fruit emojis as confetti shapes: ['🍎', '🥕', '🍌', '🥦', '🍇', '⭐', '✨']
+2. Add more variety in colors matching our brand palette
+3. Increase particle count to 60-80 for more impact
+4. Add slight spiral motion to particles
+5. Include a few "star burst" effects at the center
+
+---
+
+## PART 7: Progress & Completion States
+
+### When a lesson is completed:
+1. The completed node should do a quick "celebration" animation
+2. A golden shimmer sweeps across the node
+3. The star badge pops in with a bounce
+4. The path progress line animates to extend to the next node
+5. The next node transforms from locked to unlocked with the pop-in animation
+6. Brief confetti burst around the newly unlocked node
+
+### Progress Path Animation:
+- When progress increases, animate the orange fill smoothly
+- Add traveling dots along the progress path (like energy flowing)
+- The "tip" of the progress should have a subtle glow
+
+---
+
+## PART 8: Accessibility Considerations
+
+Ensure all animations respect user preferences:
+
+1. Wrap animations in `prefers-reduced-motion` media query
+2. Provide alternative static states for reduced motion users
+3. Ensure color contrast meets WCAG AA standards
+4. All interactive elements must have proper focus states
+5. Screen reader announcements for state changes
+```css
+@media (prefers-reduced-motion: reduce) {
+  .animate-glow-pulse,
+  .animate-float,
+  .animate-shimmer {
+    animation: none;
+  }
+}
+```
+
+---
+
+## Summary of Files to Modify:
+
+1. `client/src/components/lessons/CurvySpine.tsx` - Enhanced winding path with glow effects
+2. `client/src/components/lessons/PathNode.tsx` - 3D coin-style nodes with fruit colors
+3. `client/src/components/lessons/Confetti.tsx` - Fruit-themed celebration particles
+4. Create new: `client/src/components/lessons/PathDecorations.tsx` - Floating food decorations
+5. Global CSS/Tailwind config - New animation keyframes
+6. Parent lesson page component - Background gradient, scroll behavior
+
+## Testing Checklist:
+- [ ] Nodes display correct colors based on order
+- [ ] Locked nodes are grayed out and non-interactive
+- [ ] Unlocked node pulses gently and has START button
+- [ ] Completed nodes show star badge
+- [ ] Path progress animates smoothly
+- [ ] Decorative elements float along the path
+- [ ] Completing a lesson triggers celebration animation
+- [ ] Newly unlocked node has pop-in animation
+- [ ] All animations disabled when prefers-reduced-motion is set
+- [ ] Hover and focus states work correctly
+- [ ] Mobile touch interactions feel responsive
