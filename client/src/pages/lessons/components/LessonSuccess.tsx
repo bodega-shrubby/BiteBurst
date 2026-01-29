@@ -2,6 +2,21 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
 
+type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
+
+// Helper to extract feedback text from string or object
+function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | 'hint' | 'fail' = 'success'): string | undefined {
+  if (!feedback) return undefined;
+  if (typeof feedback === 'string') return feedback;
+  // It's an object with structured feedback
+  switch (type) {
+    case 'success': return feedback.success;
+    case 'hint': return feedback.hint_after_2;
+    case 'fail': return feedback.motivating_fail;
+    default: return feedback.success;
+  }
+}
+
 interface LessonStep {
   id: string;
   stepNumber: number;
@@ -10,7 +25,7 @@ interface LessonStep {
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
-    feedback?: string;
+    feedback?: FeedbackType;
     matchingPairs?: Array<{ left: string; right: string }>;
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
@@ -74,10 +89,10 @@ export default function LessonSuccess({
         </div>
         
         {/* Show lesson feedback with player references */}
-        {step.content.feedback && (
+        {getFeedbackText(step.content.feedback, 'success') && (
           <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
             <div className="text-sm text-green-700 whitespace-pre-line">
-              {step.content.feedback?.replace(/\\n/g, '\n')}
+              {getFeedbackText(step.content.feedback, 'success')?.replace(/\\n/g, '\n')}
             </div>
           </div>
         )}
@@ -115,10 +130,10 @@ export default function LessonSuccess({
         </div>
         
         {/* Show lesson feedback with player references */}
-        {step.content.feedback && (
+        {getFeedbackText(step.content.feedback, 'success') && (
           <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
             <div className="text-sm text-green-700">
-              {step.content.feedback}
+              {getFeedbackText(step.content.feedback, 'success')}
             </div>
           </div>
         )}
@@ -159,7 +174,7 @@ export default function LessonSuccess({
             {correctOption && (
               <div className="bg-white p-3 rounded-xl border border-green-200">
                 <div className="font-bold text-lg text-gray-900 mb-2">{(correctOption as any).name}</div>
-                <div className="text-sm text-green-700">{step.content.feedback}</div>
+                <div className="text-sm text-green-700">{getFeedbackText(step.content.feedback, 'success')}</div>
               </div>
             )}
           </div>
@@ -183,10 +198,10 @@ export default function LessonSuccess({
             )}
             
             {/* Feedback */}
-            {step.content.feedback && (
+            {getFeedbackText(step.content.feedback, 'success') && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <p className="text-gray-700 leading-relaxed">
-                  {step.content.feedback}
+                  {getFeedbackText(step.content.feedback, 'success')}
                 </p>
               </div>
             )}
