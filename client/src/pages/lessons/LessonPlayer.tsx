@@ -252,12 +252,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         // State transitions based on current attempt and config
         if (currentAttempt === 1) {
           // First incorrect: ASK → TRY_AGAIN
-          console.log('DEBUG FRONTEND - Setting tryAgainMessage from:', {
-            hasRetryConfig: !!currentStep?.retryConfig,
-            hasMessages: !!currentStep?.retryConfig?.messages,
-            tryAgain1: currentStep?.retryConfig?.messages?.tryAgain1,
-            currentAttempt
-          });
           setLessonState('incorrect');
           setTryAgainMessage(currentStep.retryConfig.messages.tryAgain1 || 'Try again!');
           setCurrentAttempt(2);
@@ -324,12 +318,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const currentStep = lessonData?.steps[currentStepIndex];
   const progress = lessonData ? ((currentStepIndex + 1) / lessonData.totalSteps) * 100 : 0;
-  
-  // DEBUG: Log currentStep retryConfig
-  if (currentStep) {
-    console.log('DEBUG FRONTEND - currentStep.retryConfig:', currentStep.retryConfig);
-    console.log('DEBUG FRONTEND - currentStep.retryConfig?.messages:', currentStep.retryConfig?.messages);
-  }
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
@@ -408,14 +396,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Handle "Try Again" from incorrect state
   const handleTryAgain = () => {
-    console.log('DEBUG FRONTEND - handleTryAgain called, current tryAgainMessage:', tryAgainMessage);
     setLessonState('asking');
     setSelectedAnswer(null);
     setHasSelectionChanged(false);
     setLastSelectedAnswer(null);
     setStepStartTime(Date.now()); // Reset timing for retry attempt analytics
     setShowRetryBanner(true); // Show hint banner when returning to asking state
-    console.log('DEBUG FRONTEND - handleTryAgain complete, showRetryBanner set to true');
   };
 
   // Handle "Continue" from LEARN_CARD state (skip to next step, award XP)
@@ -457,15 +443,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       </div>
     );
   }
-
-  // DEBUG: Log banner state
-  console.log('DEBUG FRONTEND - Banner state:', {
-    showRetryBanner,
-    tryAgainMessage,
-    willShowBanner: showRetryBanner && !!tryAgainMessage,
-    lessonState,
-    currentAttempt
-  });
 
   if (lessonState === 'complete') {
     return (
@@ -526,26 +503,19 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
         {lessonState === 'asking' && currentStep && (
-          <>
-            {console.log('DEBUG FRONTEND - Rendering LessonAsking with banner:', {
-              showRetryBanner,
-              tryAgainMessage,
-              bannerProp: showRetryBanner && tryAgainMessage ? { variant: 'tryAgain', text: tryAgainMessage } : undefined
-            })}
-            <LessonAsking
-              step={currentStep}
-              selectedAnswer={selectedAnswer}
-              onAnswerSelect={handleAnswerSelect}
-              onCheck={handleCheckAnswer}
-              isSubmitting={submitAnswerMutation.isPending}
-              canCheck={getCanCheck()}
-              lessonId={lessonId}
-              banner={showRetryBanner && tryAgainMessage ? {
-                variant: 'tryAgain',
-                text: tryAgainMessage
-              } : undefined}
-            />
-          </>
+          <LessonAsking
+            step={currentStep}
+            selectedAnswer={selectedAnswer}
+            onAnswerSelect={handleAnswerSelect}
+            onCheck={handleCheckAnswer}
+            isSubmitting={submitAnswerMutation.isPending}
+            canCheck={getCanCheck()}
+            lessonId={lessonId}
+            banner={showRetryBanner && tryAgainMessage ? {
+              variant: 'tryAgain',
+              text: tryAgainMessage
+            } : undefined}
+          />
         )}
         
         {lessonState === 'incorrect' && currentStep && (
