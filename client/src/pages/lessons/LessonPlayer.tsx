@@ -14,6 +14,8 @@ interface LessonPlayerProps {
 
 type LessonState = 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
 
+type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
+
 interface LessonStep {
   id: string;
   stepNumber: number;
@@ -22,7 +24,7 @@ interface LessonStep {
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
-    feedback?: string;
+    feedback?: FeedbackType;
     matchingPairs?: Array<{ left: string; right: string }>;
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
@@ -66,6 +68,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [stepStartTime, setStepStartTime] = useState<number>(Date.now());
   const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
   const [lastSelectedAnswer, setLastSelectedAnswer] = useState<string | null>(null); // Track previous selection for change detection
+  const [showRetryBanner, setShowRetryBanner] = useState(false); // Show hint banner after retry
 
 
   // Fetch lesson data with cache invalidation
@@ -168,6 +171,16 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           });
         }
         
+        // Helper to extract feedback messages from content.feedback
+        const getFeedbackMessage = (type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
+          const feedback = currentStep?.content?.feedback;
+          if (!feedback) return undefined;
+          if (typeof feedback === 'object') {
+            return type === 'hint_after_2' ? feedback.hint_after_2 : feedback.motivating_fail;
+          }
+          return undefined;
+        };
+        
         // Enhanced state machine logic
         if (!currentStep?.retryConfig) {
           // Fallback behavior for steps without retryConfig: ASK → TRY_AGAIN → LEARN_CARD
@@ -178,8 +191,39 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             setSelectedAnswer(null);
             setHasSelectionChanged(false);
             setLastSelectedAnswer(null);
+          } else if (currentAttempt === 2) {
+            // Second attempt - use hint_after_2 if available
+            const hintAfter2 = getFeedbackMessage('hint_after_2');
+            if (hintAfter2) {
+              setLessonState('incorrect');
+              setTryAgainMessage(hintAfter2);
+              setCurrentAttempt(3);
+              setSelectedAnswer(null);
+              setHasSelectionChanged(false);
+              setLastSelectedAnswer(null);
+            } else {
+              // No hint_after_2, go directly to learn card
+              setLessonState('learn');
+              setSelectedAnswer(null);
+              
+              // Log learn card usage
+              if (currentStep) {
+                logAttemptMutation.mutate({
+                  lessonId,
+                  stepId: currentStep.id,
+                  stepNumber: currentStep.stepNumber,
+                  attemptNumber: 3,
+                  isCorrect: false,
+                  selectedAnswer: 'learn-card-shown',
+                  timeOnStepMs,
+                  heartsRemaining: heartsRemaining,
+                  xpEarned: 0,
+                  usedLearnCard: true
+                });
+              }
+            }
           } else {
-            // Second attempt failed - go to learn card with no XP
+            // Third attempt failed - go to learn card
             setLessonState('learn');
             setSelectedAnswer(null);
             
@@ -216,9 +260,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           setLastSelectedAnswer(null);
         } else if (currentAttempt === 2 && maxAttempts >= 3) {
           // Second incorrect and max attempts allows third: TRY_AGAIN → TRY_AGAIN (with different message) or LEARN_CARD
-          if (currentStep.retryConfig.messages.tryAgain2) {
+          // Use tryAgain2 from retryConfig or hint_after_2 from feedback
+          const hintAfter2 = getFeedbackMessage('hint_after_2');
+          const secondMessage = currentStep.retryConfig.messages.tryAgain2 || hintAfter2;
+          if (secondMessage) {
             setLessonState('incorrect');
-            setTryAgainMessage(currentStep.retryConfig.messages.tryAgain2);
+            setTryAgainMessage(secondMessage);
             setCurrentAttempt(3);
             setSelectedAnswer(null);
             setHasSelectionChanged(false);
@@ -323,6 +370,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setStepStartTime(Date.now());
     setHasSelectionChanged(false);
     setLastSelectedAnswer(null);
+    setShowRetryBanner(false);
   };
 
   const handleCheckAnswer = () => {
@@ -353,6 +401,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setHasSelectionChanged(false);
     setLastSelectedAnswer(null);
     setStepStartTime(Date.now()); // Reset timing for retry attempt analytics
+    setShowRetryBanner(true); // Show hint banner when returning to asking state
   };
 
   // Handle "Continue" from LEARN_CARD state (skip to next step, award XP)
@@ -462,13 +511,17 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             isSubmitting={submitAnswerMutation.isPending}
             canCheck={getCanCheck()}
             lessonId={lessonId}
+            banner={showRetryBanner && tryAgainMessage ? {
+              variant: 'tryAgain',
+              text: tryAgainMessage
+            } : undefined}
           />
         )}
         
         {lessonState === 'incorrect' && currentStep && (
           <LessonIncorrect
             message={tryAgainMessage || "Not quite right. Try again!"}
-            onTryAgain={() => setLessonState('asking')}
+            onTryAgain={handleTryAgain}
             canTryAgain={true}
           />
         )}

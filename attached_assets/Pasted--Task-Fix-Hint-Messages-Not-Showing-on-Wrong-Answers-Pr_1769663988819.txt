@@ -1,0 +1,88 @@
+## Task: Fix Hint Messages Not Showing on Wrong Answers
+
+### Problem
+When a user answers incorrectly and clicks "Try Again", they return to the question but the hint message is not displayed. The hint should appear as a banner above the question.
+
+### Root Cause
+The `LessonAsking` component has a `banner` prop that can display hints, but `LessonPlayer.tsx` never passes this prop.
+
+### Files to Modify
+`client/src/pages/lessons/components/LessonPlayer.tsx`
+
+### Changes Required
+
+1. **Add state to track when banner should show:**
+```tsx
+const [showRetryBanner, setShowRetryBanner] = useState(false);
+```
+
+2. **Update handleTryAgain to enable banner:**
+```tsx
+const handleTryAgain = () => {
+  setLessonState('asking');
+  setSelectedAnswer(null);
+  setHasSelectionChanged(false);
+  setLastSelectedAnswer(null);
+  setStepStartTime(Date.now());
+  setShowRetryBanner(true); // ADD THIS LINE
+};
+```
+
+3. **Clear banner in resetForNextStep:**
+```tsx
+const resetForNextStep = () => {
+  // ... existing code ...
+  setShowRetryBanner(false); // ADD THIS LINE
+};
+```
+
+4. **Pass banner prop to LessonAsking:**
+```tsx
+{lessonState === 'asking' && currentStep && (
+  <LessonAsking
+    step={currentStep}
+    selectedAnswer={selectedAnswer}
+    onAnswerSelect={handleAnswerSelect}
+    onCheck={handleCheckAnswer}
+    isSubmitting={submitAnswerMutation.isPending}
+    canCheck={getCanCheck()}
+    lessonId={lessonId}
+    banner={showRetryBanner && tryAgainMessage ? {
+      variant: 'tryAgain',
+      text: tryAgainMessage
+    } : undefined}
+  />
+)}
+```
+
+5. **Use hint_after_2 from content.feedback for second attempt:**
+
+In the submitAnswerMutation.onSuccess handler, when setting tryAgainMessage for the second attempt, also check for `content.feedback.hint_after_2`:
+```tsx
+// When currentAttempt === 2, use hint_after_2 if available
+const feedback = currentStep.content.feedback;
+const hintAfter2 = typeof feedback === 'object' ? feedback.hint_after_2 : undefined;
+setTryAgainMessage(
+  hintAfter2 || currentStep.retryConfig?.messages.tryAgain2 || 'Try again!'
+);
+```
+
+6. **Show motivating_fail message when going to learn card:**
+
+Before transitioning to 'learn' state, if there's a motivating_fail message, show it briefly or include it in the learn card:
+```tsx
+// Get motivating fail message
+const feedback = currentStep.content.feedback;
+const motivatingFail = typeof feedback === 'object' ? feedback.motivating_fail : undefined;
+// Can either show this in the LessonLearn component or briefly before transitioning
+```
+
+### Testing
+1. Answer a question incorrectly
+2. Click "Try Again" 
+3. Verify the hint banner appears above the question with `tryAgain1` message
+4. Answer incorrectly again
+5. Click "Try Again"
+6. Verify the `hint_after_2` message appears
+7. Answer incorrectly a third time
+8. Verify the learn card shows with `learnCard` message
