@@ -3,13 +3,10 @@ import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import BottomNavigation from '@/components/BottomNavigation';
-import ConnectingPath from '@/components/lessons/ConnectingPath';
 import PathNode, { type NodeState } from '@/components/lessons/PathNode';
-import PathDecorations from '@/components/lessons/PathDecorations';
 import TreasureChest from '@/components/lessons/TreasureChest';
 import NextTopicBanner from '@/components/lessons/NextTopicBanner';
 import { cleanLessons, type CleanLesson } from '@/data/clean-lessons';
-import mascotImage from '@/assets/mascot-teacher.png';
 
 type LessonState = 'current' | 'unlocked' | 'locked' | 'completed';
 
@@ -37,12 +34,12 @@ function mapToNodeState(state: LessonState): NodeState {
 
 function calculateNodePositions(nodeCount: number, containerWidth: number): Point[] {
   const paddingX = 70;
-  const startY = 80;
-  const spacingY = 110;
+  const startY = 60;
+  const spacingY = 85;
   
   const positions: Point[] = [];
   const centerX = containerWidth / 2;
-  const amplitude = Math.min(80, (containerWidth - paddingX * 2) / 2 - 40);
+  const amplitude = Math.min(70, (containerWidth - paddingX * 2) / 2 - 40);
   
   for (let i = 0; i < nodeCount; i++) {
     const pattern = i % 4;
@@ -149,7 +146,7 @@ export default function Lessons() {
   );
 
   const totalHeight = nodePositions.length > 0 
-    ? nodePositions[nodePositions.length - 1].y + 200 
+    ? nodePositions[nodePositions.length - 1].y + 150 
     : 600;
 
   const handleLessonClick = (lesson: CleanLesson) => {
@@ -194,7 +191,7 @@ export default function Lessons() {
 
   return (
     <div 
-      className="min-h-screen pb-20" 
+      className="min-h-screen pb-[220px]" 
       style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%)' }}
       ref={scrollRef}
     >
@@ -219,38 +216,30 @@ export default function Lessons() {
       </header>
 
       <main className="relative">
-        <div className="absolute left-4 top-72 z-10 hidden sm:block">
-          <img 
-            src={mascotImage} 
-            alt="BiteBurst Teacher Mascot" 
-            className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-lg"
-          />
-        </div>
-
         <div ref={containerRef} className="max-w-md mx-auto px-4 relative">
-          <div className="mt-6 mb-8">
-            <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-lg font-bold text-gray-900">
+          <div className="mt-6 mb-6">
+            <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-base font-bold text-gray-900">
                   {completed} of {displayLessons.length} lessons
                 </div>
-                <div className="text-2xl">
+                <div className="text-xl">
                   {completed === displayLessons.length ? '🏆' : '📚'}
                 </div>
               </div>
               
-              <div className="w-full bg-gray-100 rounded-full h-3 mb-3 overflow-hidden">
+              <div className="w-full bg-gray-100 rounded-full h-2.5 mb-2 overflow-hidden">
                 <div 
                   className="h-full rounded-full transition-all duration-700 ease-out"
                   style={{ 
                     width: `${progressPercent}%`,
                     background: 'linear-gradient(90deg, #FF8E3C 0%, #FF6A00 100%)',
-                    boxShadow: progressPercent > 0 ? '0 0 10px rgba(255, 142, 60, 0.5)' : 'none',
+                    boxShadow: progressPercent > 0 ? '0 0 8px rgba(255, 142, 60, 0.4)' : 'none',
                   }}
                 />
               </div>
               
-              <p className="text-sm text-gray-600">
+              <p className="text-xs text-gray-500">
                 {getProgressHint()}
               </p>
             </div>
@@ -260,13 +249,6 @@ export default function Lessons() {
             className="relative"
             style={{ height: totalHeight }}
           >
-            <ConnectingPath 
-              nodePositions={nodePositions} 
-              completedCount={completed} 
-            />
-            
-            <PathDecorations nodePositions={nodePositions} />
-
             {displayLessons.map((lesson, index) => (
               <div key={lesson.id} id={`lesson-${lesson.id}`}>
                 <PathNode
@@ -286,7 +268,7 @@ export default function Lessons() {
               if ((index + 1) % 3 !== 0) return null;
               if (!nodePositions[index]) return null;
               
-              const nextY = nodePositions[index + 1]?.y ?? nodePositions[index].y + 110;
+              const nextY = nodePositions[index + 1]?.y ?? nodePositions[index].y + 85;
               const chestY = (nodePositions[index].y + nextY) / 2;
               const chestX = containerWidth / 2;
               
