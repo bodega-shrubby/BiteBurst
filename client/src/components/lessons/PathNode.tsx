@@ -104,7 +104,7 @@ export default function PathNode({
 
   return (
     <div
-      className="absolute flex flex-col items-center"
+      className="absolute flex flex-col items-center group"
       style={{
         left: x - halfSize,
         top: y - halfSize,
@@ -118,7 +118,7 @@ export default function PathNode({
         aria-disabled={!isInteractive}
         aria-label={`${title.replace('\n', ' ')}, ${state}${isUnlocked ? ', 25 XP' : ''}`}
         className={`
-          relative group rounded-full border-[3px] border-white
+          relative rounded-full border-[3px] border-white
           flex items-center justify-center
           transition-all duration-200
           ${isInteractive ? 'hover:brightness-105 active:translate-y-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2' : 'cursor-not-allowed'}
