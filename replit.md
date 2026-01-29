@@ -112,12 +112,23 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 
 ## Changelog
 
+- January 29, 2026: **Lesson Path Layout Fix - ConnectingPath Implementation**
+  - Fixed critical layout issues where path was disconnected from lesson nodes
+  - Replaced CurvySpine with ConnectingPath that draws SVG path BY CONNECTING actual node positions
+  - New responsive positioning system:
+    - Container width measurement with resize listener
+    - calculateNodePositions() with safe padding (70px from edges)
+    - Tighter vertical spacing (110px between nodes)
+    - Gentler zigzag pattern that stays within screen bounds
+  - PathDecorations now positions decorations relative to actual node pairs
+  - Deleted independent CurvySpine.tsx that was causing misalignment
+
 - January 29, 2026: **Duolingo-Inspired Lesson Path UI Overhaul**
-  - Completely redesigned lesson path with 3D coin-style nodes
-  - New components and enhancements:
-    - `CurvySpine.tsx` - Dramatic winding S-curve path with gradient, glow effects, traveling dots
+  - Redesigned lesson path with 3D coin-style nodes
+  - New components:
+    - `ConnectingPath.tsx` - SVG path connecting actual node positions with bezier curves
     - `PathNode.tsx` - 3D coin nodes with fruit/veggie color cycling (7 colors), size variations (64/72/84px)
-    - `PathDecorations.tsx` - Floating food emoji decorations with bobbing animation
+    - `PathDecorations.tsx` - Floating food emoji decorations positioned between nodes
     - `Confetti.tsx` - Enhanced with fruit emoji particles, burst physics, spiral motion
   - New CSS keyframe animations in tokens.css:
     - node-pop-in, node-glow-pulse, shimmer-sweep, float-bob, bounce-in, bounce-subtle
@@ -126,7 +137,6 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
     - Locked: 64px, grayscale, lock icon, no interaction
     - Complete: 72px, vibrant color, checkmark overlay, gold star badge
     - Unlocked: 84px, pulsing glow, bouncing START button
-  - Updated Lessons.tsx to use new components with gradient background
 
 - January 27, 2026: **Meal-Based Food Logging System**
   - Implemented 3-step flow: Meal Type → Categories → Items
