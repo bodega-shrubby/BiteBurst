@@ -265,6 +265,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(lessonSteps.lessonId, lessonId))
       .orderBy(lessonSteps.stepNumber);
     
+    // DEBUG: Log raw step data from Drizzle
+    if (steps.length > 0) {
+      console.log('DEBUG STORAGE - Raw step[0] keys:', Object.keys(steps[0]));
+      console.log('DEBUG STORAGE - step[0].retryConfig:', steps[0]?.retryConfig);
+      console.log('DEBUG STORAGE - Raw step[0]:', JSON.stringify(steps[0], null, 2));
+    }
+    
     return {
       id: lesson.id,
       title: lesson.title,

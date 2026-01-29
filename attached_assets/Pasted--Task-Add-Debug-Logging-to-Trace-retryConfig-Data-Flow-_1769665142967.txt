@@ -1,0 +1,59 @@
+## Task: Add Debug Logging to Trace retryConfig Data Flow
+
+The hint messages for wrong answers aren't displaying. We need to add debug logging to trace where the `retryConfig` data might be getting lost between the database and the frontend.
+
+### File 1: server/storage.ts
+
+In the `getLessonWithSteps` function, add debug logging after fetching steps from the database.
+
+Find this code:
+```typescript
+// Get lesson steps
+const steps = await db
+  .select()
+  .from(lessonSteps)
+  .where(eq(lessonSteps.lessonId, lessonId))
+  .orderBy(lessonSteps.stepNumber);
+```
+
+Add immediately after it:
+```typescript
+// DEBUG: Log raw step data from Drizzle
+if (steps.length > 0) {
+  console.log('DEBUG STORAGE - Raw step[0] keys:', Object.keys(steps[0]));
+  console.log('DEBUG STORAGE - step[0].retryConfig:', steps[0]?.retryConfig);
+  console.log('DEBUG STORAGE - Raw step[0]:', JSON.stringify(steps[0], null, 2));
+}
+```
+
+### File 2: server/routes/lessons.ts
+
+In the GET `/api/lessons/:lessonId` route, add debug logging before sending the response.
+
+Find this code:
+```typescript
+if (lessonFromDb) {
+  const lessonData = {
+```
+
+Add right before `const lessonData = {`:
+```typescript
+// DEBUG: Log what we received from storage
+console.log('DEBUG ROUTE - lessonFromDb.steps[0] retryConfig:', lessonFromDb.steps[0]?.retryConfig);
+```
+
+Also, find where `return res.json(lessonData);` is called for the database lesson and add right before it:
+```typescript
+// DEBUG: Log final API response
+console.log('DEBUG ROUTE - Final response steps[0].retryConfig:', lessonData.steps[0]?.retryConfig);
+```
+
+### Expected Output
+
+After these changes, when loading a lesson, the server console should show:
+- `DEBUG STORAGE - Raw step[0] keys:` - Shows all property names from Drizzle
+- `DEBUG STORAGE - step[0].retryConfig:` - Shows if retryConfig exists at storage level
+- `DEBUG ROUTE - lessonFromDb.steps[0] retryConfig:` - Shows if retryConfig reaches the route
+- `DEBUG ROUTE - Final response steps[0].retryConfig:` - Shows if retryConfig is in the API response
+
+This will help identify where the retryConfig data is being lost.

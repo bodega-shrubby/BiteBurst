@@ -112,6 +112,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const lessonFromDb = await storage.getLessonWithSteps(lessonId);
 
       if (lessonFromDb) {
+        // DEBUG: Log what we received from storage
+        console.log('DEBUG ROUTE - lessonFromDb.steps[0] retryConfig:', lessonFromDb.steps[0]?.retryConfig);
+        
         const lessonData = {
           id: lessonFromDb.id,
           title: lessonFromDb.title,
@@ -129,6 +132,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           })),
         };
 
+        // DEBUG: Log final API response
+        console.log('DEBUG ROUTE - Final response steps[0].retryConfig:', lessonData.steps[0]?.retryConfig);
+        
         setLessonCacheHeaders(res);
         console.log(`📤 LESSON CACHE: Sending ${lessonId} from database with cache headers`);
         return res.json(lessonData);
