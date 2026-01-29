@@ -42,10 +42,10 @@ function get3DStyles(state: NodeState, color: typeof nodeColors[0]) {
     return {
       background: 'linear-gradient(180deg, #F3F4F6 0%, #E5E7EB 100%)',
       boxShadow: `
-        0 6px 0 0 #D1D5DB,
-        0 8px 8px rgba(0, 0, 0, 0.1),
-        inset 0 2px 4px rgba(255, 255, 255, 0.8),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.05)
+        0 6px 0 0 #A1A1AA,
+        0 8px 12px rgba(0, 0, 0, 0.12),
+        inset 0 2px 4px rgba(255, 255, 255, 0.9),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.08)
       `,
     };
   }

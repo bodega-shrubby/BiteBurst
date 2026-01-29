@@ -65,17 +65,19 @@ function calculateNodePositions(nodeCount: number, containerWidth: number): Poin
 function calculateChestPositions(nodePositions: Point[], completedCount: number): { pos: Point; isLocked: boolean }[] {
   const chests: { pos: Point; isLocked: boolean }[] = [];
   
-  for (let i = 4; i < nodePositions.length; i += 5) {
-    const prevNode = nodePositions[i - 1];
-    const nextNode = nodePositions[i];
-    
-    chests.push({
-      pos: {
-        x: (prevNode.x + nextNode.x) / 2,
-        y: (prevNode.y + nextNode.y) / 2,
-      },
-      isLocked: completedCount < i,
-    });
+  for (let i = 3; i < nodePositions.length; i += 4) {
+    if (i + 1 < nodePositions.length) {
+      const current = nodePositions[i];
+      const next = nodePositions[i + 1];
+      
+      chests.push({
+        pos: {
+          x: (current.x + next.x) / 2,
+          y: (current.y + next.y) / 2,
+        },
+        isLocked: completedCount <= i,
+      });
+    }
   }
   
   return chests;
