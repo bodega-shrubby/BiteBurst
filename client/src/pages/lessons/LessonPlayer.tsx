@@ -252,6 +252,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         // State transitions based on current attempt and config
         if (currentAttempt === 1) {
           // First incorrect: ASK → TRY_AGAIN
+          console.log('DEBUG FRONTEND - Setting tryAgainMessage from:', {
+            hasRetryConfig: !!currentStep?.retryConfig,
+            hasMessages: !!currentStep?.retryConfig?.messages,
+            tryAgain1: currentStep?.retryConfig?.messages?.tryAgain1,
+            currentAttempt
+          });
           setLessonState('incorrect');
           setTryAgainMessage(currentStep.retryConfig.messages.tryAgain1 || 'Try again!');
           setCurrentAttempt(2);
@@ -318,6 +324,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const currentStep = lessonData?.steps[currentStepIndex];
   const progress = lessonData ? ((currentStepIndex + 1) / lessonData.totalSteps) * 100 : 0;
+  
+  // DEBUG: Log currentStep retryConfig
+  if (currentStep) {
+    console.log('DEBUG FRONTEND - currentStep.retryConfig:', currentStep.retryConfig);
+    console.log('DEBUG FRONTEND - currentStep.retryConfig?.messages:', currentStep.retryConfig?.messages);
+  }
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
@@ -443,6 +455,15 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       </div>
     );
   }
+
+  // DEBUG: Log banner state
+  console.log('DEBUG FRONTEND - Banner state:', {
+    showRetryBanner,
+    tryAgainMessage,
+    willShowBanner: showRetryBanner && !!tryAgainMessage,
+    lessonState,
+    currentAttempt
+  });
 
   if (lessonState === 'complete') {
     return (
