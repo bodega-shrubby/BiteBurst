@@ -112,6 +112,22 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 
 ## Changelog
 
+- January 29, 2026: **Duolingo-Inspired Lesson Path UI Overhaul**
+  - Completely redesigned lesson path with 3D coin-style nodes
+  - New components and enhancements:
+    - `CurvySpine.tsx` - Dramatic winding S-curve path with gradient, glow effects, traveling dots
+    - `PathNode.tsx` - 3D coin nodes with fruit/veggie color cycling (7 colors), size variations (64/72/84px)
+    - `PathDecorations.tsx` - Floating food emoji decorations with bobbing animation
+    - `Confetti.tsx` - Enhanced with fruit emoji particles, burst physics, spiral motion
+  - New CSS keyframe animations in tokens.css:
+    - node-pop-in, node-glow-pulse, shimmer-sweep, float-bob, bounce-in, bounce-subtle
+    - All animations respect prefers-reduced-motion accessibility setting
+  - Node states with distinct visuals:
+    - Locked: 64px, grayscale, lock icon, no interaction
+    - Complete: 72px, vibrant color, checkmark overlay, gold star badge
+    - Unlocked: 84px, pulsing glow, bouncing START button
+  - Updated Lessons.tsx to use new components with gradient background
+
 - January 27, 2026: **Meal-Based Food Logging System**
   - Implemented 3-step flow: Meal Type → Categories → Items
   - New TypeScript architecture:
