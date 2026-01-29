@@ -1,54 +1,58 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface CurvySpineProps {
-  progress: number; // 0-1, how far along the path progress should extend
-  nodeCount: number; // Number of lessons to determine spine height
+  progress: number;
+  nodeCount: number;
 }
 
 export default function CurvySpine({ progress, nodeCount }: CurvySpineProps) {
-  // Calculate SVG height based on number of nodes - reduced spacing
-  const svgHeight = Math.max(500, nodeCount * 120 + 150);
-  const svgWidth = 120;
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   
-  // Create the S-curve path using cubic Bézier curves
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+  
+  const svgHeight = Math.max(600, nodeCount * 140 + 180);
+  const svgWidth = 160;
+  
   const spinePath = useMemo(() => {
     const startY = 60;
     const endY = svgHeight - 100;
     const centerX = svgWidth / 2;
-    const amplitude = 100; // How far left/right the curve goes
+    const amplitude = 140;
     
-    // Create S-curve that winds through multiple control points
     const pathData = `
       M ${centerX} ${startY}
-      C ${centerX + amplitude * 2} ${startY + 140} 
-        ${centerX - amplitude * 1.4} ${startY + 280}
-        ${centerX} ${startY + 420}
-      C ${centerX + amplitude * 1.8} ${startY + 560}
-        ${centerX - amplitude * 1.2} ${startY + 700}
-        ${centerX} ${startY + 840}
-      C ${centerX + amplitude * 1.5} ${startY + 980}
-        ${centerX - amplitude} ${startY + 1120}
+      C ${centerX + amplitude * 2.2} ${startY + 160} 
+        ${centerX - amplitude * 1.6} ${startY + 320}
+        ${centerX} ${startY + 480}
+      C ${centerX + amplitude * 2} ${startY + 640}
+        ${centerX - amplitude * 1.4} ${startY + 800}
+        ${centerX} ${startY + 960}
+      C ${centerX + amplitude * 1.8} ${startY + 1120}
+        ${centerX - amplitude * 1.2} ${startY + 1280}
         ${centerX} ${endY}
     `;
     
     return pathData.trim();
   }, [svgHeight, svgWidth]);
 
-  // Calculate path length for progress animation
   const pathLength = useMemo(() => {
-    // Approximate path length for strokeDasharray calculation
-    // This is a rough calculation - in production you'd measure the actual path
-    return svgHeight * 1.2;
+    return svgHeight * 1.3;
   }, [svgHeight]);
 
-  // Calculate stroke dash offset for progress animation
   const progressOffset = pathLength * (1 - progress);
 
   return (
     <svg
       className="absolute pointer-events-none z-0"
       style={{ 
-        left: 'calc(50% - 60px)',
+        left: 'calc(50% - 80px)',
         top: '80px',
         width: svgWidth,
         height: svgHeight 
@@ -57,64 +61,129 @@ export default function CurvySpine({ progress, nodeCount }: CurvySpineProps) {
       preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
     >
-      {/* Base spine - light gray background */}
+      <defs>
+        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FF8E3C" />
+          <stop offset="50%" stopColor="#FF6A00" />
+          <stop offset="100%" stopColor="#E55A00" />
+        </linearGradient>
+        <filter id="pathGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      
       <path
         d={spinePath}
-        stroke="#e5e7eb"
-        strokeWidth="8"
+        stroke="#d1d5db"
+        strokeWidth="14"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
-        className="opacity-60"
+        className="opacity-40"
       />
       
-      {/* Progress spine - bright orange overlay */}
       <path
         d={spinePath}
-        stroke="var(--bb-orange)"
-        strokeWidth="8"
+        stroke="#e5e7eb"
+        strokeWidth="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        className="opacity-80"
+      />
+      
+      <path
+        d={spinePath}
+        stroke="url(#progressGradient)"
+        strokeWidth="10"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
         strokeDasharray={pathLength}
         strokeDashoffset={progressOffset}
-        className="opacity-80 transition-all duration-1000 ease-out"
-        style={{
-          filter: 'drop-shadow(0 2px 4px rgba(255, 122, 0, 0.3))'
-        }}
+        className="transition-all duration-1000 ease-out"
+        filter="url(#pathGlow)"
       />
+      
+      {!prefersReducedMotion && progress > 0 && [0, 1, 2].map(i => (
+        <circle
+          key={i}
+          r="4"
+          fill="#FFF"
+          style={{
+            offsetPath: `path('${spinePath}')`,
+            offsetDistance: `${Math.max(0, (progress * 100) - (i * 15))}%`,
+            filter: 'drop-shadow(0 0 4px rgba(255, 142, 60, 0.8))',
+          }}
+        >
+          <animate
+            attributeName="opacity"
+            values="0.4;1;0.4"
+            dur="1.5s"
+            repeatCount="indefinite"
+            begin={`${i}s`}
+          />
+        </circle>
+      ))}
+      
+      {!prefersReducedMotion && progress > 0 && progress < 1 && (
+        <circle
+          r="6"
+          fill="#FF6A00"
+          style={{
+            offsetPath: `path('${spinePath}')`,
+            offsetDistance: `${progress * 100}%`,
+          }}
+        >
+          <animate
+            attributeName="r"
+            values="5;8;5"
+            dur="1.5s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      )}
+      
+      {prefersReducedMotion && progress > 0 && progress < 1 && (
+        <circle
+          r="6"
+          fill="#FF6A00"
+          style={{
+            offsetPath: `path('${spinePath}')`,
+            offsetDistance: `${progress * 100}%`,
+          }}
+        />
+      )}
     </svg>
   );
 }
 
-// Helper function to sample points along the S-curve for node positioning
 export function sampleSpinePoint(t: number, nodeCount: number): { x: number; y: number } {
-  // t should be between 0 and 1, representing position along the curve
-  const svgHeight = Math.max(500, nodeCount * 120 + 150);
-  const svgWidth = 120;
+  const svgHeight = Math.max(600, nodeCount * 140 + 180);
+  const svgWidth = 160;
   const centerX = svgWidth / 2;
-  const amplitude = 100;
+  const amplitude = 140;
   const startY = 60;
   
-  // Sample the cubic Bézier curve at parameter t
-  // This approximates the curve defined in spinePath
   if (t <= 0.33) {
-    // First curve segment
     const localT = t / 0.33;
-    const y = startY + localT * 420;
-    const x = centerX + Math.sin(localT * Math.PI) * amplitude * 1.4;
+    const y = startY + localT * 480;
+    const x = centerX + Math.sin(localT * Math.PI) * amplitude * 1.6;
     return { x, y };
   } else if (t <= 0.66) {
-    // Second curve segment  
     const localT = (t - 0.33) / 0.33;
-    const y = startY + 420 + localT * 420;
-    const x = centerX - Math.sin(localT * Math.PI) * amplitude * 1.2;
+    const y = startY + 480 + localT * 480;
+    const x = centerX - Math.sin(localT * Math.PI) * amplitude * 1.4;
     return { x, y };
   } else {
-    // Final curve segment
     const localT = (t - 0.66) / 0.34;
-    const y = startY + 840 + localT * (svgHeight - 100 - (startY + 840));
-    const x = centerX + Math.sin(localT * Math.PI) * amplitude;
+    const endY = svgHeight - 100;
+    const y = startY + 960 + localT * (endY - (startY + 960));
+    const x = centerX + Math.sin(localT * Math.PI) * amplitude * 1.2;
     return { x, y };
   }
 }

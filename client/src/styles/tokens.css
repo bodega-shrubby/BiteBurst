@@ -1047,6 +1047,211 @@ html {
   box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
 }
 
+/* ========================================
+   LESSON PATH UI - Duolingo-Inspired Animations
+   ======================================== */
+
+/* Node pop-in animation for newly unlocked nodes */
+@keyframes node-pop-in {
+  0% { 
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  60% { 
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Gentle glow pulse for active/unlocked nodes */
+@keyframes node-glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 4px 15px -3px var(--glow-color, rgba(255, 142, 60, 0.4)),
+                0 8px 0 -2px var(--edge-color, #EA580C),
+                inset 0 -4px 8px rgba(0,0,0,0.1),
+                inset 0 4px 8px rgba(255,255,255,0.2);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 4px 25px 5px var(--glow-color, rgba(255, 142, 60, 0.4)),
+                0 8px 0 -2px var(--edge-color, #EA580C),
+                inset 0 -4px 8px rgba(0,0,0,0.1),
+                inset 0 4px 8px rgba(255,255,255,0.3);
+    transform: scale(1.02);
+  }
+}
+
+/* Shimmer sweep effect for completed nodes */
+@keyframes shimmer-sweep {
+  0% { 
+    background-position: -200% center;
+  }
+  100% { 
+    background-position: 200% center;
+  }
+}
+
+/* Gentle floating bob animation for decorations */
+@keyframes float-bob {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-6px) rotate(3deg); 
+  }
+  75% { 
+    transform: translateY(4px) rotate(-3deg); 
+  }
+}
+
+/* Bounce-in for START button */
+@keyframes bounce-in {
+  0% { 
+    transform: translateX(-50%) scale(0); 
+  }
+  60% { 
+    transform: translateX(-50%) scale(1.1); 
+  }
+  100% { 
+    transform: translateX(-50%) scale(1); 
+  }
+}
+
+/* Subtle bounce for START button idle */
+@keyframes bounce-subtle {
+  0%, 100% { 
+    transform: translateX(-50%) translateY(0); 
+  }
+  50% { 
+    transform: translateX(-50%) translateY(-4px); 
+  }
+}
+
+/* Confetti burst for celebrations */
+@keyframes confetti-burst {
+  0% { 
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1) rotate(180deg) translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* Traveling dot animation along progress path */
+@keyframes travel-dot {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+/* Gentle pulse for progress path tip */
+@keyframes path-tip-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* Utility classes for lesson path */
+.animate-node-pop { 
+  animation: node-pop-in 0.5s ease-out forwards; 
+}
+
+.animate-glow-pulse { 
+  animation: node-glow-pulse 2s ease-in-out infinite; 
+}
+
+.animate-shimmer { 
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer-sweep 2s linear infinite;
+}
+
+.animate-float { 
+  animation: float-bob 3s ease-in-out infinite; 
+}
+
+.animate-bounce-in { 
+  animation: bounce-in 0.4s ease-out forwards; 
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1.5s ease-in-out infinite;
+}
+
+.animate-travel-dot {
+  animation: travel-dot 3s linear infinite;
+}
+
+.animate-path-tip {
+  animation: path-tip-pulse 1.5s ease-in-out infinite;
+}
+
+/* Lesson node base styles */
+.lesson-node {
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.lesson-node.unlocked:hover {
+  transform: scale(1.08) rotate(2deg);
+}
+
+.lesson-node.complete:hover {
+  transform: scale(1.05);
+}
+
+.lesson-node:active {
+  transform: scale(0.95);
+}
+
+/* 3D coin edge effect via pseudo-element */
+.lesson-node-3d {
+  position: relative;
+}
+
+.lesson-node-3d::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 2px;
+  right: 2px;
+  height: 8px;
+  background: var(--edge-color, #EA580C);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  z-index: -1;
+}
+
+/* Fruit/veggie color assignments for nodes */
+.node-color-0 { --node-bg: linear-gradient(135deg, #f87171, #ef4444); --edge-color: #DC2626; --glow-color: rgba(239, 68, 68, 0.4); }
+.node-color-1 { --node-bg: linear-gradient(135deg, #fb923c, #f97316); --edge-color: #EA580C; --glow-color: rgba(249, 115, 22, 0.4); }
+.node-color-2 { --node-bg: linear-gradient(135deg, #fcd34d, #eab308); --edge-color: #CA8A04; --glow-color: rgba(234, 179, 8, 0.4); }
+.node-color-3 { --node-bg: linear-gradient(135deg, #4ade80, #22c55e); --edge-color: #16A34A; --glow-color: rgba(34, 197, 94, 0.4); }
+.node-color-4 { --node-bg: linear-gradient(135deg, #60a5fa, #3b82f6); --edge-color: #2563EB; --glow-color: rgba(59, 130, 246, 0.4); }
+.node-color-5 { --node-bg: linear-gradient(135deg, #c084fc, #a855f7); --edge-color: #9333EA; --glow-color: rgba(168, 85, 247, 0.4); }
+.node-color-6 { --node-bg: linear-gradient(135deg, #f472b6, #ec4899); --edge-color: #DB2777; --glow-color: rgba(236, 72, 153, 0.4); }
+
 /* Motion Preference Support */
 @media (prefers-reduced-motion: reduce) {
   .bb-emoji-chip,
@@ -1054,7 +1259,15 @@ html {
   .bb-photo-placeholder,
   .bb-goal-icon,
   .bb-streak-pill,
-  .bb-badge-pill {
+  .bb-badge-pill,
+  .animate-glow-pulse,
+  .animate-float,
+  .animate-shimmer,
+  .animate-bounce-subtle,
+  .animate-travel-dot,
+  .animate-path-tip,
+  .animate-node-pop,
+  .animate-bounce-in {
     animation: none;
   }
   
@@ -1064,13 +1277,15 @@ html {
   }
   
   .bb-enhanced-button,
-  .bb-enhanced-card {
+  .bb-enhanced-card,
+  .lesson-node {
     transition: none;
     transform: none;
   }
   
   .bb-enhanced-button:hover,
-  .bb-enhanced-card:hover {
+  .bb-enhanced-card:hover,
+  .lesson-node:hover {
     transform: none;
   }
 }
