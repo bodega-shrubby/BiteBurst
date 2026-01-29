@@ -62,6 +62,25 @@ function calculateNodePositions(nodeCount: number, containerWidth: number): Poin
   return positions;
 }
 
+function calculateChestPositions(nodePositions: Point[], completedCount: number): { pos: Point; isLocked: boolean }[] {
+  const chests: { pos: Point; isLocked: boolean }[] = [];
+  
+  for (let i = 4; i < nodePositions.length; i += 5) {
+    const prevNode = nodePositions[i - 1];
+    const nextNode = nodePositions[i];
+    
+    chests.push({
+      pos: {
+        x: (prevNode.x + nextNode.x) / 2,
+        y: (prevNode.y + nextNode.y) / 2,
+      },
+      isLocked: completedCount < i,
+    });
+  }
+  
+  return chests;
+}
+
 export default function Lessons() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
@@ -145,6 +164,11 @@ export default function Lessons() {
     [displayLessons.length, containerWidth]
   );
 
+  const chestPositions = useMemo(() => 
+    calculateChestPositions(nodePositions, completed),
+    [nodePositions, completed]
+  );
+
   const totalHeight = nodePositions.length > 0 
     ? nodePositions[nodePositions.length - 1].y + 150 
     : 600;
@@ -161,14 +185,14 @@ export default function Lessons() {
       return `Tap "${firstLesson.title.replace('\n', ' ')}" to start your journey!`;
     }
     if (completed === displayLessons.length) {
-      return "Amazing! You've completed all lessons! 🎉";
+      return "Amazing! You've completed all lessons!";
     }
     return 'Great progress! Keep going to unlock more lessons!';
   };
 
   if (loading || lessonsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-200 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="text-5xl animate-bounce">🍊</div>
           <p className="text-gray-600 font-medium">Loading lessons...</p>
@@ -179,7 +203,7 @@ export default function Lessons() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-200 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="text-4xl">📚</div>
           <h2 className="text-xl font-bold text-gray-900">Please log in</h2>
@@ -191,8 +215,7 @@ export default function Lessons() {
 
   return (
     <div 
-      className="min-h-screen pb-[220px]" 
-      style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%)' }}
+      className="min-h-screen bg-white pb-[220px]" 
       ref={scrollRef}
     >
       <header className="sticky top-0 z-30 shadow-md">
@@ -215,7 +238,7 @@ export default function Lessons() {
         </div>
       </header>
 
-      <main className="relative">
+      <main className="relative bg-white">
         <div ref={containerRef} className="max-w-md mx-auto px-4 relative">
           <div className="mt-6 mb-6">
             <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
@@ -264,22 +287,14 @@ export default function Lessons() {
               </div>
             ))}
 
-            {displayLessons.map((_, index) => {
-              if ((index + 1) % 3 !== 0) return null;
-              if (!nodePositions[index]) return null;
-              
-              const nextY = nodePositions[index + 1]?.y ?? nodePositions[index].y + 85;
-              const chestY = (nodePositions[index].y + nextY) / 2;
-              const chestX = containerWidth / 2;
-              
-              return (
-                <TreasureChest
-                  key={`chest-${index}`}
-                  x={chestX}
-                  y={chestY}
-                />
-              );
-            })}
+            {chestPositions.map((chest, index) => (
+              <TreasureChest
+                key={`chest-${index}`}
+                x={chest.pos.x}
+                y={chest.pos.y}
+                isLocked={chest.isLocked}
+              />
+            ))}
           </div>
           
           <NextTopicBanner topicName="Hydration Heroes" />

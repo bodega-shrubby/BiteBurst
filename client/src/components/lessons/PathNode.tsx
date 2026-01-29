@@ -24,25 +24,53 @@ interface PathNodeProps {
 }
 
 const nodeColors = [
-  { bg: '#EF4444', shadow: '#DC2626', glow: 'rgba(239, 68, 68, 0.3)' },
-  { bg: '#F97316', shadow: '#EA580C', glow: 'rgba(249, 115, 22, 0.3)' },
-  { bg: '#EAB308', shadow: '#CA8A04', glow: 'rgba(234, 179, 8, 0.3)' },
-  { bg: '#22C55E', shadow: '#16A34A', glow: 'rgba(34, 197, 94, 0.3)' },
-  { bg: '#3B82F6', shadow: '#2563EB', glow: 'rgba(59, 130, 246, 0.3)' },
-  { bg: '#A855F7', shadow: '#9333EA', glow: 'rgba(168, 85, 247, 0.3)' },
-  { bg: '#EC4899', shadow: '#DB2777', glow: 'rgba(236, 72, 153, 0.3)' },
+  { bg: ['#F87171', '#EF4444'], edge: '#DC2626' },
+  { bg: ['#FB923C', '#F97316'], edge: '#EA580C' },
+  { bg: ['#FBBF24', '#F59E0B'], edge: '#D97706' },
+  { bg: ['#4ADE80', '#22C55E'], edge: '#16A34A' },
+  { bg: ['#60A5FA', '#3B82F6'], edge: '#2563EB' },
+  { bg: ['#A78BFA', '#8B5CF6'], edge: '#7C3AED' },
+  { bg: ['#F472B6', '#EC4899'], edge: '#DB2777' },
 ];
 
 function getNodeColor(order: number) {
   return nodeColors[order % nodeColors.length];
 }
 
-function getNodeSize(state: NodeState): number {
-  switch (state) {
-    case 'locked': return 64;
-    case 'complete': return 68;
-    case 'unlocked': return 76;
+function get3DStyles(state: NodeState, color: typeof nodeColors[0]) {
+  if (state === 'locked') {
+    return {
+      background: 'linear-gradient(180deg, #F3F4F6 0%, #E5E7EB 100%)',
+      boxShadow: `
+        0 6px 0 0 #D1D5DB,
+        0 8px 8px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.05)
+      `,
+    };
   }
+  
+  if (state === 'complete') {
+    return {
+      background: `linear-gradient(180deg, ${color.bg[0]} 0%, ${color.bg[1]} 100%)`,
+      boxShadow: `
+        0 6px 0 0 ${color.edge},
+        0 8px 8px rgba(0, 0, 0, 0.15),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1)
+      `,
+    };
+  }
+  
+  return {
+    background: `linear-gradient(180deg, ${color.bg[0]} 0%, ${color.bg[1]} 100%)`,
+    boxShadow: `
+      0 6px 0 0 ${color.edge},
+      0 8px 8px rgba(0, 0, 0, 0.2),
+      inset 0 2px 4px rgba(255, 255, 255, 0.4),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.1)
+    `,
+  };
 }
 
 export default function PathNode({ 
@@ -70,23 +98,9 @@ export default function PathNode({
   const isUnlocked = state === 'unlocked';
   
   const color = getNodeColor(order);
-  const size = getNodeSize(state);
+  const size = state === 'unlocked' ? 76 : 68;
   const halfSize = size / 2;
-
-  const getBoxShadow = () => {
-    if (state === 'locked') {
-      return '0 6px 0 0 #D1D5DB, 0 8px 15px rgba(0,0,0,0.1)';
-    }
-    if (state === 'complete') {
-      return `0 6px 0 0 ${color.shadow}, 0 8px 15px rgba(0,0,0,0.12)`;
-    }
-    return `0 6px 0 0 ${color.shadow}, 0 8px 20px ${color.glow}`;
-  };
-
-  const getBackground = () => {
-    if (state === 'locked') return '#E5E7EB';
-    return color.bg;
-  };
+  const styles3D = get3DStyles(state, color);
 
   return (
     <div
@@ -104,31 +118,30 @@ export default function PathNode({
         aria-disabled={!isInteractive}
         aria-label={`${title.replace('\n', ' ')}, ${state}${isUnlocked ? ', 25 XP' : ''}`}
         className={`
-          relative group rounded-full border-4 border-white
+          relative group rounded-full border-[3px] border-white
           flex items-center justify-center
           transition-all duration-200
-          ${isInteractive ? 'hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2' : 'cursor-not-allowed'}
+          ${isInteractive ? 'hover:brightness-105 active:translate-y-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2' : 'cursor-not-allowed'}
           ${showAnimation ? 'animate-node-pop' : ''}
           ${isUnlocked && !showAnimation ? 'animate-glow-pulse' : ''}
         `}
         style={{ 
           width: size, 
           height: size,
-          backgroundColor: getBackground(),
-          boxShadow: getBoxShadow(),
+          ...styles3D,
         }}
       >
         {state === 'locked' ? (
           <Lock className="w-6 h-6 text-gray-400" aria-hidden="true" />
         ) : (
-          <span className={`drop-shadow-sm ${isUnlocked ? 'text-2xl' : 'text-xl'}`} role="img" aria-label={title}>
+          <span className="text-2xl drop-shadow-sm" role="img" aria-label={title}>
             {icon}
           </span>
         )}
         
         {isComplete && (
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md z-10">
-            <Check className="w-4 h-4 text-green-500" strokeWidth={3} />
+          <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white shadow-md z-10">
+            <Check className="w-4 h-4 text-yellow-900" strokeWidth={3} />
           </div>
         )}
 
@@ -137,7 +150,7 @@ export default function PathNode({
             <div 
               className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-md"
               style={{
-                backgroundColor: color.shadow,
+                backgroundColor: color.edge,
               }}
             >
               START
