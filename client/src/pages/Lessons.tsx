@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import BottomNavigation from '@/components/BottomNavigation';
-import CurvySpine, { sampleSpinePoint } from '@/components/lessons/CurvySpine';
+import ConnectingPath from '@/components/lessons/ConnectingPath';
 import PathNode, { type NodeState } from '@/components/lessons/PathNode';
 import PathDecorations from '@/components/lessons/PathDecorations';
 import StarBadge from '@/components/StarBadge';
@@ -23,19 +23,67 @@ interface ApiLesson {
   state: LessonState;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 function mapToNodeState(state: LessonState): NodeState {
   if (state === 'completed') return 'complete';
   if (state === 'current' || state === 'unlocked') return 'unlocked';
   return 'locked';
 }
 
+function calculateNodePositions(nodeCount: number, containerWidth: number): Point[] {
+  const paddingX = 70;
+  const startY = 80;
+  const spacingY = 110;
+  
+  const positions: Point[] = [];
+  const centerX = containerWidth / 2;
+  const amplitude = Math.min(80, (containerWidth - paddingX * 2) / 2 - 40);
+  
+  for (let i = 0; i < nodeCount; i++) {
+    const pattern = i % 4;
+    let x: number;
+    
+    switch (pattern) {
+      case 0: x = centerX; break;
+      case 1: x = centerX + amplitude; break;
+      case 2: x = centerX; break;
+      case 3: x = centerX - amplitude; break;
+      default: x = centerX;
+    }
+    
+    positions.push({
+      x: Math.max(paddingX, Math.min(containerWidth - paddingX, x)),
+      y: startY + (i * spacingY)
+    });
+  }
+  
+  return positions;
+}
+
 export default function Lessons() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(360);
   const [newlyUnlockedId, setNewlyUnlockedId] = useState<string | null>(null);
   
   const curriculumId = user?.curriculum || 'uk-ks2';
+  
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
   
   const { data: apiLessons, isLoading: lessonsLoading } = useQuery<ApiLesson[]>({
     queryKey: [`/api/curriculum/${curriculumId}/lessons`],
@@ -94,8 +142,14 @@ export default function Lessons() {
   const completed = displayLessons.filter(l => l.state === 'completed').length;
   const progressPercent = displayLessons.length > 0 ? (completed / displayLessons.length) * 100 : 0;
 
-  const nodeCount = displayLessons.length;
-  const svgHeight = Math.max(600, nodeCount * 140 + 180);
+  const nodePositions = useMemo(() => 
+    calculateNodePositions(displayLessons.length, containerWidth),
+    [displayLessons.length, containerWidth]
+  );
+
+  const totalHeight = nodePositions.length > 0 
+    ? nodePositions[nodePositions.length - 1].y + 200 
+    : 600;
 
   const handleLessonClick = (lesson: CleanLesson) => {
     if (lesson.state === 'current' || lesson.state === 'unlocked') {
@@ -137,8 +191,6 @@ export default function Lessons() {
     );
   }
 
-  const totalHeight = svgHeight + 200;
-
   return (
     <div 
       className="min-h-screen pb-20" 
@@ -174,7 +226,7 @@ export default function Lessons() {
           />
         </div>
 
-        <div className="max-w-md mx-auto px-4 relative">
+        <div ref={containerRef} className="max-w-md mx-auto px-4 relative">
           <div className="mt-6 mb-8">
             <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-3">
@@ -207,54 +259,36 @@ export default function Lessons() {
             className="relative"
             style={{ height: totalHeight }}
           >
-            <PathDecorations nodeCount={nodeCount} />
-            
-            <CurvySpine 
-              progress={displayLessons.length > 0 ? completed / displayLessons.length : 0}
-              nodeCount={nodeCount}
+            <ConnectingPath 
+              nodePositions={nodePositions} 
+              completedCount={completed} 
             />
+            
+            <PathDecorations nodePositions={nodePositions} />
 
-            <div 
-              className="absolute pointer-events-none"
-              style={{ 
-                left: 'calc(50% - 80px)',
-                top: '80px',
-              }}
-            >
-              {displayLessons.map((lesson, index) => {
-                const t = displayLessons.length > 1 
-                  ? index / (displayLessons.length - 1) 
-                  : 0;
-                const point = sampleSpinePoint(t, nodeCount);
-                
-                return (
-                  <div key={lesson.id} id={`lesson-${lesson.id}`} className="pointer-events-auto">
-                    <PathNode
-                      x={point.x}
-                      y={point.y}
-                      icon={lesson.icon}
-                      title={lesson.title}
-                      state={mapToNodeState(lesson.state)}
-                      order={index}
-                      onClick={() => handleLessonClick(lesson)}
-                      isNewlyUnlocked={lesson.id === newlyUnlockedId}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+            {displayLessons.map((lesson, index) => (
+              <div key={lesson.id} id={`lesson-${lesson.id}`}>
+                <PathNode
+                  x={nodePositions[index]?.x || 0}
+                  y={nodePositions[index]?.y || 0}
+                  icon={lesson.icon}
+                  title={lesson.title}
+                  state={mapToNodeState(lesson.state)}
+                  order={index}
+                  onClick={() => handleLessonClick(lesson)}
+                  isNewlyUnlocked={lesson.id === newlyUnlockedId}
+                />
+              </div>
+            ))}
 
             {[2, 5, 7].map((afterIndex) => {
-              if (afterIndex >= displayLessons.length) return null;
-              const t = displayLessons.length > 1 
-                ? (afterIndex + 0.5) / (displayLessons.length - 1)
-                : 0;
-              const point = sampleSpinePoint(Math.min(t, 1), nodeCount);
+              if (afterIndex >= displayLessons.length || !nodePositions[afterIndex]) return null;
+              const y = (nodePositions[afterIndex].y + (nodePositions[afterIndex + 1]?.y || nodePositions[afterIndex].y + 100)) / 2;
               
               return (
                 <StarBadge
                   key={`star-${afterIndex}`}
-                  y={point.y + 160}
+                  y={y}
                   isUnlocked={completed > afterIndex}
                 />
               );

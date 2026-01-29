@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import { sampleSpinePoint } from './CurvySpine';
+
+interface Point {
+  x: number;
+  y: number;
+}
 
 interface Decoration {
   id: number;
@@ -14,48 +18,43 @@ interface Decoration {
 const FOOD_EMOJIS = ['🍎', '🥕', '🥦', '🍇', '🍌', '🫐', '🍓', '🥬', '🍊', '🍋', '🥝', '🍑', '🥒', '🍒'];
 
 interface PathDecorationsProps {
-  nodeCount: number;
+  nodePositions: Point[];
 }
 
-export default function PathDecorations({ nodeCount }: PathDecorationsProps) {
+export default function PathDecorations({ nodePositions }: PathDecorationsProps) {
   const decorations = useMemo(() => {
+    if (nodePositions.length < 2) return [];
+    
     const items: Decoration[] = [];
     
-    for (let i = 0; i < nodeCount - 1; i++) {
-      const numDecorations = 2 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < nodePositions.length - 1; i++) {
+      const curr = nodePositions[i];
+      const next = nodePositions[i + 1];
       
-      for (let j = 0; j < numDecorations; j++) {
-        const tStart = i / nodeCount;
-        const tEnd = (i + 1) / nodeCount;
-        const t = tStart + ((j + 0.5) / numDecorations) * (tEnd - tStart);
-        
-        const point = sampleSpinePoint(t, nodeCount);
-        
-        const offsetDirection = (i + j) % 2 === 0 ? 1 : -1;
-        const offsetAmount = 50 + Math.random() * 40;
-        
-        items.push({
-          id: i * 10 + j,
-          emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
-          x: point.x + (offsetDirection * offsetAmount),
-          y: point.y,
-          size: 20 + Math.random() * 12,
-          opacity: 0.25 + Math.random() * 0.2,
-          delay: Math.random() * 2,
-        });
-      }
+      const midY = (curr.y + next.y) / 2;
+      const midX = (curr.x + next.x) / 2;
+      
+      const offsetX = curr.x < next.x ? -45 : 45;
+      
+      items.push({
+        id: i,
+        emoji: FOOD_EMOJIS[i % FOOD_EMOJIS.length],
+        x: midX + offsetX + (Math.random() * 20 - 10),
+        y: midY + (Math.random() * 20 - 10),
+        size: 22 + Math.random() * 8,
+        opacity: 0.3 + Math.random() * 0.15,
+        delay: i * 0.2,
+      });
     }
     
     return items;
-  }, [nodeCount]);
+  }, [nodePositions]);
+
+  if (decorations.length === 0) return null;
 
   return (
     <div 
-      className="absolute pointer-events-none z-0" 
-      style={{ 
-        left: 'calc(50% - 80px)',
-        top: '80px',
-      }}
+      className="absolute inset-0 pointer-events-none z-0" 
       aria-hidden="true"
     >
       {decorations.map((dec) => (
