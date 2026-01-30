@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/Dashboard";
 import DashboardV2 from "@/pages/DashboardV2";
+import DashboardRedesign from "@/pages/DashboardRedesign";
 import FoodLog from "@/pages/FoodLog";
 import FoodLogNew from "@/pages/FoodLogNew";
 import ActivityLog from "@/pages/ActivityLog";
@@ -75,8 +76,9 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
-      <Route path="/dashboard" component={DashboardV2} />
-      <Route path="/home" component={DashboardV2} />
+      <Route path="/dashboard" component={DashboardRedesign} />
+      <Route path="/home" component={DashboardRedesign} />
+      <Route path="/dashboard-v2" component={DashboardV2} />
       <Route path="/dashboard-v1" component={Dashboard} />
       <Route path="/food-log" component={FoodLogNew} />
       <Route path="/activity-log" component={ActivityLogNew} />

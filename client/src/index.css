@@ -21,6 +21,14 @@
   --bb-purple: #8B5CF6;
   --bb-gray: #EDEFF3;
   --bb-shadow: 0 10px 24px rgba(0,0,0,.08);
+  
+  /* Dashboard Redesign Colors */
+  --bb-lavender: #DDD6E8;
+  --bb-lavender-light: #E8E0F0;
+  --bb-navy: #1A1B4B;
+  --bb-page-bg: #FAFAFA;
+  --bb-text-primary: #1A1A1A;
+  --bb-text-secondary: #666666;
 }
 
 /* Onboarding animations */
