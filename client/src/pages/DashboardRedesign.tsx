@@ -253,13 +253,13 @@ export default function DashboardRedesign() {
           </div>
         </div>
 
-        {/* 3. STATUS BAR - Streak, Hearts, Settings */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="max-w-md mx-auto flex items-center justify-center space-x-4">
+        {/* 3. STATUS BAR - Streak, Hearts, Settings - FULL WIDTH */}
+        <div className="w-full bg-white border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-center space-x-6">
             {/* Streak Pill */}
-            <div className="flex items-center space-x-1 bg-orange-50 px-3 py-2 rounded-full">
-              <span className="text-lg">🔥</span>
-              <span className="text-sm font-bold text-orange-600">
+            <div className="flex items-center space-x-2 bg-orange-50 px-4 py-2.5 rounded-full">
+              <span className="text-xl lg:text-2xl">🔥</span>
+              <span className="text-sm lg:text-base font-bold text-orange-600">
                 {dailySummary.streak_days} day streak
               </span>
             </div>
@@ -269,30 +269,27 @@ export default function DashboardRedesign() {
             
             {/* Settings */}
             <button 
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2.5 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="Settings"
             >
-              <Settings className="w-5 h-5 text-gray-500" />
+              <Settings className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
             </button>
           </div>
         </div>
 
-        {/* 4. MASCOT GREETING */}
-        <div className="bg-white px-4 py-4">
-          <div className="max-w-md mx-auto flex items-center space-x-3">
+        {/* CONSTRAINED CONTENT AREA - Cards and content below */}
+        <div className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 pb-32">
+          {/* 4. MASCOT GREETING */}
+          <div className="flex items-center space-x-4">
             <img 
               src={oniTheOrangeImage}
               alt="Oni mascot"
-              className="w-12 h-12 object-contain"
+              className="w-14 h-14 lg:w-16 lg:h-16 object-contain"
             />
-            <div className="bg-gray-100 rounded-2xl px-4 py-2.5 flex-1">
-              <p className="text-sm font-medium text-gray-800">{greeting}</p>
+            <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1">
+              <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>
             </div>
           </div>
-        </div>
-
-        {/* Main Content */}
-        <main className="px-4 py-6 space-y-5 pb-32 max-w-md mx-auto">
           {/* 5. LESSON HERO - PRIMARY CTA */}
           <LessonHero />
 
@@ -317,19 +314,19 @@ export default function DashboardRedesign() {
           />
 
           {/* 9. QUICK LOG - DEMOTED (smaller, secondary) */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="font-bold text-gray-800">Quick Log</h3>
-              <span className="text-xs text-gray-400">Tap to log</span>
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 lg:p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-gray-800 text-lg">Quick Log</h3>
+              <span className="text-sm text-gray-400">Tap to log</span>
             </div>
             
             {/* Quick emoji buttons */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-3 mb-5">
               {['🍎', '🥦', '🍞', '🧃', '⚽', '🧘', '🏃'].map((emoji, i) => (
                 <button
                   key={i}
                   onClick={() => setLocation(i < 4 ? '/food-log' : '/activity-log')}
-                  className="w-11 h-11 bg-gray-100 rounded-lg flex items-center justify-center text-xl hover:bg-orange-50 hover:scale-105 transition-all"
+                  className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center text-2xl lg:text-3xl hover:bg-orange-50 hover:scale-105 transition-all"
                 >
                   {emoji}
                 </button>
@@ -337,16 +334,16 @@ export default function DashboardRedesign() {
             </div>
             
             {/* Outline buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <button
                 onClick={() => setLocation('/food-log')}
-                className="flex-1 border-2 border-[#FF6A00] text-[#FF6A00] py-2.5 rounded-xl text-sm font-bold hover:bg-orange-50 transition-colors"
+                className="flex-1 border-2 border-[#FF6A00] text-[#FF6A00] py-3 lg:py-4 rounded-xl text-base lg:text-lg font-bold hover:bg-orange-50 transition-colors"
               >
                 Log Food
               </button>
               <button
                 onClick={() => setLocation('/activity-log')}
-                className="flex-1 border-2 border-[#FF6A00] text-[#FF6A00] py-2.5 rounded-xl text-sm font-bold hover:bg-orange-50 transition-colors"
+                className="flex-1 border-2 border-[#FF6A00] text-[#FF6A00] py-3 lg:py-4 rounded-xl text-base lg:text-lg font-bold hover:bg-orange-50 transition-colors"
               >
                 Log Activity
               </button>
@@ -370,7 +367,7 @@ export default function DashboardRedesign() {
               progress: badge.progress,
             })) || dailySummary.badges.locked}
           />
-        </main>
+        </div>
       </div>
 
       {/* Bottom Navigation - Mobile only */}

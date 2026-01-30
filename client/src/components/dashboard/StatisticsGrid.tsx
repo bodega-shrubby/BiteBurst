@@ -48,16 +48,16 @@ export default function StatisticsGrid({
   ];
 
   return (
-    <div className="space-y-3">
-      <h3 className="font-bold text-gray-800 text-lg">Statistics</h3>
-      <div className="grid grid-cols-2 gap-3">
+    <div className="space-y-4">
+      <h3 className="font-bold text-gray-800 text-lg lg:text-xl">Statistics</h3>
+      <div className="grid grid-cols-2 gap-4">
         {stats.map((stat, index) => (
           <button
             key={index}
             onClick={stat.onClick}
             disabled={!stat.isClickable}
             className={`
-              bg-white rounded-xl border border-gray-200 p-4 text-left
+              bg-white rounded-xl border border-gray-200 p-5 lg:p-6 text-left
               transition-all duration-200
               ${stat.isClickable 
                 ? 'hover:bg-gray-50 hover:border-gray-300 cursor-pointer active:scale-[0.98]' 
@@ -65,13 +65,13 @@ export default function StatisticsGrid({
               }
             `}
           >
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">{stat.emoji}</span>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl lg:text-3xl">{stat.emoji}</span>
               <div>
-                <div className={`font-bold ${stat.isText ? 'text-lg text-[#FF6A00]' : 'text-xl text-gray-900'}`}>
+                <div className={`font-bold ${stat.isText ? 'text-lg lg:text-xl text-[#FF6A00]' : 'text-2xl lg:text-3xl text-gray-900'}`}>
                   {stat.value}
                 </div>
-                <div className="text-xs text-gray-500">{stat.label}</div>
+                <div className="text-sm text-gray-500">{stat.label}</div>
               </div>
             </div>
           </button>
