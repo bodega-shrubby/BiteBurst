@@ -4,110 +4,104 @@ import { Button } from "@/components/ui/button";
 import OnboardingLayout from "./OnboardingLayout";
 import { useOnboardingContext } from "./OnboardingContext";
 
-const UK_AGE_OPTIONS = [
-  { value: "5-7", label: "Key Stage 1 (5-7 years)", emoji: "🧒", description: "Years 1-2" },
-  { value: "7-11", label: "Key Stage 2 (7-11 years)", emoji: "👦", description: "Years 3-6" },
-  { value: "11-14", label: "Key Stage 3 (11-14 years)", emoji: "👧", description: "Years 7-9" }
-];
-
-const US_AGE_OPTIONS = [
-  { value: "5-7", label: "Grades K-2 (5-7 years)", emoji: "🧒", description: "Kindergarten to 2nd Grade" },
-  { value: "7-11", label: "Grades 3-5 (7-11 years)", emoji: "👦", description: "3rd to 5th Grade" },
-  { value: "11-14", label: "Grades 6-8 (11-14 years)", emoji: "👧", description: "Middle School" }
-];
-
-function deriveCurriculumId(country: string, ageBracket: string): string {
-  if (country === "uk") {
-    switch (ageBracket) {
-      case "5-7": return "uk-ks1";
-      case "7-11": return "uk-ks2";
-      case "11-14": return "uk-ks3";
-      default: return "uk-ks2";
-    }
-  } else {
-    switch (ageBracket) {
-      case "5-7": return "us-k2";
-      case "7-11": return "us-35";
-      case "11-14": return "us-68";
-      default: return "us-35";
-    }
-  }
+interface YearGroupOption {
+  id: string;
+  label: string;
+  curriculumId: string;
+  ageBracket: string;
 }
+
+const getYearGroupOptions = (country: 'uk' | 'us'): YearGroupOption[] => {
+  if (country === 'uk') {
+    return [
+      { id: 'year-2', label: 'Year 2', curriculumId: 'uk-ks1', ageBracket: '5-7' },
+      { id: 'year-3', label: 'Year 3', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-4', label: 'Year 4', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-5', label: 'Year 5', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-6', label: 'Year 6', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-7', label: 'Year 7', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+      { id: 'year-8', label: 'Year 8', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+      { id: 'year-9', label: 'Year 9', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+    ];
+  } else {
+    return [
+      { id: 'grade-1', label: 'Grade 1', curriculumId: 'us-k2', ageBracket: '5-7' },
+      { id: 'grade-2', label: 'Grade 2', curriculumId: 'us-k2', ageBracket: '5-7' },
+      { id: 'grade-3', label: 'Grade 3', curriculumId: 'us-35', ageBracket: '7-11' },
+      { id: 'grade-4', label: 'Grade 4', curriculumId: 'us-35', ageBracket: '7-11' },
+      { id: 'grade-5', label: 'Grade 5', curriculumId: 'us-35', ageBracket: '7-11' },
+      { id: 'grade-6', label: 'Grade 6', curriculumId: 'us-68', ageBracket: '11-14' },
+      { id: 'grade-7', label: 'Grade 7', curriculumId: 'us-68', ageBracket: '11-14' },
+      { id: 'grade-8', label: 'Grade 8', curriculumId: 'us-68', ageBracket: '11-14' },
+    ];
+  }
+};
 
 export default function AgeStep() {
   const [, setLocation] = useLocation();
   const { updateProfile, profile } = useOnboardingContext();
-  const [selectedAge, setSelectedAge] = useState(profile.ageBracket || "");
+  const [selectedYearGroup, setSelectedYearGroup] = useState(profile.yearGroup || "");
 
-  // Guard: Redirect to curriculum step if country not selected
   useEffect(() => {
     if (!profile.curriculumCountry) {
       setLocation("/profile/curriculum");
     }
   }, [profile.curriculumCountry, setLocation]);
 
-  const ageOptions = useMemo(() => {
-    return profile.curriculumCountry === "uk" ? UK_AGE_OPTIONS : US_AGE_OPTIONS;
+  const yearGroupOptions = useMemo(() => {
+    return getYearGroupOptions(profile.curriculumCountry as 'uk' | 'us');
   }, [profile.curriculumCountry]);
 
-  const handleAgeSelect = (age: string) => {
-    setSelectedAge(age);
-    const curriculumId = deriveCurriculumId(profile.curriculumCountry, age);
-    updateProfile({ ageBracket: age, curriculum: curriculumId });
+  const handleYearGroupSelect = (option: YearGroupOption) => {
+    setSelectedYearGroup(option.id);
+    updateProfile({ 
+      yearGroup: option.id,
+      ageBracket: option.ageBracket, 
+      curriculum: option.curriculumId 
+    });
   };
+
+  const questionText = profile.curriculumCountry === "uk" 
+    ? "What year group is your child in?"
+    : "What grade is your child in?";
 
   return (
     <OnboardingLayout step={5} totalSteps={11}>
       <div className="flex flex-col h-full min-h-[calc(100vh-120px)]">
         
-        <div className="flex-1 space-y-8">
+        <div className="flex-1 space-y-6">
           <h1 
             className="font-extrabold text-3xl leading-tight"
             style={{ color: 'var(--bb-text, #000000)' }}
           >
-            What {profile.curriculumCountry === "uk" ? "year group" : "grade"} is {profile.displayName || 'your child'} in?
+            {questionText}
           </h1>
 
-          <div className="space-y-4">
-            {ageOptions.map((option) => (
+          <div className="grid grid-cols-2 gap-3">
+            {yearGroupOptions.map((option) => (
               <button
-                key={option.value}
-                onClick={() => handleAgeSelect(option.value)}
-                className={`w-full flex items-center gap-4 px-6 py-4 text-lg font-medium rounded-2xl border-2 transition-all duration-200 hover:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
-                  selectedAge === option.value
+                key={option.id}
+                onClick={() => handleYearGroupSelect(option)}
+                className={`flex items-center justify-center px-4 py-4 text-lg font-bold rounded-2xl border-2 transition-all duration-200 hover:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+                  selectedYearGroup === option.id
                     ? 'text-white border-orange-500'
-                    : 'text-black border-gray-200 hover:border-gray-300'
+                    : 'text-gray-800 border-gray-200 hover:border-gray-300'
                 }`}
                 style={{ 
                   minHeight: '72px',
-                  backgroundColor: selectedAge === option.value ? 'var(--bb-header, #FF6A00)' : 'white'
+                  backgroundColor: selectedYearGroup === option.id ? 'var(--bb-header, #FF6A00)' : 'white'
                 }}
               >
-                <span className="text-2xl">{option.emoji}</span>
-                <div className="flex-1 text-left">
-                  <div>{option.label}</div>
-                  <div className={`text-sm ${selectedAge === option.value ? 'text-orange-100' : 'text-gray-500'}`}>
-                    {option.description}
-                  </div>
-                </div>
-                {selectedAge === option.value && (
-                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                )}
+                {option.label}
               </button>
             ))}
           </div>
         </div>
 
-        {selectedAge && (
+        {selectedYearGroup && (
           <div className="mt-auto pb-6 flex justify-center">
             <Button
               onClick={() => {
-                const curriculumId = deriveCurriculumId(profile.curriculumCountry, selectedAge);
-                updateProfile({ ageBracket: selectedAge, curriculum: curriculumId });
                 setLocation("/profile/goal");
               }}
               className="max-w-[366px] w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold uppercase tracking-wider"

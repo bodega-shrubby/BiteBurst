@@ -1,0 +1,103 @@
+## Task: Replace Age Bracket Selection with Year Group/Grade Selection in Onboarding
+
+### Overview
+Currently, onboarding asks users to select an age bracket (5-7, 7-11, 11-14). This needs to be replaced with year group selection for UK users and grade selection for US users. The selected year/grade will then map to the appropriate curriculum_id.
+
+### Changes Required
+
+#### 1. Update the Onboarding Flow
+
+**File: client/src/pages/Onboarding.tsx** (or wherever the onboarding steps are defined)
+
+After the user selects their country/curriculum (UK or US), replace the age bracket question with:
+
+**For UK curriculum:**
+- Question: "What year group is your child in?"
+- Options: Year 2, Year 3, Year 4, Year 5, Year 6, Year 7, Year 8, Year 9
+- Each option maps to a curriculum_id:
+  - Year 2 → uk-ks1
+  - Year 3, 4, 5, 6 → uk-ks2
+  - Year 7, 8, 9 → uk-ks3
+
+**For US curriculum:**
+- Question: "What grade is your child in?"
+- Options: Grade 1, Grade 2, Grade 3, Grade 4, Grade 5, Grade 6, Grade 7, Grade 8
+- Each option maps to a curriculum_id:
+  - Grade 1, 2 → us-k2
+  - Grade 3, 4, 5 → us-35
+  - Grade 6, 7, 8 → us-68
+
+#### 2. Update State Management
+
+Store the selected year_group (e.g., "year-2", "grade-3") in addition to the derived curriculum_id.
+
+The mapping logic:
+```typescript
+const getYearGroupOptions = (country: 'uk' | 'us') => {
+  if (country === 'uk') {
+    return [
+      { id: 'year-2', label: 'Year 2', curriculumId: 'uk-ks1', ageBracket: '5-7' },
+      { id: 'year-3', label: 'Year 3', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-4', label: 'Year 4', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-5', label: 'Year 5', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-6', label: 'Year 6', curriculumId: 'uk-ks2', ageBracket: '7-11' },
+      { id: 'year-7', label: 'Year 7', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+      { id: 'year-8', label: 'Year 8', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+      { id: 'year-9', label: 'Year 9', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+    ];
+  } else {
+    return [
+      { id: 'grade-1', label: 'Grade 1', curriculumId: 'us-k2', ageBracket: '5-7' },
+      { id: 'grade-2', label: 'Grade 2', curriculumId: 'us-k2', ageBracket: '5-7' },
+      { id: 'grade-3', label: 'Grade 3', curriculumId: 'us-35', ageBracket: '7-11' },
+      { id: 'grade-4', label: 'Grade 4', curriculumId: 'us-35', ageBracket: '7-11' },
+      { id: 'grade-5', label: 'Grade 5', curriculumId: 'us-35', ageBracket: '7-11' },
+      { id: 'grade-6', label: 'Grade 6', curriculumId: 'us-68', ageBracket: '11-14' },
+      { id: 'grade-7', label: 'Grade 7', curriculumId: 'us-68', ageBracket: '11-14' },
+      { id: 'grade-8', label: 'Grade 8', curriculumId: 'us-68', ageBracket: '11-14' },
+    ];
+  }
+};
+```
+
+#### 3. Update User Creation API Call
+
+When creating the user, send:
+- `yearGroup`: The selected year/grade (e.g., "year-5", "grade-3")
+- `curriculumId`: Derived from the year/grade mapping
+- `ageBracket`: Derived from the year/grade mapping (still needed for database)
+
+#### 4. Update User Registration Endpoint
+
+**File: server/routes/auth.ts** (or wherever user registration is handled)
+
+Accept the new `yearGroup` field and store it in the users table.
+
+#### 5. Update Drizzle Schema
+
+**File: shared/schema.ts**
+
+Add a new field to the users table:
+```typescript
+yearGroup: text("year_group"), // e.g., "year-5", "grade-3"
+```
+
+Also update the insertUserSchema to include yearGroup.
+
+### UI Design
+
+The year group selection screen should:
+1. Show a grid or list of year/grade options
+2. Use visual styling consistent with other onboarding steps
+3. Show the question text based on selected country:
+   - UK: "What year group is your child in?"
+   - US: "What grade is your child in?"
+
+### Testing Checklist
+- [ ] UK flow: Selecting Year 2 sets curriculum to uk-ks1
+- [ ] UK flow: Selecting Year 5 sets curriculum to uk-ks2
+- [ ] UK flow: Selecting Year 8 sets curriculum to uk-ks3
+- [ ] US flow: Selecting Grade 2 sets curriculum to us-k2
+- [ ] US flow: Selecting Grade 4 sets curriculum to us-35
+- [ ] US flow: Selecting Grade 7 sets curriculum to us-68
+- [ ] User record is created with correct yearGroup, curriculumId, and ageBracket

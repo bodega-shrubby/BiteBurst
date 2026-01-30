@@ -80,6 +80,7 @@ export const users = pgTable("users", {
   parentAuthId: text("parent_auth_id"), // Links to parent's Supabase auth user ID (nullable for migration)
   displayName: text("display_name").notNull(),
   ageBracket: ageBracketEnum("age_bracket").notNull(),
+  yearGroup: text("year_group"), // e.g., "year-5", "grade-3"
   goal: goalEnum("goal").notNull().references(() => goals.id),
   curriculum: text("curriculum").default('us-common-core'), // Legacy field - "us-common-core" | "uk-ks2-ks3"
   curriculumId: varchar("curriculum_id").references(() => curriculums.id), // New FK to curriculums table
