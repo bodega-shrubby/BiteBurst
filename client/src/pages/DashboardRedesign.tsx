@@ -206,47 +206,49 @@ export default function DashboardRedesign() {
       <div className="md:ml-[200px]">
         {/* 1. AVATAR HERO SECTION - Light lavender background */}
         <div 
-          className="w-full py-8 px-4 flex flex-col items-center"
+          className="w-full py-10 lg:py-12 px-4 flex flex-col items-center"
           style={{ background: 'linear-gradient(180deg, #E8E0F0 0%, #DDD6E8 100%)' }}
         >
           <div className="relative">
-            <CharacterAvatar size="lg" />
+            <div className="w-28 h-28 lg:w-36 lg:h-36">
+              <CharacterAvatar size="lg" />
+            </div>
             <button 
-              className="absolute bottom-0 right-0 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+              className="absolute bottom-0 right-0 w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
               aria-label="Edit avatar"
             >
-              <Pencil className="w-4 h-4 text-gray-600" />
+              <Pencil className="w-5 h-5 lg:w-6 lg:h-6 text-gray-600" />
             </button>
           </div>
         </div>
 
         {/* 2. USER INFO BAR - Dark navy blue */}
         <div 
-          className="text-white py-5 px-4 text-center"
+          className="w-full text-white py-6 lg:py-8 px-4 text-center"
           style={{ backgroundColor: '#1A1B4B' }}
         >
-          <h1 className="text-2xl font-bold">{dailySummary.user.display_name}</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl lg:text-3xl font-bold">{dailySummary.user.display_name}</h1>
+          <p className="text-gray-400 text-sm lg:text-base mt-1">
             @{dailySummary.user.display_name.toLowerCase().replace(/\s+/g, '')}
           </p>
           
           {/* Level Badge */}
-          <div className="flex justify-center mt-3">
-            <span className="bg-[#FF6A00] text-white text-sm font-bold px-4 py-1.5 rounded-full">
+          <div className="flex justify-center mt-4">
+            <span className="bg-[#FF6A00] text-white text-base lg:text-lg font-bold px-5 py-2 rounded-full">
               Level {dailySummary.user.level}
             </span>
           </div>
           
           {/* Level Progress */}
-          <div className="max-w-[240px] mx-auto mt-4 space-y-2">
-            <div className="flex justify-between text-xs text-gray-400">
+          <div className="max-w-sm mx-auto mt-5 space-y-2">
+            <div className="flex justify-between text-sm lg:text-base text-gray-400">
               <span>Lvl {dailySummary.user.level}</span>
               <span>{dailySummary.user.lifetime_xp % 100} / 100 XP</span>
               <span>Lvl {dailySummary.user.level + 1}</span>
             </div>
-            <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
+            <div className="bg-gray-700 rounded-full h-3 lg:h-4 overflow-hidden">
               <div 
-                className="bg-[#FF6A00] h-2 rounded-full transition-all duration-500"
+                className="bg-[#FF6A00] h-3 lg:h-4 rounded-full transition-all duration-500"
                 style={{ width: `${dailySummary.user.lifetime_xp % 100}%` }}
               />
             </div>
@@ -254,12 +256,12 @@ export default function DashboardRedesign() {
         </div>
 
         {/* 3. STATUS BAR - Streak, Hearts, Settings - FULL WIDTH */}
-        <div className="w-full bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center justify-center space-x-6">
+        <div className="w-full bg-white border-b border-gray-200 px-4 py-4 lg:py-5">
+          <div className="flex items-center justify-center space-x-6 lg:space-x-8">
             {/* Streak Pill */}
-            <div className="flex items-center space-x-2 bg-orange-50 px-4 py-2.5 rounded-full">
-              <span className="text-xl lg:text-2xl">🔥</span>
-              <span className="text-sm lg:text-base font-bold text-orange-600">
+            <div className="flex items-center space-x-2 bg-orange-50 px-5 py-3 rounded-full">
+              <span className="text-2xl lg:text-3xl">🔥</span>
+              <span className="text-base lg:text-lg font-bold text-orange-600">
                 {dailySummary.streak_days} day streak
               </span>
             </div>
@@ -269,25 +271,25 @@ export default function DashboardRedesign() {
             
             {/* Settings */}
             <button 
-              className="p-2.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="Settings"
             >
-              <Settings className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
+              <Settings className="w-6 h-6 lg:w-7 lg:h-7 text-gray-500" />
             </button>
           </div>
         </div>
 
-        {/* CONSTRAINED CONTENT AREA - Cards and content below */}
-        <div className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 pb-32">
+        {/* CONTENT AREA - Full width with comfortable padding */}
+        <div className="w-full px-4 md:px-8 lg:px-12 py-6 space-y-6 pb-24">
           {/* 4. MASCOT GREETING */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 lg:space-x-5">
             <img 
               src={oniTheOrangeImage}
               alt="Oni mascot"
-              className="w-14 h-14 lg:w-16 lg:h-16 object-contain"
+              className="w-16 h-16 lg:w-20 lg:h-20 object-contain"
             />
-            <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1">
-              <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>
+            <div className="bg-gray-100 rounded-2xl px-5 lg:px-6 py-4 lg:py-5 flex-1">
+              <p className="text-base lg:text-lg font-medium text-gray-800">{greeting}</p>
             </div>
           </div>
           {/* 5. LESSON HERO - PRIMARY CTA */}
