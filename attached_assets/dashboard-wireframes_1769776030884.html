@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Dashboard Wireframes - Avatar Hero Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .wireframe-box {
+      border: 2px dashed #ccc;
+      background: #f9f9f9;
+    }
+    .label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .purple-gradient {
+      background: linear-gradient(180deg, #E8E0F0 0%, #DDD6E8 100%);
+    }
+    .navy-blue {
+      background-color: #1A1B4B;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+  <h1 class="text-3xl font-bold text-center mb-2">BiteBurst Dashboard Wireframes</h1>
+  <p class="text-center text-gray-500 mb-8">Avatar Hero Design (Duolingo Profile Style)</p>
+
+  <div class="flex flex-wrap justify-center gap-12">
+
+    <!-- MOBILE WIREFRAME -->
+    <div class="flex flex-col items-center">
+      <h2 class="text-xl font-semibold mb-4">📱 Mobile View (375px)</h2>
+      <div class="w-[375px] bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-gray-800">
+
+        <!-- Status Bar -->
+        <div class="bg-gray-800 text-white text-xs px-4 py-1 flex justify-between">
+          <span>9:41</span>
+          <span>●●● WiFi 100%</span>
+        </div>
+
+        <!-- AVATAR HERO SECTION - Light Purple Background -->
+        <div class="purple-gradient py-8 text-center">
+          <div class="relative inline-block">
+            <div class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-lg overflow-hidden mx-auto">
+              <div class="w-full h-full bg-orange-200 flex items-center justify-center text-4xl">👧</div>
+            </div>
+            <button class="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-gray-600">
+              ✏️
+            </button>
+          </div>
+          <p class="label text-center mt-3 text-purple-600">← AVATAR HERO (light lavender like Duolingo)</p>
+        </div>
+
+        <!-- USER INFO BAR - Dark Navy Blue -->
+        <div class="navy-blue text-white py-4 text-center">
+          <h1 class="text-xl font-bold">Rav</h1>
+          <p class="text-gray-400 text-sm">@rav</p>
+          <div class="mt-2">
+            <span class="bg-[#FF6A00] text-white text-xs font-bold px-3 py-1 rounded-full">
+              Level 1
+            </span>
+          </div>
+          <!-- XP Progress -->
+          <div class="mt-3 max-w-[200px] mx-auto px-4">
+            <div class="flex justify-between text-xs text-gray-400 mb-1">
+              <span>Lvl 1</span>
+              <span>45 / 100 XP</span>
+              <span>Lvl 2</span>
+            </div>
+            <div class="bg-gray-700 rounded-full h-2">
+              <div class="bg-[#FF6A00] h-2 rounded-full" style="width: 45%"></div>
+            </div>
+          </div>
+          <p class="label text-center mt-2 text-gray-500">← USER INFO (name, @username, level)</p>
+        </div>
+
+        <!-- STATUS BAR - Streak, Hearts, Settings -->
+        <div class="bg-white border-b border-gray-200 px-4 py-3">
+          <div class="flex items-center justify-center space-x-6">
+            <div class="flex items-center space-x-1 bg-orange-50 px-3 py-1.5 rounded-full">
+              <span>🔥</span>
+              <span class="text-sm font-semibold text-orange-600">0 day streak</span>
+            </div>
+            <span class="text-red-500">❤️❤️❤️</span>
+            <span class="text-gray-400">⚙️</span>
+          </div>
+          <p class="label text-center mt-2">← STATUS BAR (streak, hearts, settings)</p>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-4 space-y-4 bg-gray-50 h-[450px] overflow-y-auto">
+
+          <!-- MASCOT GREETING -->
+          <div class="bg-white rounded-xl p-3">
+            <div class="flex items-center justify-center space-x-3">
+              <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-2xl">🍊</div>
+              <div class="bg-gray-100 rounded-2xl px-4 py-2">
+                <p class="text-sm text-gray-700">Good morning, Rav! Ready to start? ☀️</p>
+              </div>
+            </div>
+            <p class="label text-center mt-2">← MASCOT GREETING</p>
+          </div>
+
+          <!-- HERO: Lesson CTA -->
+          <div class="bg-gradient-to-br from-orange-50 to-white rounded-2xl border-2 border-orange-200 p-4">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-bold text-gray-800">Continue Learning</span>
+              <span>📚</span>
+            </div>
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center text-2xl">⚽</div>
+              <div class="flex-1">
+                <div class="font-medium text-gray-800">Fuel for Football</div>
+                <div class="text-xs text-gray-500">3 of 5 slides</div>
+                <div class="mt-1 bg-gray-200 rounded-full h-2">
+                  <div class="bg-orange-500 h-2 rounded-full w-3/5"></div>
+                </div>
+              </div>
+            </div>
+            <button class="w-full bg-[#FF6A00] text-white py-3 rounded-xl font-bold">
+              📖 START LESSON
+            </button>
+            <p class="label text-center mt-2">← PRIMARY ACTION (HERO)</p>
+          </div>
+
+          <!-- STATISTICS GRID - 2x2 Like Duolingo Profile -->
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-2">Statistics</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-white rounded-xl border border-gray-200 p-3">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xl">🔥</span>
+                  <div>
+                    <div class="text-xl font-bold">0</div>
+                    <div class="text-xs text-gray-500">Day streak</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-gray-200 p-3">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xl">⚡</span>
+                  <div>
+                    <div class="text-xl font-bold">85</div>
+                    <div class="text-xs text-gray-500">Total XP</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-gray-200 p-3">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xl">🏆</span>
+                  <div>
+                    <div class="text-lg font-bold text-orange-500">Bronze</div>
+                    <div class="text-xs text-gray-500">League</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-gray-200 p-3">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xl">🏅</span>
+                  <div>
+                    <div class="text-xl font-bold">0</div>
+                    <div class="text-xs text-gray-500">Best Streak</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="label text-center mt-2">← STATISTICS GRID (like Duolingo profile)</p>
+          </div>
+
+          <!-- Daily XP -->
+          <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-semibold text-gray-700">⚡ Daily XP Goal</span>
+              <span class="text-orange-500 font-bold">0 / 80</span>
+            </div>
+            <div class="bg-gray-200 rounded-full h-3">
+              <div class="bg-orange-500 h-3 rounded-full w-0"></div>
+            </div>
+            <div class="text-xs text-gray-500 mt-1 text-center">80 XP to go!</div>
+          </div>
+
+          <!-- Today's Journey -->
+          <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-semibold text-gray-700">Today's Journey</span>
+              <span class="text-xs text-gray-500">0/3</span>
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 border-2 border-gray-300 rounded"></span>
+                  <span class="text-sm">Complete one lesson</span>
+                </div>
+                <span class="text-xs text-orange-500 font-semibold">+20 XP</span>
+              </div>
+              <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 border-2 border-gray-300 rounded"></span>
+                  <span class="text-sm">Log one fruit</span>
+                </div>
+                <span class="text-xs text-orange-500 font-semibold">+10 XP</span>
+              </div>
+              <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 border-2 border-gray-300 rounded"></span>
+                  <span class="text-sm">Move for 15 minutes</span>
+                </div>
+                <span class="text-xs text-orange-500 font-semibold">+20 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Log (Demoted) -->
+          <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-semibold text-gray-700 text-sm">Quick Log</span>
+              <span class="text-xs text-gray-400">Tap to log</span>
+            </div>
+            <div class="flex space-x-2 mb-3">
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🍎</div>
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🥦</div>
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🍞</div>
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🧃</div>
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">⚽</div>
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🧘</div>
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🏃</div>
+            </div>
+            <div class="flex space-x-2">
+              <button class="flex-1 border border-orange-500 text-orange-500 py-2 rounded-lg text-sm font-medium">Log Food</button>
+              <button class="flex-1 border border-orange-500 text-orange-500 py-2 rounded-lg text-sm font-medium">Log Activity</button>
+            </div>
+            <p class="label text-center mt-2">← SECONDARY (demoted)</p>
+          </div>
+
+          <!-- Badges Preview -->
+          <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-semibold text-gray-700">🏆 Badges</span>
+              <span class="text-xs text-orange-500">View All →</span>
+            </div>
+            <div class="flex space-x-3 overflow-x-auto">
+              <div class="flex-shrink-0 text-center">
+                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-xl">🏆</div>
+                <div class="text-xs text-gray-500 mt-1">First Log</div>
+              </div>
+              <div class="flex-shrink-0 text-center">
+                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-xl">⭐</div>
+                <div class="text-xs text-gray-500 mt-1">XP Champ</div>
+              </div>
+              <div class="flex-shrink-0 text-center">
+                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-xl opacity-40">🎯</div>
+                <div class="text-xs text-gray-400 mt-1">Locked</div>
+              </div>
+              <div class="flex-shrink-0 text-center">
+                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-xl opacity-40">🔥</div>
+                <div class="text-xs text-gray-400 mt-1">Locked</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-20"></div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bg-white border-t-2 border-gray-200 px-2 py-2">
+          <div class="flex justify-around items-end">
+            <div class="flex flex-col items-center px-3 py-1 bg-orange-50 rounded-xl">
+              <span class="text-xl">📚</span>
+              <span class="text-xs text-orange-500 font-medium">Lessons</span>
+            </div>
+            <div class="flex flex-col items-center px-3 py-1">
+              <span class="text-xl">👑</span>
+              <span class="text-xs text-gray-500">Champs</span>
+            </div>
+            <div class="flex flex-col items-center px-3 py-1">
+              <div class="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center -mt-6 shadow-lg">
+                <span class="text-2xl text-white">+</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">LOG</span>
+            </div>
+            <div class="flex flex-col items-center px-3 py-1">
+              <span class="text-xl">👤</span>
+              <span class="text-xs text-gray-500">Profile</span>
+            </div>
+            <div class="flex flex-col items-center px-3 py-1 relative group">
+              <span class="text-xl">•••</span>
+              <span class="text-xs text-gray-500">More</span>
+              <!-- Hover tooltip showing dropdown items -->
+              <div class="hidden group-hover:block absolute bottom-full right-0 mb-2 bg-white rounded-lg shadow-lg border p-2 text-xs whitespace-nowrap">
+                Settings / Help / Logout
+              </div>
+            </div>
+          </div>
+          <p class="label text-center mt-1">← BOTTOM NAV: Lessons, Champs, LOG, Profile, More</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLET/DESKTOP WIREFRAME -->
+    <div class="flex flex-col items-center">
+      <h2 class="text-xl font-semibold mb-4">💻 Tablet/Desktop View (768px+)</h2>
+      <div class="w-[900px] h-[800px] bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 flex">
+
+        <!-- Sidebar -->
+        <div class="w-[200px] bg-white border-r border-gray-200 flex flex-col">
+          <!-- Logo -->
+          <div class="p-4 border-b border-gray-100">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">🍊</span>
+              <span class="text-lg font-bold text-orange-500">BiteBurst</span>
+            </div>
+          </div>
+
+          <!-- Nav Items -->
+          <div class="flex-1 p-3 space-y-1">
+            <div class="flex items-center space-x-3 px-4 py-3 bg-orange-50 rounded-xl text-orange-500 border-2 border-orange-200">
+              <span>📚</span>
+              <span class="font-medium">Lessons</span>
+              <span class="ml-auto text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">NEW</span>
+            </div>
+            <div class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span>👑</span>
+              <span>Champs</span>
+            </div>
+            <div class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span>➕</span>
+              <span>LOG</span>
+            </div>
+            <div class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span>👤</span>
+              <span>Profile</span>
+            </div>
+          </div>
+
+          <!-- More (with dropdown on hover) -->
+          <div class="p-3 border-t border-gray-100 relative group">
+            <div class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 cursor-pointer">
+              <span>•••</span>
+              <span>More</span>
+            </div>
+            <!-- Dropdown on hover -->
+            <div class="hidden group-hover:block absolute bottom-full left-3 right-3 mb-1 bg-white rounded-xl shadow-lg border border-gray-200 py-2">
+              <div class="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                <span>⚙️</span>
+                <span class="text-sm">Settings</span>
+              </div>
+              <div class="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                <span>❓</span>
+                <span class="text-sm">Help</span>
+              </div>
+              <div class="flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50">
+                <span>🚪</span>
+                <span class="text-sm">Logout</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="label text-center py-2">← SIDEBAR: Lessons, Champs, LOG, Profile, More</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 bg-gray-50 overflow-y-auto">
+
+          <!-- AVATAR HERO SECTION - Purple Background -->
+          <div class="purple-gradient py-8 text-center">
+            <div class="relative inline-block">
+              <div class="w-28 h-28 rounded-full bg-white border-4 border-white shadow-lg overflow-hidden mx-auto">
+                <div class="w-full h-full bg-orange-200 flex items-center justify-center text-5xl">👧</div>
+              </div>
+              <button class="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-gray-600">
+                ✏️
+              </button>
+            </div>
+            <p class="label text-center mt-3 text-purple-600">← AVATAR HERO (light lavender background)</p>
+          </div>
+
+          <!-- USER INFO + STATUS BAR Combined for Desktop -->
+          <div class="navy-blue text-white py-4 px-6">
+            <div class="max-w-xl mx-auto flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div>
+                  <span class="text-xl font-bold">Rav</span>
+                  <span class="text-gray-400 text-sm ml-2">@rav</span>
+                </div>
+                <span class="bg-[#FF6A00] text-white text-xs font-bold px-3 py-1 rounded-full">Level 1</span>
+              </div>
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1 bg-orange-500/20 px-3 py-1.5 rounded-full">
+                  <span>🔥</span>
+                  <span class="text-sm font-semibold">0</span>
+                </div>
+                <span class="text-red-400">❤️❤️❤️</span>
+                <span class="text-gray-400 cursor-pointer">⚙️</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="max-w-xl mx-auto p-6 space-y-5">
+
+            <!-- MASCOT GREETING -->
+            <div class="bg-white rounded-xl border border-gray-200 p-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-2xl">🍊</div>
+                <div class="bg-gray-100 rounded-2xl px-4 py-2">
+                  <p class="text-gray-700">Good morning, Rav! Ready to start? ☀️</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- HERO: Lesson CTA -->
+            <div class="bg-gradient-to-br from-orange-50 to-white rounded-2xl border-2 border-orange-200 p-6 shadow-sm">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-xl font-bold text-gray-800">Continue Learning</span>
+                <span class="text-2xl">📚</span>
+              </div>
+              <div class="flex items-center space-x-4 mb-4">
+                <div class="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center text-4xl">⚽</div>
+                <div class="flex-1">
+                  <div class="text-lg font-semibold text-gray-800">Fuel for Football</div>
+                  <div class="text-sm text-gray-500">3 of 5 slides completed</div>
+                  <div class="mt-2 bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-orange-500 h-2.5 rounded-full w-3/5"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="w-full bg-[#FF6A00] text-white py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition flex items-center justify-center space-x-2">
+                <span>📖</span>
+                <span>START LESSON</span>
+              </button>
+              <p class="label text-center mt-3">← PRIMARY ACTION (HERO)</p>
+            </div>
+
+            <!-- STATISTICS GRID - 4 columns on desktop -->
+            <div class="bg-white rounded-xl border border-gray-200 p-4">
+              <h3 class="font-semibold text-gray-800 mb-3">Statistics</h3>
+              <div class="grid grid-cols-4 gap-3">
+                <div class="text-center p-3 bg-gray-50 rounded-xl">
+                  <div class="text-2xl mb-1">🔥</div>
+                  <div class="text-xl font-bold">0</div>
+                  <div class="text-xs text-gray-500">Day streak</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-xl">
+                  <div class="text-2xl mb-1">⚡</div>
+                  <div class="text-xl font-bold">85</div>
+                  <div class="text-xs text-gray-500">Total XP</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-xl">
+                  <div class="text-2xl mb-1">🏆</div>
+                  <div class="text-lg font-bold text-orange-500">Bronze</div>
+                  <div class="text-xs text-gray-500">League</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-xl">
+                  <div class="text-2xl mb-1">🏅</div>
+                  <div class="text-xl font-bold">0</div>
+                  <div class="text-xs text-gray-500">Best Streak</div>
+                </div>
+              </div>
+              <p class="label text-center mt-2">← STATISTICS (like Duolingo profile)</p>
+            </div>
+
+            <!-- Daily XP + Today's Journey side by side -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Daily XP -->
+              <div class="bg-white rounded-xl border border-gray-200 p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold text-gray-700">⚡ Daily XP</span>
+                  <span class="text-orange-500 font-bold">0 / 80</span>
+                </div>
+                <div class="bg-gray-200 rounded-full h-3">
+                  <div class="bg-orange-500 h-3 rounded-full w-0"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2">80 XP to go!</div>
+              </div>
+
+              <!-- Today's Journey Summary -->
+              <div class="bg-white rounded-xl border border-gray-200 p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold text-gray-700">Today's Journey</span>
+                  <span class="text-gray-500 text-sm">0/3</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center space-x-2 text-sm">
+                    <span class="w-4 h-4 border border-gray-300 rounded"></span>
+                    <span>Complete lesson</span>
+                  </div>
+                  <div class="flex items-center space-x-2 text-sm">
+                    <span class="w-4 h-4 border border-gray-300 rounded"></span>
+                    <span>Log fruit</span>
+                  </div>
+                  <div class="flex items-center space-x-2 text-sm">
+                    <span class="w-4 h-4 border border-gray-300 rounded"></span>
+                    <span>Move 15 min</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Log (Secondary) -->
+            <div class="bg-white rounded-xl border border-gray-200 p-4">
+              <div class="flex justify-between items-center mb-3">
+                <span class="font-semibold text-gray-700">Quick Log</span>
+                <span class="text-xs text-gray-400">Tap to log food or activity</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="flex space-x-2">
+                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-orange-50">🍎</div>
+                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-orange-50">🥦</div>
+                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-orange-50">🍞</div>
+                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-orange-50">⚽</div>
+                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-orange-50">🧘</div>
+                </div>
+                <div class="flex-1 flex space-x-2">
+                  <button class="flex-1 border border-orange-500 text-orange-500 py-2 rounded-lg text-sm font-medium hover:bg-orange-50">Log Food</button>
+                  <button class="flex-1 border border-orange-500 text-orange-500 py-2 rounded-lg text-sm font-medium hover:bg-orange-50">Log Activity</button>
+                </div>
+              </div>
+              <p class="label text-center mt-2">← SECONDARY (demoted)</p>
+            </div>
+
+            <!-- Badges -->
+            <div class="bg-white rounded-xl border border-gray-200 p-4">
+              <div class="flex justify-between items-center mb-3">
+                <span class="font-semibold text-gray-700">🏆 Badges & Rewards</span>
+                <span class="text-sm text-orange-500 cursor-pointer">View All →</span>
+              </div>
+              <div class="flex space-x-4">
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center text-2xl">🏆</div>
+                  <div class="text-xs text-gray-600 mt-1">First Log</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center text-2xl">⭐</div>
+                  <div class="text-xs text-gray-600 mt-1">XP Champ</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center text-2xl opacity-40">🎯</div>
+                  <div class="text-xs text-gray-400 mt-1">Locked</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center text-2xl opacity-40">🔥</div>
+                  <div class="text-xs text-gray-400 mt-1">Locked</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center text-2xl opacity-40">💪</div>
+                  <div class="text-xs text-gray-400 mt-1">Locked</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Section Order Reference -->
+  <div class="max-w-4xl mx-auto mt-12 bg-white rounded-xl p-6 shadow">
+    <h2 class="text-xl font-bold mb-4">📋 Dashboard Section Order (NEW)</h2>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="font-semibold text-gray-700 mb-2">Mobile (Top to Bottom)</h3>
+        <ol class="list-decimal list-inside space-y-1 text-sm">
+          <li><strong class="text-purple-600">Avatar Hero</strong> - Light lavender background, large avatar</li>
+          <li><strong>User Info</strong> - Name, @username, Level badge (navy blue bg)</li>
+          <li><strong>Status Bar</strong> - Streak pill, hearts, settings</li>
+          <li><strong>Mascot Greeting</strong> - Good morning message with 🍊</li>
+          <li><strong class="text-orange-500">Lesson Hero</strong> - PRIMARY CTA (Continue Learning)</li>
+          <li><strong>Statistics Grid</strong> - 2x2 (Streak, XP, League, Best)</li>
+          <li><strong>Daily XP</strong> - Progress bar (0/80 XP)</li>
+          <li><strong>Today's Journey</strong> - 3-item checklist</li>
+          <li><strong>Quick Log</strong> - SECONDARY (emoji grid + outline buttons)</li>
+          <li><strong>Badges</strong> - Horizontal scroll preview</li>
+          <li><strong>Bottom Nav</strong> - Lessons, Champs, LOG, Profile, More (mobile only)</li>
+        </ol>
+      </div>
+      <div>
+        <h3 class="font-semibold text-gray-700 mb-2">Tablet/Desktop</h3>
+        <ol class="list-decimal list-inside space-y-1 text-sm">
+          <li><strong>Sidebar</strong> - Left nav (200px): Lessons, Champs, LOG, Profile, More</li>
+          <li><strong class="text-purple-600">Avatar Hero</strong> - Light lavender background, centered</li>
+          <li><strong>User Info + Status</strong> - Combined navy blue bar with streak/hearts</li>
+          <li><strong>Mascot Greeting</strong> - Good morning message</li>
+          <li><strong class="text-orange-500">Lesson Hero</strong> - PRIMARY CTA</li>
+          <li><strong>Statistics</strong> - 4-column grid</li>
+          <li><strong>Daily XP + Journey</strong> - Side by side (2 columns)</li>
+          <li><strong>Quick Log</strong> - Compact with inline buttons</li>
+          <li><strong>Badges</strong> - Horizontal row</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="mt-6 p-4 bg-purple-50 rounded-lg">
+      <h3 class="font-semibold text-purple-700 mb-2">🎨 Color Reference</h3>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <div class="flex items-center space-x-2 mb-1">
+            <div class="w-6 h-6 rounded purple-gradient border"></div>
+            <span><strong>#E8E0F0 → #DDD6E8</strong> - Avatar background (light lavender)</span>
+          </div>
+          <div class="flex items-center space-x-2 mb-1">
+            <div class="w-6 h-6 rounded navy-blue"></div>
+            <span><strong>#1A1B4B</strong> - User info bar (dark navy blue)</span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2 mb-1">
+            <div class="w-6 h-6 rounded bg-[#FF6A00]"></div>
+            <span><strong>#FF6A00</strong> - Primary orange (BiteBurst)</span>
+          </div>
+          <div class="flex items-center space-x-2 mb-1">
+            <div class="w-6 h-6 rounded bg-white border"></div>
+            <span><strong>#FFFFFF</strong> - Card backgrounds</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 p-4 bg-orange-50 rounded-lg">
+      <h3 class="font-semibold text-orange-700 mb-2">🎯 Key Design Principles</h3>
+      <ul class="text-sm space-y-1 text-orange-800">
+        <li>• <strong>Avatar Hero at top</strong> - Like Duolingo profile page, creates visual identity</li>
+        <li>• <strong>LESSONS are PRIMARY</strong> - The "Start Lesson" button is the hero CTA</li>
+        <li>• <strong>Statistics visible</strong> - 2x2 grid shows progress at a glance</li>
+        <li>• <strong>Logging is SECONDARY</strong> - Demoted to smaller section with outline buttons</li>
+        <li>• <strong>Light lavender accent</strong> - Avatar background adds personality (like Duolingo)</li>
+        <li>• <strong>Sidebar on 768px+</strong> - Hide bottom nav, show sidebar</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>

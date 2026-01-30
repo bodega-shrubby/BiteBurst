@@ -1,0 +1,872 @@
+# BiteBurst Dashboard Redesign - Replit Agent Prompt
+
+---
+
+## WIREFRAMES
+
+### Mobile View (375px) - Bottom Nav Visible
+```
+┌─────────────────────────────────────┐
+│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+│░░░░░░░░░░ LIGHT LAVENDER ░░░░░░░░░░░│
+│░░░░░░░░░░ BACKGROUND   ░░░░░░░░░░░░░│  ← AVATAR HERO SECTION
+│░░░░░░░░░   ┌──────┐   ░░░░░░░░░░░░░░│     Background: #DDD6E8 (light lavender)
+│░░░░░░░░░   │ 🧑‍🦱  │   ░░░░░░░░░░░░░░│     or gradient lavender
+│░░░░░░░░░   │AVATAR│   ░░░░░░░░░░░░░░│
+│░░░░░░░░░   └──────┘   ░░░░░░░░░░░░░░│
+│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+├─────────────────────────────────────┤
+│         Rav                         │
+│         @rav                        │  ← USER INFO
+│      [ Level 1 ]                    │     Name, username, level badge
+├─────────────────────────────────────┤
+│  🔥 0 streak   ❤️❤️❤️       ⚙️     │  ← STATUS BAR
+│                                     │     Streak pill, hearts, settings
+├─────────────────────────────────────┤
+│  Good morning, Rav! Ready to start? │  ← MASCOT GREETING
+│  🍊 (small mascot)            ☀️    │     With Sunny Slice mascot
+├─────────────────────────────────────┤
+│ ┌─────────────────────────────────┐ │
+│ │  📚 Continue Learning           │ │
+│ │  ┌────┐                         │ │
+│ │  │ ⚽ │  Fuel for Football      │ │  ← LESSON HERO
+│ │  └────┘  3/5 slides             │ │     (PRIMARY CTA)
+│ │  ████████░░░░░ 60%              │ │
+│ │  ┌─────────────────────────┐    │ │
+│ │  │   📖 START LESSON       │    │ │  ← Big orange button
+│ │  └─────────────────────────┘    │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ Statistics                      │ │
+│ │ ┌───────────┐ ┌───────────┐    │ │
+│ │ │ 🔥  0     │ │ ⚡  85    │    │ │
+│ │ │ Day streak│ │ Total XP  │    │ │  ← STATISTICS GRID
+│ │ └───────────┘ └───────────┘    │ │     (like Duolingo profile)
+│ │ ┌───────────┐ ┌───────────┐    │ │
+│ │ │ 🏆 Bronze │ │ 🏅  0     │    │ │
+│ │ │ League    │ │ Best Streak│    │ │
+│ │ └───────────┘ └───────────┘    │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ ⚡ Daily XP Goal        0 / 80  │ │  ← XP Progress
+│ │ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │ │
+│ │           80 XP to go!          │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ Today's Journey           0/3   │ │
+│ │ ○ Log one fruit          +10 XP │ │  ← Daily Tasks
+│ │ ○ Move for 15 minutes    +20 XP │ │
+│ │ ○ Drink water            +5 XP  │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ Quick Log                       │ │
+│ │ 🍎 🥦 🍞 🧃 ⚽ 🧘 🏃           │ │  ← SECONDARY
+│ │ [Log Food]  [Log Activity]      │ │     (outline buttons)
+│ └─────────────────────────────────┘ │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ 🏆 Badges & Rewards  View All → │ │
+│ │ [🏆✓] [⭐✓] [○] [○] [○]  →     │ │  ← Badges Preview
+│ │ 2/13 earned                     │ │
+│ └─────────────────────────────────┘ │
+├─────────────────────────────────────┤
+│  📚    👑    [+]    👤    •••     │  ← BOTTOM NAV
+│Lessons Champs LOG Profile More    │     (mobile only)
+└─────────────────────────────────────┘
+```
+
+### Tablet/Desktop View (768px+) - Sidebar Visible
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ ┌─────────┐  ┌────────────────────────────────────────────────┐  │
+│ │ 🍊      │  │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  │
+│ │BiteBurst│  │░░░░░░░░░░░ LIGHT LAVENDER HEADER ░░░░░░░░░░░░░│  │
+│ ├─────────┤  │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  │
+│ │         │  │░░░░░░░░   ┌──────┐   ░░░░░░░░░░░░░░░░░░░░░░░░░│  │
+│ │ ┌─────┐ │  │░░░░░░░░   │ 🧑‍🦱  │   ░░░░░░░░░░░░░░░░░░░░░░░░░│  │
+│ │ │📚   │ │  │░░░░░░░░   │AVATAR│   ░░░░░░░░░░░░░░░░░░░░░░░░░│  │
+│ │ │Lesson│ │  │░░░░░░░░   └──────┘   ░░░░░░░░░░░░░░░░░░░░░░░░░│  │
+│ │ │ NEW │ │  └────────────────────────────────────────────────┘  │
+│ │ └─────┘ │                                                      │
+│ │         │  ┌────────────────────────────────────────────────┐  │
+│ │ 👑Champs│  │  Rav  @rav   [Level 1]   🔥0  ❤️❤️❤️           │  │
+│ │         │  └────────────────────────────────────────────────┘  │
+│ │ ➕ LOG  │                                                      │
+│ │         │  ┌────────────────────────────────────────────────┐  │
+│ │ 👤Profile│  │  🍊 Good morning, Rav! Ready to start? ☀️      │  │
+│ │         │  └────────────────────────────────────────────────┘  │
+│ ├─────────┤                                                      │
+│ │ ••• More│  ┌────────────────────────────────────────────────┐  │
+│ │ (hover) │  │  📚 Continue Learning                          │  │
+│ │ Settings│  │  ┌────┐                                        │  │
+│ │ Help    │  │  │ ⚽ │  Fuel for Football  (3/5 slides)       │  │
+│ │ Logout  │  │  └────┘  ████████████░░░░░░░░ 60%              │  │
+│ │         │  │  ┌────────────────────────────────────────┐    │  │
+│ └─────────┘  │  │         📖 START LESSON                │    │  │
+│              │  └────────────────────────────────────────┘    │  │
+│   SIDEBAR    └────────────────────────────────────────────────┘  │
+│  (200px)                                                         │
+│              ┌────────────────────────────────────────────────┐  │
+│              │ Statistics                                     │  │
+│              │ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐│  │
+│              │ │🔥 0     │ │⚡ 85    │ │🏆Bronze │ │🏅 0     ││  │
+│              │ │Streak   │ │Total XP │ │League   │ │Best     ││  │
+│              │ └─────────┘ └─────────┘ └─────────┘ └─────────┘│  │
+│              └────────────────────────────────────────────────┘  │
+│                                                                  │
+│              ┌──────────────────┐ ┌───────────────────────────┐  │
+│              │⚡Daily XP   0/80 │ │Today's Journey       0/3  │  │
+│              │░░░░░░░░░░░░░░░░░│ │○ Log fruit        +10 XP  │  │
+│              │  80 XP to go!   │ │○ Move 15 min      +20 XP  │  │
+│              └──────────────────┘ │○ Drink water      +5 XP  │  │
+│                                   └───────────────────────────┘  │
+│              ┌────────────────────────────────────────────────┐  │
+│              │ Quick Log  🍎🥦🍞⚽🧘  [Log Food][Log Activity]│  │
+│              └────────────────────────────────────────────────┘  │
+│              ┌────────────────────────────────────────────────┐  │
+│              │ 🏆 Badges & Rewards (2/13)        View All →   │  │
+│              │ [🏆✓] [⭐✓] [○] [○] [○]                        │  │
+│              └────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
+  NO BOTTOM NAV on tablet/desktop - use sidebar instead
+```
+
+### Section Priority (NEW ORDER)
+```
+┌─────────────────────────────────────────────────┐
+│  1. AVATAR HERO     (lavender bg, large avatar) │  ← Like Duolingo profile
+│  2. USER INFO       (name, @username, level)    │
+│  3. STATUS BAR      (streak, hearts, settings)  │
+│  4. MASCOT GREETING (Good morning + mascot)     │
+│  5. LESSON HERO     ★ PRIMARY ACTION ★          │  ← Most prominent CTA
+│  6. STATISTICS      (2x2 grid - Duolingo style) │
+│  7. DAILY XP        (progress bar)              │
+│  8. TODAY'S JOURNEY (checklist)                 │
+│  9. QUICK LOG       (secondary, demoted)        │
+│  10. BADGES         (horizontal scroll)         │
+└─────────────────────────────────────────────────┘
+```
+
+### Color Reference
+```
+Avatar Background:  #DDD6E8 (light lavender)
+                    or gradient: linear-gradient(180deg, #E8E0F0 0%, #DDD6E8 100%)
+User Info Bar:      #1A1B4B (dark navy blue)
+Primary Orange:     #FF6A00
+Card Background:    #FFFFFF
+Page Background:    #FAFAFA
+Text Primary:       #1A1A1A
+Text Secondary:     #666666
+```
+
+---
+
+## Overview
+Redesign the BiteBurst dashboard to be cleaner, simpler, and more like Duolingo's interface. The **PRIMARY ACTION should be LESSONS** (not food/activity logging). This is a UI refactor - maintain all existing functionality.
+
+---
+
+## IMPORTANT CONTEXT
+
+**Tech Stack (already in use - DO NOT change):**
+- React 18 + TypeScript
+- Tailwind CSS (with CSS custom properties)
+- Wouter for routing
+- Lucide React for icons
+- TanStack Query for data fetching
+- Radix UI components
+
+**Primary Color:** `#FF6A00` (BiteBurst orange) - already used throughout
+
+**Key Files to Modify:**
+- `client/src/pages/Dashboard.tsx` - Main dashboard page
+- `client/src/components/BottomNavigation.tsx` - Navigation component
+- `client/src/App.tsx` - May need layout wrapper updates
+- `client/src/index.css` - Global styles
+
+**Existing Dashboard Components (in `client/src/components/dashboard/`):**
+- `TodaysJourney.tsx`
+- `XPProgressBar.tsx`
+- `BadgesShelf.tsx`
+- `StreakPill.tsx`
+- `QuickLogGrid.tsx`
+
+---
+
+## 1. ADD SIDEBAR NAVIGATION (Desktop/Tablet)
+
+### Create new file: `client/src/components/Sidebar.tsx`
+
+```tsx
+import { BookOpen, Medal, Plus, User, MoreHorizontal, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+
+interface NavItem {
+  id: string;
+  label: string;
+  icon: typeof Home;
+  path: string;
+  isPrimary?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'lessons', label: 'Lessons', icon: BookOpen, path: '/lessons', isPrimary: true },
+  { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard' },
+  { id: 'log', label: 'LOG', icon: Plus, path: '/food-log' },
+  { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
+];
+
+export default function Sidebar() {
+  const [location, setLocation] = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const isActive = (path: string) => {
+    return location.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    // Implement logout logic
+    console.log('Logout clicked');
+  };
+
+  return (
+    <aside className="hidden md:flex fixed left-0 top-0 h-full w-[200px] bg-white border-r border-gray-200 flex-col z-40">
+      {/* Logo */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-center space-x-2">
+          <span className="text-2xl">🍊</span>
+          <span className="text-lg font-bold text-[#FF6A00]">BiteBurst</span>
+        </div>
+      </div>
+
+      {/* Navigation Items */}
+      <nav className="flex-1 p-3 space-y-1">
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => setLocation(item.path)}
+              className={`
+                w-full flex items-center space-x-3 px-4 py-3 rounded-xl
+                transition-all duration-200
+                ${active
+                  ? 'bg-orange-50 text-[#FF6A00] font-semibold'
+                  : 'text-gray-600 hover:bg-gray-50'
+                }
+                ${item.isPrimary && !active ? 'border-2 border-orange-200 bg-orange-50/50' : ''}
+              `}
+            >
+              <Icon className={`w-5 h-5 ${active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
+              <span className="text-sm">{item.label}</span>
+              {item.isPrimary && (
+                <span className="ml-auto text-xs bg-[#FF6A00] text-white px-2 py-0.5 rounded-full">
+                  NEW
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* More dropdown at bottom */}
+      <div className="p-3 border-t border-gray-100 relative">
+        <button
+          onClick={() => setMoreOpen(!moreOpen)}
+          className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          <MoreHorizontal className="w-5 h-5 text-gray-500" />
+          <span className="text-sm">More</span>
+        </button>
+
+        {/* Dropdown menu - shows on hover/click */}
+        {moreOpen && (
+          <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2">
+            <button
+              onClick={() => setLocation('/settings')}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm">Settings</span>
+            </button>
+            <button
+              onClick={() => setLocation('/help')}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-sm">Help</span>
+            </button>
+            <button
+              onClick={() => handleLogout()}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm">Logout</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </aside>
+  );
+}
+```
+
+### Update `client/src/components/BottomNavigation.tsx`
+Update navigation items and add responsive hiding (only show on mobile):
+
+```tsx
+import { BookOpen, Medal, Plus, User, MoreHorizontal, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { useLocation } from 'wouter';
+import { useState } from 'react';
+
+export default function BottomNavigation() {
+  const [location, setLocation] = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const handleLogout = () => {
+    // Implement logout logic
+  };
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 z-50">
+      <div className="flex justify-around items-center py-2 relative">
+        {/* Lessons */}
+        <button
+          onClick={() => setLocation('/lessons')}
+          className={`flex flex-col items-center px-3 py-1 ${location.startsWith('/lessons') ? 'text-[#FF6A00]' : 'text-gray-500'}`}
+        >
+          <BookOpen className="w-6 h-6" />
+          <span className="text-xs mt-1">Lessons</span>
+        </button>
+
+        {/* Champs */}
+        <button
+          onClick={() => setLocation('/leaderboard')}
+          className={`flex flex-col items-center px-3 py-1 ${location.startsWith('/leaderboard') ? 'text-[#FF6A00]' : 'text-gray-500'}`}
+        >
+          <Medal className="w-6 h-6" />
+          <span className="text-xs mt-1">Champs</span>
+        </button>
+
+        {/* LOG - Center prominent button */}
+        <button
+          onClick={() => setLocation('/food-log')}
+          className="flex flex-col items-center"
+        >
+          <div className="w-14 h-14 bg-[#FF6A00] rounded-full flex items-center justify-center -mt-6 shadow-lg">
+            <Plus className="w-7 h-7 text-white" />
+          </div>
+          <span className="text-xs text-gray-500 mt-1">LOG</span>
+        </button>
+
+        {/* Profile */}
+        <button
+          onClick={() => setLocation('/profile')}
+          className={`flex flex-col items-center px-3 py-1 ${location.startsWith('/profile') ? 'text-[#FF6A00]' : 'text-gray-500'}`}
+        >
+          <User className="w-6 h-6" />
+          <span className="text-xs mt-1">Profile</span>
+        </button>
+
+        {/* More */}
+        <button
+          onClick={() => setMoreOpen(!moreOpen)}
+          className={`flex flex-col items-center px-3 py-1 ${moreOpen ? 'text-[#FF6A00]' : 'text-gray-500'}`}
+        >
+          <MoreHorizontal className="w-6 h-6" />
+          <span className="text-xs mt-1">More</span>
+        </button>
+
+        {/* More dropdown */}
+        {moreOpen && (
+          <div className="absolute bottom-full right-2 mb-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 min-w-[150px]">
+            <button
+              onClick={() => { setLocation('/settings'); setMoreOpen(false); }}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm">Settings</span>
+            </button>
+            <button
+              onClick={() => { setLocation('/help'); setMoreOpen(false); }}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-sm">Help</span>
+            </button>
+            <button
+              onClick={() => { handleLogout(); setMoreOpen(false); }}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm">Logout</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+```
+
+---
+
+## 2. UPDATE DASHBOARD.TSX
+
+Replace the current Dashboard.tsx with a new structure inspired by Duolingo's profile page:
+
+### New Section Order:
+1. **Avatar Hero Section** (purple background with large avatar)
+2. **User Info Bar** (name, @username, level badge)
+3. **Status Bar** (streak pill, hearts, settings)
+4. **Mascot Greeting** (Good morning message with Sunny Slice)
+5. **Continue Lesson Card** (HERO - PRIMARY CTA)
+6. **Statistics Grid** (2x2 - like Duolingo profile)
+7. **Daily XP Progress** (progress bar)
+8. **Today's Journey** (checklist)
+9. **Quick Log** (DEMOTED - smaller, secondary)
+10. **Badges Preview** (horizontal scroll)
+
+### Key Changes to Dashboard.tsx:
+
+#### A. Add Avatar Hero Section (NEW - at the very top)
+
+```tsx
+{/* AVATAR HERO SECTION - Light lavender background like Duolingo profile */}
+<div
+  className="w-full py-8 px-4 flex flex-col items-center"
+  style={{
+    background: 'linear-gradient(180deg, #E8E0F0 0%, #DDD6E8 100%)'
+  }}
+>
+  {/* Avatar */}
+  <div className="relative">
+    <div className="w-24 h-24 rounded-full bg-white border-4 border-white shadow-lg overflow-hidden">
+      {/* User avatar image or default */}
+      <img
+        src={dashboardData.user.avatarUrl || '/default-avatar.png'}
+        alt="Avatar"
+        className="w-full h-full object-cover"
+      />
+    </div>
+    {/* Edit button */}
+    <button className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center">
+      <Pencil className="w-4 h-4 text-gray-600" />
+    </button>
+  </div>
+</div>
+
+{/* USER INFO BAR - Dark Navy Blue */}
+<div className="text-white py-4 px-4 text-center" style={{ backgroundColor: '#1A1B4B' }}>
+  <h1 className="text-xl font-bold">{dashboardData.user.displayName}</h1>
+  <p className="text-gray-400 text-sm">@{dashboardData.user.username || 'user'}</p>
+  <div className="mt-2">
+    <span className="bg-[#FF6A00] text-white text-xs font-bold px-3 py-1 rounded-full">
+      Level {Math.floor(dashboardData.user.xp / 100) + 1}
+    </span>
+  </div>
+
+  {/* XP Progress to next level */}
+  <div className="mt-3 max-w-xs mx-auto">
+    <div className="flex justify-between text-xs text-gray-400 mb-1">
+      <span>Level {Math.floor(dashboardData.user.xp / 100) + 1}</span>
+      <span>{dashboardData.user.xp % 100} / 100 XP</span>
+      <span>Level {Math.floor(dashboardData.user.xp / 100) + 2}</span>
+    </div>
+    <div className="bg-gray-700 rounded-full h-2">
+      <div
+        className="bg-[#FF6A00] h-2 rounded-full transition-all"
+        style={{ width: `${dashboardData.user.xp % 100}%` }}
+      />
+    </div>
+  </div>
+</div>
+
+{/* STATUS BAR - Streak, Hearts, Settings */}
+<div className="bg-white border-b border-gray-200 px-4 py-3">
+  <div className="flex items-center justify-center space-x-6">
+    {/* Streak */}
+    <div className="flex items-center space-x-1 bg-orange-50 px-3 py-1.5 rounded-full">
+      <Flame className="w-4 h-4 text-orange-500" />
+      <span className="text-sm font-semibold text-orange-600">
+        {dashboardData.streakData.current} day streak
+      </span>
+    </div>
+    {/* Hearts */}
+    <div className="flex items-center space-x-1">
+      <span className="text-red-500">❤️❤️❤️</span>
+    </div>
+    {/* Settings */}
+    <button onClick={() => window.location.href = '/settings'}>
+      <Settings className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+    </button>
+  </div>
+</div>
+```
+
+#### B. Add Mascot Greeting Section
+
+```tsx
+{/* MASCOT GREETING */}
+<div className="bg-white px-4 py-4">
+  <div className="flex items-center justify-center space-x-3">
+    <img
+      src={mascotImage}
+      alt="Sunny Slice"
+      className="w-12 h-12 rounded-full"
+    />
+    <div className="bg-gray-100 rounded-2xl px-4 py-2">
+      <p className="text-sm text-gray-700">
+        Good morning, {dashboardData.user.displayName}! Ready to start? ☀️
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+#### C. Add Lesson Hero Section (PRIMARY CTA)
+
+```tsx
+{/* LESSON HERO SECTION - Primary CTA */}
+<div className="px-4 py-4">
+  <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl border-2 border-orange-200 p-6 shadow-sm">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-xl font-bold text-gray-900">Continue Learning</h2>
+      <span className="text-2xl">📚</span>
+    </div>
+
+    <div className="flex items-center space-x-4 mb-4">
+      <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-3xl">
+        ⚽
+      </div>
+      <div className="flex-1">
+        <h3 className="font-semibold text-gray-900">Fuel for Football</h3>
+        <p className="text-sm text-gray-500">3 of 5 slides completed</p>
+        <div className="mt-2 w-full bg-gray-100 rounded-full h-2">
+          <div className="bg-[#FF6A00] h-2 rounded-full" style={{ width: '60%' }} />
+        </div>
+      </div>
+    </div>
+
+    <button
+      onClick={() => window.location.href = '/lessons'}
+      className="w-full bg-[#FF6A00] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#E55A00] transition-colors flex items-center justify-center space-x-2"
+    >
+      <BookOpen className="w-5 h-5" />
+      <span>START LESSON</span>
+    </button>
+  </div>
+</div>
+```
+
+#### D. Add Statistics Grid (Duolingo-style 2x2)
+
+```tsx
+{/* STATISTICS GRID - Like Duolingo profile */}
+<div className="px-4 py-4">
+  <h2 className="text-lg font-bold text-gray-900 mb-3">Statistics</h2>
+  <div className="grid grid-cols-2 gap-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex items-center space-x-2">
+        <span className="text-xl">🔥</span>
+        <div>
+          <div className="text-xl font-bold text-gray-900">{dashboardData.streakData.current}</div>
+          <div className="text-xs text-gray-500">Day streak</div>
+        </div>
+      </div>
+    </div>
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex items-center space-x-2">
+        <span className="text-xl">⚡</span>
+        <div>
+          <div className="text-xl font-bold text-gray-900">{dashboardData.user.xp}</div>
+          <div className="text-xs text-gray-500">Total XP</div>
+        </div>
+      </div>
+    </div>
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex items-center space-x-2">
+        <span className="text-xl">🏆</span>
+        <div>
+          <div className="text-lg font-bold text-[#FF6A00]">Bronze</div>
+          <div className="text-xs text-gray-500">League</div>
+        </div>
+      </div>
+    </div>
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex items-center space-x-2">
+        <span className="text-xl">🏅</span>
+        <div>
+          <div className="text-xl font-bold text-gray-900">{dashboardData.streakData.longest}</div>
+          <div className="text-xs text-gray-500">Best Streak</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+#### E. Simplify the Quick Log Section (DEMOTE - make smaller)
+
+```tsx
+{/* Quick Log - Secondary Action */}
+<div className="bg-white rounded-2xl border border-gray-200 p-4">
+  <div className="flex items-center justify-between mb-3">
+    <h2 className="text-base font-semibold text-gray-900">Quick Log</h2>
+    <span className="text-xs text-gray-500">Tap to log</span>
+  </div>
+
+  <div className="flex space-x-2 mb-3">
+    {['🍎', '🥦', '🍞', '🧃', '⚽', '🧘', '🏃'].map((emoji, i) => (
+      <button
+        key={i}
+        onClick={() => setQuickLogModal({ isOpen: true, type: i < 4 ? 'food' : 'activity', emoji })}
+        className="w-10 h-10 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center text-lg hover:bg-orange-50 hover:border-orange-200 transition-colors"
+      >
+        {emoji}
+      </button>
+    ))}
+  </div>
+
+  <div className="flex space-x-2">
+    <button
+      onClick={() => window.location.href = '/food-log'}
+      className="flex-1 bg-white text-[#FF6A00] border border-[#FF6A00] py-2 rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors"
+    >
+      Log Food
+    </button>
+    <button
+      onClick={() => window.location.href = '/activity-log'}
+      className="flex-1 bg-white text-[#FF6A00] border border-[#FF6A00] py-2 rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors"
+    >
+      Log Activity
+    </button>
+  </div>
+</div>
+```
+
+#### C. Add 2x2 Stats Grid (replace current "Your Goal" card position)
+
+```tsx
+{/* Stats Grid - 2x2 */}
+<div className="grid grid-cols-2 gap-3">
+  <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+    <div className="text-2xl mb-1">🔥</div>
+    <div className="text-2xl font-bold text-gray-900">{dashboardData.streakData.current}</div>
+    <div className="text-xs text-gray-500">Day Streak</div>
+  </div>
+  <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+    <div className="text-2xl mb-1">⚡</div>
+    <div className="text-2xl font-bold text-gray-900">{dashboardData.user.xp}</div>
+    <div className="text-xs text-gray-500">Total XP</div>
+  </div>
+  <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+    <div className="text-2xl mb-1">🏆</div>
+    <div className="text-lg font-bold text-[#FF6A00]">Bronze</div>
+    <div className="text-xs text-gray-500">League</div>
+  </div>
+  <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+    <div className="text-2xl mb-1">🏅</div>
+    <div className="text-2xl font-bold text-gray-900">{dashboardData.streakData.longest}</div>
+    <div className="text-xs text-gray-500">Best Streak</div>
+  </div>
+</div>
+```
+
+#### D. Update Header (simplify)
+
+```tsx
+{/* Simplified Header */}
+<header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+  <div className="flex items-center justify-between">
+    <div>
+      <h1 className="text-lg font-bold text-gray-900">
+        Good morning, {dashboardData.user.displayName}! 🍊
+      </h1>
+    </div>
+    <div className="flex items-center space-x-4">
+      {/* Streak */}
+      <div className="flex items-center space-x-1 bg-orange-50 px-3 py-1.5 rounded-full">
+        <Flame className="w-4 h-4 text-orange-500" />
+        <span className="text-sm font-semibold text-orange-600">
+          {dashboardData.streakData.current}
+        </span>
+      </div>
+      {/* Hearts */}
+      <div className="flex items-center space-x-1">
+        <span className="text-red-500">❤️❤️❤️</span>
+      </div>
+      {/* Settings */}
+      <Settings className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
+    </div>
+  </div>
+</header>
+```
+
+---
+
+## 3. ADD LAYOUT WRAPPER
+
+### Create `client/src/components/Layout.tsx`
+
+```tsx
+import Sidebar from './Sidebar';
+import BottomNavigation from './BottomNavigation';
+
+interface LayoutProps {
+  children: React.ReactNode;
+  showNav?: boolean;
+}
+
+export default function Layout({ children, showNav = true }: LayoutProps) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {showNav && <Sidebar />}
+
+      {/* Main content - offset for sidebar on desktop */}
+      <main className={showNav ? 'md:ml-[200px]' : ''}>
+        <div className="max-w-2xl mx-auto">
+          {children}
+        </div>
+      </main>
+
+      {showNav && <BottomNavigation />}
+    </div>
+  );
+}
+```
+
+### Update pages to use Layout
+
+In Dashboard.tsx, Lessons.tsx, etc., wrap content:
+
+```tsx
+import Layout from '@/components/Layout';
+
+export default function Dashboard() {
+  // ... existing code ...
+
+  return (
+    <Layout>
+      <div className="min-h-screen bg-white pb-24 md:pb-8">
+        {/* ... dashboard content ... */}
+      </div>
+    </Layout>
+  );
+}
+```
+
+---
+
+## 4. REMOVE/CONSOLIDATE SECTIONS
+
+**Remove from Dashboard.tsx:**
+- "Your Goal" card → Move to Profile page or show only in onboarding
+- "Today's Progress" circular meters → Replace with simpler XP progress bar
+- Inline bottom navigation (it's duplicated - use BottomNavigation component)
+
+**Keep but simplify:**
+- Today's Journey → Keep as is, it's good
+- Badges & Rewards → Simplify to horizontal scroll preview
+
+---
+
+## 5. RESPONSIVE BREAKPOINTS
+
+Add these Tailwind utilities for responsiveness:
+
+```css
+/* In index.css or as Tailwind classes */
+
+/* Mobile: < 768px */
+/* - Full width content */
+/* - Bottom navigation visible */
+/* - Sidebar hidden */
+
+/* Tablet: 768px - 1024px */
+/* - Sidebar visible (200px) */
+/* - Content centered, max-width 600px */
+/* - Bottom navigation hidden */
+
+/* Desktop: > 1024px */
+/* - Sidebar visible (200px) */
+/* - Content centered, max-width 600px */
+/* - Optional: right sidebar for activity feed */
+```
+
+The key classes to use:
+- `md:hidden` - Hide on tablet/desktop
+- `hidden md:flex` - Show only on tablet/desktop
+- `md:ml-[200px]` - Offset for sidebar
+- `max-w-2xl mx-auto` - Center content
+
+---
+
+## 6. SECTION ORDER SUMMARY
+
+### New Dashboard Order (top to bottom):
+1. **Avatar Hero** - Large avatar on light lavender background (#DDD6E8)
+2. **User Info Bar** - Name, @username, Level badge (dark navy blue #1A1B4B)
+3. **Status Bar** - Streak pill + Hearts + Settings icon (white bar)
+4. **Mascot Greeting** - "Good morning, [Name]!" with Sunny Slice mascot
+5. **Lesson Hero Card** - Continue/Start lesson CTA ★ PRIMARY ACTION ★
+6. **Statistics Grid** - 2x2 grid (Streak, XP, League, Best Streak)
+7. **Daily XP Progress** - Simple progress bar (0/80 XP)
+8. **Today's Journey** - 3-item checklist
+9. **Quick Log** - SECONDARY - Compact emoji grid + two outline buttons
+10. **Badges Preview** - Horizontal scroll of 5 badges
+
+### What's REMOVED from dashboard:
+- Old header with greeting (replaced with Avatar Hero + Status Bar)
+- "Your Goal" card
+- Circular XP/Streak meters (replaced with Statistics Grid)
+- "Today's Activity" section (redundant)
+- Duplicate bottom navigation code
+
+---
+
+## 7. FILES TO CREATE/MODIFY
+
+### Create:
+- `client/src/components/Sidebar.tsx` (new)
+- `client/src/components/Layout.tsx` (new)
+
+### Modify:
+- `client/src/pages/Dashboard.tsx` (major changes)
+- `client/src/components/BottomNavigation.tsx` (add `md:hidden`)
+- `client/src/App.tsx` (wrap routes with Layout if needed)
+
+### Optional:
+- `client/src/components/dashboard/LessonHero.tsx` (extract hero section)
+- `client/src/components/dashboard/StatsGrid.tsx` (extract stats grid)
+
+---
+
+## 8. TESTING CHECKLIST
+
+After implementing, verify:
+- [ ] Lessons CTA is the most prominent element on dashboard
+- [ ] Sidebar appears on screens 768px and wider
+- [ ] Bottom nav appears only on screens below 768px
+- [ ] All navigation links work correctly
+- [ ] Dashboard loads without errors
+- [ ] Responsive design works on mobile, tablet, and desktop
+- [ ] Existing functionality (logging, data fetching) still works
+
+---
+
+## IMPORTANT NOTES
+
+1. **LESSONS are PRIMARY** - The "Start Lesson" button should be the biggest, most prominent CTA
+2. **Logging is SECONDARY** - Keep it accessible but not the hero
+3. **Keep existing functionality** - This is a UI refactor only
+4. **Use existing color scheme** - #FF6A00 orange on white backgrounds
+5. **Keep existing Tailwind approach** - Don't switch styling systems
+6. **Test on iPad** - This is a priority device (768px-1024px)
