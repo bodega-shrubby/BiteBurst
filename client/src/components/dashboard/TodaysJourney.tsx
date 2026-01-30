@@ -69,44 +69,44 @@ export default function TodaysJourney({ milestones, className = '', onTaskComple
   }, [allComplete, bonusAwarded, onTaskComplete]);
   
   return (
-    <div className={`bg-white rounded-2xl border-2 border-gray-200 p-6 lg:p-8 ${className}`}>
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl lg:text-2xl font-bold text-gray-900">Today's Journey</h2>
-        <div className="text-base lg:text-lg font-semibold text-gray-600">
+    <div className={`bg-white rounded-2xl border-2 border-gray-200 p-6 ${className}`}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Today's Journey</h2>
+        <div className="text-sm font-semibold text-gray-600">
           {completedCount}/{totalCount} tasks
         </div>
       </div>
       
-      <div className="space-y-4 mb-5">
+      <div className="space-y-3 mb-4">
         {milestones.map((milestone) => (
           <div 
             key={milestone.id}
             className={`
-              flex items-center justify-between p-4 lg:p-5 rounded-xl transition-all duration-300
+              flex items-center justify-between p-3 rounded-xl transition-all duration-300
               ${milestone.completed 
                 ? 'bg-green-50 border-2 border-green-200' 
                 : 'bg-gray-50 border-2 border-gray-200'
               }
             `}
           >
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               {/* Animated Checkbox */}
               <div className={`
-                w-7 h-7 lg:w-8 lg:h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300
+                w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
                 ${milestone.completed 
                   ? 'bg-green-500 border-green-500 animate-check-pop' 
                   : 'border-gray-300'
                 }
               `}>
                 {milestone.completed && (
-                  <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </div>
 
               <span 
-                className={`font-medium text-base lg:text-lg transition-all duration-300 ${
+                className={`font-medium transition-all duration-300 ${
                   milestone.completed 
                     ? 'line-through text-green-700' 
                     : 'text-gray-900'
@@ -116,7 +116,7 @@ export default function TodaysJourney({ milestones, className = '', onTaskComple
               </span>
             </div>
             <span 
-              className={`text-base lg:text-lg font-bold ${
+              className={`text-sm font-bold ${
                 milestone.completed 
                   ? 'text-green-600' 
                   : 'text-orange-500'
@@ -129,8 +129,8 @@ export default function TodaysJourney({ milestones, className = '', onTaskComple
       </div>
       
       {/* Progress Bar */}
-      <div className="space-y-3">
-        <div className="flex justify-between text-base lg:text-lg">
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
           <span className="text-gray-600">
             Progress
           </span>
@@ -139,9 +139,9 @@ export default function TodaysJourney({ milestones, className = '', onTaskComple
           </span>
         </div>
         
-        <div className="w-full bg-gray-100 rounded-full h-4 lg:h-5 overflow-hidden">
+        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
           <div 
-            className="bg-gradient-to-r from-orange-400 to-orange-600 h-4 lg:h-5 rounded-full transition-all duration-500 ease-out"
+            className="bg-gradient-to-r from-orange-400 to-orange-600 h-3 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
             role="progressbar"
             aria-valuenow={completedCount}
@@ -155,11 +155,11 @@ export default function TodaysJourney({ milestones, className = '', onTaskComple
       {/* Completion Bonus */}
       {allComplete && (
         <div 
-          className="mt-5 p-5 lg:p-6 bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300 rounded-xl text-center"
+          className="mt-4 p-4 bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300 rounded-xl text-center"
           role="status"
           aria-live="polite"
         >
-          <p className="text-xl lg:text-2xl font-bold text-orange-800">
+          <p className="text-lg font-bold text-orange-800">
             🎉 Daily Journey Complete! +50 XP Bonus!
           </p>
         </div>
