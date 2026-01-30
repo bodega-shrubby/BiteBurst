@@ -75,7 +75,7 @@ async function createMockUsers(): Promise<string[]> {
     
     const [user] = await db.insert(users).values({
       displayName: userData.name,
-      ageBracket: '7-11',
+      yearGroup: 'year-5',
       goal: 'energy',
       email: mockEmail,
       parentConsent: true,

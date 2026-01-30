@@ -8,31 +8,30 @@ interface YearGroupOption {
   id: string;
   label: string;
   curriculumId: string;
-  ageBracket: string;
 }
 
 const getYearGroupOptions = (country: 'uk' | 'us'): YearGroupOption[] => {
   if (country === 'uk') {
     return [
-      { id: 'year-2', label: 'Year 2', curriculumId: 'uk-ks1', ageBracket: '5-7' },
-      { id: 'year-3', label: 'Year 3', curriculumId: 'uk-ks2', ageBracket: '7-11' },
-      { id: 'year-4', label: 'Year 4', curriculumId: 'uk-ks2', ageBracket: '7-11' },
-      { id: 'year-5', label: 'Year 5', curriculumId: 'uk-ks2', ageBracket: '7-11' },
-      { id: 'year-6', label: 'Year 6', curriculumId: 'uk-ks2', ageBracket: '7-11' },
-      { id: 'year-7', label: 'Year 7', curriculumId: 'uk-ks3', ageBracket: '11-14' },
-      { id: 'year-8', label: 'Year 8', curriculumId: 'uk-ks3', ageBracket: '11-14' },
-      { id: 'year-9', label: 'Year 9', curriculumId: 'uk-ks3', ageBracket: '11-14' },
+      { id: 'year-2', label: 'Year 2', curriculumId: 'uk-ks1' },
+      { id: 'year-3', label: 'Year 3', curriculumId: 'uk-ks2' },
+      { id: 'year-4', label: 'Year 4', curriculumId: 'uk-ks2' },
+      { id: 'year-5', label: 'Year 5', curriculumId: 'uk-ks2' },
+      { id: 'year-6', label: 'Year 6', curriculumId: 'uk-ks2' },
+      { id: 'year-7', label: 'Year 7', curriculumId: 'uk-ks3' },
+      { id: 'year-8', label: 'Year 8', curriculumId: 'uk-ks3' },
+      { id: 'year-9', label: 'Year 9', curriculumId: 'uk-ks3' },
     ];
   } else {
     return [
-      { id: 'grade-1', label: 'Grade 1', curriculumId: 'us-k2', ageBracket: '5-7' },
-      { id: 'grade-2', label: 'Grade 2', curriculumId: 'us-k2', ageBracket: '5-7' },
-      { id: 'grade-3', label: 'Grade 3', curriculumId: 'us-35', ageBracket: '7-11' },
-      { id: 'grade-4', label: 'Grade 4', curriculumId: 'us-35', ageBracket: '7-11' },
-      { id: 'grade-5', label: 'Grade 5', curriculumId: 'us-35', ageBracket: '7-11' },
-      { id: 'grade-6', label: 'Grade 6', curriculumId: 'us-68', ageBracket: '11-14' },
-      { id: 'grade-7', label: 'Grade 7', curriculumId: 'us-68', ageBracket: '11-14' },
-      { id: 'grade-8', label: 'Grade 8', curriculumId: 'us-68', ageBracket: '11-14' },
+      { id: 'grade-1', label: 'Grade 1', curriculumId: 'us-k2' },
+      { id: 'grade-2', label: 'Grade 2', curriculumId: 'us-k2' },
+      { id: 'grade-3', label: 'Grade 3', curriculumId: 'us-35' },
+      { id: 'grade-4', label: 'Grade 4', curriculumId: 'us-35' },
+      { id: 'grade-5', label: 'Grade 5', curriculumId: 'us-35' },
+      { id: 'grade-6', label: 'Grade 6', curriculumId: 'us-68' },
+      { id: 'grade-7', label: 'Grade 7', curriculumId: 'us-68' },
+      { id: 'grade-8', label: 'Grade 8', curriculumId: 'us-68' },
     ];
   }
 };
@@ -56,7 +55,6 @@ export default function AgeStep() {
     setSelectedYearGroup(option.id);
     updateProfile({ 
       yearGroup: option.id,
-      ageBracket: option.ageBracket, 
       curriculum: option.curriculumId 
     });
   };

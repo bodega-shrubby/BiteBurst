@@ -16,7 +16,6 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Create enums to match database
-export const ageBracketEnum = pgEnum('age_bracket', ['5-7', '7-11', '11-14']);
 export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
 export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
@@ -52,7 +51,6 @@ export const curriculums = pgTable("curriculums", {
   id: varchar("id").primaryKey(),
   name: text("name").notNull(),
   country: text("country").notNull(),
-  ageBracket: ageBracketEnum("age_bracket").notNull(),
   description: text("description"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -79,7 +77,6 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   parentAuthId: text("parent_auth_id"), // Links to parent's Supabase auth user ID (nullable for migration)
   displayName: text("display_name").notNull(),
-  ageBracket: ageBracketEnum("age_bracket").notNull(),
   yearGroup: text("year_group"), // e.g., "year-5", "grade-3"
   goal: goalEnum("goal").notNull().references(() => goals.id),
   curriculum: text("curriculum").default('us-common-core'), // Legacy field - "us-common-core" | "uk-ks2-ks3"
@@ -198,7 +195,7 @@ export const lessons = pgTable("lessons", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description"),
-  targetAgeBracket: ageBracketEnum("target_age_bracket").notNull(),
+  yearGroup: varchar("year_group"),
   totalSteps: integer("total_steps").notNull(),
   category: text("category").notNull().default('nutrition'),
   isActive: boolean("is_active").notNull().default(true),
@@ -267,7 +264,17 @@ export const lessonAttempts = pgTable("lesson_attempts", {
 
 // Note: Indexes are created via SQL commands, not in Drizzle schema
 
+// Year group mappings table for UK/US year group labels
+export const yearGroupMappings = pgTable("year_group_mappings", {
+  id: varchar("id").primaryKey(),
+  label: text("label").notNull(),
+  country: text("country").notNull(),
+  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id),
+  displayOrder: integer("display_order").notNull(),
+});
+
 // Type exports
+export type YearGroupMapping = typeof yearGroupMappings.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Log = typeof logs.$inferSelect;
@@ -297,7 +304,7 @@ export type InsertLessonAttempt = typeof lessonAttempts.$inferInsert;
 export const insertUserSchema = createInsertSchema(users).pick({
   parentAuthId: true,
   displayName: true,
-  ageBracket: true,
+  yearGroup: true,
   goal: true,
   curriculum: true,
   curriculumId: true,
@@ -325,7 +332,7 @@ export const insertLogSchema = createInsertSchema(logs).pick({
 export const insertLessonSchema = createInsertSchema(lessons).pick({
   title: true,
   description: true,
-  targetAgeBracket: true,
+  yearGroup: true,
   totalSteps: true,
   category: true,
   isActive: true,

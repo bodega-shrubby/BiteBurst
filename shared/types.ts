@@ -1,6 +1,5 @@
 // BiteBurst Database Types for Replit Key-Value Store
 
-export type AgeBracket = "6-8" | "9-11" | "12-14";
 export type Goal = "energy" | "focus" | "strength";
 export type LogType = "food" | "activity";
 export type EntryMethod = "emoji" | "text" | "photo";
@@ -9,7 +8,7 @@ export type UserStatus = "active" | "deleted";
 export interface User {
   uid: string;
   displayName: string;
-  ageBracket: AgeBracket;
+  yearGroup?: string;
   goal: Goal;
   avatar: string;
   email?: string;
@@ -28,7 +27,7 @@ export interface OnboardingSession {
   step: number;
   answers: {
     displayName?: string;
-    ageBracket?: AgeBracket;
+    yearGroup?: string;
     goal?: Goal;
     avatar?: string;
     email?: string;
@@ -99,7 +98,6 @@ export interface SchemaVersion {
 // Validation schemas
 export const DISPLAY_NAME_MIN = 2;
 export const DISPLAY_NAME_MAX = 20;
-export const AGE_BRACKETS: AgeBracket[] = ["6-8", "9-11", "12-14"];
 export const GOALS: Goal[] = ["energy", "focus", "strength"];
 export const LOG_TYPES: LogType[] = ["food", "activity"];
 export const ENTRY_METHODS: EntryMethod[] = ["emoji", "text", "photo"];

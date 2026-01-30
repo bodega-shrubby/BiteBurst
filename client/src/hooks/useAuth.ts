@@ -6,7 +6,7 @@ interface User {
   id: string;
   displayName: string;
   email: string;
-  ageBracket: string;
+  yearGroup?: string;
   goal: string;
   curriculum?: string;
   avatarId: string | null;
@@ -21,7 +21,7 @@ interface SignupData {
   password: string;
   parentConsent: boolean;
   childName: string;
-  age: string;
+  yearGroup: string;
   curriculum: string;
   goal: string;
   avatarId?: string;

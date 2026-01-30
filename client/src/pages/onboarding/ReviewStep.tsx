@@ -13,11 +13,6 @@ const GOAL_LABELS = {
   strength: "💪 Strength"
 };
 
-const AGE_LABELS = {
-  "5-7": "5–7 years old",
-  "7-11": "7–11 years old", 
-  "11-14": "11–14 years old"
-};
 
 const YEAR_GROUP_LABELS: Record<string, string> = {
   "year-2": "Year 2",
@@ -75,7 +70,6 @@ export default function ReviewStep() {
           password: profile.password,
           parentConsent: profile.hasParentConsent,
           childName: profile.displayName,
-          age: profile.ageBracket,
           yearGroup: profile.yearGroup,
           curriculum: profile.curriculum || "us-35",
           goal: profile.goal,
@@ -146,7 +140,7 @@ export default function ReviewStep() {
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-gray-600">Year/Grade</span>
-              <span className="font-medium">{YEAR_GROUP_LABELS[profile.yearGroup] || AGE_LABELS[profile.ageBracket as keyof typeof AGE_LABELS]}</span>
+              <span className="font-medium">{YEAR_GROUP_LABELS[profile.yearGroup] || profile.yearGroup}</span>
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-gray-100">

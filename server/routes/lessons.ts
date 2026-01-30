@@ -22,6 +22,46 @@ const setLessonCacheHeaders = (res: any) => {
 };
 
 export function registerLessonRoutes(app: Express, requireAuth: any) {
+  // Get lessons by year group
+  app.get('/api/lessons/year-group/:yearGroup', requireAuth, async (req: any, res: any) => {
+    try {
+      const { yearGroup } = req.params;
+      const userId = req.userId;
+      
+      const allLessons = await storage.getLessonsByYearGroup(yearGroup);
+      
+      const completedLessons = await storage.getCompletedLessonIds(userId);
+      const completedLessonIds = new Set(completedLessons);
+      
+      let foundCurrent = false;
+      const lessonsWithState = allLessons.map((lesson) => {
+        const isCompleted = completedLessonIds.has(lesson.id);
+        let state: 'current' | 'unlocked' | 'locked' | 'completed' = 'locked';
+        
+        if (isCompleted) {
+          state = 'completed';
+        } else if (!foundCurrent) {
+          state = 'current';
+          foundCurrent = true;
+        }
+        
+        return {
+          id: lesson.id,
+          title: lesson.title,
+          icon: lesson.iconEmoji || '📚',
+          unitId: lesson.unitId,
+          description: lesson.description,
+          state
+        };
+      });
+      
+      res.json(lessonsWithState);
+    } catch (error) {
+      console.error('Failed to get lessons by year group:', error);
+      res.status(500).json({ error: 'Failed to load lessons' });
+    }
+  });
+
   // Get all lessons for a curriculum (combines units + lessons)
   app.get('/api/curriculum/:curriculumId/lessons', requireAuth, async (req: any, res: any) => {
     try {

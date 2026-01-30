@@ -70,7 +70,7 @@ async function createMockUsers(): Promise<string[]> {
   for (const userData of DEMO_USERS) {
     const [user] = await db.insert(users).values({
       displayName: userData.name,
-      ageBracket: '9-11', // All demo users are in middle age bracket
+      yearGroup: 'year-5', // All demo users are in Year 5
       goal: 'energy', // Default goal
       email: null,
       parentConsent: true,

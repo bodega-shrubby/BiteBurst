@@ -220,7 +220,7 @@ export default function Feedback() {
           'x-session-id': localStorage.getItem('sessionId') || '',
         },
         body: JSON.stringify({
-          age: user.ageBracket,
+          yearGroup: user.yearGroup,
           goal: user.goal,
           mealLog: logData.content,
           logId: logData.id,

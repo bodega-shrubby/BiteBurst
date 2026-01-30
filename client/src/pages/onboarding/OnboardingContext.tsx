@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface OnboardingProfile {
   displayName: string;
-  ageBracket: string;
   yearGroup: string; // e.g., "year-5", "grade-3"
   goal: string;
   curriculumCountry: string; // 'uk' or 'us'
@@ -26,7 +25,6 @@ interface OnboardingContextType {
 
 const defaultProfile: OnboardingProfile = {
   displayName: "",
-  ageBracket: "",
   yearGroup: "",
   goal: "",
   curriculumCountry: "",

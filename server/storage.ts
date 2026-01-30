@@ -85,6 +85,9 @@ export interface IStorage {
   
   // Lesson progress operations
   getCompletedLessonIds(userId: string): Promise<string[]>;
+  
+  // Lesson by year group operations
+  getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -337,6 +340,16 @@ export class DatabaseStorage implements IStorage {
         eq(lessonAttempts.isCorrect, true)
       ));
     return results.map(r => r.lessonId);
+  }
+  
+  // Get lessons by year group
+  async getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]> {
+    return await db.select().from(lessons)
+      .where(and(
+        eq(lessons.yearGroup, yearGroup),
+        eq(lessons.isActive, true)
+      ))
+      .orderBy(lessons.orderInUnit);
   }
 }
 
