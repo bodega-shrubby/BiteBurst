@@ -112,6 +112,15 @@ The application follows a Duolingo-inspired design philosophy with clean layouts
 
 ## Changelog
 
+- January 30, 2026: **Year Group Migration - ageBracket to yearGroup**
+  - Replaced ageBracket (age ranges like "5-7", "7-11", "11-14") with yearGroup (specific grades like "year-5", "grade-3")
+  - Updated Drizzle schema: removed ageBracketEnum, added yearGroup column to users/lessons/curriculums tables
+  - Added yearGroupMappings table for UK/US year group labels
+  - New storage method: getLessonsByYearGroup() for curriculum-aware lesson retrieval
+  - New API endpoint: GET /api/lessons/year-group/:yearGroup
+  - Updated all auth endpoints to use yearGroup instead of ageBracket
+  - Migrated all client-side components (onboarding, useAuth, Feedback page) to use yearGroup
+
 - January 29, 2026: **Lesson Path Layout Fix - ConnectingPath Implementation**
   - Fixed critical layout issues where path was disconnected from lesson nodes
   - Replaced CurvySpine with ConnectingPath that draws SVG path BY CONNECTING actual node positions
