@@ -1,0 +1,168 @@
+## Task: Update Backend to Use yearGroup Instead of ageBracket
+
+The onboarding form is already updated. Now update the backend (Drizzle schema, storage, routes) to work with yearGroup.
+
+### Database State (already done in Supabase)
+- `year_group` column exists on users table
+- `year_group` column exists on lessons table  
+- `year_group_mappings` table exists with UK/US mappings
+- `age_bracket` column has been removed from users, curriculums, lessons tables
+
+### Changes Required
+
+#### 1. Update Drizzle Schema (shared/schema.ts)
+
+**DELETE the ageBracketEnum entirely:**
+```typescript
+// DELETE THIS LINE:
+export const ageBracketEnum = pgEnum('age_bracket', ['5-7', '7-11', '11-14']);
+```
+
+**In users table definition, REMOVE:**
+```typescript
+ageBracket: ageBracketEnum("age_bracket").notNull(),
+```
+
+**In users table definition, ADD:**
+```typescript
+yearGroup: text("year_group"),
+```
+
+**In curriculums table definition, REMOVE:**
+```typescript
+ageBracket: ageBracketEnum("age_bracket").notNull(),
+```
+
+**In lessons table definition, REMOVE:**
+```typescript
+targetAgeBracket: ageBracketEnum("target_age_bracket").notNull(),
+```
+
+**In lessons table definition, ADD:**
+```typescript
+yearGroup: varchar("year_group"),
+```
+
+**ADD new yearGroupMappings table:**
+```typescript
+export const yearGroupMappings = pgTable("year_group_mappings", {
+  id: varchar("id").primaryKey(),
+  label: text("label").notNull(),
+  country: text("country").notNull(),
+  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id),
+  displayOrder: integer("display_order").notNull(),
+});
+
+export type YearGroupMapping = typeof yearGroupMappings.$inferSelect;
+```
+
+**Update insertUserSchema** - remove ageBracket, add yearGroup:
+```typescript
+export const insertUserSchema = createInsertSchema(users).pick({
+  parentAuthId: true,
+  displayName: true,
+  yearGroup: true,
+  goal: true,
+  curriculum: true,
+  curriculumId: true,
+  email: true,
+  parentEmail: true,
+  parentConsent: true,
+  authProvider: true,
+  avatarId: true,
+  locale: true,
+  tz: true,
+});
+```
+
+**Update insertLessonSchema** - remove targetAgeBracket, add yearGroup.
+
+#### 2. Update Storage Layer (server/storage.ts)
+
+**Add to IStorage interface:**
+```typescript
+getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]>;
+```
+
+**Add method implementation:**
+```typescript
+async getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]> {
+  return await db.select().from(lessons)
+    .where(and(
+      eq(lessons.yearGroup, yearGroup),
+      eq(lessons.isActive, true)
+    ))
+    .orderBy(lessons.orderInUnit);
+}
+```
+
+#### 3. Update Lesson Routes (server/routes/lessons.ts)
+
+**Add new endpoint:**
+```typescript
+app.get('/api/lessons/year-group/:yearGroup', requireAuth, async (req: any, res: any) => {
+  try {
+    const { yearGroup } = req.params;
+    const userId = req.userId;
+    
+    const allLessons = await storage.getLessonsByYearGroup(yearGroup);
+    
+    const completedLessons = await storage.getCompletedLessonIds(userId);
+    const completedLessonIds = new Set(completedLessons);
+    
+    let foundCurrent = false;
+    const lessonsWithState = allLessons.map((lesson) => {
+      const isCompleted = completedLessonIds.has(lesson.id);
+      let state: 'current' | 'unlocked' | 'locked' | 'completed' = 'locked';
+      
+      if (isCompleted) {
+        state = 'completed';
+      } else if (!foundCurrent) {
+        state = 'current';
+        foundCurrent = true;
+      }
+      
+      return {
+        id: lesson.id,
+        title: lesson.title,
+        icon: lesson.iconEmoji || '📚',
+        unitId: lesson.unitId,
+        description: lesson.description,
+        state
+      };
+    });
+    
+    res.json(lessonsWithState);
+  } catch (error) {
+    console.error('Failed to get lessons by year group:', error);
+    res.status(500).json({ error: 'Failed to load lessons' });
+  }
+});
+```
+
+#### 4. Update Frontend Lesson Loading
+
+Find where lessons are fetched and update to use yearGroup:
+```typescript
+// Change from:
+apiRequest(`/api/curriculum/${user.curriculumId}/lessons`)
+
+// To:
+apiRequest(`/api/lessons/year-group/${user.yearGroup}`)
+```
+
+#### 5. Search and Remove All ageBracket References
+
+Search entire codebase and remove:
+- `ageBracket`
+- `age_bracket`
+- `AgeBracket`
+- `targetAgeBracket`
+- `target_age_bracket`
+- `ageBracketEnum`
+
+### Testing
+- [ ] App compiles without TypeScript errors
+- [ ] New user can complete onboarding with year/grade selection
+- [ ] User record is created with yearGroup field
+- [ ] Lessons load based on user's yearGroup
