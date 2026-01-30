@@ -26,6 +26,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         parentConsent,
         childName,    // Child's display name
         age,          // "5-7" | "7-11" | "11-14"
+        yearGroup,    // e.g., "year-5", "grade-3"
         curriculum,   // "uk-ks1" | "uk-ks2" | "uk-ks3" | "us-k2" | "us-35" | "us-68"
         goal,         // "energy" | "focus" | "strength"
         avatarId, 
@@ -85,6 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           parentAuthId,
           displayName: childName,
           ageBracket: age as '5-7' | '7-11' | '11-14',
+          yearGroup: yearGroup || null,
           goal: goal as 'energy' | 'focus' | 'strength',
           curriculum: selectedCurriculum,
           parentConsent: true,
@@ -101,6 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           parentAuthId,
           displayName: childName,
           ageBracket: age as '5-7' | '7-11' | '11-14',
+          yearGroup: yearGroup || null,
           goal: goal as 'energy' | 'focus' | 'strength',
           curriculum: selectedCurriculum,
           email: parentEmail, // Use parent email as unique identifier
@@ -127,6 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           displayName: childProfile.displayName,
           email: childProfile.email,
           ageBracket: childProfile.ageBracket,
+          yearGroup: childProfile.yearGroup,
           goal: childProfile.goal,
           curriculum: childProfile.curriculum,
           avatarId: childProfile.avatarId,
@@ -197,6 +201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           displayName: childProfile.displayName,
           email: childProfile.email,
           ageBracket: childProfile.ageBracket,
+          yearGroup: childProfile.yearGroup,
           goal: childProfile.goal,
           curriculum: childProfile.curriculum,
           avatarId: childProfile.avatarId,
@@ -251,6 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         displayName: user.displayName,
         email: user.email,
         ageBracket: user.ageBracket,
+        yearGroup: user.yearGroup,
         goal: user.goal,
         curriculum: user.curriculum,
         avatarId: user.avatarId,
