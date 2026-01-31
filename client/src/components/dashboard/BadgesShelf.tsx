@@ -144,13 +144,13 @@ function BadgeCard({ badge, isEarned, onClick }: { badge: Badge; isEarned: boole
     <button 
       onClick={onClick}
       className={`
-        relative aspect-square flex flex-col items-center justify-center
-        rounded-2xl border-2 p-3 transition-all duration-300
+        relative flex flex-col items-center justify-center
+        rounded-2xl border-2 p-2 py-3 transition-all duration-300 min-h-[100px]
         ${isEarned 
-          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 shadow-lg scale-105' 
+          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 shadow-lg' 
           : 'bg-gray-50 border-gray-200'
         }
-        hover:scale-110 active:scale-95
+        hover:scale-105 active:scale-95
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
       `}
       aria-label={`${badge.name} badge${isEarned ? ' - earned' : ' - locked'}`}
@@ -311,8 +311,8 @@ export default function BadgesShelf({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-3">
-          {allBadges.map((badge) => (
+        <div className="grid grid-cols-3 gap-3">
+          {allBadges.slice(0, 6).map((badge) => (
             <BadgeCard 
               key={badge.code} 
               badge={badge} 
