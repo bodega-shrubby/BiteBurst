@@ -69,7 +69,24 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
   app.get('/api/curriculum/:curriculumId/lessons', requireAuth, async (req: any, res: any) => {
     try {
       let { curriculumId } = req.params;
-      const userId = req.userId;
+      const childUserId = req.query.userId as string;
+      
+      // Validate child profile belongs to parent
+      if (!childUserId) {
+        return res.status(400).json({ error: 'userId query parameter is required' });
+      }
+      
+      const childProfile = await storage.getUser(childUserId);
+      if (!childProfile) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      const isParentOwned = childProfile.parentAuthId === req.userId;
+      const isDirectMatch = childUserId === req.userId;
+      
+      if (!isParentOwned && !isDirectMatch) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
       
       // Get topics for this curriculum
       let curriculumTopics = await storage.getTopicsByCurriculum(curriculumId);
@@ -102,7 +119,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       allLessons.sort((a, b) => a.sortOrder - b.sortOrder);
       
       // Get user's completed lessons from lesson_attempts
-      const completedLessons = await storage.getCompletedLessonIds(userId);
+      const completedLessons = await storage.getCompletedLessonIds(childUserId);
       const completedLessonIds = new Set(completedLessons);
       
       // Assign states: first incomplete is 'current', completed ones are 'completed', rest locked

@@ -348,7 +348,14 @@ export default function Lessons() {
   const curriculumId = user?.curriculum || 'uk-ks2';
   
   const { data: apiLessons, isLoading: lessonsLoading } = useQuery<ApiLesson[]>({
-    queryKey: [`/api/curriculum/${curriculumId}/lessons`],
+    queryKey: [`/api/curriculum/${curriculumId}/lessons`, user?.id],
+    queryFn: async () => {
+      const res = await fetch(`/api/curriculum/${curriculumId}/lessons?userId=${user?.id}`, {
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Failed to fetch lessons');
+      return res.json();
+    },
     enabled: !!user && !!curriculumId,
   });
 
