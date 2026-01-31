@@ -403,7 +403,7 @@ export default function DashboardV2() {
   if (error || !dailySummary) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="text-center space-y-4 max-w-md">
+        <div className="text-center space-y-4 max-w-3xl">
           <MascotAvatar size="large" />
           <h2 className="text-xl font-bold text-gray-900">Oops! Something went wrong</h2>
           <p className="text-gray-600">We couldn't load your dashboard right now.</p>
@@ -422,7 +422,7 @@ export default function DashboardV2() {
     <div className="min-h-screen bg-white">
       {/* Greeting Header */}
       <div className="bg-white px-4 py-3 border-b border-gray-100">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-3xl mx-auto">
           <p className="text-sm text-gray-500">{getCurrentDate()}</p>
           <h1 className="text-2xl font-bold text-gray-900">
             {getCurrentGreeting()}, {dailySummary.user.display_name}! 
@@ -433,7 +433,7 @@ export default function DashboardV2() {
 
       {/* Profile Header with Hearts */}
       <header className="bg-gradient-to-b from-purple-300 to-purple-400 px-4 py-3 relative">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             {/* LEFT: Streak Flame with Frosted Glass Backdrop */}
             <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 shadow-lg">
@@ -470,7 +470,7 @@ export default function DashboardV2() {
       
       {/* Prominent Mascot Section */}
       <div className="bg-gradient-to-b from-purple-400 to-white px-4 pb-2">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-3xl mx-auto">
           <MascotSection 
             state={mascotState} 
             displayName={dailySummary.user.display_name}
@@ -524,7 +524,7 @@ export default function DashboardV2() {
       </div>
 
       {/* Main Content */}
-      <main className="px-4 py-6 space-y-6 pb-36 max-w-md mx-auto">
+      <main className="px-4 py-6 space-y-6 pb-36 max-w-3xl mx-auto">
         {/* 1. XP Progress Bar - Top Priority */}
         <XPProgressBar xpToday={dailySummary.xp_today} xpGoal={dailySummary.xp_goal} />
 
@@ -751,7 +751,7 @@ function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-4">
-        <div className="flex items-center justify-between max-w-md mx-auto">
+        <div className="flex items-center justify-between max-w-3xl mx-auto">
           <div className="flex items-center space-x-3">
             <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse"></div>
             <div className="space-y-2">
@@ -765,7 +765,7 @@ function DashboardSkeleton() {
         </div>
       </header>
 
-      <main className="px-4 py-6 space-y-6 pb-36 max-w-md mx-auto">
+      <main className="px-4 py-6 space-y-6 pb-36 max-w-3xl mx-auto">
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="bg-white rounded-2xl border border-gray-200 p-6">
             <div className="w-32 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
