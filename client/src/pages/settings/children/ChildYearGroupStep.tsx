@@ -58,7 +58,7 @@ export default function ChildYearGroupStep() {
     : "What grade is your child in?";
 
   return (
-    <AddChildLayout step={2} totalSteps={6}>
+    <AddChildLayout step={2} totalSteps={9}>
       <div className="flex flex-col h-full min-h-[calc(100vh-200px)]">
         <div className="flex-1 space-y-6">
           <h1 className="font-extrabold text-3xl text-gray-900">

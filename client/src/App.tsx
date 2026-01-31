@@ -36,8 +36,11 @@ import { AddChildProvider } from "@/pages/settings/children/AddChildContext";
 import ChildNameStep from "@/pages/settings/children/ChildNameStep";
 import ChildYearGroupStep from "@/pages/settings/children/ChildYearGroupStep";
 import ChildGoalStep from "@/pages/settings/children/ChildGoalStep";
+import ChildFruitsStep from "@/pages/settings/children/ChildFruitsStep";
+import ChildVeggiesStep from "@/pages/settings/children/ChildVeggiesStep";
+import ChildFoodsStep from "@/pages/settings/children/ChildFoodsStep";
+import ChildSportsStep from "@/pages/settings/children/ChildSportsStep";
 import ChildAvatarStep from "@/pages/settings/children/ChildAvatarStep";
-import ChildPreferencesStep from "@/pages/settings/children/ChildPreferencesStep";
 import ChildReviewStep from "@/pages/settings/children/ChildReviewStep";
 
 // Onboarding components
@@ -93,8 +96,11 @@ function AddChildRoutes() {
         <Route path="/settings/children/add/name" component={ChildNameStep} />
         <Route path="/settings/children/add/year-group" component={ChildYearGroupStep} />
         <Route path="/settings/children/add/goal" component={ChildGoalStep} />
+        <Route path="/settings/children/add/fruits" component={ChildFruitsStep} />
+        <Route path="/settings/children/add/veggies" component={ChildVeggiesStep} />
+        <Route path="/settings/children/add/foods" component={ChildFoodsStep} />
+        <Route path="/settings/children/add/sports" component={ChildSportsStep} />
         <Route path="/settings/children/add/avatar" component={ChildAvatarStep} />
-        <Route path="/settings/children/add/preferences" component={ChildPreferencesStep} />
         <Route path="/settings/children/add/review" component={ChildReviewStep} />
       </Switch>
     </AddChildProvider>
@@ -135,8 +141,11 @@ function Router() {
       <Route path="/settings/children/add/name" component={AddChildRoutes} />
       <Route path="/settings/children/add/year-group" component={AddChildRoutes} />
       <Route path="/settings/children/add/goal" component={AddChildRoutes} />
+      <Route path="/settings/children/add/fruits" component={AddChildRoutes} />
+      <Route path="/settings/children/add/veggies" component={AddChildRoutes} />
+      <Route path="/settings/children/add/foods" component={AddChildRoutes} />
+      <Route path="/settings/children/add/sports" component={AddChildRoutes} />
       <Route path="/settings/children/add/avatar" component={AddChildRoutes} />
-      <Route path="/settings/children/add/preferences" component={AddChildRoutes} />
       <Route path="/settings/children/add/review" component={AddChildRoutes} />
       
       {/* Onboarding Flow - Single Provider */}

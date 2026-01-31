@@ -76,7 +76,7 @@ export default function ChildReviewStep() {
   };
 
   return (
-    <AddChildLayout step={6} totalSteps={6}>
+    <AddChildLayout step={9} totalSteps={9}>
       <div className="flex flex-col h-full min-h-[calc(100vh-200px)]">
         <div className="flex-1 space-y-6">
           <h1 className="font-extrabold text-3xl text-gray-900">

@@ -30,7 +30,7 @@ export default function ChildAvatarStep() {
   };
 
   return (
-    <AddChildLayout step={4} totalSteps={6}>
+    <AddChildLayout step={8} totalSteps={9}>
       <div className="flex flex-col h-full min-h-[calc(100vh-200px)]">
         <div className="flex-1 space-y-6">
           <h1 className="font-extrabold text-3xl text-gray-900">
@@ -56,7 +56,7 @@ export default function ChildAvatarStep() {
 
         <div className="mt-auto pb-6">
           <Button
-            onClick={() => setLocation("/settings/children/add/preferences")}
+            onClick={() => setLocation("/settings/children/add/review")}
             className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition"
           >
             NEXT

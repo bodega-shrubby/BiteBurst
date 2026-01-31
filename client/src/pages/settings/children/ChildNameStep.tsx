@@ -48,7 +48,7 @@ export default function ChildNameStep() {
   return (
     <AddChildLayout 
       step={1} 
-      totalSteps={6}
+      totalSteps={9}
       onBack={() => setLocation('/settings/children')}
     >
       <div className="flex flex-col h-full min-h-[calc(100vh-200px)]">

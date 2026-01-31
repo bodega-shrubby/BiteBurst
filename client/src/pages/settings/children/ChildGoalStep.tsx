@@ -36,7 +36,7 @@ export default function ChildGoalStep() {
   };
 
   return (
-    <AddChildLayout step={3} totalSteps={6}>
+    <AddChildLayout step={3} totalSteps={9}>
       <div className="flex flex-col h-full min-h-[calc(100vh-200px)]">
         <div className="flex-1 space-y-6">
           <h1 className="font-extrabold text-3xl text-gray-900">
@@ -69,7 +69,7 @@ export default function ChildGoalStep() {
         {selectedGoal && (
           <div className="mt-auto pb-6">
             <Button
-              onClick={() => setLocation("/settings/children/add/avatar")}
+              onClick={() => setLocation("/settings/children/add/fruits")}
               className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition"
             >
               NEXT
