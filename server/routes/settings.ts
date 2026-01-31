@@ -18,8 +18,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         return res.status(404).json({ error: 'User not found' });
       }
       
-      // Get all children for this user
-      const childrenList = await storage.getChildren(user.id);
+      // Get all children from children table
+      const childrenFromTable = await storage.getChildren(user.id);
       
       // Determine curriculum country from curriculum ID
       let curriculumCountry: 'uk' | 'us' = 'us';
@@ -27,13 +27,31 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         curriculumCountry = 'uk';
       }
       
-      res.json({
-        plan: user.subscriptionPlan || 'free',
-        childrenLimit: user.subscriptionChildrenLimit || 1,
-        childrenCount: childrenList.length,
-        curriculumCountry,
-        activeChildId: user.activeChildId,
-        children: childrenList.map(child => ({
+      // Build combined children list
+      // Include the primary user profile as the "first child" if they have child data
+      const allChildren: any[] = [];
+      
+      // Add primary child from users table if they have display name (from onboarding)
+      if (user.displayName && user.yearGroup) {
+        const primaryChildId = `primary-${user.id}`;
+        allChildren.push({
+          id: primaryChildId,
+          name: user.displayName,
+          username: user.username || user.displayName.toUpperCase().replace(/\s+/g, ''),
+          avatar: user.avatarId || '🧒',
+          yearGroup: user.yearGroup,
+          curriculumId: user.curriculum || '',
+          goal: user.goal,
+          xp: user.totalXp || 0,
+          streak: user.streak || 0,
+          isActive: !user.activeChildId || user.activeChildId === primaryChildId,
+          isPrimary: true,
+        });
+      }
+      
+      // Add additional children from children table
+      childrenFromTable.forEach(child => {
+        allChildren.push({
           id: child.id,
           name: child.name,
           username: child.username,
@@ -44,7 +62,17 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
           xp: child.xp,
           streak: child.streak,
           isActive: child.id === user.activeChildId,
-        })),
+          isPrimary: false,
+        });
+      });
+      
+      res.json({
+        plan: user.subscriptionPlan || 'free',
+        childrenLimit: user.subscriptionChildrenLimit || 1,
+        childrenCount: allChildren.length,
+        curriculumCountry,
+        activeChildId: user.activeChildId || (allChildren.length > 0 ? allChildren[0].id : null),
+        children: allChildren,
       });
     } catch (error) {
       console.error("Get subscription error:", error);
