@@ -10,8 +10,8 @@ interface ApiLesson {
   id: string;
   title: string;
   icon: string;
-  unitId: string;
-  unitTitle: string;
+  topicId: string;
+  topicTitle: string;
   sortOrder: number;
   description: string | null;
   state: LessonState;

@@ -11,7 +11,7 @@ import {
   lessonAttempts,
   mascots,
   curriculums,
-  units,
+  topics,
   type User,
   type InsertUser,
   type Log,
@@ -26,7 +26,7 @@ import {
   type InsertLessonAttempt,
   type Mascot,
   type Curriculum,
-  type Unit,
+  type Topic,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -77,11 +77,12 @@ export interface IStorage {
   getCurriculums(): Promise<Curriculum[]>;
   getCurriculumsByCountry(country: string): Promise<Curriculum[]>;
   
-  // Unit operations
-  getUnitsByCurriculum(curriculumId: string): Promise<Unit[]>;
+  // Topic operations
+  getTopicsByCurriculum(curriculumId: string): Promise<Topic[]>;
+  getTopicsByYearGroup(yearGroup: string): Promise<Topic[]>;
   
-  // Lesson by unit operations
-  getLessonsByUnit(unitId: string): Promise<Lesson[]>;
+  // Lesson by topic operations
+  getLessonsByTopic(topicId: string): Promise<Lesson[]>;
   
   // Lesson progress operations
   getCompletedLessonIds(userId: string): Promise<string[]>;
@@ -314,17 +315,23 @@ export class DatabaseStorage implements IStorage {
     );
   }
   
-  // Unit operations
-  async getUnitsByCurriculum(curriculumId: string): Promise<Unit[]> {
-    return await db.select().from(units)
-      .where(and(eq(units.curriculumId, curriculumId), eq(units.isActive, true)))
-      .orderBy(units.orderPosition);
+  // Topic operations
+  async getTopicsByCurriculum(curriculumId: string): Promise<Topic[]> {
+    return await db.select().from(topics)
+      .where(and(eq(topics.curriculumId, curriculumId), eq(topics.isActive, true)))
+      .orderBy(topics.orderPosition);
   }
   
-  // Lesson by unit operations
-  async getLessonsByUnit(unitId: string): Promise<Lesson[]> {
+  async getTopicsByYearGroup(yearGroup: string): Promise<Topic[]> {
+    return await db.select().from(topics)
+      .where(and(eq(topics.yearGroup, yearGroup), eq(topics.isActive, true)))
+      .orderBy(topics.orderPosition);
+  }
+  
+  // Lesson by topic operations
+  async getLessonsByTopic(topicId: string): Promise<Lesson[]> {
     return await db.select().from(lessons)
-      .where(and(eq(lessons.unitId, unitId), eq(lessons.isActive, true)))
+      .where(and(eq(lessons.topicId, topicId), eq(lessons.isActive, true)))
       .orderBy(lessons.orderInUnit);
   }
   

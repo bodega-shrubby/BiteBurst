@@ -56,8 +56,8 @@ export const curriculums = pgTable("curriculums", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Units table for organizing lessons within a curriculum
-export const units = pgTable("units", {
+// Topics table for organizing lessons within a curriculum
+export const topics = pgTable("topics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id, { onDelete: 'cascade' }),
   title: text("title").notNull(),
@@ -65,6 +65,7 @@ export const units = pgTable("units", {
   iconEmoji: text("icon_emoji"),
   orderPosition: integer("order_position").notNull(),
   defaultMascotId: varchar("default_mascot_id").references(() => mascots.id),
+  yearGroup: varchar("year_group"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -204,7 +205,7 @@ export const lessons = pgTable("lessons", {
   mascotId: varchar("mascot_id").references(() => mascots.id),
   mascotIntro: text("mascot_intro"),
   curriculumId: varchar("curriculum_id").references(() => curriculums.id),
-  unitId: varchar("unit_id").references(() => units.id),
+  topicId: varchar("topic_id").references(() => topics.id),
   difficultyLevel: integer("difficulty_level").default(1),
   orderInUnit: integer("order_in_unit"),
   estimatedMinutes: integer("estimated_minutes").default(5),
@@ -290,7 +291,7 @@ export type InsertLeagueBoard = typeof leagueBoards.$inferInsert;
 export type LeaderboardCache = typeof leaderboardCache.$inferSelect;
 export type Mascot = typeof mascots.$inferSelect;
 export type Curriculum = typeof curriculums.$inferSelect;
-export type Unit = typeof units.$inferSelect;
+export type Topic = typeof topics.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 export type InsertLesson = typeof lessons.$inferInsert;
 export type LessonStep = typeof lessonSteps.$inferSelect;
@@ -340,7 +341,7 @@ export const insertLessonSchema = createInsertSchema(lessons).pick({
   mascotId: true,
   mascotIntro: true,
   curriculumId: true,
-  unitId: true,
+  topicId: true,
   difficultyLevel: true,
   orderInUnit: true,
   estimatedMinutes: true,

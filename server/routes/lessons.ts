@@ -49,7 +49,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
           id: lesson.id,
           title: lesson.title,
           icon: lesson.iconEmoji || '📚',
-          unitId: lesson.unitId,
+          topicId: lesson.topicId,
           description: lesson.description,
           state
         };
@@ -62,33 +62,33 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     }
   });
 
-  // Get all lessons for a curriculum (combines units + lessons)
+  // Get all lessons for a curriculum (combines topics + lessons)
   app.get('/api/curriculum/:curriculumId/lessons', requireAuth, async (req: any, res: any) => {
     try {
       let { curriculumId } = req.params;
       const userId = req.userId;
       
-      // Get units for this curriculum
-      let units = await storage.getUnitsByCurriculum(curriculumId);
+      // Get topics for this curriculum
+      let curriculumTopics = await storage.getTopicsByCurriculum(curriculumId);
       
-      // If no units found, fall back to uk-ks1 which has sample lessons
-      if (units.length === 0 && curriculumId !== 'uk-ks1') {
-        console.log(`No units found for curriculum ${curriculumId}, falling back to uk-ks1`);
+      // If no topics found, fall back to uk-ks1 which has sample lessons
+      if (curriculumTopics.length === 0 && curriculumId !== 'uk-ks1') {
+        console.log(`No topics found for curriculum ${curriculumId}, falling back to uk-ks1`);
         curriculumId = 'uk-ks1';
-        units = await storage.getUnitsByCurriculum('uk-ks1');
+        curriculumTopics = await storage.getTopicsByCurriculum('uk-ks1');
       }
       
-      // Get lessons for each unit
+      // Get lessons for each topic
       const allLessons: any[] = [];
-      for (const unit of units) {
-        const unitLessons = await storage.getLessonsByUnit(unit.id);
-        for (const lesson of unitLessons) {
+      for (const topic of curriculumTopics) {
+        const topicLessons = await storage.getLessonsByTopic(topic.id);
+        for (const lesson of topicLessons) {
           allLessons.push({
             id: lesson.id,
             title: lesson.title,
             icon: lesson.iconEmoji || '📚',
-            unitId: unit.id,
-            unitTitle: unit.title,
+            topicId: topic.id,
+            topicTitle: topic.title,
             sortOrder: lesson.orderInUnit ?? 0,
             description: lesson.description
           });
@@ -132,15 +132,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     }
   });
 
-  // Get units for a curriculum
-  app.get('/api/curriculum/:curriculumId/units', requireAuth, async (req: any, res: any) => {
+  // Get topics for a curriculum
+  app.get('/api/curriculum/:curriculumId/topics', requireAuth, async (req: any, res: any) => {
     try {
       const { curriculumId } = req.params;
-      const units = await storage.getUnitsByCurriculum(curriculumId);
-      res.json(units);
+      const curriculumTopics = await storage.getTopicsByCurriculum(curriculumId);
+      res.json(curriculumTopics);
     } catch (error) {
-      console.error('Failed to get curriculum units:', error);
-      res.status(500).json({ error: 'Failed to load units' });
+      console.error('Failed to get curriculum topics:', error);
+      res.status(500).json({ error: 'Failed to load topics' });
     }
   });
 
