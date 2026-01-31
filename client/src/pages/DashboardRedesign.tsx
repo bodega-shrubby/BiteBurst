@@ -176,7 +176,7 @@ export default function DashboardRedesign() {
   if (error || !dailySummary) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
-        <div className="text-center space-y-4 max-w-md">
+        <div className="text-center space-y-4 max-w-3xl">
           <div className="text-6xl">🍊</div>
           <h2 className="text-xl font-bold text-gray-900">Oops! Something went wrong</h2>
           <p className="text-gray-600">We couldn't load your dashboard right now.</p>
