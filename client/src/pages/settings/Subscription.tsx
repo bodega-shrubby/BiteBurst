@@ -31,13 +31,20 @@ export default function Subscription() {
         body: data,
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
       toast({
-        title: "Subscription Updated",
-        description: "Your plan has been updated successfully.",
+        title: "Subscription Updated!",
+        description: variables.plan === 'family' 
+          ? "You can now add up to " + (variables.childrenLimit || 4) + " children." 
+          : "Your plan has been updated successfully.",
       });
       setSelectedPlan(null);
+      
+      // Redirect to Manage Children if upgraded to Family Plan
+      if (variables.plan === 'family') {
+        setTimeout(() => setLocation('/settings/children'), 500);
+      }
     },
     onError: () => {
       toast({
