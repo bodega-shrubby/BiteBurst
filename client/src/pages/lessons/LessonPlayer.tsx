@@ -74,6 +74,14 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [lastSelectedAnswer, setLastSelectedAnswer] = useState<string | null>(null); // Track previous selection for change detection
   const [showRetryBanner, setShowRetryBanner] = useState(false); // Show hint banner after retry
 
+  // Helper to extract feedback message from step content
+  const getStepFeedbackMessage = (step: LessonStep | undefined, type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
+    if (!step) return undefined;
+    const feedback = step.content.feedback;
+    if (!feedback) return undefined;
+    if (typeof feedback === 'string') return undefined;
+    return type === 'hint_after_2' ? feedback.hint_after_2 : feedback.motivating_fail;
+  };
 
   // Fetch lesson data with cache invalidation
   const { data: lessonData, isLoading } = useQuery({
@@ -532,7 +540,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         
         {lessonState === 'learn' && currentStep && (
           <LessonLearn
-            body={currentStep.retryConfig?.messages.learnCard || "Let's learn more about this!"}
+            body={currentStep.retryConfig?.messages.learnCard || getStepFeedbackMessage(currentStep, 'motivating_fail') || "Let's learn more about this!"}
             onContinue={handleLearnContinue}
           />
         )}
