@@ -365,100 +365,245 @@ export default function DashboardRedesign() {
           </div>
         </div>
 
-        {/* CONSTRAINED CONTENT AREA - Cards and content below */}
-        <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 pb-32">
-          {/* 4. MASCOT GREETING */}
-          <div className="flex items-center space-x-4">
-            <img 
-              src={oniTheOrangeImage}
-              alt="Oni mascot"
-              className="w-14 h-14 lg:w-16 lg:h-16 object-contain"
-            />
-            <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1">
-              <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>
+        {/* TWO-COLUMN LAYOUT for content below status bar */}
+        <div className="flex justify-center">
+          <div className="flex max-w-[1100px] w-full">
+
+            {/* LEFT: Main Content Column */}
+            <div className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 space-y-6 pb-32">
+              {/* 4. MASCOT GREETING */}
+              <div className="flex items-center space-x-4">
+                <img 
+                  src={oniTheOrangeImage}
+                  alt="Oni mascot"
+                  className="w-14 h-14 lg:w-16 lg:h-16 object-contain"
+                />
+                <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1">
+                  <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>
+                </div>
+              </div>
+
+              {/* 5. STATISTICS GRID - MOVED UP */}
+              <div>
+                <h2 className="font-bold text-xl mb-4">Statistics</h2>
+                <div className="grid grid-cols-2 gap-5">
+                  {/* Day Streak */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-4xl">🔥</span>
+                      <div>
+                        <div className="text-4xl font-bold text-gray-900">{dailySummary.streak_days}</div>
+                        <div className="text-sm text-gray-500 font-medium">Day streak</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Total XP */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-4xl">⚡</span>
+                      <div>
+                        <div className="text-4xl font-bold text-gray-900">{dailySummary.user.lifetime_xp}</div>
+                        <div className="text-sm text-gray-500 font-medium">Total XP</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* League */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-4xl">🥉</span>
+                      <div>
+                        <div className="text-2xl font-bold text-orange-600">Bronze</div>
+                        <div className="text-sm text-gray-500 font-medium">League</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Best Streak */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-4xl">🏅</span>
+                      <div>
+                        <div className="text-4xl font-bold text-gray-900">{dailySummary.best_streak}</div>
+                        <div className="text-sm text-gray-500 font-medium">Best Streak</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 6. LESSON HERO - PRIMARY CTA */}
+              <LessonHero />
+
+              {/* 7. QUICK LOG - Larger Grid */}
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="font-bold text-xl">Quick Log</h3>
+                  <span className="text-sm text-gray-400">Tap to log</span>
+                </div>
+
+                {/* 4-column emoji grid with larger items */}
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                  {['🍎', '🥦', '🍞', '🧃', '⚽', '🧘', '🏃', '🚴'].map((emoji, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setLocation(i < 4 ? '/food-log' : '/activity-log')}
+                      className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-4xl hover:bg-orange-50 hover:scale-105 cursor-pointer transition"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Larger buttons */}
+                <div className="grid grid-cols-2 gap-5">
+                  <button
+                    onClick={() => setLocation('/food-log')}
+                    className="border-2 border-orange-500 text-orange-500 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition"
+                  >
+                    Log Food
+                  </button>
+                  <button
+                    onClick={() => setLocation('/activity-log')}
+                    className="border-2 border-orange-500 text-orange-500 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition"
+                  >
+                    Log Activity
+                  </button>
+                </div>
+              </div>
+
+              {/* 8. RECENT ACTIVITY - with AI feedback dropdown (main column for all screens) */}
+              <RecentLogsList logs={dailySummary.recent_logs} />
+
+              {/* MOBILE ONLY: Show sidebar content stacked below */}
+              <div className="lg:hidden space-y-6">
+                {/* Daily XP Goal - Mobile */}
+                <XPProgressBar 
+                  xpToday={dailySummary.xp_today} 
+                  xpGoal={dailySummary.xp_goal} 
+                />
+
+                {/* Today's Journey - Mobile */}
+                <TodaysJourney 
+                  milestones={dailySummary.milestones} 
+                  onTaskComplete={handleXpBurst}
+                />
+
+                {/* Badges - Mobile */}
+                <BadgesShelf
+                  earnedBadges={badgeData?.earned?.map((badge: any) => ({
+                    code: badge.code,
+                    name: badge.name,
+                    description: badge.description || '',
+                    emoji: badge.emoji,
+                    isNew: badge.isNew,
+                  })) || dailySummary.badges.earned}
+                  lockedBadges={badgeData?.locked?.map((badge: any) => ({
+                    code: badge.code,
+                    name: badge.name,
+                    description: badge.description || '',
+                    emoji: badge.emoji,
+                    progress: badge.progress,
+                  })) || dailySummary.badges.locked}
+                  onBadgeUnlock={handleBadgeUnlock}
+                />
+              </div>
             </div>
+
+            {/* RIGHT: Sidebar Column (desktop only) */}
+            <div className="hidden lg:block w-[340px] bg-gray-50 border-l border-gray-200 p-5 space-y-5 flex-shrink-0">
+
+              {/* Daily XP Goal */}
+              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl">⚡</span>
+                    <span className="font-bold">Daily XP Goal</span>
+                  </div>
+                  <span className="text-sm">
+                    <span className="text-orange-500 font-bold">{dailySummary.xp_today}</span> / {dailySummary.xp_goal}
+                  </span>
+                </div>
+                <div className="bg-gray-200 rounded-full h-3">
+                  <div
+                    className="bg-gradient-to-r from-orange-400 to-orange-600 h-3 rounded-full transition-all"
+                    style={{ width: `${Math.min((dailySummary.xp_today / dailySummary.xp_goal) * 100, 100)}%` }}
+                  />
+                </div>
+                <p className="text-center text-sm text-orange-500 mt-2 font-medium">
+                  {dailySummary.xp_goal - dailySummary.xp_today > 0 
+                    ? `${dailySummary.xp_goal - dailySummary.xp_today} XP to go!`
+                    : "🎉 Goal reached!"}
+                </p>
+              </div>
+
+              {/* Today's Journey */}
+              <TodaysJourney 
+                milestones={dailySummary.milestones} 
+                onTaskComplete={handleXpBurst}
+              />
+
+              {/* Today's Activity */}
+              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                <h3 className="font-bold text-lg mb-4">Today's Activity</h3>
+                {dailySummary.recent_logs.length === 0 ? (
+                  <div className="text-center py-4">
+                    <div className="text-5xl mb-3">🍊</div>
+                    <p className="font-bold text-gray-800">No activity yet today</p>
+                    <p className="text-sm text-gray-500">Time to fuel up! 🍎</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {dailySummary.recent_logs.slice(0, 3).map((log: any, i: number) => (
+                      <div key={i} className="flex items-center space-x-3 py-2 border-b border-gray-100 last:border-0">
+                        <span className="text-xl">{log.type === 'food' ? '🍽️' : '🏃'}</span>
+                        <span className="text-sm flex-1 truncate">{log.summary}</span>
+                        {log.xpAwarded && (
+                          <span className="text-xs text-orange-500 font-bold">+{log.xpAwarded} XP</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="space-y-2 mt-4">
+                  <button
+                    onClick={() => setLocation('/food-log')}
+                    className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition"
+                  >
+                    🍽️ Log a Meal
+                  </button>
+                  <button
+                    onClick={() => setLocation('/activity-log')}
+                    className="w-full border-2 border-orange-200 text-orange-500 py-3 rounded-xl font-bold hover:bg-orange-50 transition"
+                  >
+                    ⚽ Log Activity
+                  </button>
+                </div>
+              </div>
+
+              {/* Badges & Rewards */}
+              <BadgesShelf
+                earnedBadges={badgeData?.earned?.map((badge: any) => ({
+                  code: badge.code,
+                  name: badge.name,
+                  description: badge.description || '',
+                  emoji: badge.emoji,
+                  isNew: badge.isNew,
+                })) || dailySummary.badges.earned}
+                lockedBadges={badgeData?.locked?.map((badge: any) => ({
+                  code: badge.code,
+                  name: badge.name,
+                  description: badge.description || '',
+                  emoji: badge.emoji,
+                  progress: badge.progress,
+                })) || dailySummary.badges.locked}
+                onBadgeUnlock={handleBadgeUnlock}
+              />
+
+            </div>
+
           </div>
-          {/* 5. LESSON HERO - PRIMARY CTA */}
-          <LessonHero />
-
-          {/* 6. STATISTICS GRID */}
-          <StatisticsGrid 
-            streakDays={dailySummary.streak_days}
-            totalXP={dailySummary.user.lifetime_xp}
-            league="Bronze"
-            bestStreak={dailySummary.best_streak}
-          />
-
-          {/* 7. DAILY XP PROGRESS */}
-          <XPProgressBar 
-            xpToday={dailySummary.xp_today} 
-            xpGoal={dailySummary.xp_goal} 
-          />
-
-          {/* 8. TODAY'S JOURNEY */}
-          <TodaysJourney 
-            milestones={dailySummary.milestones} 
-            onTaskComplete={handleXpBurst} 
-          />
-
-          {/* 9. RECENT ACTIVITY - with AI feedback dropdown */}
-          <RecentLogsList logs={dailySummary.recent_logs} />
-
-          {/* 10. QUICK LOG - DEMOTED (smaller, secondary) */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 lg:p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-800 text-lg">Quick Log</h3>
-              <span className="text-sm text-gray-400">Tap to log</span>
-            </div>
-            
-            {/* Quick emoji buttons */}
-            <div className="flex flex-wrap gap-3 mb-5">
-              {['🍎', '🥦', '🍞', '🧃', '⚽', '🧘', '🏃'].map((emoji, i) => (
-                <button
-                  key={i}
-                  onClick={() => setLocation(i < 4 ? '/food-log' : '/activity-log')}
-                  className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center text-2xl lg:text-3xl hover:bg-orange-50 hover:scale-105 transition-all"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-            
-            {/* Outline buttons */}
-            <div className="flex gap-4">
-              <button
-                onClick={() => setLocation('/food-log')}
-                className="flex-1 border-2 border-[#FF6A00] text-[#FF6A00] py-3 lg:py-4 rounded-xl text-base lg:text-lg font-bold hover:bg-orange-50 transition-colors"
-              >
-                Log Food
-              </button>
-              <button
-                onClick={() => setLocation('/activity-log')}
-                className="flex-1 border-2 border-[#FF6A00] text-[#FF6A00] py-3 lg:py-4 rounded-xl text-base lg:text-lg font-bold hover:bg-orange-50 transition-colors"
-              >
-                Log Activity
-              </button>
-            </div>
-          </div>
-
-          {/* 10. BADGES PREVIEW */}
-          <BadgesShelf
-            earnedBadges={badgeData?.earned?.map((badge: any) => ({
-              code: badge.code,
-              name: badge.name,
-              description: badge.description || '',
-              emoji: badge.emoji,
-              isNew: badge.isNew,
-            })) || dailySummary.badges.earned}
-            lockedBadges={badgeData?.locked?.map((badge: any) => ({
-              code: badge.code,
-              name: badge.name,
-              description: badge.description || '',
-              emoji: badge.emoji,
-              progress: badge.progress,
-            })) || dailySummary.badges.locked}
-            onBadgeUnlock={handleBadgeUnlock}
-          />
         </div>
       </div>
 
