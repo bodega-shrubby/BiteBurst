@@ -412,9 +412,16 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     },
     onSuccess: () => {
       console.log('✅ Lesson marked as complete');
-      // Invalidate lesson queries so the next lessons show as unlocked
-      queryClient.invalidateQueries({ queryKey: ['/api/lessons'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/curriculum'] });
+      // Invalidate all lesson and curriculum queries so the next lessons show as unlocked
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return typeof key === 'string' && (
+            key.startsWith('/api/lessons') || 
+            key.startsWith('/api/curriculum')
+          );
+        }
+      });
     },
     onError: (error) => {
       console.error('Failed to mark lesson complete:', error);
