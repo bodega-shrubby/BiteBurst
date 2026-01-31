@@ -1,0 +1,139 @@
+## Task: Rename units to topics in codebase
+
+The database table `units` has been renamed to `topics` and `unit_id` in lessons is now `topic_id`.
+
+### Database Changes Already Made
+- `units` table renamed to `topics`
+- `year_group` column added to topics table
+- `unit_id` column in lessons renamed to `topic_id`
+
+### Changes Required
+
+#### 1. Update Drizzle Schema (shared/schema.ts)
+
+**Rename units table to topics:**
+
+Change from:
+```typescript
+export const units = pgTable("units", {
+```
+
+To:
+```typescript
+export const topics = pgTable("topics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id, { onDelete: 'cascade' }),
+  title: text("title").notNull(),
+  description: text("description"),
+  iconEmoji: text("icon_emoji"),
+  orderPosition: integer("order_position").notNull(),
+  defaultMascotId: varchar("default_mascot_id").references(() => mascots.id),
+  yearGroup: varchar("year_group"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+```
+
+**Update lessons table - change unitId to topicId:**
+
+Change:
+```typescript
+unitId: varchar("unit_id").references(() => units.id),
+```
+
+To:
+```typescript
+topicId: varchar("topic_id").references(() => topics.id),
+```
+
+**Update type exports:**
+
+Change:
+```typescript
+export type Unit = typeof units.$inferSelect;
+```
+
+To:
+```typescript
+export type Topic = typeof topics.$inferSelect;
+```
+
+#### 2. Update Storage Layer (server/storage.ts)
+
+**Import topics instead of units:**
+```typescript
+import { topics } from "@shared/schema";
+```
+
+**Rename methods:**
+- `getUnitsByCurriculum` → `getTopicsByCurriculum`
+- `getLessonsByUnit` → `getLessonsByTopic`
+
+**Add new method to get topics by year group:**
+```typescript
+async getTopicsByYearGroup(yearGroup: string): Promise<Topic[]> {
+  return await db.select().from(topics)
+    .where(and(
+      eq(topics.yearGroup, yearGroup),
+      eq(topics.isActive, true)
+    ))
+    .orderBy(topics.orderPosition);
+}
+```
+
+**Update getLessonsByYearGroup to go through topics:**
+```typescript
+async getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]> {
+  const yearGroupTopics = await this.getTopicsByYearGroup(yearGroup);
+  const topicIds = yearGroupTopics.map(t => t.id);
+  
+  if (topicIds.length === 0) return [];
+  
+  return await db.select().from(lessons)
+    .where(and(
+      inArray(lessons.topicId, topicIds),
+      eq(lessons.isActive, true)
+    ))
+    .orderBy(lessons.orderInUnit);
+}
+```
+
+**Update IStorage interface** - rename all Unit to Topic and unit to topic in method names.
+
+#### 3. Update API Routes (server/routes/lessons.ts)
+
+- Change `getUnitsByCurriculum` calls to `getTopicsByCurriculum`
+- Change `getLessonsByUnit` calls to `getLessonsByTopic`
+- Change any `unit` variable names to `topic`
+- Change any `unitId` references to `topicId`
+
+#### 4. Search and Replace Throughout Codebase
+
+Search and replace (case-sensitive):
+- `units` → `topics` (for table/import references)
+- `Unit` → `Topic` (for type references)
+- `unitId` → `topicId` (for field references)
+- `unit_id` → `topic_id` (for any raw SQL or string references)
+- `getUnitsByCurriculum` → `getTopicsByCurriculum`
+- `getLessonsByUnit` → `getLessonsByTopic`
+- `unitTitle` → `topicTitle`
+
+#### 5. Update Frontend Components
+
+Any components that display or reference units should now use topics:
+- Props named `unit` → `topic`
+- State variables like `selectedUnit` → `selectedTopic`
+- API responses expecting `unitId` → `topicId`
+
+### Files Likely to Need Updates
+- shared/schema.ts
+- server/storage.ts
+- server/routes/lessons.ts
+- Any frontend components showing lesson lists or topics
+
+### Testing
+- [ ] App compiles without TypeScript errors
+- [ ] Topics load for a year group
+- [ ] Lessons load correctly
+- [ ] No references to "unit" remain (except in comments if needed)
