@@ -10,6 +10,7 @@ import StatisticsGrid from "@/components/dashboard/StatisticsGrid";
 import XPProgressBar from "@/components/dashboard/XPProgressBar";
 import TodaysJourney from "@/components/dashboard/TodaysJourney";
 import BadgesShelf from "@/components/dashboard/BadgesShelf";
+import RecentLogsList from "@/components/dashboard/RecentLogsList";
 import BottomNavigation from "@/components/BottomNavigation";
 import Sidebar from "@/components/Sidebar";
 
@@ -313,7 +314,10 @@ export default function DashboardRedesign() {
             onTaskComplete={handleXpBurst} 
           />
 
-          {/* 9. QUICK LOG - DEMOTED (smaller, secondary) */}
+          {/* 9. RECENT ACTIVITY - with AI feedback dropdown */}
+          <RecentLogsList logs={dailySummary.recent_logs} />
+
+          {/* 10. QUICK LOG - DEMOTED (smaller, secondary) */}
           <div className="bg-white rounded-2xl border border-gray-200 p-5 lg:p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-800 text-lg">Quick Log</h3>
