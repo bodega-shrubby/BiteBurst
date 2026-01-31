@@ -21,6 +21,7 @@ export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
 export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading']);
 export const curriculumEnum = pgEnum('curriculum', ['us-common-core', 'uk-ks2-ks3']);
+export const subscriptionPlanEnum = pgEnum('subscription_plan', ['free', 'individual', 'family']);
 
 // Catalog tables
 export const avatars = pgTable("avatars", {
@@ -100,9 +101,40 @@ export const users = pgTable("users", {
   leaderboardOptOut: boolean("leaderboard_opt_out").notNull().default(false),
   leagueTier: text("league_tier").notNull().default("bronze"),
   isMock: boolean("is_mock").notNull().default(false),
+  // Subscription fields
+  subscriptionPlan: text("subscription_plan").notNull().default('free'), // 'free', 'individual', 'family'
+  subscriptionChildrenLimit: integer("subscription_children_limit").notNull().default(1), // 1 for free/individual, 2-4 for family
+  isParent: boolean("is_parent").notNull().default(false), // true for parent accounts
+  curriculumCountry: text("curriculum_country"), // 'uk' or 'us' - inherited by children
+  activeChildId: varchar("active_child_id"), // Reference to active child profile
 }, (table) => ({
   emailIdx: index("users_email_idx").on(table.email),
   parentAuthIdx: index("users_parent_auth_idx").on(table.parentAuthId),
+}));
+
+// Children table for family plan - child profiles linked to parent
+export const children = pgTable("children", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  parentId: varchar("parent_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: text("name").notNull(),
+  username: text("username").notNull(),
+  avatar: text("avatar").notNull().default('child'),
+  // Year Group / Grade (NOT age)
+  yearGroup: text("year_group").notNull(), // e.g., 'year-5', 'grade-3'
+  curriculumId: text("curriculum_id").notNull(), // e.g., 'uk-ks2', 'us-35'
+  // Learning preferences
+  goal: text("goal"), // 'energy', 'focus', 'strength'
+  favoriteFruits: text("favorite_fruits").array(),
+  favoriteVeggies: text("favorite_veggies").array(),
+  favoriteFoods: text("favorite_foods").array(),
+  favoriteSports: text("favorite_sports").array(),
+  // Progress tracking
+  xp: integer("xp").notNull().default(0),
+  streak: integer("streak").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  parentIdIdx: index("children_parent_id_idx").on(table.parentId),
 }));
 
 // Logs table with UUID and proper types
@@ -300,6 +332,8 @@ export type UserLessonProgress = typeof userLessonProgress.$inferSelect;
 export type InsertUserLessonProgress = typeof userLessonProgress.$inferInsert;
 export type LessonAttempt = typeof lessonAttempts.$inferSelect;
 export type InsertLessonAttempt = typeof lessonAttempts.$inferInsert;
+export type Child = typeof children.$inferSelect;
+export type InsertChild = typeof children.$inferInsert;
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -380,8 +414,23 @@ export const insertLessonAttemptSchema = createInsertSchema(lessonAttempts).pick
   usedLearnCard: true,
 });
 
+export const insertChildSchema = createInsertSchema(children).pick({
+  parentId: true,
+  name: true,
+  username: true,
+  avatar: true,
+  yearGroup: true,
+  curriculumId: true,
+  goal: true,
+  favoriteFruits: true,
+  favoriteVeggies: true,
+  favoriteFoods: true,
+  favoriteSports: true,
+});
+
 export type InsertUserType = z.infer<typeof insertUserSchema>;
 export type InsertLogType = z.infer<typeof insertLogSchema>;
 export type InsertLessonType = z.infer<typeof insertLessonSchema>;
 export type InsertLessonStepType = z.infer<typeof insertLessonStepSchema>;
 export type InsertUserLessonProgressType = z.infer<typeof insertUserLessonProgressSchema>;
+export type InsertChildType = z.infer<typeof insertChildSchema>;

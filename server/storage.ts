@@ -13,6 +13,7 @@ import {
   mascots,
   curriculums,
   topics,
+  children,
   type User,
   type InsertUser,
   type Log,
@@ -28,6 +29,8 @@ import {
   type Mascot,
   type Curriculum,
   type Topic,
+  type Child,
+  type InsertChild,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -91,6 +94,17 @@ export interface IStorage {
   
   // Lesson by year group operations
   getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]>;
+  
+  // Children operations
+  getChildren(parentId: string): Promise<Child[]>;
+  getChild(childId: string): Promise<Child | undefined>;
+  createChild(insertChild: InsertChild): Promise<Child>;
+  updateChild(childId: string, updates: Partial<InsertChild>): Promise<Child>;
+  deleteChild(childId: string): Promise<void>;
+  
+  // Subscription operations
+  updateSubscription(userId: string, plan: string, childrenLimit: number): Promise<User>;
+  setActiveChild(userId: string, childId: string): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -398,6 +412,65 @@ export class DatabaseStorage implements IStorage {
         eq(lessons.isActive, true)
       ))
       .orderBy(lessons.orderInUnit);
+  }
+  
+  // Children operations
+  async getChildren(parentId: string): Promise<Child[]> {
+    return await db.select().from(children)
+      .where(eq(children.parentId, parentId))
+      .orderBy(children.createdAt);
+  }
+  
+  async getChild(childId: string): Promise<Child | undefined> {
+    const [child] = await db.select().from(children).where(eq(children.id, childId));
+    return child || undefined;
+  }
+  
+  async createChild(insertChild: InsertChild): Promise<Child> {
+    const [child] = await db
+      .insert(children)
+      .values(insertChild as any)
+      .returning();
+    return child;
+  }
+  
+  async updateChild(childId: string, updates: Partial<InsertChild>): Promise<Child> {
+    const [child] = await db
+      .update(children)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(children.id, childId))
+      .returning();
+    return child;
+  }
+  
+  async deleteChild(childId: string): Promise<void> {
+    await db.delete(children).where(eq(children.id, childId));
+  }
+  
+  // Subscription operations
+  async updateSubscription(userId: string, plan: string, childrenLimit: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        subscriptionPlan: plan,
+        subscriptionChildrenLimit: childrenLimit,
+        updatedAt: new Date() 
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+  
+  async setActiveChild(userId: string, childId: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        activeChildId: childId,
+        updatedAt: new Date() 
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 }
 

@@ -25,6 +25,21 @@ import Streak from "@/pages/Streak";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/useAuth";
 
+// Settings pages
+import Settings from "@/pages/settings/Settings";
+import Profile from "@/pages/settings/Profile";
+import Subscription from "@/pages/settings/Subscription";
+import ManageChildren from "@/pages/settings/ManageChildren";
+
+// Child onboarding components
+import { AddChildProvider } from "@/pages/settings/children/AddChildContext";
+import ChildNameStep from "@/pages/settings/children/ChildNameStep";
+import ChildYearGroupStep from "@/pages/settings/children/ChildYearGroupStep";
+import ChildGoalStep from "@/pages/settings/children/ChildGoalStep";
+import ChildAvatarStep from "@/pages/settings/children/ChildAvatarStep";
+import ChildPreferencesStep from "@/pages/settings/children/ChildPreferencesStep";
+import ChildReviewStep from "@/pages/settings/children/ChildReviewStep";
+
 // Onboarding components
 import { OnboardingProvider } from "@/pages/onboarding/OnboardingContext";
 import MascotIntroStep from "@/pages/onboarding/MascotIntroStep";
@@ -71,6 +86,21 @@ function OnboardingRoutes() {
   );
 }
 
+function AddChildRoutes() {
+  return (
+    <AddChildProvider>
+      <Switch>
+        <Route path="/settings/children/add/name" component={ChildNameStep} />
+        <Route path="/settings/children/add/year-group" component={ChildYearGroupStep} />
+        <Route path="/settings/children/add/goal" component={ChildGoalStep} />
+        <Route path="/settings/children/add/avatar" component={ChildAvatarStep} />
+        <Route path="/settings/children/add/preferences" component={ChildPreferencesStep} />
+        <Route path="/settings/children/add/review" component={ChildReviewStep} />
+      </Switch>
+    </AddChildProvider>
+  );
+}
+
 function Router() {
   return (
     <Switch>
@@ -94,6 +124,20 @@ function Router() {
         {(params) => <LessonPlayer lessonId={params.lessonId} />}
       </Route>
       <Route path="/streak" component={Streak} />
+      
+      {/* Settings Pages */}
+      <Route path="/settings" component={Settings} />
+      <Route path="/settings/profile" component={Profile} />
+      <Route path="/settings/subscription" component={Subscription} />
+      <Route path="/settings/children" component={ManageChildren} />
+      
+      {/* Add Child Onboarding Flow */}
+      <Route path="/settings/children/add/name" component={AddChildRoutes} />
+      <Route path="/settings/children/add/year-group" component={AddChildRoutes} />
+      <Route path="/settings/children/add/goal" component={AddChildRoutes} />
+      <Route path="/settings/children/add/avatar" component={AddChildRoutes} />
+      <Route path="/settings/children/add/preferences" component={AddChildRoutes} />
+      <Route path="/settings/children/add/review" component={AddChildRoutes} />
       
       {/* Onboarding Flow - Single Provider */}
       <Route path="/profile/intro" component={OnboardingRoutes} />
