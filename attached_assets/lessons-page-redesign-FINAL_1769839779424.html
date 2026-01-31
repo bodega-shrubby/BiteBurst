@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Lessons Page - FINAL Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .lesson-card {
+      transition: all 0.3s ease;
+    }
+    .lesson-card:hover {
+      transform: translateY(-3px);
+    }
+    .current-glow {
+      box-shadow: 0 0 20px rgba(255, 106, 0, 0.15);
+    }
+    .current-glow:hover {
+      box-shadow: 0 0 30px rgba(255, 106, 0, 0.25);
+    }
+    .mascot-peek {
+      animation: peek 4s ease-in-out infinite;
+    }
+    @keyframes peek {
+      0%, 80%, 100% { transform: translateX(0); }
+      10%, 70% { transform: translateX(10px); }
+    }
+    .treasure-subtle {
+      animation: subtle-glow 3s ease-in-out infinite;
+    }
+    @keyframes subtle-glow {
+      0%, 100% { box-shadow: 0 4px 15px rgba(180, 140, 80, 0.15); }
+      50% { box-shadow: 0 4px 20px rgba(180, 140, 80, 0.25); }
+    }
+    .path-connector {
+      background: repeating-linear-gradient(
+        to bottom,
+        #e5e7eb 0px,
+        #e5e7eb 8px,
+        transparent 8px,
+        transparent 16px
+      );
+    }
+    .path-connector-active {
+      background: repeating-linear-gradient(
+        to bottom,
+        #86efac 0px,
+        #86efac 8px,
+        transparent 8px,
+        transparent 16px
+      );
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen">
+
+  <!-- Header Banner -->
+  <div class="bg-gray-700 text-white text-center py-2 text-sm font-bold">
+    ✅ FINAL WIREFRAME: BiteBurst Lessons Page - Balanced Colors
+  </div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ==================== -->
+    <!-- LEFT SIDEBAR - 200px -->
+    <!-- ==================== -->
+    <aside class="w-[200px] bg-white border-r border-gray-200 flex-shrink-0 p-4 sticky top-0 h-screen">
+      <div class="mb-6">
+        <span class="text-2xl">🍊</span>
+        <span class="text-lg font-bold text-orange-500 ml-2">BiteBurst</span>
+      </div>
+
+      <nav class="space-y-2">
+        <div class="flex items-center space-x-3 px-4 py-3 bg-orange-50 text-orange-600 rounded-xl border border-orange-200">
+          <span>📚</span>
+          <span class="text-sm font-semibold">Lessons</span>
+          <span class="ml-auto text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">NEW</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>🏆</span>
+          <span class="text-sm">Champs</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>➕</span>
+          <span class="text-sm">LOG</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>👤</span>
+          <span class="text-sm">Profile</span>
+        </div>
+        <div class="border-t border-gray-200 my-3"></div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>•••</span>
+          <span class="text-sm">More</span>
+        </div>
+      </nav>
+
+      <!-- Mascot Helper in Sidebar -->
+      <div class="absolute bottom-20 left-4 right-4">
+        <div class="bg-gray-50 rounded-2xl p-3 border border-gray-200">
+          <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center mascot-peek">
+              <span class="text-2xl">🍊</span>
+            </div>
+            <div class="text-xs text-gray-600">
+              <p class="font-semibold">Need help?</p>
+              <p class="text-gray-400">Tap me!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== -->
+    <!-- MAIN CONTENT AREA -->
+    <!-- ==================== -->
+    <div class="flex-1 flex justify-center">
+      <div class="flex max-w-[1100px] w-full">
+
+        <!-- CENTER: Lesson Path Column -->
+        <div class="flex-1 min-w-0 bg-white">
+
+          <!-- Topic Header - Toned down -->
+          <header class="sticky top-0 z-30">
+            <div class="relative overflow-hidden">
+              <!-- Softer gradient background -->
+              <div
+                class="px-6 py-6"
+                style="background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%);"
+              >
+                <div class="relative z-10">
+                  <div class="flex items-center space-x-2 mb-2">
+                    <button class="text-white/80 hover:text-white text-sm flex items-center space-x-1">
+                      <span>←</span>
+                      <span>Back</span>
+                    </button>
+                    <span class="text-white/40">|</span>
+                    <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium">
+                      Week 1 of 8
+                    </span>
+                  </div>
+                  <h1 class="text-2xl font-bold text-white">
+                    Sports Nutrition: Week 1
+                  </h1>
+                  <p class="text-orange-100 text-sm mt-1 flex items-center space-x-2">
+                    <span>⚽ Football Edition</span>
+                    <span>•</span>
+                    <span>10 Lessons</span>
+                    <span>•</span>
+                    <span>~30 min</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Stats bar - cleaner -->
+              <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-6">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">🏅</span>
+                    <div>
+                      <div class="text-base font-bold text-gray-900">0/10</div>
+                      <div class="text-xs text-gray-500">Completed</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">⚡</span>
+                    <div>
+                      <div class="text-base font-bold text-gray-700">85 XP</div>
+                      <div class="text-xs text-gray-500">Earned</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">🔥</span>
+                    <div>
+                      <div class="text-base font-bold text-gray-700">0</div>
+                      <div class="text-xs text-gray-500">Streak</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mini progress -->
+                <div class="w-40">
+                  <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progress</span>
+                    <span>0%</span>
+                  </div>
+                  <div class="bg-gray-200 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- MAIN LESSON CONTENT -->
+          <div class="px-6 py-6 bg-gray-50">
+
+            <!-- Progress Card - Simplified -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 mb-6">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-3">
+                  <div class="w-11 h-11 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <span class="text-xl">📚</span>
+                  </div>
+                  <div>
+                    <div class="text-base font-bold text-gray-900">0 of 10 lessons</div>
+                    <div class="text-sm text-gray-500">Complete lessons to earn XP!</div>
+                  </div>
+                </div>
+                <div class="text-2xl">🎯</div>
+              </div>
+
+              <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div
+                  class="h-full rounded-full transition-all duration-500 bg-green-500"
+                  style="width: 0%;"
+                ></div>
+              </div>
+
+              <p class="text-sm text-gray-500 mt-2">
+                💡 Tap "Rocket Fuel for Legs!" to start your journey!
+              </p>
+            </div>
+
+            <!-- LESSON CARDS -->
+            <div class="space-y-4">
+
+              <!-- LESSON 1 - CURRENT (Available) -->
+              <div class="lesson-card current-glow">
+                <div class="bg-white rounded-2xl border-2 border-orange-200 shadow-sm overflow-hidden">
+                  <div class="flex">
+                    <!-- Left: Number & Status -->
+                    <div class="w-16 bg-orange-500 flex flex-col items-center justify-center py-4">
+                      <span class="text-white text-2xl font-bold">1</span>
+                    </div>
+
+                    <!-- Center: Content -->
+                    <div class="flex-1 p-4">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <h3 class="font-bold text-base text-gray-900">🚀 Rocket Fuel for Legs!</h3>
+                          <p class="text-sm text-gray-500 mt-1">Learn which foods give you energy to run faster</p>
+                          <div class="flex items-center space-x-2 mt-3">
+                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">5 min</span>
+                            <span class="bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full">+15 XP</span>
+                            <span class="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-full">Quiz</span>
+                          </div>
+                        </div>
+                        <div class="text-4xl">🥗</div>
+                      </div>
+                    </div>
+
+                    <!-- Right: Action -->
+                    <div class="w-28 bg-green-500 flex items-center justify-center cursor-pointer hover:bg-green-600 transition">
+                      <div class="text-center text-white">
+                        <span class="text-xl">▶️</span>
+                        <p class="text-sm font-bold mt-1">START</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Path Connector -->
+              <div class="flex justify-center">
+                <div class="w-0.5 h-6 path-connector-active rounded-full"></div>
+              </div>
+
+              <!-- LESSON 2 - LOCKED -->
+              <div class="lesson-card opacity-60">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div class="flex">
+                    <div class="w-16 bg-gray-200 flex flex-col items-center justify-center py-4">
+                      <span class="text-gray-400 text-2xl font-bold">2</span>
+                    </div>
+                    <div class="flex-1 p-4">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <h3 class="font-bold text-base text-gray-400">🥩 Power Up Proteins</h3>
+                          <p class="text-sm text-gray-400 mt-1">Discover the building blocks for strong muscles</p>
+                          <div class="flex items-center space-x-2 mt-3">
+                            <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-full">5 min</span>
+                            <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-full">+15 XP</span>
+                          </div>
+                        </div>
+                        <div class="text-3xl opacity-30">🥩</div>
+                      </div>
+                    </div>
+                    <div class="w-28 bg-gray-100 flex items-center justify-center">
+                      <div class="text-center text-gray-400">
+                        <span class="text-xl">🔒</span>
+                        <p class="text-xs mt-1">Locked</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Path Connector -->
+              <div class="flex justify-center">
+                <div class="w-0.5 h-6 path-connector rounded-full"></div>
+              </div>
+
+              <!-- LESSON 3 - LOCKED -->
+              <div class="lesson-card opacity-60">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div class="flex">
+                    <div class="w-16 bg-gray-200 flex flex-col items-center justify-center py-4">
+                      <span class="text-gray-400 text-2xl font-bold">3</span>
+                    </div>
+                    <div class="flex-1 p-4">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <h3 class="font-bold text-base text-gray-400">🍞 Carbs for Energy</h3>
+                          <p class="text-sm text-gray-400 mt-1">The best fuel sources for active kids</p>
+                          <div class="flex items-center space-x-2 mt-3">
+                            <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-full">5 min</span>
+                            <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-full">+15 XP</span>
+                          </div>
+                        </div>
+                        <div class="text-3xl opacity-30">🍞</div>
+                      </div>
+                    </div>
+                    <div class="w-28 bg-gray-100 flex items-center justify-center">
+                      <span class="text-xl text-gray-400">🔒</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ==================== -->
+              <!-- TREASURE CHEST CHECKPOINT - TONED DOWN -->
+              <!-- ==================== -->
+              <div class="flex justify-center py-4">
+                <div class="treasure-subtle bg-white rounded-2xl px-6 py-5 border border-gray-200 shadow-sm max-w-lg w-full">
+                  <div class="flex items-center space-x-4">
+                    <!-- Treasure Chest Icon - Subtle -->
+                    <div class="relative">
+                      <div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl flex items-center justify-center border border-amber-300">
+                        <span class="text-3xl">📦</span>
+                      </div>
+                      <!-- Lock overlay -->
+                      <div class="absolute -top-1 -right-1 w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center border-2 border-white">
+                        <span class="text-xs">🔒</span>
+                      </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1">
+                      <h4 class="font-bold text-gray-800">Checkpoint Reward</h4>
+                      <p class="text-sm text-gray-500 mt-0.5">Complete 3 lessons to unlock</p>
+
+                      <!-- Progress bar -->
+                      <div class="mt-2">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                          <span>Progress</span>
+                          <span>0 / 3</span>
+                        </div>
+                        <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div class="bg-amber-400 h-full rounded-full transition-all" style="width: 0%"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Reward preview -->
+                    <div class="text-center px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
+                      <div class="text-lg">🎁</div>
+                      <div class="text-xs text-gray-600 font-medium">+50 XP</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Path Connector -->
+              <div class="flex justify-center">
+                <div class="w-0.5 h-6 path-connector rounded-full"></div>
+              </div>
+
+              <!-- LESSON 4 - LOCKED -->
+              <div class="lesson-card opacity-60">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div class="flex">
+                    <div class="w-16 bg-gray-200 flex flex-col items-center justify-center py-4">
+                      <span class="text-gray-400 text-2xl font-bold">4</span>
+                    </div>
+                    <div class="flex-1 p-4">
+                      <h3 class="font-bold text-base text-gray-400">💧 Hydration Station</h3>
+                      <p class="text-sm text-gray-400 mt-1">Why water is your best friend during sports</p>
+                    </div>
+                    <div class="w-28 bg-gray-100 flex items-center justify-center">
+                      <span class="text-xl text-gray-400">🔒</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Path Connector -->
+              <div class="flex justify-center">
+                <div class="w-0.5 h-6 path-connector rounded-full"></div>
+              </div>
+
+              <!-- LESSON 5 - LOCKED -->
+              <div class="lesson-card opacity-60">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div class="flex">
+                    <div class="w-16 bg-gray-200 flex flex-col items-center justify-center py-4">
+                      <span class="text-gray-400 text-2xl font-bold">5</span>
+                    </div>
+                    <div class="flex-1 p-4">
+                      <h3 class="font-bold text-base text-gray-400">🍌 Snack Attack</h3>
+                      <p class="text-sm text-gray-400 mt-1">Healthy pre-game snack ideas</p>
+                    </div>
+                    <div class="w-28 bg-gray-100 flex items-center justify-center">
+                      <span class="text-xl text-gray-400">🔒</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- More lessons indicator -->
+              <div class="text-center py-4">
+                <p class="text-gray-400 text-sm">+ 5 more lessons below</p>
+              </div>
+
+            </div>
+
+            <!-- Next Topic Preview - Subtle -->
+            <div class="mt-6 bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs text-gray-400 font-medium uppercase tracking-wide">Next Topic</span>
+                  <h3 class="text-lg font-bold text-gray-800 mt-1">🌊 Hydration Heroes</h3>
+                  <p class="text-sm text-gray-500 mt-1">Learn why water is your superpower!</p>
+                </div>
+                <div class="text-4xl opacity-40">🔒</div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ==================== -->
+        <!-- RIGHT SIDEBAR - 340px -->
+        <!-- ==================== -->
+        <div class="w-[340px] bg-gray-50 border-l border-gray-200 p-5 space-y-5 flex-shrink-0">
+
+          <!-- Weekly Challenge - Slightly toned down -->
+          <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-md">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs bg-white/20 px-3 py-1 rounded-full font-medium">🎯 WEEKLY CHALLENGE</span>
+              <span class="text-xs opacity-80">3 days left</span>
+            </div>
+            <h3 class="font-bold text-lg">Complete 5 Lessons</h3>
+            <p class="text-sm text-indigo-100 mt-1">Earn a special badge!</p>
+            <div class="mt-4">
+              <div class="flex justify-between text-xs mb-1 opacity-80">
+                <span>Progress</span>
+                <span>0/5</span>
+              </div>
+              <div class="bg-white/20 rounded-full h-2">
+                <div class="bg-white h-2 rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TOPIC LESSONS - Simple List -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-base text-gray-800">Topic Lessons</h3>
+              <span class="text-sm text-gray-400">0/10</span>
+            </div>
+
+            <div class="space-y-1 max-h-[300px] overflow-y-auto">
+              <!-- Lesson 1 - Current -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg bg-orange-50 cursor-pointer">
+                <span class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</span>
+                <span class="text-sm font-medium text-gray-900 flex-1">Rocket Fuel for Legs!</span>
+                <span class="text-green-500 text-xs">▶</span>
+              </div>
+
+              <!-- Lesson 2 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">2</span>
+                <span class="text-sm text-gray-500 flex-1">Power Up Proteins</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <!-- Lesson 3 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">3</span>
+                <span class="text-sm text-gray-500 flex-1">Carbs for Energy</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <!-- Checkpoint -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg opacity-50">
+                <span class="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 text-xs">📦</span>
+                <span class="text-sm text-amber-700 flex-1">Checkpoint Reward</span>
+                <span class="text-amber-600 text-xs">0/3</span>
+              </div>
+
+              <!-- Lesson 4 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">4</span>
+                <span class="text-sm text-gray-500 flex-1">Hydration Station</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <!-- Lesson 5 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">5</span>
+                <span class="text-sm text-gray-500 flex-1">Snack Attack</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <!-- Lesson 6 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">6</span>
+                <span class="text-sm text-gray-500 flex-1">Recovery Foods</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <!-- Checkpoint 2 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg opacity-50">
+                <span class="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 text-xs">📦</span>
+                <span class="text-sm text-amber-700 flex-1">Checkpoint Reward</span>
+                <span class="text-amber-600 text-xs">0/6</span>
+              </div>
+
+              <!-- Lesson 7-10 -->
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">7</span>
+                <span class="text-sm text-gray-500 flex-1">Game Day Meals</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">8</span>
+                <span class="text-sm text-gray-500 flex-1">Breakfast Champions</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">9</span>
+                <span class="text-sm text-gray-500 flex-1">Protein Power</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+
+              <div class="flex items-center space-x-3 py-2 px-2 rounded-lg hover:bg-gray-50 opacity-50">
+                <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs font-bold">10</span>
+                <span class="text-sm text-gray-500 flex-1">Final Challenge</span>
+                <span class="text-gray-400 text-xs">🔒</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LEADERBOARD -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-base text-gray-800">🏆 Leaderboard</h3>
+              <a href="#" class="text-sm text-orange-500 font-medium hover:underline">View All →</a>
+            </div>
+
+            <div class="space-y-2">
+              <!-- 1st Place -->
+              <div class="flex items-center space-x-3 p-2 bg-amber-50/50 rounded-xl">
+                <span class="text-lg">🥇</span>
+                <div class="w-7 h-7 bg-purple-400 rounded-full flex items-center justify-center text-white text-xs font-bold">S</div>
+                <div class="flex-1">
+                  <p class="font-medium text-sm text-gray-800">Sarah K.</p>
+                </div>
+                <span class="font-bold text-sm text-gray-700">450 XP</span>
+              </div>
+
+              <!-- 2nd Place -->
+              <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-xl">
+                <span class="text-lg">🥈</span>
+                <div class="w-7 h-7 bg-blue-400 rounded-full flex items-center justify-center text-white text-xs font-bold">M</div>
+                <div class="flex-1">
+                  <p class="font-medium text-sm text-gray-700">Mike T.</p>
+                </div>
+                <span class="font-bold text-sm text-gray-600">380 XP</span>
+              </div>
+
+              <!-- 3rd Place -->
+              <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-xl">
+                <span class="text-lg">🥉</span>
+                <div class="w-7 h-7 bg-green-400 rounded-full flex items-center justify-center text-white text-xs font-bold">A</div>
+                <div class="flex-1">
+                  <p class="font-medium text-sm text-gray-700">Alex R.</p>
+                </div>
+                <span class="font-bold text-sm text-gray-600">290 XP</span>
+              </div>
+
+              <!-- Your position -->
+              <div class="border-t border-gray-100 pt-2 mt-2">
+                <div class="flex items-center space-x-3 p-2 bg-orange-50 rounded-xl border border-orange-200">
+                  <span class="text-xs font-bold text-gray-500 w-5 text-center">#8</span>
+                  <div class="w-7 h-7 bg-orange-400 rounded-full flex items-center justify-center text-white text-xs font-bold">R</div>
+                  <div class="flex-1">
+                    <p class="font-medium text-sm text-gray-800">You (Rav)</p>
+                  </div>
+                  <span class="font-bold text-sm text-orange-600">85 XP</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ad Placeholder -->
+          <div class="bg-gray-100 rounded-2xl p-4 border border-gray-200">
+            <div class="text-center py-8">
+              <div class="text-3xl mb-2 opacity-50">📣</div>
+              <p class="text-sm text-gray-400">Ad Placeholder</p>
+              <p class="text-xs text-gray-300 mt-1">340 x 180</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-lg border border-gray-200 px-5 py-3 z-50">
+    <div class="flex items-center space-x-3 text-xs">
+      <span class="font-bold text-gray-600">BALANCED DESIGN:</span>
+      <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">✓ Removed Day Streak</span>
+      <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">✓ Subtle Checkpoint</span>
+      <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">✓ Toned Colors</span>
+    </div>
+  </div>
+
+</body>
+</html>
