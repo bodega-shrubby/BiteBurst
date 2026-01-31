@@ -26,11 +26,28 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
   app.get('/api/lessons/year-group/:yearGroup', requireAuth, async (req: any, res: any) => {
     try {
       const { yearGroup } = req.params;
-      const userId = req.userId;
+      const childUserId = req.query.userId as string;
+      
+      // Validate child profile belongs to parent
+      if (!childUserId) {
+        return res.status(400).json({ error: 'userId query parameter is required' });
+      }
+      
+      const childProfile = await storage.getUser(childUserId);
+      if (!childProfile) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      const isParentOwned = childProfile.parentAuthId === req.userId;
+      const isDirectMatch = childUserId === req.userId;
+      
+      if (!isParentOwned && !isDirectMatch) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
       
       const allLessons = await storage.getLessonsByYearGroup(yearGroup);
       
-      const completedLessons = await storage.getCompletedLessonIds(userId);
+      const completedLessons = await storage.getCompletedLessonIds(childUserId);
       const completedLessonIds = new Set(completedLessons);
       
       let foundCurrent = false;
