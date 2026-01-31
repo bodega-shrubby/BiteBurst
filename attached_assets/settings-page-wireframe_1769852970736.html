@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Settings Page - Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen">
+
+  <!-- Header Banner -->
+  <div class="bg-gray-700 text-white text-center py-2 text-sm font-bold">
+    WIREFRAME: BiteBurst Settings Page (Family Plan User)
+  </div>
+
+  <div class="flex min-h-screen">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-[200px] bg-white border-r border-gray-200 flex-shrink-0 p-4 sticky top-0 h-screen">
+      <div class="mb-6">
+        <span class="text-2xl">🍊</span>
+        <span class="text-lg font-bold text-orange-500 ml-2">BiteBurst</span>
+      </div>
+
+      <nav class="space-y-2">
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>📚</span>
+          <span class="text-sm">Lessons</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>🏆</span>
+          <span class="text-sm">Champs</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>➕</span>
+          <span class="text-sm">LOG</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>👤</span>
+          <span class="text-sm">Profile</span>
+        </div>
+        <div class="border-t border-gray-200 my-3"></div>
+        <div class="flex items-center space-x-3 px-4 py-3 bg-orange-50 text-orange-600 rounded-xl border border-orange-200">
+          <span>⚙️</span>
+          <span class="text-sm font-semibold">Settings</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex justify-center py-8">
+      <div class="w-full max-w-xl px-6">
+
+        <!-- Page Header -->
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+
+        <!-- Current Child Selector (Family Plan Only) -->
+        <div class="bg-gradient-to-r from-purple-50 to-orange-50 rounded-2xl border border-purple-200 p-4 mb-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-orange-300 shadow-sm">
+                <span class="text-2xl">🧒</span>
+              </div>
+              <div>
+                <p class="text-xs text-purple-600 font-medium">Currently learning as</p>
+                <p class="font-bold text-gray-900">Amar</p>
+              </div>
+            </div>
+            <a href="manage-children-wireframe.html" class="text-sm text-orange-500 font-medium hover:text-orange-600">
+              Switch →
+            </a>
+          </div>
+        </div>
+
+        <!-- Settings Menu -->
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+          <!-- Manage Children (Family Plan Only) -->
+          <a href="manage-children-wireframe.html" class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <span class="text-lg">👨‍👩‍👧‍👦</span>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900">Manage Children</p>
+                <p class="text-sm text-gray-500">Add, edit, or switch profiles</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">3 kids</span>
+              <span class="text-gray-400">→</span>
+            </div>
+          </a>
+
+          <!-- Profile -->
+          <a href="profile-page-wireframe.html" class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                <span class="text-lg">👤</span>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900">Profile</p>
+                <p class="text-sm text-gray-500">Edit your account details</p>
+              </div>
+            </div>
+            <span class="text-gray-400">→</span>
+          </a>
+
+          <!-- Subscription -->
+          <a href="subscription-page-wireframe.html" class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="text-lg">⭐</span>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900">Subscription</p>
+                <p class="text-sm text-gray-500">Manage your plan</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">Family Pro</span>
+              <span class="text-gray-400">→</span>
+            </div>
+          </a>
+
+          <!-- Help -->
+          <div class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <span class="text-lg">❓</span>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900">Help & Support</p>
+                <p class="text-sm text-gray-500">FAQs and contact us</p>
+              </div>
+            </div>
+            <span class="text-gray-400">→</span>
+          </div>
+
+          <!-- Logout -->
+          <div class="flex items-center justify-between p-4 hover:bg-red-50 cursor-pointer transition">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <span class="text-lg">🚪</span>
+              </div>
+              <div>
+                <p class="font-semibold text-red-600">Log Out</p>
+                <p class="text-sm text-gray-500">Sign out of your account</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- App Info -->
+        <div class="mt-8 text-center">
+          <p class="text-sm text-gray-400">BiteBurst v1.0.0</p>
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="#" class="text-xs text-gray-400 hover:text-gray-600">Privacy Policy</a>
+            <span class="text-gray-300">•</span>
+            <a href="#" class="text-xs text-gray-400 hover:text-gray-600">Terms of Service</a>
+          </div>
+        </div>
+
+        <!-- Note for Free Users -->
+        <div class="mt-8 p-4 bg-gray-100 rounded-xl text-center">
+          <p class="text-xs text-gray-500">
+            <strong>Note:</strong> "Manage Children" and child switcher only appear for Family Plan subscribers.
+            Free/Individual users won't see these options.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

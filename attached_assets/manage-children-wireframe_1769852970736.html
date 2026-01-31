@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Manage Children - Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .child-card {
+      transition: all 0.2s ease;
+    }
+    .child-card:hover {
+      transform: translateY(-2px);
+    }
+    .child-active {
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen">
+
+  <!-- Header Banner -->
+  <div class="bg-gray-700 text-white text-center py-2 text-sm font-bold">
+    WIREFRAME: BiteBurst Manage Children (Family Plan) - Updated with Year Group/Grade
+  </div>
+
+  <div class="flex min-h-screen">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-[200px] bg-white border-r border-gray-200 flex-shrink-0 p-4 sticky top-0 h-screen">
+      <div class="mb-6">
+        <span class="text-2xl">🍊</span>
+        <span class="text-lg font-bold text-orange-500 ml-2">BiteBurst</span>
+      </div>
+
+      <nav class="space-y-2">
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>📚</span>
+          <span class="text-sm">Lessons</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>🏆</span>
+          <span class="text-sm">Champs</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>➕</span>
+          <span class="text-sm">LOG</span>
+        </div>
+        <div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+          <span>👤</span>
+          <span class="text-sm">Profile</span>
+        </div>
+        <div class="border-t border-gray-200 my-3"></div>
+        <div class="flex items-center space-x-3 px-4 py-3 bg-orange-50 text-orange-600 rounded-xl border border-orange-200">
+          <span>⚙️</span>
+          <span class="text-sm font-semibold">Settings</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex justify-center py-8">
+      <div class="w-full max-w-xl px-6">
+
+        <!-- Back Button + Header -->
+        <div class="flex items-center space-x-3 mb-6">
+          <a href="settings-page-wireframe.html" class="w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition">
+            <span class="text-gray-600">←</span>
+          </a>
+          <h1 class="text-2xl font-bold text-gray-900">Manage Children</h1>
+        </div>
+
+        <!-- Plan Info Banner -->
+        <div class="bg-purple-50 rounded-2xl p-4 mb-6 flex items-center justify-between border border-purple-100">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">👨‍👩‍👧‍👦</span>
+            <div>
+              <p class="font-semibold text-purple-800">Family Plan</p>
+              <p class="text-sm text-purple-600">3 of 4 children added</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-white text-purple-600 px-2 py-1 rounded-full border border-purple-200">🇬🇧 UK Curriculum</span>
+            <div class="w-20 bg-purple-200 rounded-full h-2">
+              <div class="bg-purple-500 h-2 rounded-full" style="width: 75%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Children List -->
+        <div class="space-y-3 mb-6">
+
+          <!-- Child 1 - Active/Selected (UK Curriculum) -->
+          <div class="child-card child-active bg-white rounded-2xl border-2 p-4 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="relative">
+                  <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center border-2 border-orange-300">
+                    <span class="text-2xl">🧒</span>
+                  </div>
+                  <!-- Active indicator -->
+                  <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
+                    <span class="text-white text-xs">✓</span>
+                  </div>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-900">Amar</p>
+                  <p class="text-sm text-gray-500">@AMARTHEPRO • <span class="text-orange-600 font-medium">Year 5</span></p>
+                  <div class="flex items-center space-x-2 mt-1">
+                    <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">🔥 5 day streak</span>
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">450 XP</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">Active</span>
+                <button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition">
+                  <span class="text-gray-500">✏️</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Child 2 (UK Curriculum) -->
+          <div class="child-card bg-white rounded-2xl border border-gray-200 p-4 cursor-pointer hover:border-orange-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center border-2 border-pink-200">
+                  <span class="text-2xl">👧</span>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-900">Priya</p>
+                  <p class="text-sm text-gray-500">@PRIYASTAR • <span class="text-orange-600 font-medium">Year 3</span></p>
+                  <div class="flex items-center space-x-2 mt-1">
+                    <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">🔥 3 day streak</span>
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">280 XP</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button class="text-sm text-orange-500 font-medium hover:text-orange-600 px-3 py-1 rounded-full border border-orange-200 hover:bg-orange-50 transition">
+                  Switch
+                </button>
+                <button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition">
+                  <span class="text-gray-500">✏️</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Child 3 (UK Curriculum) -->
+          <div class="child-card bg-white rounded-2xl border border-gray-200 p-4 cursor-pointer hover:border-orange-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-200">
+                  <span class="text-2xl">👦</span>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-900">Raj</p>
+                  <p class="text-sm text-gray-500">@RAJTHECHAMP • <span class="text-orange-600 font-medium">Year 7</span></p>
+                  <div class="flex items-center space-x-2 mt-1">
+                    <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">No streak</span>
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">120 XP</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button class="text-sm text-orange-500 font-medium hover:text-orange-600 px-3 py-1 rounded-full border border-orange-200 hover:bg-orange-50 transition">
+                  Switch
+                </button>
+                <button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition">
+                  <span class="text-gray-500">✏️</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Add Child Button - Triggers Onboarding Flow -->
+        <button class="w-full bg-white rounded-2xl border-2 border-dashed border-gray-300 p-5 hover:border-orange-300 hover:bg-orange-50 transition group">
+          <div class="flex items-center justify-center space-x-3">
+            <div class="w-12 h-12 bg-gray-100 group-hover:bg-orange-100 rounded-full flex items-center justify-center transition">
+              <span class="text-2xl text-gray-400 group-hover:text-orange-500">+</span>
+            </div>
+            <div class="text-left">
+              <p class="font-semibold text-gray-700 group-hover:text-orange-600">Add Another Child</p>
+              <p class="text-sm text-gray-500">1 spot remaining • Starts onboarding</p>
+            </div>
+          </div>
+        </button>
+
+        <!-- Info Note -->
+        <div class="mt-6 bg-blue-50 rounded-2xl p-4 border border-blue-100">
+          <div class="flex items-start space-x-3">
+            <span class="text-lg">💡</span>
+            <div>
+              <p class="font-medium text-blue-800 text-sm">About Year Groups</p>
+              <p class="text-sm text-blue-600 mt-1">
+                Year groups are based on the UK curriculum you selected. Each child's lessons are tailored to their specific year group.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ONBOARDING FLOW FOR NEW CHILD - Preview -->
+  <!-- ============================================ -->
+
+  <div class="border-t-4 border-dashed border-gray-300 mt-8">
+    <div class="text-center py-4 bg-gray-200">
+      <p class="text-sm font-bold text-gray-600">↓ CHILD ONBOARDING FLOW (triggered when "Add Another Child" is clicked) ↓</p>
+    </div>
+
+    <!-- Onboarding Step 1: Child's Name -->
+    <div class="bg-white py-8">
+      <div class="max-w-md mx-auto px-6">
+        <div class="mb-4">
+          <span class="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-medium">Step 1 of 7</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="bg-orange-500 h-2 rounded-full" style="width: 14%"></div>
+        </div>
+
+        <h1 class="font-extrabold text-3xl text-gray-900 mb-6">What's your child's name?</h1>
+
+        <input
+          type="text"
+          placeholder="Enter their name"
+          class="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl text-lg focus:outline-none focus:border-orange-500 mb-6"
+        />
+
+        <button class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition">
+          NEXT
+        </button>
+      </div>
+    </div>
+
+    <!-- Onboarding Step 2: Year Group / Grade -->
+    <div class="bg-gray-50 py-8 border-t border-gray-200">
+      <div class="max-w-md mx-auto px-6">
+        <div class="mb-4">
+          <span class="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-medium">Step 2 of 7</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="bg-orange-500 h-2 rounded-full" style="width: 28%"></div>
+        </div>
+
+        <h1 class="font-extrabold text-3xl text-gray-900 mb-2">What year group is your child in?</h1>
+        <p class="text-gray-500 mb-6">Based on UK curriculum (inherited from family)</p>
+
+        <!-- Year Group Options (UK) -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 2
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 3
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-orange-500 bg-orange-500 text-white transition">
+            Year 4
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 5
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 6
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 7
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 8
+          </button>
+          <button class="px-4 py-4 text-lg font-bold rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            Year 9
+          </button>
+        </div>
+
+        <button class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition">
+          NEXT
+        </button>
+
+        <!-- US Grade Alternative -->
+        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <p class="text-xs text-blue-600">
+            <strong>Note:</strong> If family used US curriculum, this would show: Grade 1, Grade 2, Grade 3, etc.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding Step 3: Goal -->
+    <div class="bg-white py-8 border-t border-gray-200">
+      <div class="max-w-md mx-auto px-6">
+        <div class="mb-4">
+          <span class="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-medium">Step 3 of 7</span>
+        </div>
+
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="bg-orange-500 h-2 rounded-full" style="width: 42%"></div>
+        </div>
+
+        <h1 class="font-extrabold text-3xl text-gray-900 mb-6">What's their learning goal?</h1>
+
+        <div class="space-y-3 mb-6">
+          <button class="w-full p-4 text-left rounded-2xl border-2 border-orange-500 bg-orange-50 transition">
+            <p class="font-bold text-gray-900">🎯 Build healthy habits</p>
+            <p class="text-sm text-gray-500">Learn about nutrition basics</p>
+          </button>
+          <button class="w-full p-4 text-left rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            <p class="font-bold text-gray-900">⚽ Improve sports performance</p>
+            <p class="text-sm text-gray-500">Fuel for active kids</p>
+          </button>
+          <button class="w-full p-4 text-left rounded-2xl border-2 border-gray-200 hover:border-orange-300 transition">
+            <p class="font-bold text-gray-900">🧠 Learn food science</p>
+            <p class="text-sm text-gray-500">Understand how food works</p>
+          </button>
+        </div>
+
+        <button class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition">
+          NEXT
+        </button>
+      </div>
+    </div>
+
+    <!-- Onboarding Step 4: Avatar -->
+    <div class="bg-gray-50 py-8 border-t border-gray-200">
+      <div class="max-w-md mx-auto px-6">
+        <div class="mb-4">
+          <span class="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-medium">Step 4 of 7</span>
+        </div>
+
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="bg-orange-500 h-2 rounded-full" style="width: 56%"></div>
+        </div>
+
+        <h1 class="font-extrabold text-3xl text-gray-900 mb-6">Choose an avatar!</h1>
+
+        <div class="flex justify-center flex-wrap gap-4 mb-6">
+          <button class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center border-4 border-orange-500 hover:scale-110 transition">
+            <span class="text-3xl">🧒</span>
+          </button>
+          <button class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center border-2 border-transparent hover:border-pink-300 hover:scale-110 transition">
+            <span class="text-3xl">👧</span>
+          </button>
+          <button class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center border-2 border-transparent hover:border-blue-300 hover:scale-110 transition">
+            <span class="text-3xl">👦</span>
+          </button>
+          <button class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center border-2 border-transparent hover:border-purple-300 hover:scale-110 transition">
+            <span class="text-3xl">🧒🏽</span>
+          </button>
+          <button class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center border-2 border-transparent hover:border-green-300 hover:scale-110 transition">
+            <span class="text-3xl">👧🏿</span>
+          </button>
+          <button class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center border-2 border-transparent hover:border-yellow-300 hover:scale-110 transition">
+            <span class="text-3xl">👦🏽</span>
+          </button>
+        </div>
+
+        <button class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition">
+          NEXT
+        </button>
+      </div>
+    </div>
+
+    <!-- Onboarding Step 5-6: Food Preferences (Combined Preview) -->
+    <div class="bg-white py-8 border-t border-gray-200">
+      <div class="max-w-md mx-auto px-6">
+        <div class="mb-4">
+          <span class="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-medium">Steps 5-6 of 7</span>
+        </div>
+
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="bg-orange-500 h-2 rounded-full" style="width: 78%"></div>
+        </div>
+
+        <h1 class="font-extrabold text-3xl text-gray-900 mb-2">Food Preferences</h1>
+        <p class="text-gray-500 mb-6">Help us personalize their learning journey</p>
+
+        <div class="space-y-4 mb-6">
+          <div class="p-4 bg-green-50 rounded-2xl border border-green-200">
+            <p class="font-bold text-green-800 mb-2">🍎 Favorite Fruits</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-green-500 text-white rounded-full text-sm">Apple</span>
+              <span class="px-3 py-1 bg-green-500 text-white rounded-full text-sm">Banana</span>
+              <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">Orange</span>
+              <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">+5 more</span>
+            </div>
+          </div>
+
+          <div class="p-4 bg-orange-50 rounded-2xl border border-orange-200">
+            <p class="font-bold text-orange-800 mb-2">🥕 Favorite Veggies</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-orange-500 text-white rounded-full text-sm">Carrots</span>
+              <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">Broccoli</span>
+              <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">+6 more</span>
+            </div>
+          </div>
+
+          <div class="p-4 bg-purple-50 rounded-2xl border border-purple-200">
+            <p class="font-bold text-purple-800 mb-2">⚽ Favorite Sports</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-purple-500 text-white rounded-full text-sm">Football</span>
+              <span class="px-3 py-1 bg-purple-500 text-white rounded-full text-sm">Swimming</span>
+              <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">+4 more</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition">
+          NEXT
+        </button>
+      </div>
+    </div>
+
+    <!-- Onboarding Step 7: Review & Complete -->
+    <div class="bg-gray-50 py-8 border-t border-gray-200">
+      <div class="max-w-md mx-auto px-6">
+        <div class="mb-4">
+          <span class="text-xs bg-green-100 text-green-600 px-3 py-1 rounded-full font-medium">Step 7 of 7 - Review</span>
+        </div>
+
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+        </div>
+
+        <h1 class="font-extrabold text-3xl text-gray-900 mb-6">All set! 🎉</h1>
+
+        <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm mb-6">
+          <div class="flex items-center space-x-4 mb-4">
+            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center border-2 border-orange-300">
+              <span class="text-3xl">🧒</span>
+            </div>
+            <div>
+              <p class="font-bold text-xl text-gray-900">Maya</p>
+              <p class="text-sm text-gray-500">@MAYATHEGREAT</p>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-gray-500">Year Group</span>
+              <span class="font-medium text-gray-900">Year 4</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-gray-500">Curriculum</span>
+              <span class="font-medium text-gray-900">🇬🇧 UK Key Stage 2</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-gray-500">Goal</span>
+              <span class="font-medium text-gray-900">Build healthy habits</span>
+            </div>
+            <div class="flex justify-between py-2">
+              <span class="text-gray-500">Favorite Sport</span>
+              <span class="font-medium text-gray-900">Football, Swimming</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full bg-green-500 text-white font-bold py-4 rounded-xl hover:bg-green-600 transition mb-3">
+          ADD CHILD TO FAMILY
+        </button>
+
+        <p class="text-center text-sm text-gray-500">
+          You can always edit these details later in Settings
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-lg border border-gray-200 px-5 py-3 z-40">
+    <div class="flex items-center space-x-3 text-xs">
+      <span class="font-bold text-gray-600">KEY CHANGES:</span>
+      <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded">Year Group instead of Age</span>
+      <span class="bg-purple-100 text-purple-600 px-2 py-1 rounded">Full Onboarding Flow</span>
+    </div>
+  </div>
+
+</body>
+</html>
