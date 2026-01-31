@@ -74,6 +74,78 @@ function HeartsDisplay({ hearts = 3, maxHearts = 5 }: { hearts?: number; maxHear
   );
 }
 
+function Confetti() {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50" aria-hidden="true">
+      <div className="confetti-particle">🎉</div>
+      <div className="confetti-particle">✨</div>
+      <div className="confetti-particle">🎊</div>
+      <div className="confetti-particle">⭐</div>
+      <div className="confetti-particle">🌟</div>
+      <div className="confetti-particle">💫</div>
+      <div className="confetti-particle">🎉</div>
+      <div className="confetti-particle">✨</div>
+      <div className="confetti-particle">🎊</div>
+    </div>
+  );
+}
+
+interface BadgeToastProps {
+  badge: { code: string; name: string };
+  isVisible: boolean;
+  onClose: () => void;
+}
+
+function BadgeToast({ badge, isVisible, onClose }: BadgeToastProps) {
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(onClose, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onClose]);
+  
+  if (!isVisible) return null;
+  
+  return (
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 toast-enter pointer-events-none">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 max-w-sm pointer-events-auto">
+        <div className="text-2xl animate-bounce">🏆</div>
+        <div>
+          <p className="font-bold text-sm">New Badge Unlocked!</p>
+          <p className="text-sm opacity-90">{badge.name}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface XPBurstProps {
+  amount: number;
+  visible: boolean;
+  onComplete: () => void;
+}
+
+function XPBurst({ amount, visible, onComplete }: XPBurstProps) {
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(onComplete, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, onComplete]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+      <div className="xp-burst-animation">
+        <span className="text-5xl font-black text-orange-500 drop-shadow-lg">
+          +{amount} XP
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function getMascotGreeting(displayName: string, xpToday: number, xpGoal: number): string {
   const hour = new Date().getHours();
   const percentToGoal = (xpToday / xpGoal) * 100;
@@ -123,9 +195,16 @@ export default function DashboardRedesign() {
   const { user, session, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [xpBurst, setXpBurst] = useState<{ amount: number; visible: boolean }>({ amount: 0, visible: false });
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [badgeToast, setBadgeToast] = useState<{ badge: { code: string; name: string }; visible: boolean } | null>(null);
+  const [hasGoalCelebrated, setHasGoalCelebrated] = useState(false);
 
   const handleXpBurst = useCallback((amount: number) => {
     setXpBurst({ amount, visible: true });
+  }, []);
+
+  const handleBadgeUnlock = useCallback((badge: { code: string; name: string }) => {
+    setBadgeToast({ badge, visible: true });
   }, []);
 
   const { data: dailySummary, isLoading, error } = useQuery<DailySummaryV2>({
@@ -160,6 +239,14 @@ export default function DashboardRedesign() {
     },
     enabled: !!user?.id && !!session?.access_token,
   });
+
+  useEffect(() => {
+    if (dailySummary && !hasGoalCelebrated && dailySummary.xp_today >= dailySummary.xp_goal) {
+      setHasGoalCelebrated(true);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }, [dailySummary, hasGoalCelebrated]);
 
   if (authLoading) {
     return <DashboardSkeleton />;
@@ -370,12 +457,31 @@ export default function DashboardRedesign() {
               emoji: badge.emoji,
               progress: badge.progress,
             })) || dailySummary.badges.locked}
+            onBadgeUnlock={handleBadgeUnlock}
           />
         </div>
       </div>
 
       {/* Bottom Navigation - Mobile only */}
       <BottomNavigation />
+
+      {/* Celebrations */}
+      {showConfetti && <Confetti />}
+      
+      {badgeToast && (
+        <BadgeToast
+          badge={badgeToast.badge}
+          isVisible={badgeToast.visible}
+          onClose={() => setBadgeToast(null)}
+        />
+      )}
+      
+      {/* XP Burst Animation */}
+      <XPBurst 
+        amount={xpBurst.amount} 
+        visible={xpBurst.visible}
+        onComplete={() => setXpBurst({ ...xpBurst, visible: false })}
+      />
     </div>
   );
 }
