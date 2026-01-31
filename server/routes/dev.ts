@@ -6,6 +6,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { updateStreak, getCurrentTime } from "../utils/streakTracker";
+import { supabaseAdmin } from "../lib/supabase";
 
 export function registerDevRoutes(app: Express) {
   // Only register dev routes in development
@@ -143,6 +144,43 @@ export function registerDevRoutes(app: Express) {
       success: true,
       message: 'Clear localStorage.removeItem("streakShownOn") on the frontend to test pill display again'
     });
+  });
+
+  // Delete orphaned Supabase user by email (for cleanup after failed signup)
+  app.post('/api/dev/delete-supabase-user', async (req: any, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'email required' });
+      }
+
+      // List users and find by email
+      const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError) {
+        return res.status(500).json({ error: 'Failed to list users', details: listError.message });
+      }
+
+      const user = users.users.find(u => u.email === email);
+      if (!user) {
+        return res.status(404).json({ error: `No Supabase user found with email: ${email}` });
+      }
+
+      // Delete the user
+      const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+      if (deleteError) {
+        return res.status(500).json({ error: 'Failed to delete user', details: deleteError.message });
+      }
+
+      res.json({ 
+        success: true, 
+        message: `Deleted Supabase user: ${email}`,
+        userId: user.id
+      });
+    } catch (error) {
+      console.error('Dev delete-supabase-user error:', error);
+      res.status(500).json({ error: 'Failed to delete Supabase user' });
+    }
   });
 
   console.log('🛠️  Development streak testing routes registered:');

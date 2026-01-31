@@ -53,6 +53,7 @@ export interface IStorage {
     authProvider: string;
     subscriptionPlan?: string;
     subscriptionChildrenLimit?: number;
+    displayName?: string;
   }): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User>;
   
@@ -183,6 +184,7 @@ export class DatabaseStorage implements IStorage {
     authProvider: string;
     subscriptionPlan?: string;
     subscriptionChildrenLimit?: number;
+    displayName?: string;
   }): Promise<User> {
     const [user] = await db.insert(users).values({
       parentAuthId: data.parentAuthId,
@@ -190,6 +192,7 @@ export class DatabaseStorage implements IStorage {
       parentEmail: data.parentEmail || data.email,
       parentConsent: data.parentConsent,
       authProvider: data.authProvider,
+      displayName: data.displayName || data.email.split('@')[0],
       subscriptionPlan: data.subscriptionPlan || 'free',
       subscriptionChildrenLimit: data.subscriptionChildrenLimit || 1,
       createdAt: new Date(),
