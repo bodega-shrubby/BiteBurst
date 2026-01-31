@@ -14,6 +14,7 @@ interface User {
   totalXp: number;
   level: number;
   streak: number;
+  activeChildId?: string;
 }
 
 interface SignupData {

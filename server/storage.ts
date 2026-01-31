@@ -33,7 +33,7 @@ import {
   type InsertChild,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -69,7 +69,7 @@ export interface IStorage {
   
   // Lesson attempt operations
   logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt>;
-  markLessonComplete(userId: string, lessonId: string, xpEarned: number): Promise<void>;
+  markLessonComplete(userId: string, lessonId: string, xpEarned: number, childId?: string): Promise<void>;
   
   // Lesson operations
   getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined>;
@@ -90,7 +90,7 @@ export interface IStorage {
   getLessonsByTopic(topicId: string): Promise<Lesson[]>;
   
   // Lesson progress operations
-  getCompletedLessonIds(userId: string): Promise<string[]>;
+  getCompletedLessonIds(userId: string, childId?: string): Promise<string[]>;
   
   // Lesson by year group operations
   getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]>;
@@ -351,8 +351,23 @@ export class DatabaseStorage implements IStorage {
       .orderBy(lessons.orderInUnit);
   }
   
-  // Get completed lesson IDs for a user
-  async getCompletedLessonIds(userId: string): Promise<string[]> {
+  // Get completed lesson IDs for a user or child
+  async getCompletedLessonIds(userId: string, childId?: string): Promise<string[]> {
+    // If childId is provided, fetch progress for that specific child
+    if (childId) {
+      // Check lesson_attempts for the child
+      const attemptResults = await db
+        .selectDistinct({ lessonId: lessonAttempts.lessonId })
+        .from(lessonAttempts)
+        .where(and(
+          eq(lessonAttempts.childId, childId),
+          eq(lessonAttempts.isCorrect, true)
+        ));
+      
+      return attemptResults.map(r => r.lessonId);
+    }
+    
+    // For primary child (no childId), use userId
     // First check user_lesson_progress table for explicitly completed lessons
     const progressResults = await db
       .select({ lessonId: userLessonProgress.lessonId })
@@ -362,13 +377,14 @@ export class DatabaseStorage implements IStorage {
         eq(userLessonProgress.completed, true)
       ));
     
-    // Also check lesson_attempts for backwards compatibility
+    // Also check lesson_attempts for backwards compatibility (where childId is null)
     const attemptResults = await db
       .selectDistinct({ lessonId: lessonAttempts.lessonId })
       .from(lessonAttempts)
       .where(and(
         eq(lessonAttempts.userId, userId),
-        eq(lessonAttempts.isCorrect, true)
+        eq(lessonAttempts.isCorrect, true),
+        sql`${lessonAttempts.childId} IS NULL`
       ));
     
     // Combine both sources
@@ -381,27 +397,61 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Mark a lesson as complete
-  async markLessonComplete(userId: string, lessonId: string, xpEarned: number): Promise<void> {
-    await db
-      .insert(userLessonProgress)
-      .values({
-        userId,
-        lessonId,
-        currentStep: 999, // All steps done
-        completed: true,
-        completedAt: new Date(),
-        totalXpEarned: xpEarned,
-        hearts: 5,
-      })
-      .onConflictDoUpdate({
-        target: [userLessonProgress.userId, userLessonProgress.lessonId],
-        set: {
+  async markLessonComplete(userId: string, lessonId: string, xpEarned: number, childId?: string): Promise<void> {
+    if (childId) {
+      // For additional children, we track completion via lesson_attempts with childId
+      // Check if there's already a completion record
+      const existing = await db
+        .select()
+        .from(lessonAttempts)
+        .where(and(
+          eq(lessonAttempts.childId, childId),
+          eq(lessonAttempts.lessonId, lessonId),
+          eq(lessonAttempts.isCorrect, true)
+        ))
+        .limit(1);
+      
+      if (existing.length === 0) {
+        // Get the first step of the lesson to use as reference
+        const steps = await db.select().from(lessonSteps).where(eq(lessonSteps.lessonId, lessonId)).limit(1);
+        const stepId = steps[0]?.id || 'completion-step';
+        
+        // Insert a completion record
+        await db.insert(lessonAttempts).values({
+          userId,
+          childId,
+          lessonId,
+          stepId,
+          stepNumber: 999,
+          attemptNumber: 1,
+          isCorrect: true,
+          heartsRemaining: 5,
+          xpEarned,
+        });
+      }
+    } else {
+      // For primary child, use user_lesson_progress
+      await db
+        .insert(userLessonProgress)
+        .values({
+          userId,
+          lessonId,
+          currentStep: 999, // All steps done
           completed: true,
           completedAt: new Date(),
           totalXpEarned: xpEarned,
-          updatedAt: new Date(),
-        }
-      });
+          hearts: 5,
+        })
+        .onConflictDoUpdate({
+          target: [userLessonProgress.userId, userLessonProgress.lessonId],
+          set: {
+            completed: true,
+            completedAt: new Date(),
+            totalXpEarned: xpEarned,
+            updatedAt: new Date(),
+          }
+        });
+    }
   }
   
   // Get lessons by year group

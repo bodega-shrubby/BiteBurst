@@ -279,6 +279,7 @@ export const userLessonProgress = pgTable("user_lesson_progress", {
 export const lessonAttempts = pgTable("lesson_attempts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  childId: varchar("child_id").references(() => children.id, { onDelete: 'cascade' }), // For additional children from children table
   lessonId: varchar("lesson_id").notNull().references(() => lessons.id, { onDelete: 'cascade' }),
   stepId: varchar("step_id").notNull().references(() => lessonSteps.id, { onDelete: 'cascade' }),
   stepNumber: integer("step_number").notNull(),
@@ -292,6 +293,7 @@ export const lessonAttempts = pgTable("lesson_attempts", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => ({
   userLessonIdx: index("lesson_attempts_user_lesson_idx").on(table.userId, table.lessonId),
+  childLessonIdx: index("lesson_attempts_child_lesson_idx").on(table.childId, table.lessonId),
   stepIdx: index("lesson_attempts_step_idx").on(table.stepId)
 }));
 
@@ -402,6 +404,7 @@ export const insertUserLessonProgressSchema = createInsertSchema(userLessonProgr
 
 export const insertLessonAttemptSchema = createInsertSchema(lessonAttempts).pick({
   userId: true,
+  childId: true, // For additional children from children table
   lessonId: true,
   stepId: true,
   stepNumber: true,

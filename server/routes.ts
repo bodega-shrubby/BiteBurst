@@ -259,6 +259,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalXp: user.totalXp || 0,
         level: user.level || 1,
         streak: user.streak || 0,
+        activeChildId: user.activeChildId,
       });
     } catch (error) {
       console.error("Get user error:", error);

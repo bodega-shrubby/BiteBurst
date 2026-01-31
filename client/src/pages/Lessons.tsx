@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useActiveChild } from '@/hooks/useActiveChild';
 import { apiRequest } from '@/lib/queryClient';
 import Sidebar from '@/components/Sidebar';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -345,12 +346,19 @@ function AdPlaceholder() {
 export default function Lessons() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const activeChild = useActiveChild(user);
   
-  const curriculumId = user?.curriculum || 'uk-ks2';
+  const curriculumId = activeChild?.curriculumId || user?.curriculum || 'uk-ks2';
   
   const { data: apiLessons, isLoading: lessonsLoading } = useQuery<ApiLesson[]>({
-    queryKey: [`/api/curriculum/${curriculumId}/lessons`, user?.id],
-    queryFn: () => apiRequest(`/api/curriculum/${curriculumId}/lessons?userId=${user?.id}`),
+    queryKey: [`/api/curriculum/${curriculumId}/lessons`, user?.id, activeChild?.childId],
+    queryFn: () => {
+      const params = new URLSearchParams({ userId: user?.id || '' });
+      if (activeChild?.childId) {
+        params.append('childId', activeChild.childId);
+      }
+      return apiRequest(`/api/curriculum/${curriculumId}/lessons?${params.toString()}`);
+    },
     enabled: !!user && !!curriculumId,
   });
 

@@ -5,6 +5,7 @@ import { insertLessonAttemptSchema } from "../../shared/schema";
 
 const answerSubmissionSchema = z.object({
   userId: z.string(),
+  childId: z.string().optional(), // For additional children from children table
   lessonId: z.string(),
   stepId: z.string(),
   answer: z.string(),
@@ -21,12 +22,45 @@ const setLessonCacheHeaders = (res: any) => {
   });
 };
 
+// Helper to validate childId ownership - ensures child belongs to the parent user
+async function validateChildOwnership(
+  childId: string | undefined, 
+  parentUserId: string, 
+  parentAuthId: string
+): Promise<{ valid: boolean; error?: string }> {
+  if (!childId) {
+    return { valid: true }; // No childId provided, nothing to validate
+  }
+  
+  const child = await storage.getChild(childId);
+  if (!child) {
+    return { valid: false, error: 'Child not found' };
+  }
+  
+  // Child's parentId should match the parent user ID
+  if (child.parentId !== parentUserId) {
+    return { valid: false, error: 'Unauthorized child access' };
+  }
+  
+  // Also verify that the parent user belongs to the authenticated parent
+  const parentUser = await storage.getUser(parentUserId);
+  if (!parentUser || parentUser.parentAuthId !== parentAuthId) {
+    // Allow direct match for legacy users
+    if (parentUserId !== parentAuthId) {
+      return { valid: false, error: 'Unauthorized access' };
+    }
+  }
+  
+  return { valid: true };
+}
+
 export function registerLessonRoutes(app: Express, requireAuth: any) {
   // Get lessons by year group
   app.get('/api/lessons/year-group/:yearGroup', requireAuth, async (req: any, res: any) => {
     try {
       const { yearGroup } = req.params;
       const childUserId = req.query.userId as string;
+      const childId = req.query.childId as string; // For children from children table
       
       // Validate child profile belongs to parent
       if (!childUserId) {
@@ -45,9 +79,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
       
+      // Validate childId ownership if provided
+      const childValidation = await validateChildOwnership(childId, childUserId, req.userId);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
+      }
+      
       const allLessons = await storage.getLessonsByYearGroup(yearGroup);
       
-      const completedLessons = await storage.getCompletedLessonIds(childUserId);
+      // Get completed lessons for either the additional child (childId) or primary child (userId)
+      const completedLessons = await storage.getCompletedLessonIds(childUserId, childId || undefined);
       const completedLessonIds = new Set(completedLessons);
       
       let foundCurrent = false;
@@ -87,6 +128,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       let { curriculumId } = req.params;
       const childUserId = req.query.userId as string;
+      const childId = req.query.childId as string; // For children from children table
       
       // Validate child profile belongs to parent
       if (!childUserId) {
@@ -103,6 +145,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       
       if (!isParentOwned && !isDirectMatch) {
         return res.status(403).json({ error: 'Unauthorized' });
+      }
+      
+      // Validate childId ownership if provided
+      const childValidation = await validateChildOwnership(childId, childUserId, req.userId);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
       }
       
       // Get topics for this curriculum
@@ -135,8 +183,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       // Sort by unit order then lesson order
       allLessons.sort((a, b) => a.sortOrder - b.sortOrder);
       
-      // Get user's completed lessons from lesson_attempts
-      const completedLessons = await storage.getCompletedLessonIds(childUserId);
+      // Get completed lessons for either the additional child (childId) or primary child (userId)
+      const completedLessons = await storage.getCompletedLessonIds(childUserId, childId || undefined);
       const completedLessonIds = new Set(completedLessons);
       
       // Assign states: first incomplete is 'current', completed ones are 'completed', rest locked
@@ -575,6 +623,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       if (!isParentOwned && !isDirectMatch) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
+      
+      // Validate childId ownership if provided
+      const childValidation = await validateChildOwnership(validatedData.childId, validatedData.userId, req.userId);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
+      }
 
       // For now, hardcode the correct answers by lesson
       // In the future, this would check against the database
@@ -898,6 +952,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       if (!isParentOwned && !isDirectMatch) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
+      
+      // Validate childId ownership if provided
+      const childValidation = await validateChildOwnership(validatedData.childId, validatedData.userId, req.userId);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
+      }
 
       // Store the analytics data
       const result = await storage.logLessonAttempt(validatedData);
@@ -913,7 +973,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
   app.post('/api/lessons/:lessonId/complete', requireAuth, async (req: any, res: any) => {
     try {
       const { lessonId } = req.params;
-      const { xpEarned, userId } = req.body;
+      const { xpEarned, userId, childId } = req.body;
       
       if (!userId) {
         return res.status(400).json({ error: 'userId is required' });
@@ -932,7 +992,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
       
-      await storage.markLessonComplete(userId, lessonId, xpEarned || 0);
+      // If childId is provided, verify the child belongs to this parent
+      if (childId) {
+        const child = await storage.getChild(childId);
+        if (!child || child.parentId !== userId) {
+          return res.status(403).json({ error: 'Unauthorized child access' });
+        }
+      }
+      
+      await storage.markLessonComplete(userId, lessonId, xpEarned || 0, childId);
       
       res.json({ success: true });
     } catch (error) {

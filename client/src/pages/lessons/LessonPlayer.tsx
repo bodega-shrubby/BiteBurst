@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
+import { useActiveChild } from '@/hooks/useActiveChild';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { X, Heart } from 'lucide-react';
@@ -56,6 +57,7 @@ interface LessonData {
 
 export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const { user } = useAuth();
+  const activeChild = useActiveChild(user);
   const [, setLocation] = useLocation();
   
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -107,11 +109,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
       
-      console.log('📝 Logging attempt:', { userId: user.id, ...attemptData });
+      console.log('📝 Logging attempt:', { userId: user.id, childId: activeChild?.childId, ...attemptData });
       return apiRequest('/api/lessons/log-attempt', {
         method: 'POST',
         body: {
           userId: user.id,
+          childId: activeChild?.childId, // For additional children
           ...attemptData,
         }
       });
@@ -133,6 +136,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         method: 'POST',
         body: {
           userId: user.id,
+          childId: activeChild?.childId, // For additional children
           lessonId,
           stepId,
           answer,
@@ -407,7 +411,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       if (!user?.id) throw new Error('User not authenticated');
       return apiRequest(`/api/lessons/${lessonId}/complete`, {
         method: 'POST',
-        body: { xpEarned, userId: user.id }
+        body: { xpEarned, userId: user.id, childId: activeChild?.childId }
       });
     },
     onSuccess: () => {
