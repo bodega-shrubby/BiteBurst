@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, ProgressBar } from './components';
@@ -107,6 +107,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
       
+      console.log('📝 Logging attempt:', { userId: user.id, ...attemptData });
       return apiRequest('/api/lessons/log-attempt', {
         method: 'POST',
         body: {
@@ -114,6 +115,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           ...attemptData,
         }
       });
+    },
+    onSuccess: () => {
+      console.log('📝 Attempt logged successfully');
+    },
+    onError: (error) => {
+      console.error('📝 Failed to log attempt:', error);
     },
   });
 
@@ -394,6 +401,26 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     });
   };
 
+  // Mutation to mark lesson as complete
+  const markCompleteMutation = useMutation({
+    mutationFn: async ({ lessonId, xpEarned }: { lessonId: string; xpEarned: number }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      return apiRequest(`/api/lessons/${lessonId}/complete`, {
+        method: 'POST',
+        body: { xpEarned, userId: user.id }
+      });
+    },
+    onSuccess: () => {
+      console.log('✅ Lesson marked as complete');
+      // Invalidate lesson queries so the next lessons show as unlocked
+      queryClient.invalidateQueries({ queryKey: ['/api/lessons'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/curriculum'] });
+    },
+    onError: (error) => {
+      console.error('Failed to mark lesson complete:', error);
+    }
+  });
+
   const handleContinue = () => {
     if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
       // Add a brief delay for smooth transition to next step
@@ -401,7 +428,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         resetForNextStep();
       }, 400);
     } else {
-      // Lesson complete
+      // Lesson complete - mark it in the database
+      markCompleteMutation.mutate({ lessonId, xpEarned: totalXpEarned });
       setLessonState('complete');
     }
   };
@@ -419,14 +447,18 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   // Handle "Continue" from LEARN_CARD state (skip to next step, award XP)
   const handleLearnContinue = () => {
     // Award XP for completing via learn card (only here, not when showing the card)
+    let finalXp = totalXpEarned;
     if (currentStep) {
       const learnXP = calculateXP(currentStep, 3) ?? 0;
-      setTotalXpEarned(prev => prev + learnXP);
+      finalXp = totalXpEarned + learnXP;
+      setTotalXpEarned(finalXp);
     }
     
     if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
       resetForNextStep();
     } else {
+      // Mark lesson as complete in database
+      markCompleteMutation.mutate({ lessonId, xpEarned: finalXp });
       setLessonState('complete');
     }
   };

@@ -9,6 +9,7 @@ import {
   lessons,
   lessonSteps,
   lessonAttempts,
+  userLessonProgress,
   mascots,
   curriculums,
   topics,
@@ -65,6 +66,7 @@ export interface IStorage {
   
   // Lesson attempt operations
   logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt>;
+  markLessonComplete(userId: string, lessonId: string, xpEarned: number): Promise<void>;
   
   // Lesson operations
   getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined>;
@@ -335,18 +337,57 @@ export class DatabaseStorage implements IStorage {
       .orderBy(lessons.orderInUnit);
   }
   
-  // Get completed lesson IDs for a user (based on lesson_attempts with isCorrect=true for all steps)
+  // Get completed lesson IDs for a user
   async getCompletedLessonIds(userId: string): Promise<string[]> {
-    // Get all unique lessonIds where user has at least one correct answer
-    // This is a simplified approach - ideally should check if ALL steps are completed
-    const results = await db
+    // First check user_lesson_progress table for explicitly completed lessons
+    const progressResults = await db
+      .select({ lessonId: userLessonProgress.lessonId })
+      .from(userLessonProgress)
+      .where(and(
+        eq(userLessonProgress.userId, userId),
+        eq(userLessonProgress.completed, true)
+      ));
+    
+    // Also check lesson_attempts for backwards compatibility
+    const attemptResults = await db
       .selectDistinct({ lessonId: lessonAttempts.lessonId })
       .from(lessonAttempts)
       .where(and(
         eq(lessonAttempts.userId, userId),
         eq(lessonAttempts.isCorrect, true)
       ));
-    return results.map(r => r.lessonId);
+    
+    // Combine both sources
+    const completedIds = new Set([
+      ...progressResults.map(r => r.lessonId),
+      ...attemptResults.map(r => r.lessonId)
+    ]);
+    
+    return Array.from(completedIds);
+  }
+  
+  // Mark a lesson as complete
+  async markLessonComplete(userId: string, lessonId: string, xpEarned: number): Promise<void> {
+    await db
+      .insert(userLessonProgress)
+      .values({
+        userId,
+        lessonId,
+        currentStep: 999, // All steps done
+        completed: true,
+        completedAt: new Date(),
+        totalXpEarned: xpEarned,
+        hearts: 5,
+      })
+      .onConflictDoUpdate({
+        target: [userLessonProgress.userId, userLessonProgress.lessonId],
+        set: {
+          completed: true,
+          completedAt: new Date(),
+          totalXpEarned: xpEarned,
+          updatedAt: new Date(),
+        }
+      });
   }
   
   // Get lessons by year group

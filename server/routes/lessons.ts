@@ -34,7 +34,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       const completedLessonIds = new Set(completedLessons);
       
       let foundCurrent = false;
-      const lessonsWithState = allLessons.map((lesson) => {
+      const lessonsWithState = allLessons.map((lesson, index) => {
         const isCompleted = completedLessonIds.has(lesson.id);
         let state: 'current' | 'unlocked' | 'locked' | 'completed' = 'locked';
         
@@ -43,6 +43,9 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         } else if (!foundCurrent) {
           state = 'current';
           foundCurrent = true;
+        } else if (index > 0 && completedLessonIds.has(allLessons[index - 1]?.id)) {
+          // Unlock next lesson if previous is completed
+          state = 'unlocked';
         }
         
         return {
@@ -849,18 +852,58 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       const validatedData = insertLessonAttemptSchema.parse(req.body);
       
-      // Verify user matches authenticated user
-      if (validatedData.userId !== req.userId) {
+      // Verify parent owns the child profile (same pattern as /api/lessons/answer)
+      const childProfile = await storage.getUser(validatedData.userId);
+      if (!childProfile) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      const isParentOwned = childProfile.parentAuthId === req.userId;
+      const isDirectMatch = validatedData.userId === req.userId;
+      
+      if (!isParentOwned && !isDirectMatch) {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
       // Store the analytics data
-      await storage.logLessonAttempt(validatedData);
+      const result = await storage.logLessonAttempt(validatedData);
 
       res.json({ success: true });
     } catch (error) {
       console.error('Log attempt error:', error);
       res.status(500).json({ error: 'Failed to log attempt' });
+    }
+  });
+
+  // Mark a lesson as complete
+  app.post('/api/lessons/:lessonId/complete', requireAuth, async (req: any, res: any) => {
+    try {
+      const { lessonId } = req.params;
+      const { xpEarned, userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+      
+      // Verify parent owns the child profile (same pattern as /api/lessons/answer)
+      const childProfile = await storage.getUser(userId);
+      if (!childProfile) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      const isParentOwned = childProfile.parentAuthId === req.userId;
+      const isDirectMatch = userId === req.userId;
+      
+      if (!isParentOwned && !isDirectMatch) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+      
+      await storage.markLessonComplete(userId, lessonId, xpEarned || 0);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Mark lesson complete error:', error);
+      res.status(500).json({ error: 'Failed to mark lesson complete' });
     }
   });
 }
