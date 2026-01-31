@@ -35,9 +35,20 @@ Preferred communication style: Simple, everyday language.
 - **Curriculum-Aware Lesson Delivery**: Onboarding flow with country-specific curriculum selection (UK/US) and age bracket mapping (e.g., Key Stages vs. Grades). Lessons are organized into topics with mascot integration.
 - **Parent-First Onboarding**: Parents create accounts and link child profiles, with support for multiple children.
 
+### Database Architecture (Parent/Child Separation)
+- **Users Table (Parent Accounts)**: Stores authentication credentials (email, password hash, parentAuthId), subscription info (plan, children limit), and activeChildId reference. No child-specific data like XP, streak, or curriculum.
+- **Children Table (Child Profiles)**: Stores ALL child profiles including the first child created during onboarding. Contains: name, username, avatar, yearGroup, curriculumId, curriculumCountry, goal, favorites, totalXp, level, streak, lastLogAt, tz.
+- **Data Access Pattern**: All data fetching uses child IDs, not parent IDs. Logs, badges, and progress are keyed to childId.
+- **Key Storage Methods**: 
+  - `getParentByAuthId()` - Find parent account
+  - `getChildById()`, `getChildrenByParentId()` - Get child profiles
+  - `createChildProfile()` - Create new child
+  - `updateChildProgress()` - Update XP, streak, level
+  - `setActiveChildId()` - Switch active child
+
 ### Data Flow
-- **User Interaction**: Registration/Login, Goal Selection, Content Logging (food/activity), AI Processing for feedback, Reward Distribution (XP, badges, streaks), Progress Tracking.
-- **Data Storage**: User and session data in PostgreSQL. Images as Base64 (MVP). AI responses cached for performance.
+- **User Interaction**: Registration/Login (creates parent + first child), Goal Selection, Content Logging (food/activity), AI Processing for feedback, Reward Distribution (XP, badges, streaks), Progress Tracking.
+- **Data Storage**: Parent accounts and child profiles in PostgreSQL. Logs keyed to childId. Images as Base64 (MVP). AI responses cached for performance.
 
 ## External Dependencies
 
