@@ -28,7 +28,7 @@ export default function Subscription() {
     mutationFn: async (data: { plan: string; childrenLimit?: number }) => {
       return apiRequest('/api/subscription', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: data,
       });
     },
     onSuccess: () => {

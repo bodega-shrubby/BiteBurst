@@ -17,7 +17,7 @@ export default function ChildReviewStep() {
     mutationFn: async () => {
       return apiRequest('/api/children', {
         method: 'POST',
-        body: JSON.stringify({
+        body: {
           name: profile.name,
           username: profile.username,
           avatar: profile.avatar,
@@ -28,7 +28,7 @@ export default function ChildReviewStep() {
           favoriteVeggies: profile.favoriteVeggies,
           favoriteFoods: profile.favoriteFoods,
           favoriteSports: profile.favoriteSports,
-        }),
+        },
       });
     },
     onSuccess: () => {

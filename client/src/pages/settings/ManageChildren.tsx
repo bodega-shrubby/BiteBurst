@@ -39,6 +39,7 @@ export default function ManageChildren() {
     mutationFn: async (childId: string) => {
       return apiRequest(`/api/children/${childId}/switch`, {
         method: 'POST',
+        body: {},
       });
     },
     onSuccess: () => {

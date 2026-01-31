@@ -52,7 +52,7 @@ export default function Profile() {
     mutationFn: async (data: { displayName?: string; avatarId?: string }) => {
       return apiRequest('/api/profile', {
         method: 'PUT',
-        body: JSON.stringify(data),
+        body: data,
       });
     },
     onSuccess: () => {
