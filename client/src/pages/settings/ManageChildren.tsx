@@ -43,7 +43,10 @@ export default function ManageChildren() {
       });
     },
     onSuccess: () => {
+      // Invalidate all relevant queries for the switch
       queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       toast({
         title: "Switched Profile",
         description: "Now learning as this child.",

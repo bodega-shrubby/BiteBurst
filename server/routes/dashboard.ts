@@ -5,54 +5,95 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
   // Get dashboard data
   app.get('/api/dashboard', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.userId;
+      const parentAuthId = req.userId;
       
-      // Get user data
-      const user = await storage.getUser(userId);
-      if (!user) {
+      // Get parent user data (may be different from active child)
+      let parentUser = await storage.getUserByParentAuthId(parentAuthId);
+      if (!parentUser) {
+        parentUser = await storage.getUser(parentAuthId);
+      }
+      if (!parentUser) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Get streak data
-      const streakData = await storage.getUserStreak(userId) || {
+      // Determine active child data
+      let activeChildId = parentUser.activeChildId;
+      let displayName: string;
+      let goal: string | null;
+      let totalXp: number;
+      let streak: number;
+      let avatarId: string | null;
+      let userId: string;
+      
+      if (activeChildId) {
+        // Get active child from children table
+        const activeChild = await storage.getChild(activeChildId);
+        if (activeChild) {
+          displayName = activeChild.name;
+          goal = activeChild.goal;
+          totalXp = activeChild.xp || 0;
+          streak = activeChild.streak || 0;
+          avatarId = activeChild.avatar;
+          userId = activeChildId;
+        } else {
+          // Fallback to primary user
+          displayName = parentUser.displayName || 'User';
+          goal = parentUser.goal;
+          totalXp = parentUser.totalXp || 0;
+          streak = parentUser.streak || 0;
+          avatarId = parentUser.avatarId;
+          userId = parentUser.id;
+        }
+      } else {
+        // Use primary user data
+        displayName = parentUser.displayName || 'User';
+        goal = parentUser.goal;
+        totalXp = parentUser.totalXp || 0;
+        streak = parentUser.streak || 0;
+        avatarId = parentUser.avatarId;
+        userId = parentUser.id;
+      }
+
+      // Get streak data (for primary user - TODO: separate per child)
+      const streakData = await storage.getUserStreak(parentUser.id) || {
         current: 0,
         longest: 0,
         lastActive: null
       };
 
-      // Get today's logs to calculate XP
+      // Get today's logs (for primary user - TODO: separate per child)
       const today = new Date().toISOString().split('T')[0];
-      const todayLogs = await storage.getUserLogs(userId, 50); // Get recent logs
+      const todayLogs = await storage.getUserLogs(parentUser.id, 50);
       const todayLogsFiltered = todayLogs.filter(log => 
         log.ts && log.ts.toISOString().split('T')[0] === today
       );
       
       const todayXp = todayLogsFiltered.reduce((sum, log) => sum + (log.xpAwarded || 0), 0);
 
-      // Get user badges
-      const badges = await storage.getUserBadges(userId);
+      // Get user badges (for primary user - TODO: separate per child)
+      const badges = await storage.getUserBadges(parentUser.id);
 
       // Daily XP goal based on user goal
-      const dailyGoalMap = {
+      const dailyGoalMap: Record<string, number> = {
         energy: 100,
         focus: 80,
         strength: 120
       };
-      const dailyGoal = dailyGoalMap[user.goal] || 100;
+      const dailyGoal = dailyGoalMap[goal || 'energy'] || 100;
 
       const dashboardData = {
         user: {
-          id: user.id,
-          displayName: user.displayName,
-          goal: user.goal,
-          xp: user.totalXp,
-          streak: user.streak,
-          avatarId: user.avatarId
+          id: userId,
+          displayName,
+          goal,
+          xp: totalXp,
+          streak,
+          avatarId
         },
         todayXp,
         dailyGoal,
         streakData: {
-          current: streakData.current,
+          current: streak || streakData.current,
           longest: streakData.longest,
           lastActive: streakData.lastActive
         },

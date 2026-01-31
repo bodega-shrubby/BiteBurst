@@ -104,7 +104,7 @@ export interface IStorage {
   
   // Subscription operations
   updateSubscription(userId: string, plan: string, childrenLimit: number): Promise<User>;
-  setActiveChild(userId: string, childId: string): Promise<User>;
+  setActiveChild(userId: string, childId: string | null): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -511,7 +511,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
   
-  async setActiveChild(userId: string, childId: string): Promise<User> {
+  async setActiveChild(userId: string, childId: string | null): Promise<User> {
     const [user] = await db
       .update(users)
       .set({ 

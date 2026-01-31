@@ -37,7 +37,7 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         allChildren.push({
           id: primaryChildId,
           name: user.displayName,
-          username: user.username || user.displayName.toUpperCase().replace(/\s+/g, ''),
+          username: user.displayName.toUpperCase().replace(/\s+/g, ''),
           avatar: user.avatarId || '🧒',
           yearGroup: user.yearGroup,
           curriculumId: user.curriculum || '',
@@ -343,7 +343,26 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         return res.status(404).json({ error: 'User not found' });
       }
       
-      // Verify child belongs to user
+      // Handle primary child (from users table)
+      const primaryChildId = `primary-${user.id}`;
+      if (childId === primaryChildId) {
+        // Switch to primary child - set activeChildId to null
+        const updatedUser = await storage.setActiveChild(user.id, null);
+        
+        return res.json({
+          success: true,
+          activeChildId: null,
+          child: {
+            id: primaryChildId,
+            name: user.displayName,
+            username: user.displayName?.toUpperCase().replace(/\s+/g, '') || 'USER',
+            avatar: user.avatarId || '🧒',
+            yearGroup: user.yearGroup,
+          }
+        });
+      }
+      
+      // Handle additional child (from children table)
       const child = await storage.getChild(childId);
       if (!child || child.parentId !== user.id) {
         return res.status(404).json({ error: 'Child not found' });
