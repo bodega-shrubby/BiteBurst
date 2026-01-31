@@ -17,197 +17,212 @@ import { supabaseAdmin } from "./lib/supabase";
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
-  // Supabase Auth: Signup endpoint (Parent-first flow)
-  // Parent creates auth account, then child profile is linked via parent_auth_id
+  // Supabase Auth: Signup endpoint
+  // Creates parent account + first child profile (new architecture)
   app.post("/api/auth/signup", async (req: any, res) => {
     try {
-      const { 
-        parentEmail,  // Parent's email for Supabase auth
-        password, 
+      const {
+        parentEmail,
+        password,
         parentConsent,
-        childName,    // Child's display name
-        yearGroup,    // e.g., "year-5", "grade-3"
-        curriculum,   // "uk-ks1" | "uk-ks2" | "uk-ks3" | "us-k2" | "us-35" | "us-68"
-        goal,         // "energy" | "focus" | "strength"
-        avatarId, 
-        timezone 
+        childName,
+        yearGroup,
+        curriculum,
+        curriculumCountry,
+        goal,
+        avatarId,
+        timezone,
+        favoriteFruits,
+        favoriteVeggies,
+        favoriteFoods,
+        favoriteSports,
       } = req.body;
-      
+
       // Validate required fields
-      if (!parentEmail || !password || !childName || !goal) {
+      if (!parentEmail || !password || !childName || !yearGroup || !curriculum) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
-      
+
       if (!parentConsent) {
         return res.status(400).json({ error: 'Parent consent is required' });
       }
-      
+
       if (password.length < 6) {
         return res.status(400).json({ error: 'Password must be at least 6 characters' });
       }
-      
-      // Validate curriculum (supports both UK Key Stages and US Grades)
-      const validCurriculums = ['uk-ks1', 'uk-ks2', 'uk-ks3', 'us-k2', 'us-35', 'us-68'];
-      const selectedCurriculum = curriculum || 'us-35';
-      if (!validCurriculums.includes(selectedCurriculum)) {
-        return res.status(400).json({ error: 'Please select a valid curriculum' });
-      }
-      
+
       console.log("Signup attempt for parent:", parentEmail);
-      
-      // Create parent account in Supabase Auth
+
+      // 1. Create parent account in Supabase Auth
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: parentEmail,
         password,
-        email_confirm: true, // Skip email verification for MVP
+        email_confirm: true,
       });
-      
+
       if (authError) {
         console.error("Supabase auth error:", authError.message);
         if (authError.message.includes('already registered')) {
-          return res.status(409).json({ error: 'This email is already registered. Try logging in instead.' });
+          return res.status(409).json({ error: 'This email is already registered.' });
         }
         return res.status(400).json({ error: authError.message });
       }
-      
+
       if (!authData.user) {
         return res.status(500).json({ error: 'Failed to create auth user' });
       }
-      
+
       const parentAuthId = authData.user.id;
-      
-      // Check if child profile already exists with this parent email
-      let existingUser = await storage.getUserByEmail(parentEmail);
-      let childProfile;
-      
-      if (existingUser) {
-        // Update existing profile with parent auth ID and new info
-        childProfile = await storage.updateUser(existingUser.id, {
-          parentAuthId,
-          displayName: childName,
-          yearGroup: yearGroup || null,
-          goal: goal as 'energy' | 'focus' | 'strength',
-          curriculum: selectedCurriculum,
-          parentConsent: true,
-          authProvider: 'supabase',
-          avatarId: avatarId || null,
-          tz: timezone || null,
-        });
-        if (!childProfile) {
-          childProfile = existingUser;
-        }
-      } else {
-        // Create new child profile (auto-generated ID, NOT Supabase auth ID)
-        childProfile = await storage.createUser({
-          parentAuthId,
-          displayName: childName,
-          yearGroup: yearGroup || null,
-          goal: goal as 'energy' | 'focus' | 'strength',
-          curriculum: selectedCurriculum,
-          email: parentEmail, // Use parent email as unique identifier
-          parentEmail,
-          parentConsent: true,
-          authProvider: 'supabase',
-          avatarId: avatarId || null,
-          tz: timezone || null,
-        });
-      }
-      
-      console.log("Child profile created successfully:", childProfile.id);
-      
-      // Sign in the parent to get a session
-      const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+
+      // 2. Create parent record in users table (NO child data here)
+      const parentUser = await storage.createParentUser({
+        parentAuthId,
+        email: parentEmail,
+        parentEmail,
+        parentConsent: true,
+        authProvider: 'supabase',
+        subscriptionPlan: 'free',
+        subscriptionChildrenLimit: 1,
+      });
+
+      console.log("Parent user created:", parentUser.id);
+
+      // 3. Create first child profile in children table
+      const username = childName.toUpperCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000);
+
+      const childProfile = await storage.createChildProfile({
+        parentId: parentUser.id,
+        name: childName,
+        username,
+        avatar: avatarId || '🧒',
+        yearGroup,
+        curriculumId: curriculum,
+        curriculumCountry: curriculumCountry || (curriculum.startsWith('uk-') ? 'uk' : 'us'),
+        goal: goal || null,
+        favoriteFruits: favoriteFruits || [],
+        favoriteVeggies: favoriteVeggies || [],
+        favoriteFoods: favoriteFoods || [],
+        favoriteSports: favoriteSports || [],
+        tz: timezone || null,
+      });
+
+      console.log("Child profile created:", childProfile.id);
+
+      // 4. Set this child as the active child
+      await storage.setActiveChildId(parentUser.id, childProfile.id);
+
+      // 5. Sign in to get session
+      const { data: signInData } = await supabaseAdmin.auth.signInWithPassword({
         email: parentEmail,
         password,
       });
-      
+
+      // Return the CHILD's profile data (this is who's "logged in" from user perspective)
       res.json({
         success: true,
         user: {
-          id: childProfile.id,
-          displayName: childProfile.displayName,
-          email: childProfile.email,
+          id: childProfile.id,  // Child ID for all API calls
+          displayName: childProfile.name,
+          email: parentEmail,
           yearGroup: childProfile.yearGroup,
           goal: childProfile.goal,
-          curriculum: childProfile.curriculum,
-          avatarId: childProfile.avatarId,
+          curriculum: childProfile.curriculumId,
+          curriculumCountry: childProfile.curriculumCountry,
+          avatarId: childProfile.avatar,
           totalXp: childProfile.totalXp || 0,
           level: childProfile.level || 1,
           streak: childProfile.streak || 0,
+          parentId: parentUser.id,
+          activeChildId: childProfile.id,
         },
         session: signInData?.session || null,
       });
-      
+
     } catch (error) {
       console.error("Signup error:", error);
       res.status(500).json({ error: "Failed to create account" });
     }
   });
 
-  // Supabase Auth: Login endpoint (Parent-first flow)
-  // Parent logs in, then we fetch child profile(s) by parent_auth_id
+  // Supabase Auth: Login endpoint
+  // Returns the active child's profile (new architecture)
   app.post("/api/auth/login", async (req: any, res) => {
     try {
       const { email, password } = req.body;
-      
+
       if (!email || !password) {
         return res.status(400).json({ error: 'Email and password required' });
       }
-      
+
       console.log("Login attempt for:", email);
-      
-      // Sign in with Supabase (parent account)
+
+      // 1. Sign in with Supabase (parent account)
       const { data, error } = await supabaseAdmin.auth.signInWithPassword({
         email,
         password,
       });
-      
+
       if (error) {
         console.error("Supabase login error:", error.message);
         return res.status(401).json({ error: 'Invalid email or password' });
       }
-      
+
       if (!data.user || !data.session) {
         return res.status(401).json({ error: 'Login failed' });
       }
-      
+
       const parentAuthId = data.user.id;
-      
-      // First try to find child profile by parent_auth_id (new flow)
-      let childProfile = await storage.getUserByParentAuthId(parentAuthId);
-      
-      // Fallback: Try legacy lookup by email or user ID
-      if (!childProfile) {
-        childProfile = await storage.getUserByEmail(email);
+
+      // 2. Find parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+
+      if (!parentUser) {
+        console.error("No parent user found for auth ID:", parentAuthId);
+        return res.status(404).json({ error: 'No account found. Please sign up.' });
       }
-      if (!childProfile) {
-        childProfile = await storage.getUser(parentAuthId);
+
+      // 3. Get children for this parent
+      const children = await storage.getChildrenByParentId(parentUser.id);
+
+      if (children.length === 0) {
+        return res.status(404).json({ error: 'No child profiles found. Please complete signup.' });
       }
-      
-      if (!childProfile) {
-        console.error("No child profile found for parent:", parentAuthId);
-        return res.status(404).json({ error: 'No child profile found. Please complete signup.' });
+
+      // 4. Get active child (or default to first child)
+      let activeChild = children[0];
+      if (parentUser.activeChildId) {
+        const found = children.find(c => c.id === parentUser.activeChildId);
+        if (found) activeChild = found;
       }
-      
-      console.log("Login successful for child profile:", childProfile.id);
-      
+
+      // 5. Ensure active_child_id is set
+      if (!parentUser.activeChildId) {
+        await storage.setActiveChildId(parentUser.id, activeChild.id);
+      }
+
+      console.log("Login successful for child profile:", activeChild.id);
+
+      // Return the ACTIVE CHILD's profile data
       res.json({
         success: true,
         user: {
-          id: childProfile.id,
-          displayName: childProfile.displayName,
-          email: childProfile.email,
-          yearGroup: childProfile.yearGroup,
-          goal: childProfile.goal,
-          curriculum: childProfile.curriculum,
-          avatarId: childProfile.avatarId,
-          totalXp: childProfile.totalXp || 0,
-          level: childProfile.level || 1,
-          streak: childProfile.streak || 0,
+          id: activeChild.id,  // Child ID for all API calls
+          displayName: activeChild.name,
+          email: parentUser.email,
+          yearGroup: activeChild.yearGroup,
+          goal: activeChild.goal,
+          curriculum: activeChild.curriculumId,
+          curriculumCountry: activeChild.curriculumCountry,
+          avatarId: activeChild.avatar,
+          totalXp: activeChild.totalXp || 0,
+          level: activeChild.level || 1,
+          streak: activeChild.streak || 0,
+          parentId: parentUser.id,
+          activeChildId: activeChild.id,
         },
         session: data.session,
       });
-      
+
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ error: "Login failed" });
@@ -229,37 +244,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Supabase Auth: Get current user (child profile)
-  // req.userId is the parent's Supabase auth ID from JWT
+  // Get current user (returns active child's profile) - new architecture
   app.get("/api/auth/me", requireAuth, async (req: any, res) => {
     try {
       const parentAuthId = req.userId;
-      
-      // First try to find child profile by parent_auth_id
-      let user = await storage.getUserByParentAuthId(parentAuthId);
-      
-      // Fallback: Direct lookup by ID (legacy users)
-      if (!user) {
-        user = await storage.getUser(parentAuthId);
-      }
-      
-      if (!user) {
+
+      // 1. Find parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+
+      if (!parentUser) {
         return res.status(404).json({ error: 'User not found' });
       }
-      
+
+      // 2. Get children for this parent
+      const children = await storage.getChildrenByParentId(parentUser.id);
+
+      if (children.length === 0) {
+        return res.status(404).json({ error: 'No child profiles found' });
+      }
+
+      // 3. Get active child (or default to first child)
+      let activeChild = children[0];
+      if (parentUser.activeChildId) {
+        const found = children.find(c => c.id === parentUser.activeChildId);
+        if (found) activeChild = found;
+      }
+
+      // Return the ACTIVE CHILD's profile data
       res.json({
-        id: user.id,
-        displayName: user.displayName,
-        email: user.email,
-        yearGroup: user.yearGroup,
-        goal: user.goal,
-        curriculum: user.curriculum,
-        avatarId: user.avatarId,
-        parentEmail: user.parentEmail,
-        totalXp: user.totalXp || 0,
-        level: user.level || 1,
-        streak: user.streak || 0,
-        activeChildId: user.activeChildId,
+        id: activeChild.id,  // Child ID for all API calls
+        displayName: activeChild.name,
+        email: parentUser.email,
+        yearGroup: activeChild.yearGroup,
+        goal: activeChild.goal,
+        curriculum: activeChild.curriculumId,
+        curriculumCountry: activeChild.curriculumCountry,
+        avatarId: activeChild.avatar,
+        totalXp: activeChild.totalXp || 0,
+        level: activeChild.level || 1,
+        streak: activeChild.streak || 0,
+        parentId: parentUser.id,
+        activeChildId: activeChild.id,
+        subscriptionPlan: parentUser.subscriptionPlan,
+        subscriptionChildrenLimit: parentUser.subscriptionChildrenLimit,
       });
     } catch (error) {
       console.error("Get user error:", error);
@@ -267,87 +294,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // XP update endpoint
+  // XP update endpoint - now uses child ID (new architecture)
   app.post("/api/user/:id/xp", requireAuth, async (req: any, res) => {
     try {
-      const userId = req.params.id;
+      const childId = req.params.id;
       const { delta_xp, reason } = req.body;
-      
+
       // Validate request
       if (!delta_xp || typeof delta_xp !== 'number') {
         return res.status(400).json({ error: 'delta_xp is required and must be a number' });
       }
-      
-      // Get current user data
-      const user = await storage.getUser(userId);
-      if (!user) {
+
+      // Get parent user
+      const parentAuthId = req.userId;
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+      if (!parentUser) {
         return res.status(404).json({ error: 'User not found' });
       }
-      
-      // Verify parent owns the child profile
-      // req.userId is the Supabase parent auth ID
-      // userId (from URL) is the child profile ID
-      const isParentOwned = user.parentAuthId === req.userId;
-      const isDirectMatch = userId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
-        return res.status(403).json({ error: 'Cannot update XP for other users' });
+
+      // Verify child belongs to parent
+      const child = await storage.getChildById(childId);
+      if (!child || child.parentId !== parentUser.id) {
+        return res.status(403).json({ error: 'Cannot update XP for this user' });
       }
-      
+
       // Calculate new totals
-      const newTotalXp = Math.max(0, (user.totalXp || 0) + delta_xp);
-      
-      // Calculate new level using the same curve as frontend (100 + L * 25)
-      let newLevel = 1;
-      let remaining = newTotalXp;
-      while (remaining >= (100 + (newLevel - 1) * 25)) {
-        remaining -= (100 + (newLevel - 1) * 25);
-        newLevel++;
-      }
-      
-      // Update streak using timezone-aware utility
+      const newTotalXp = Math.max(0, (child.totalXp || 0) + delta_xp);
+
+      // Calculate new level (100 XP per level for simplicity)
+      const newLevel = Math.floor(newTotalXp / 100) + 1;
+
+      // Update streak
       const now = getCurrentTime();
-      const streakResult = updateStreak(
-        userId,
-        user.streak || 0,
-        user.streak || 0, // Using current streak as longest for simplicity, could add separate field
-        user.lastLogAt,
-        now,
-        user.tz
-      );
-      
+      let newStreak = child.streak || 0;
+
+      if (child.lastLogAt) {
+        const lastLog = new Date(child.lastLogAt);
+        const hoursSinceLastLog = (now.getTime() - lastLog.getTime()) / (1000 * 60 * 60);
+
+        if (hoursSinceLastLog < 24) {
+          // Same day or consecutive - keep streak
+        } else if (hoursSinceLastLog < 48) {
+          // Next day - increment streak
+          newStreak += 1;
+        } else {
+          // Missed days - reset streak
+          newStreak = 1;
+        }
+      } else {
+        newStreak = 1;
+      }
+
       // Check for level-based badge eligibility
       let badge = undefined;
-      if (newLevel > (user.level || 1)) {
+      if (newLevel > (child.level || 1)) {
         badge = `level_${newLevel}`;
-      } else if (streakResult.badge_awarded) {
-        // Use milestone streak badge from utility
-        badge = streakResult.badge_awarded.code;
       }
-      
-      // Update user in database
-      await storage.updateUserXP(userId, {
+
+      // Update child progress
+      await storage.updateChildProgress(childId, {
         totalXp: newTotalXp,
         level: newLevel,
-        streak: streakResult.streak_days,
-        lastLogAt: now
+        streak: newStreak,
+        lastLogAt: now,
       });
-      
-      // Log XP event for audit trail
+
+      // Log XP event for audit trail (still uses userId for compatibility)
       await storage.logXPEvent({
-        userId,
+        userId: childId,
         amount: delta_xp,
         reason: reason || 'unknown'
       });
-      
+
       res.json({
         total_xp: newTotalXp,
         level: newLevel,
-        streak_days: streakResult.streak_days,
-        streak_changed: streakResult.streak_changed,
-        longest_streak: streakResult.longest_streak,
-        badge_awarded: streakResult.badge_awarded,
-        badge // Keep legacy badge for level-ups
+        streak_days: newStreak,
+        badge
       });
       
     } catch (error) {

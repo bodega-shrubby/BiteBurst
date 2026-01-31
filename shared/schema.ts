@@ -72,56 +72,58 @@ export const topics = pgTable("topics", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// Users table with UUID and proper types
-// Note: id is the child profile ID (auto-generated), NOT the Supabase auth ID
+// Users table = Parent accounts (auth only, no child-specific data)
+// id is the parent's profile ID (auto-generated)
 // parent_auth_id links to the parent's Supabase auth.users account
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  parentAuthId: text("parent_auth_id"), // Links to parent's Supabase auth user ID (nullable for migration)
-  displayName: text("display_name").notNull(),
-  yearGroup: text("year_group"), // e.g., "year-5", "grade-3"
-  goal: goalEnum("goal").notNull().references(() => goals.id),
-  curriculum: text("curriculum").default('us-common-core'), // Legacy field - "us-common-core" | "uk-ks2-ks3"
-  curriculumId: varchar("curriculum_id").references(() => curriculums.id), // New FK to curriculums table
+  parentAuthId: text("parent_auth_id"), // Links to parent's Supabase auth user ID
   email: text("email").unique().notNull(),
   parentEmail: text("parent_email"),
   parentConsent: boolean("parent_consent").notNull().default(false),
   authProvider: text("auth_provider").notNull().default("supabase"),
-  avatarId: text("avatar_id").references(() => avatars.id),
-  locale: text("locale").default('en-GB'),
-  tz: text("tz"),
-  totalXp: integer("total_xp").notNull().default(0),
-  level: integer("level").notNull().default(1),
-  streak: integer("streak").notNull().default(0),
-  lastLogAt: timestamp("last_log_at"),
-  status: text("status").notNull().default('active'),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  // Leaderboard fields
-  leaderboardOptOut: boolean("leaderboard_opt_out").notNull().default(false),
-  leagueTier: text("league_tier").notNull().default("bronze"),
-  isMock: boolean("is_mock").notNull().default(false),
   // Subscription fields
   subscriptionPlan: text("subscription_plan").notNull().default('free'), // 'free', 'individual', 'family'
   subscriptionChildrenLimit: integer("subscription_children_limit").notNull().default(1), // 1 for free/individual, 2-4 for family
-  isParent: boolean("is_parent").notNull().default(false), // true for parent accounts
-  curriculumCountry: text("curriculum_country"), // 'uk' or 'us' - inherited by children
-  activeChildId: varchar("active_child_id"), // Reference to active child profile
+  activeChildId: varchar("active_child_id"), // Reference to active child profile in children table
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  // Legacy fields (kept for backwards compatibility during migration)
+  displayName: text("display_name"),
+  yearGroup: text("year_group"),
+  goal: text("goal"),
+  curriculum: text("curriculum"),
+  curriculumId: varchar("curriculum_id"),
+  avatarId: text("avatar_id"),
+  locale: text("locale").default('en-GB'),
+  tz: text("tz"),
+  totalXp: integer("total_xp").default(0),
+  level: integer("level").default(1),
+  streak: integer("streak").default(0),
+  lastLogAt: timestamp("last_log_at"),
+  status: text("status").default('active'),
+  leaderboardOptOut: boolean("leaderboard_opt_out").default(false),
+  leagueTier: text("league_tier").default("bronze"),
+  isMock: boolean("is_mock").default(false),
+  isParent: boolean("is_parent").default(false),
+  curriculumCountry: text("curriculum_country"),
 }, (table) => ({
   emailIdx: index("users_email_idx").on(table.email),
   parentAuthIdx: index("users_parent_auth_idx").on(table.parentAuthId),
 }));
 
-// Children table for family plan - child profiles linked to parent
+// Children table = ALL child profiles (including first child from onboarding)
+// All data fetching uses child ID, not parent ID
 export const children = pgTable("children", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   parentId: varchar("parent_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: text("name").notNull(),
   username: text("username").notNull(),
-  avatar: text("avatar").notNull().default('child'),
+  avatar: text("avatar").notNull().default('🧒'),
   // Year Group / Grade (NOT age)
   yearGroup: text("year_group").notNull(), // e.g., 'year-5', 'grade-3'
   curriculumId: text("curriculum_id").notNull(), // e.g., 'uk-ks2', 'us-35'
+  curriculumCountry: text("curriculum_country"), // 'uk' or 'us'
   // Learning preferences
   goal: text("goal"), // 'energy', 'focus', 'strength'
   favoriteFruits: text("favorite_fruits").array(),
@@ -129,8 +131,13 @@ export const children = pgTable("children", {
   favoriteFoods: text("favorite_foods").array(),
   favoriteSports: text("favorite_sports").array(),
   // Progress tracking
-  xp: integer("xp").notNull().default(0),
+  totalXp: integer("total_xp").notNull().default(0),
+  level: integer("level").notNull().default(1),
   streak: integer("streak").notNull().default(0),
+  lastLogAt: timestamp("last_log_at"),
+  // Localization
+  locale: text("locale"),
+  tz: text("tz"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => ({
@@ -424,16 +431,20 @@ export const insertChildSchema = createInsertSchema(children).pick({
   avatar: true,
   yearGroup: true,
   curriculumId: true,
+  curriculumCountry: true,
   goal: true,
   favoriteFruits: true,
   favoriteVeggies: true,
   favoriteFoods: true,
   favoriteSports: true,
+  locale: true,
+  tz: true,
 });
+
+export type InsertChildType = z.infer<typeof insertChildSchema>;
 
 export type InsertUserType = z.infer<typeof insertUserSchema>;
 export type InsertLogType = z.infer<typeof insertLogSchema>;
 export type InsertLessonType = z.infer<typeof insertLessonSchema>;
 export type InsertLessonStepType = z.infer<typeof insertLessonStepSchema>;
 export type InsertUserLessonProgressType = z.infer<typeof insertUserLessonProgressSchema>;
-export type InsertChildType = z.infer<typeof insertChildSchema>;

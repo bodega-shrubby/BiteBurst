@@ -2,100 +2,72 @@ import type { Express } from "express";
 import { storage } from "../storage";
 
 export function registerDashboardRoutes(app: Express, requireAuth: any) {
-  // Get dashboard data
+  // Get dashboard data (new architecture - uses child IDs)
   app.get('/api/dashboard', requireAuth, async (req: any, res: any) => {
     try {
       const parentAuthId = req.userId;
-      
-      // Get parent user data (may be different from active child)
-      let parentUser = await storage.getUserByParentAuthId(parentAuthId);
-      if (!parentUser) {
-        parentUser = await storage.getUser(parentAuthId);
-      }
+
+      // Get parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
       if (!parentUser) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Determine active child data
+      // Get active child (required in new architecture)
       let activeChildId = parentUser.activeChildId;
-      let displayName: string;
-      let goal: string | null;
-      let totalXp: number;
-      let streak: number;
-      let avatarId: string | null;
-      let userId: string;
-      
-      if (activeChildId) {
-        // Get active child from children table
-        const activeChild = await storage.getChild(activeChildId);
-        if (activeChild) {
-          displayName = activeChild.name;
-          goal = activeChild.goal;
-          totalXp = activeChild.xp || 0;
-          streak = activeChild.streak || 0;
-          avatarId = activeChild.avatar;
-          userId = activeChildId;
+      if (!activeChildId) {
+        // Get first child if no active child set
+        const children = await storage.getChildrenByParentId(parentUser.id);
+        if (children.length > 0) {
+          activeChildId = children[0].id;
+          await storage.setActiveChildId(parentUser.id, activeChildId);
         } else {
-          // Fallback to primary user
-          displayName = parentUser.displayName || 'User';
-          goal = parentUser.goal;
-          totalXp = parentUser.totalXp || 0;
-          streak = parentUser.streak || 0;
-          avatarId = parentUser.avatarId;
-          userId = parentUser.id;
+          return res.status(404).json({ error: 'No child profiles found' });
         }
-      } else {
-        // Use primary user data
-        displayName = parentUser.displayName || 'User';
-        goal = parentUser.goal;
-        totalXp = parentUser.totalXp || 0;
-        streak = parentUser.streak || 0;
-        avatarId = parentUser.avatarId;
-        userId = parentUser.id;
       }
 
-      // Get streak data (for primary user - TODO: separate per child)
-      const streakData = await storage.getUserStreak(parentUser.id) || {
-        current: 0,
-        longest: 0,
-        lastActive: null
-      };
+      // Get active child data
+      const child = await storage.getChildById(activeChildId);
+      if (!child) {
+        return res.status(404).json({ error: 'Active child not found' });
+      }
 
-      // Get today's logs (for primary user - TODO: separate per child)
+      // Get today's logs for this child (using childId)
       const today = new Date().toISOString().split('T')[0];
-      const todayLogs = await storage.getUserLogs(parentUser.id, 50);
+      const todayLogs = await storage.getUserLogs(activeChildId, 50);
       const todayLogsFiltered = todayLogs.filter(log => 
         log.ts && log.ts.toISOString().split('T')[0] === today
       );
-      
+
       const todayXp = todayLogsFiltered.reduce((sum, log) => sum + (log.xpAwarded || 0), 0);
 
-      // Get user badges (for primary user - TODO: separate per child)
-      const badges = await storage.getUserBadges(parentUser.id);
+      // Get child badges
+      const badges = await storage.getUserBadges(activeChildId);
 
-      // Daily XP goal based on user goal
+      // Daily XP goal based on child's goal
       const dailyGoalMap: Record<string, number> = {
         energy: 100,
         focus: 80,
         strength: 120
       };
-      const dailyGoal = dailyGoalMap[goal || 'energy'] || 100;
+      const dailyGoal = dailyGoalMap[child.goal || 'energy'] || 100;
 
       const dashboardData = {
         user: {
-          id: userId,
-          displayName,
-          goal,
-          xp: totalXp,
-          streak,
-          avatarId
+          id: activeChildId,
+          displayName: child.name,
+          goal: child.goal,
+          xp: child.totalXp || 0,
+          streak: child.streak || 0,
+          avatarId: child.avatar,
+          level: child.level || 1,
         },
         todayXp,
         dailyGoal,
         streakData: {
-          current: streak || streakData.current,
-          longest: streakData.longest,
-          lastActive: streakData.lastActive
+          current: child.streak || 0,
+          longest: child.streak || 0,
+          lastActive: child.lastLogAt
         },
         badges: badges.map(badge => ({
           badgeId: badge.badgeCode,
@@ -117,14 +89,31 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
     }
   });
 
-  // Quick log endpoint
+  // Quick log endpoint (new architecture - uses child IDs)
   app.post('/api/dashboard/quick-log', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.userId;
+      const parentAuthId = req.userId;
       const { type, content, entryMethod } = req.body;
 
       if (!type || !content || !entryMethod) {
         return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Get parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+      if (!parentUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Get active child
+      const activeChildId = parentUser.activeChildId;
+      if (!activeChildId) {
+        return res.status(400).json({ error: 'No active child set' });
+      }
+
+      const child = await storage.getChildById(activeChildId);
+      if (!child || child.parentId !== parentUser.id) {
+        return res.status(404).json({ error: 'Active child not found' });
       }
 
       // Calculate XP based on type and content
@@ -132,37 +121,46 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
       if (type === 'food') xpAwarded = 15;
       if (type === 'activity') xpAwarded = 20;
 
-      // Get user's current goal for context
-      const user = await storage.getUser(userId);
-      const goalContext = user?.goal;
+      // Get child's current goal for context
+      const goalContext = child.goal;
 
-      // Create log entry
+      // Create log entry (using childId as userId for backward compatibility)
       const logEntry = await storage.createLog({
-        userId,
+        userId: activeChildId,
         type: type as 'food' | 'activity',
         entryMethod: entryMethod as 'emoji' | 'text' | 'photo',
         content: typeof content === 'string' ? { description: content } : content,
-        goalContext,
+        goalContext: goalContext as 'energy' | 'focus' | 'strength' | null,
         xpAwarded
       });
 
-      // Update user XP
-      if (user) {
-        await storage.updateUser(userId, {
-          totalXp: (user.totalXp || 0) + xpAwarded
-        });
+      // Update child's XP and streak
+      const today = new Date().toISOString().split('T')[0];
+      const lastLogDate = child.lastLogAt ? new Date(child.lastLogAt).toISOString().split('T')[0] : null;
+
+      let newStreak = child.streak || 0;
+      if (lastLogDate !== today) {
+        // Check if this is consecutive day
+        if (lastLogDate) {
+          const lastDate = new Date(lastLogDate);
+          const todayDate = new Date(today);
+          const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            newStreak = newStreak + 1;
+          } else if (diffDays > 1) {
+            newStreak = 1; // Reset streak
+          }
+        } else {
+          newStreak = 1; // First log
+        }
       }
 
-      // Update streak if it's a new day
-      const today = new Date().toISOString().split('T')[0];
-      const streakData = await storage.getUserStreak(userId);
-      
-      if (!streakData || streakData.lastActive !== today) {
-        const newCurrent = streakData ? streakData.current + 1 : 1;
-        const newLongest = Math.max(newCurrent, streakData?.longest || 0);
-        
-        await storage.updateStreak(userId, { current: newCurrent, longest: newLongest, lastActive: new Date() });
-      }
+      // Update child progress
+      await storage.updateChildProgress(activeChildId, {
+        totalXp: (child.totalXp || 0) + xpAwarded,
+        streak: newStreak,
+        lastLogAt: new Date(),
+      });
 
       // Simple feedback based on type
       const feedback = type === 'food' 
@@ -182,29 +180,37 @@ export function registerDashboardRoutes(app: Express, requireAuth: any) {
     }
   });
 
-  // Complete journey task
+  // Complete journey task (new architecture - uses child IDs)
   app.post('/api/dashboard/complete-task', requireAuth, async (req: any, res: any) => {
     try {
-      const userId = req.userId;
+      const parentAuthId = req.userId;
       const { taskId, xpReward } = req.body;
 
       if (!taskId || !xpReward) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      // Get user
-      const user = await storage.getUser(userId);
-      if (!user) {
+      // Get parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+      if (!parentUser) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Update user XP
-      await storage.updateUser(userId, {
-        totalXp: (user.totalXp || 0) + xpReward
-      });
+      // Get active child
+      const activeChildId = parentUser.activeChildId;
+      if (!activeChildId) {
+        return res.status(400).json({ error: 'No active child set' });
+      }
 
-      // Create XP event for tracking
-      // Note: This would be implemented once xp_events storage methods are added
+      const child = await storage.getChildById(activeChildId);
+      if (!child || child.parentId !== parentUser.id) {
+        return res.status(404).json({ error: 'Active child not found' });
+      }
+
+      // Update child's XP
+      await storage.updateChildProgress(activeChildId, {
+        totalXp: (child.totalXp || 0) + xpReward
+      });
 
       res.json({
         success: true,

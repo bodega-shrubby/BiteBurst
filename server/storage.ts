@@ -37,13 +37,23 @@ import { eq, and, desc, sql } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
-  // User operations
+  // Parent User operations (new architecture)
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByDisplayName(displayName: string): Promise<User | undefined>;
   getUserByParentAuthId(parentAuthId: string): Promise<User | undefined>;
+  getParentByAuthId(authId: string): Promise<User | undefined>;
   createUser(insertUser: Partial<InsertUser>): Promise<User>;
   createUserWithId(userData: Partial<InsertUser> & { id: string }): Promise<User>;
+  createParentUser(data: {
+    parentAuthId: string;
+    email: string;
+    parentEmail?: string;
+    parentConsent: boolean;
+    authProvider: string;
+    subscriptionPlan?: string;
+    subscriptionChildrenLimit?: number;
+  }): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User>;
   
   // Avatar and Goal operations
@@ -63,9 +73,17 @@ export interface IStorage {
   getUserBadges(userId: string): Promise<Badge[]>;
   awardBadge(userId: string, badgeId: string): Promise<Badge>;
   
-  // XP operations
+  // XP operations (legacy - kept for backwards compatibility)
   updateUserXP(userId: string, updates: { totalXp: number; level: number; streak: number; lastLogAt: Date }): Promise<User>;
   logXPEvent(event: { userId: string; amount: number; reason: string; refLog?: string }): Promise<any>;
+  
+  // Child progress operations (new architecture)
+  updateChildProgress(childId: string, data: {
+    totalXp?: number;
+    level?: number;
+    streak?: number;
+    lastLogAt?: Date;
+  }): Promise<Child>;
   
   // Lesson attempt operations
   logLessonAttempt(insertAttempt: InsertLessonAttempt): Promise<LessonAttempt>;
@@ -95,16 +113,37 @@ export interface IStorage {
   // Lesson by year group operations
   getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]>;
   
-  // Children operations
+  // Children operations (new architecture - ALL children including first)
   getChildren(parentId: string): Promise<Child[]>;
+  getChildrenByParentId(parentId: string): Promise<Child[]>;
   getChild(childId: string): Promise<Child | undefined>;
+  getChildById(childId: string): Promise<Child | undefined>;
   createChild(insertChild: InsertChild): Promise<Child>;
+  createChildProfile(data: {
+    parentId: string;
+    name: string;
+    username: string;
+    avatar?: string;
+    yearGroup: string;
+    curriculumId: string;
+    curriculumCountry?: string;
+    goal?: string;
+    favoriteFruits?: string[];
+    favoriteVeggies?: string[];
+    favoriteFoods?: string[];
+    favoriteSports?: string[];
+    locale?: string;
+    tz?: string;
+  }): Promise<Child>;
   updateChild(childId: string, updates: Partial<InsertChild>): Promise<Child>;
+  updateChildProfile(childId: string, updates: Partial<Child>): Promise<Child>;
   deleteChild(childId: string): Promise<void>;
+  isChildOwnedByParent(childId: string, parentId: string): Promise<boolean>;
   
   // Subscription operations
   updateSubscription(userId: string, plan: string, childrenLimit: number): Promise<User>;
   setActiveChild(userId: string, childId: string | null): Promise<User>;
+  setActiveChildId(parentId: string, childId: string | null): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -124,10 +163,39 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  // Find child profile by parent's Supabase auth ID
+  // Find parent user by Supabase auth ID (new architecture)
   async getUserByParentAuthId(parentAuthId: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.parentAuthId, parentAuthId));
     return user || undefined;
+  }
+
+  // Alias for consistency with new architecture
+  async getParentByAuthId(authId: string): Promise<User | undefined> {
+    return this.getUserByParentAuthId(authId);
+  }
+
+  // Create a parent user (auth only, no child data) - new architecture
+  async createParentUser(data: {
+    parentAuthId: string;
+    email: string;
+    parentEmail?: string;
+    parentConsent: boolean;
+    authProvider: string;
+    subscriptionPlan?: string;
+    subscriptionChildrenLimit?: number;
+  }): Promise<User> {
+    const [user] = await db.insert(users).values({
+      parentAuthId: data.parentAuthId,
+      email: data.email,
+      parentEmail: data.parentEmail || data.email,
+      parentConsent: data.parentConsent,
+      authProvider: data.authProvider,
+      subscriptionPlan: data.subscriptionPlan || 'free',
+      subscriptionChildrenLimit: data.subscriptionChildrenLimit || 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any).returning();
+    return user;
   }
 
   async createUser(insertUser: Partial<InsertUser>): Promise<User> {
@@ -464,11 +532,16 @@ export class DatabaseStorage implements IStorage {
       .orderBy(lessons.orderInUnit);
   }
   
-  // Children operations
+  // Children operations (new architecture - ALL children including first)
   async getChildren(parentId: string): Promise<Child[]> {
     return await db.select().from(children)
       .where(eq(children.parentId, parentId))
       .orderBy(children.createdAt);
+  }
+  
+  // Alias for consistency with new architecture
+  async getChildrenByParentId(parentId: string): Promise<Child[]> {
+    return this.getChildren(parentId);
   }
   
   async getChild(childId: string): Promise<Child | undefined> {
@@ -476,11 +549,57 @@ export class DatabaseStorage implements IStorage {
     return child || undefined;
   }
   
+  // Alias for consistency with new architecture
+  async getChildById(childId: string): Promise<Child | undefined> {
+    return this.getChild(childId);
+  }
+  
   async createChild(insertChild: InsertChild): Promise<Child> {
     const [child] = await db
       .insert(children)
       .values(insertChild as any)
       .returning();
+    return child;
+  }
+  
+  // Create a child profile (used for ALL children, including first) - new architecture
+  async createChildProfile(data: {
+    parentId: string;
+    name: string;
+    username: string;
+    avatar?: string;
+    yearGroup: string;
+    curriculumId: string;
+    curriculumCountry?: string;
+    goal?: string;
+    favoriteFruits?: string[];
+    favoriteVeggies?: string[];
+    favoriteFoods?: string[];
+    favoriteSports?: string[];
+    locale?: string;
+    tz?: string;
+  }): Promise<Child> {
+    const [child] = await db.insert(children).values({
+      parentId: data.parentId,
+      name: data.name,
+      username: data.username,
+      avatar: data.avatar || '🧒',
+      yearGroup: data.yearGroup,
+      curriculumId: data.curriculumId,
+      curriculumCountry: data.curriculumCountry || null,
+      goal: data.goal || null,
+      totalXp: 0,
+      level: 1,
+      streak: 0,
+      favoriteFruits: data.favoriteFruits || [],
+      favoriteVeggies: data.favoriteVeggies || [],
+      favoriteFoods: data.favoriteFoods || [],
+      favoriteSports: data.favoriteSports || [],
+      locale: data.locale || null,
+      tz: data.tz || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
     return child;
   }
   
@@ -493,8 +612,38 @@ export class DatabaseStorage implements IStorage {
     return child;
   }
   
+  // Update child profile (alias for consistency)
+  async updateChildProfile(childId: string, updates: Partial<Child>): Promise<Child> {
+    const [child] = await db
+      .update(children)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(children.id, childId))
+      .returning();
+    return child;
+  }
+  
+  // Update child XP/level/streak - new architecture
+  async updateChildProgress(childId: string, data: {
+    totalXp?: number;
+    level?: number;
+    streak?: number;
+    lastLogAt?: Date;
+  }): Promise<Child> {
+    const [child] = await db.update(children)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(children.id, childId))
+      .returning();
+    return child;
+  }
+  
   async deleteChild(childId: string): Promise<void> {
     await db.delete(children).where(eq(children.id, childId));
+  }
+  
+  // Check if child belongs to parent - new architecture
+  async isChildOwnedByParent(childId: string, parentId: string): Promise<boolean> {
+    const child = await this.getChildById(childId);
+    return child ? child.parentId === parentId : false;
   }
   
   // Subscription operations
@@ -521,6 +670,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+  
+  // Alias for consistency with new architecture
+  async setActiveChildId(parentId: string, childId: string | null): Promise<User> {
+    return this.setActiveChild(parentId, childId);
   }
 }
 

@@ -56,26 +56,26 @@ const DAILY_MILESTONES = [
 ];
 
 export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
-  // Get comprehensive daily summary for dashboard
+  // Get comprehensive daily summary for dashboard (now uses child ID)
   app.get('/api/user/:id/daily-summary', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.params.id;
-      
-      // Get user for timezone and goal
-      const user = await storage.getUser(userId);
-      
-      // Verify access: user must be the parent (via parent_auth_id) or direct match (legacy)
-      const isParent = user?.parentAuthId === req.userId;
-      const isDirectMatch = req.userId === userId;
-      if (!isParent && !isDirectMatch) {
-        return res.status(403).json({ error: 'Cannot access other user data' });
-      }
-      if (!user) {
+      const childId = req.params.id;
+      const parentAuthId = req.userId;
+
+      // Get parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+      if (!parentUser) {
         return res.status(404).json({ error: 'User not found' });
       }
-      
-      // Calculate today's date in user's timezone
-      const timezone = user.tz || 'UTC';
+
+      // Get child and verify ownership
+      const child = await storage.getChildById(childId);
+      if (!child || child.parentId !== parentUser.id) {
+        return res.status(403).json({ error: 'Cannot access other user data' });
+      }
+
+      // Calculate today's date in child's timezone
+      const timezone = child.tz || 'UTC';
       const now = new Date();
       const today = now.toLocaleDateString('en-CA', { 
         timeZone: timezone,
@@ -83,30 +83,30 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
         month: '2-digit', 
         day: '2-digit'
       }); // Returns YYYY-MM-DD
-      
-      // Get today's logs for this user
+
+      // Get today's logs for this child (using childId as userId for logs)
       const todaysLogs = await db
         .select()
         .from(logs)
         .where(and(
-          eq(logs.userId, userId),
+          eq(logs.userId, childId),
           eq(logs.logDate, today)
         ));
-      
+
       // Calculate today's XP
       const xpToday = todaysLogs.reduce((sum, log) => sum + (log.xpAwarded || 0), 0);
-      
-      // Get daily goal based on user goal
-      const dailyGoalMap = {
+
+      // Get daily goal based on child's goal
+      const dailyGoalMap: Record<string, number> = {
         energy: 80,
         focus: 80,
         strength: 100
       };
-      const xpGoal = dailyGoalMap[user.goal] || 80;
-      
-      // Get streak data
-      const streakData = await storage.getUserStreak(userId);
-      
+      const xpGoal = child.goal ? dailyGoalMap[child.goal] || 80 : 80;
+
+      // Get streak data (use child streak directly from child profile)
+      const streakData = { current: child.streak || 0, longest: child.streak || 0, lastActive: child.lastLogAt };
+
       // Detect milestones
       const milestones = DAILY_MILESTONES.map(milestone => ({
         id: milestone.id,
@@ -114,14 +114,14 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
         reward: milestone.reward,
         completed: milestone.detector(todaysLogs)
       }));
-      
+
       // Check food and activity presence
       const hasFoodToday = todaysLogs.some(log => log.type === 'food');
       const hasActivityToday = todaysLogs.some(log => log.type === 'activity');
-      
-      // Get badges - simplified for MVP
-      const userBadges = await storage.getUserBadges(userId);
-      
+
+      // Get badges - simplified for MVP (using childId as userId)
+      const userBadges = await storage.getUserBadges(childId);
+
       const earnedBadges = userBadges.map((ub: any) => {
         const earnedAt = ub.ts || ub.createdAt || ub.earnedAt;
         const isNew = earnedAt && (Date.now() - new Date(earnedAt).getTime()) < 86400000; // 24 hours
@@ -133,12 +133,12 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
           isNew
         };
       });
-      
+
       // Get all-time logs for badge progress calculation
       const allTimeLogs = await db
         .select()
         .from(logs)
-        .where(eq(logs.userId, userId));
+        .where(eq(logs.userId, childId));
       
       // Calculate badge progress for each badge type
       const fruitEmojis = ['🍎', '🍌', '🍇', '🍓', '🍊', '🫐', '🍉', '🥝', '🍑', '🍒', '🥭', '🍍'];
@@ -277,13 +277,13 @@ export function registerDailySummaryV2Routes(app: Express, requireAuth: any) {
         },
         recent_logs: recentLogs,
         user: {
-          lifetime_xp: user.totalXp || 0,
-          level: Math.floor((user.totalXp || 0) / 100) + 1,
-          goal: user.goal,
-          display_name: user.displayName
+          lifetime_xp: child.totalXp || 0,
+          level: child.level || Math.floor((child.totalXp || 0) / 100) + 1,
+          goal: child.goal,
+          display_name: child.name
         }
       };
-      
+
       res.json(response);
       
     } catch (error) {
