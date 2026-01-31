@@ -193,6 +193,11 @@ export class DatabaseStorage implements IStorage {
       parentConsent: data.parentConsent,
       authProvider: data.authProvider,
       displayName: data.displayName || data.email.split('@')[0],
+      // Default values for legacy fields (child data now in children table)
+      goal: 'energy',
+      yearGroup: 'year-1',
+      curriculum: 'uk-ks1',
+      curriculumCountry: 'uk',
       subscriptionPlan: data.subscriptionPlan || 'free',
       subscriptionChildrenLimit: data.subscriptionChildrenLimit || 1,
       createdAt: new Date(),
