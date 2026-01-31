@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { apiRequest } from '@/lib/queryClient';
 import Sidebar from '@/components/Sidebar';
 import BottomNavigation from '@/components/BottomNavigation';
 import { cleanLessons, type CleanLesson, type LessonState } from '@/data/clean-lessons';
@@ -349,13 +350,7 @@ export default function Lessons() {
   
   const { data: apiLessons, isLoading: lessonsLoading } = useQuery<ApiLesson[]>({
     queryKey: [`/api/curriculum/${curriculumId}/lessons`, user?.id],
-    queryFn: async () => {
-      const res = await fetch(`/api/curriculum/${curriculumId}/lessons?userId=${user?.id}`, {
-        credentials: 'include'
-      });
-      if (!res.ok) throw new Error('Failed to fetch lessons');
-      return res.json();
-    },
+    queryFn: () => apiRequest(`/api/curriculum/${curriculumId}/lessons?userId=${user?.id}`),
     enabled: !!user && !!curriculumId,
   });
 
