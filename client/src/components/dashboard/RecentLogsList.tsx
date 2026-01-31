@@ -54,32 +54,7 @@ export default function RecentLogsList({ logs, className = '' }: RecentLogsListP
   };
   
   if (!logs || logs.length === 0) {
-    return (
-      <div className={`space-y-4 ${className}`}>
-        <h2 className="text-xl font-bold text-gray-900">Today's Activity</h2>
-        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-8 text-center">
-          <div className="mb-4">
-            <div className="text-6xl animate-subtle-bounce">🍊</div>
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">No activity yet today</h3>
-          <p className="text-gray-600 text-sm mb-4">Time to fuel up! 🍎</p>
-          <div className="flex flex-col gap-2 mt-4">
-            <button 
-              onClick={() => setLocation('/food-log')}
-              className="px-4 py-3 bg-[#FF6A00] text-white rounded-xl font-bold hover:bg-[#E55A00] transition-colors min-h-[48px] pulse-cta"
-            >
-              🍎 Log Your First Meal
-            </button>
-            <button 
-              onClick={() => setLocation('/activity-log')}
-              className="px-4 py-3 border-2 border-[#FF6A00] text-[#FF6A00] rounded-xl font-bold hover:bg-orange-50 transition-colors min-h-[48px]"
-            >
-              ⚽ Log Your First Activity
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
   
   return (
