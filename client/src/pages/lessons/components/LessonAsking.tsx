@@ -18,13 +18,16 @@ interface LessonStep {
   questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank';
   question: string;
   content: {
-    options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
+    options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }> | string[];
     correctAnswer?: string | boolean;
     correctPair?: string[];
     feedback?: string | { success?: string; hint_after_2?: string; motivating_fail?: string };
     matchingPairs?: Array<{ left: string; right: string }>;
+    pairs?: Array<{ left: string; right: string }>;
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
+    items?: Array<{ id: string; text: string; category: string }>;
+    blanks?: Array<{ id: string; correctAnswer: string }>;
   };
   xpReward: number;
   mascotAction?: string;
@@ -90,11 +93,29 @@ export default function LessonAsking({
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedOrderItem, setSelectedOrderItem] = useState<string | null>(null);
   
+  // Get matching pairs from either legacy or new format
+  const getMatchingPairs = () => step.content.matchingPairs || step.content.pairs || [];
+  
+  // Get ordering items from either legacy or new format
+  const getOrderingItems = () => {
+    if (step.content.orderingItems) return step.content.orderingItems;
+    if (step.content.items) {
+      const categories = [...new Set(step.content.items.map(i => i.category))];
+      return step.content.items.map((item, index) => ({
+        id: item.id,
+        text: item.text,
+        correctOrder: index + 1,
+        category: item.category
+      }));
+    }
+    return [];
+  };
+  
   // Auto-update answer when matching slots are filled (send real data for backend validation)
   useEffect(() => {
-    if (step.questionType === 'matching' && step.content.matchingPairs) {
-      const pairs = step.content.matchingPairs;
-      const allMatched = Object.keys(matches).length === pairs.length;
+    const matchingPairs = getMatchingPairs();
+    if (step.questionType === 'matching' && matchingPairs.length > 0) {
+      const allMatched = Object.keys(matches).length === matchingPairs.length;
       
       if (allMatched) {
         // Always send actual matches data, let backend validate correctness
@@ -109,12 +130,13 @@ export default function LessonAsking({
         }
       }
     }
-  }, [matches, step.questionType, step.content.matchingPairs, selectedAnswer, onAnswerSelect]);
+  }, [matches, step.questionType, step.content.matchingPairs, step.content.pairs, selectedAnswer, onAnswerSelect]);
   
   // Initialize shuffled matching items on step change
   useEffect(() => {
-    if (step.questionType === 'matching' && step.content.matchingPairs) {
-      const pairs = step.content.matchingPairs;
+    const matchingPairs = getMatchingPairs();
+    if (step.questionType === 'matching' && matchingPairs.length > 0) {
+      const pairs = matchingPairs;
       
       // Fisher-Yates shuffle for left items
       const leftItems = [...pairs.map(p => p.left)];
@@ -139,8 +161,9 @@ export default function LessonAsking({
   
   // Initialize shuffled ordering items on step change
   useEffect(() => {
-    if (step.questionType === 'ordering' && step.content.orderingItems) {
-      const items = step.content.orderingItems;
+    const orderingItems = getOrderingItems();
+    if (step.questionType === 'ordering' && orderingItems.length > 0) {
+      const items = orderingItems;
       // Fisher-Yates shuffle
       const shuffledIds = [...items.map(item => item.id)];
       for (let i = shuffledIds.length - 1; i > 0; i--) {
@@ -154,9 +177,9 @@ export default function LessonAsking({
   
   // Auto-update answer when all ordering items are placed (send real data for backend validation)
   useEffect(() => {
-    if (step.questionType === 'ordering' && step.content.orderingItems && orderedItems.length > 0) {
-      const items = step.content.orderingItems;
-      const allPlaced = orderedItems.length === items.length;
+    const orderingItems = getOrderingItems();
+    if (step.questionType === 'ordering' && orderingItems.length > 0 && orderedItems.length > 0) {
+      const allPlaced = orderedItems.length === orderingItems.length;
       
       if (allPlaced) {
         // Always send actual order data, let backend validate correctness
@@ -171,7 +194,7 @@ export default function LessonAsking({
         }
       }
     }
-  }, [orderedItems, step.questionType, step.content.orderingItems, selectedAnswer, onAnswerSelect]);
+  }, [orderedItems, step.questionType, step.content.orderingItems, step.content.items, selectedAnswer, onAnswerSelect]);
   
   // Reset mobile touch selections on step change to prevent state leakage
   useEffect(() => {
@@ -255,9 +278,9 @@ export default function LessonAsking({
   };
 
   const renderMatching = () => {
-    if (!step.content.matchingPairs) return null;
+    const pairs = getMatchingPairs();
+    if (pairs.length === 0) return null;
     
-    const pairs = step.content.matchingPairs;
     // Use shuffled arrays instead of direct mapping
     const leftItems = shuffledLeftItems.length > 0 ? shuffledLeftItems : pairs.map(p => p.left);
     const rightItems = shuffledRightItems.length > 0 ? shuffledRightItems : pairs.map(p => p.right);
@@ -471,9 +494,8 @@ export default function LessonAsking({
   };
   
   const renderOrdering = () => {
-    if (!step.content.orderingItems) return null;
-    
-    const items = step.content.orderingItems;
+    const items = getOrderingItems();
+    if (items.length === 0) return null;
     
     // Items are now initialized via useEffect with shuffling
     
@@ -701,13 +723,29 @@ export default function LessonAsking({
   const renderFillBlank = () => {
     if (!step.content.options) return null;
     
+    // Handle both legacy format (options as objects) and new format (options as strings)
+    const normalizedOptions = Array.isArray(step.content.options) 
+      ? step.content.options.map((opt, index) => {
+          if (typeof opt === 'string') {
+            return { id: opt, text: opt };
+          }
+          return opt;
+        })
+      : [];
+    
+    const getSelectedText = () => {
+      if (!selectedAnswer) return '______';
+      const option = normalizedOptions.find(o => o.id === selectedAnswer);
+      return option ? `[${option.text}]` : '______';
+    };
+    
     return (
       <div className="space-y-4">
         {/* Show the question with blank indicator */}
         <div className="bg-gray-50 p-4 rounded-xl text-center">
           <p className="text-lg text-gray-800 leading-relaxed">
             {step.question.includes('______') 
-              ? step.question.replace('______', selectedAnswer ? `[${step.content.options.find(o => o.id === selectedAnswer)?.text || '___'}]` : '______')
+              ? step.question.replace('______', getSelectedText())
               : step.question
             }
           </p>
@@ -718,7 +756,7 @@ export default function LessonAsking({
         </div>
         
         <div className="flex flex-wrap justify-center gap-3">
-          {step.content.options.map((option) => (
+          {normalizedOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => onAnswerSelect(option.id)}

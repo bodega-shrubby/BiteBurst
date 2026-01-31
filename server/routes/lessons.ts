@@ -669,9 +669,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   break;
                   
                 case 'fill-blank':
-                  // Validate fill-blank: answer matches correctAnswer
+                  // Validate fill-blank: answer matches correctAnswer or blanks[0].correctAnswer
                   if (step.content?.correctAnswer) {
                     isCorrect = validatedData.answer === step.content.correctAnswer;
+                  } else if (step.content?.blanks && Array.isArray(step.content.blanks)) {
+                    // New format: blanks array with correctAnswer field
+                    const blanks = step.content.blanks as Array<{id: string; correctAnswer: string}>;
+                    if (blanks.length > 0) {
+                      isCorrect = validatedData.answer === blanks[0].correctAnswer;
+                    }
                   }
                   break;
                   
@@ -684,18 +690,24 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   break;
                   
                 case 'true-false':
-                  // Validate true-false: answer matches correctAnswer as string
+                  // Validate true-false: answer matches correctAnswer or correct option ID
                   if (step.content?.correctAnswer !== undefined) {
                     isCorrect = validatedData.answer === String(step.content.correctAnswer);
+                  } else if (step.content?.options && Array.isArray(step.content.options)) {
+                    // New format: options array with correct field
+                    const correctOption = step.content.options.find((o: any) => o.correct === true);
+                    isCorrect = correctOption && validatedData.answer === correctOption.id;
                   }
                   break;
                   
                 case 'matching':
                   // Validate matching: answer is JSON object of left->right pairs
-                  if (step.content?.matchingPairs) {
+                  // Support both matchingPairs (legacy) and pairs (new format)
+                  const matchingPairs = step.content?.matchingPairs || step.content?.pairs;
+                  if (matchingPairs && Array.isArray(matchingPairs)) {
                     try {
                       const submittedMatches = JSON.parse(validatedData.answer);
-                      const pairs = step.content.matchingPairs as Array<{left: string; right: string}>;
+                      const pairs = matchingPairs as Array<{left: string; right: string}>;
                       const correctMatches: Record<string, string> = {};
                       pairs.forEach(p => { correctMatches[p.left] = p.right; });
                       isCorrect = Object.keys(correctMatches).every(left => 
@@ -710,6 +722,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   
                 case 'ordering':
                   // Validate ordering: answer is JSON array in correct order
+                  // Support both orderingItems (legacy) and items with category (new format)
                   if (step.content?.orderingItems) {
                     try {
                       const submittedOrder = JSON.parse(validatedData.answer);
@@ -717,6 +730,19 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                       const correctOrderIds = items
                         .sort((a, b) => a.correctOrder - b.correctOrder)
                         .map(item => item.id);
+                      isCorrect = JSON.stringify(submittedOrder) === JSON.stringify(correctOrderIds);
+                    } catch (e) {
+                      console.error('Failed to parse ordering answer:', e);
+                      isCorrect = false;
+                    }
+                  } else if (step.content?.items && Array.isArray(step.content.items)) {
+                    // New format: items array with id, text, category
+                    // For category-based ordering (NEED vs WANT), validate by matching categories
+                    try {
+                      const submittedOrder = JSON.parse(validatedData.answer);
+                      const items = step.content.items as Array<{id: string; text: string; category: string}>;
+                      // The correct order is the original order in the array (as defined in DB)
+                      const correctOrderIds = items.map(item => item.id);
                       isCorrect = JSON.stringify(submittedOrder) === JSON.stringify(correctOrderIds);
                     } catch (e) {
                       console.error('Failed to parse ordering answer:', e);
