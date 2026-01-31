@@ -204,12 +204,24 @@ export default function LessonAsking({
   
   // Note: Answer selection moved to handleOrderDrop to prevent render loops
   
+  // Helper to normalize options from either object array or string array format
+  const getNormalizedOptions = () => {
+    if (!step.content.options) return [];
+    return step.content.options.map((opt) => {
+      if (typeof opt === 'string') {
+        return { id: opt, text: opt };
+      }
+      return opt;
+    });
+  };
+  
   const renderMultipleChoice = () => {
-    if (!step.content.options) return null;
+    const normalizedOptions = getNormalizedOptions();
+    if (normalizedOptions.length === 0) return null;
     
     return (
       <div className="space-y-3">
-        {step.content.options.map((option) => (
+        {normalizedOptions.map((option) => (
           <button
             key={option.id}
             onClick={() => onAnswerSelect(option.id)}
@@ -675,7 +687,7 @@ export default function LessonAsking({
         </div>
         
         <div className="grid grid-cols-2 gap-3">
-          {step.content.options.map((option) => {
+          {getNormalizedOptions().map((option) => {
             const isSelected = selectedItems.includes(option.id);
             return (
               <button
@@ -721,17 +733,8 @@ export default function LessonAsking({
 
   // Render fill-blank question type - select word to complete sentence
   const renderFillBlank = () => {
-    if (!step.content.options) return null;
-    
-    // Handle both legacy format (options as objects) and new format (options as strings)
-    const normalizedOptions = Array.isArray(step.content.options) 
-      ? step.content.options.map((opt, index) => {
-          if (typeof opt === 'string') {
-            return { id: opt, text: opt };
-          }
-          return opt;
-        })
-      : [];
+    const normalizedOptions = getNormalizedOptions();
+    if (normalizedOptions.length === 0) return null;
     
     const getSelectedText = () => {
       if (!selectedAnswer) return '______';
