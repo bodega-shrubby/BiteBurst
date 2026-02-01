@@ -31,7 +31,6 @@ export default function CategoryScreen({
   onFinish,
   onTextInput
 }: CategoryScreenProps) {
-  const [, setLocation] = useLocation();
   const mealName = mealType.charAt(0).toUpperCase() + mealType.slice(1);
 
   const getCategoryItemCount = (categoryId: string): number => {

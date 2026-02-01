@@ -38,7 +38,6 @@ export default function ItemSelectionScreen({
   onFinish,
   onBack
 }: ItemSelectionScreenProps) {
-  const [, setLocation] = useLocation();
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [searchQuery, setSearchQuery] = useState('');
   const category = FOOD_CATEGORIES.find(c => c.id === categoryId);
