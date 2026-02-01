@@ -5,10 +5,11 @@ import hydroHeroImage from '@assets/Mascots/HydroHero.png';
 import coachFlexImage from '@assets/Mascots/CoachFlex.png';
 import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
 import snackTwinsImage from '@assets/Mascots/SnackTwins.png';
+import danceStarImage from '@assets/Mascots/DanceStar.png';
 
 interface LessonMascotProps {
   type?: 'professor' | 'topic';
-  topicMascot?: 'apple' | 'carrot' | 'hydration' | 'fitness' | 'brain' | 'snacks';
+  topicMascot?: 'apple' | 'carrot' | 'hydration' | 'fitness' | 'brain' | 'snacks' | 'dancestar';
   message?: string;
   size?: 'sm' | 'md' | 'lg';
   position?: 'inline' | 'sidebar' | 'floating';
@@ -22,6 +23,7 @@ const mascotImages: Record<string, string> = {
   fitness: coachFlexImage,
   brain: brainyBoltImage,
   snacks: snackTwinsImage,
+  dancestar: danceStarImage,
 };
 
 const sizeClasses = {

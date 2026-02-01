@@ -27,7 +27,7 @@ export default function CoachFlexCard({ step = 'activity', activitySelected = fa
     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
       <LessonMascot
         type="topic"
-        topicMascot="fitness"
+        topicMascot="dancestar"
         message={message}
         size="md"
       />
