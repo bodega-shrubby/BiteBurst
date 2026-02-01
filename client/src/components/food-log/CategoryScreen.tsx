@@ -10,6 +10,7 @@ interface CategoryScreenProps {
   selectedItems: FoodItem[];
   totalXP: number;
   currentMealState: MealLog;
+  streak?: number;
   onSelectCategory: (categoryId: string) => void;
   onBack: () => void;
   onFinish: () => void;
@@ -21,6 +22,7 @@ export default function CategoryScreen({
   selectedItems, 
   totalXP,
   currentMealState,
+  streak = 0,
   onSelectCategory, 
   onBack,
   onFinish,
@@ -37,32 +39,40 @@ export default function CategoryScreen({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen bg-white pb-32"
+      className="min-h-screen bg-[#F5F5F7] pb-32"
     >
-      <header className="bg-gradient-to-b from-orange-500 to-orange-600 px-4 py-4 text-white sticky top-0 z-10">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <button 
-            onClick={onBack}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-bold">{mealName}</h2>
-          <div className="w-10" />
+      <header className="bg-gradient-to-r from-[#FF6B35] to-[#FF8F5C] px-6 py-6 text-white sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <button 
+              onClick={onBack}
+              className="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-extrabold mb-1">{mealName}</h1>
+              <p className="text-white/90 text-sm">What did you have?</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex items-center gap-2 bg-gradient-to-r from-[#FF9500] to-[#FF6B00] px-4 py-2 rounded-full font-bold">
+              <span>🔥</span>
+              <span>{streak}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#FFA500] px-4 py-2 rounded-full font-bold">
+              <span>⭐</span>
+              <span>{totalXP}</span>
+            </div>
+          </div>
         </div>
       </header>
 
       <FoodLogBreadcrumb mealType={mealType} />
 
-      <div className="p-4 max-w-md mx-auto space-y-4">
-        <div className="text-center">
-          <p className="text-lg text-gray-700 mb-1">
-            What did you have?
-          </p>
-          <p className="text-sm text-gray-500">
-            Pick a category to get started
-          </p>
-        </div>
+      <div className="p-6 max-w-2xl mx-auto">
+        <p className="text-center text-[#8E8E93] text-lg mb-7">Pick a category to get started</p>
 
         {selectedItems.length > 0 && (
           <MealSummaryCard 
@@ -72,7 +82,7 @@ export default function CategoryScreen({
           />
         )}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-5 max-w-[640px] mx-auto">
           {FOOD_CATEGORIES.map((category) => {
             const itemCount = getCategoryItemCount(category.id);
             const hasItems = itemCount > 0;
@@ -81,66 +91,44 @@ export default function CategoryScreen({
               <button
                 key={category.id}
                 onClick={() => onSelectCategory(category.id)}
-                className={`
-                  relative
-                  flex flex-col items-center justify-center
-                  p-6 rounded-2xl
-                  bg-gradient-to-br ${category.color}
-                  border-2 ${category.borderColor}
-                  hover:scale-105 hover:shadow-xl hover:-translate-y-1
-                  active:scale-95
-                  transition-all duration-200
-                  min-h-[140px]
-                  overflow-hidden
-                `}
+                className="relative bg-white rounded-2xl p-6 text-center shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-l-[5px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] active:scale-[0.98]"
+                style={{ borderLeftColor: category.accentColor }}
               >
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-0 hover:opacity-10 transition-opacity duration-500 pointer-events-none" />
-                
                 {hasItems && (
-                  <div className="absolute -top-2 -right-2 z-10 bg-green-500 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2 border-white">
-                    <span className="text-xs font-bold">{itemCount}</span>
+                  <div className="absolute -top-2 -right-2 z-10 bg-[#34C759] text-white rounded-full min-w-[28px] h-7 flex items-center justify-center text-sm font-extrabold border-[3px] border-white shadow-[0_2px_8px_rgba(0,0,0,0.15)]">
+                    {itemCount}
                   </div>
                 )}
 
-                <span className="text-5xl mb-3">{category.emoji}</span>
-                <span className="text-base font-bold text-gray-900 text-center">
+                <span className="text-5xl mb-2.5 block">{category.emoji}</span>
+                <span className="text-base font-bold text-[#1C1C1E]">
                   {category.name}
                 </span>
-                
-                {hasItems ? (
-                  <span className="text-xs text-green-700 font-semibold mt-1">
-                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
-                  </span>
-                ) : category.description && (
-                  <span className="text-xs text-gray-600 mt-1">
-                    {category.description}
-                  </span>
-                )}
               </button>
             );
           })}
         </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center mb-3">
+        <div className="mt-7 pt-7 border-t border-[#E5E5EA] max-w-[640px] mx-auto">
+          <p className="text-sm text-[#8E8E93] text-center mb-3">
             Can't find what you're looking for?
           </p>
           <button
             onClick={onTextInput}
-            className="w-full py-3 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center space-x-2 min-h-[56px]"
+            className="w-full py-4 px-6 bg-white border-2 border-dashed border-[#C7C7CC] rounded-xl text-base font-semibold text-[#8E8E93] flex items-center justify-center gap-2.5 hover:bg-[#F5F5F7] transition-all"
           >
-            <MessageSquare className="w-5 h-5" />
+            <span className="text-xl">💬</span>
             <span>Type what you ate</span>
           </button>
         </div>
       </div>
 
       {selectedItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20 animate-slide-up-fade">
-          <div className="max-w-md mx-auto">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-20">
+          <div className="max-w-2xl mx-auto flex justify-end">
             <button
               onClick={onFinish}
-              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-green-700 active:scale-95 transition-all text-lg min-h-[56px]"
+              className="py-4 px-8 bg-[#34C759] hover:bg-[#2FB350] text-white font-bold rounded-2xl shadow-lg transition-all active:scale-[0.98] text-lg"
             >
               Done with {mealName}
             </button>

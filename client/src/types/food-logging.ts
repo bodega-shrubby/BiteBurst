@@ -12,6 +12,7 @@ export interface FoodCategory {
   emoji: string;
   color: string;
   borderColor: string;
+  accentColor?: string;
   description?: string;
 }
 
@@ -22,6 +23,7 @@ export interface MealType {
   timeRange: string;
   color: string;
   borderColor: string;
+  accentColor?: string;
   typical: string[];
 }
 

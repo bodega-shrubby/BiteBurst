@@ -5,9 +5,11 @@ import { MEAL_TYPES, getRecommendedMealType } from '@/constants/food-data';
 
 interface MealTypeScreenProps {
   onSelect: (mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack') => void;
+  streak?: number;
+  totalXP?: number;
 }
 
-export default function MealTypeScreen({ onSelect }: MealTypeScreenProps) {
+export default function MealTypeScreen({ onSelect, streak = 0, totalXP = 0 }: MealTypeScreenProps) {
   const [, setLocation] = useLocation();
   const recommendedMeal = getRecommendedMealType();
 
@@ -16,24 +18,40 @@ export default function MealTypeScreen({ onSelect }: MealTypeScreenProps) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen bg-white"
+      className="min-h-screen bg-[#F5F5F7]"
     >
-      <header className="bg-gradient-to-b from-orange-500 to-orange-600 px-4 py-6 text-white">
-        <div className="max-w-md mx-auto">
-          <button 
-            onClick={() => setLocation('/dashboard')}
-            className="mb-4 p-2 hover:bg-white/10 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
+      <header className="bg-gradient-to-r from-[#FF6B35] to-[#FF8F5C] px-6 py-6 text-white">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <button 
+              onClick={() => setLocation('/dashboard')}
+              className="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-extrabold mb-1">Log Your Meal</h1>
+              <p className="text-white/90 text-sm">What meal is this?</p>
+            </div>
+          </div>
           
-          <h1 className="text-3xl font-black mb-2">Log Your Meal</h1>
-          <p className="text-orange-100 text-sm">What meal is this?</p>
+          <div className="flex gap-3">
+            <div className="flex items-center gap-2 bg-gradient-to-r from-[#FF9500] to-[#FF6B00] px-4 py-2 rounded-full font-bold">
+              <span>🔥</span>
+              <span>{streak}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#FFA500] px-4 py-2 rounded-full font-bold">
+              <span>⭐</span>
+              <span>{totalXP}</span>
+            </div>
+          </div>
         </div>
       </header>
 
-      <div className="p-4 max-w-md mx-auto">
-        <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="p-6 max-w-2xl mx-auto">
+        <p className="text-center text-[#8E8E93] text-lg mb-7">What meal are you logging?</p>
+        
+        <div className="grid grid-cols-2 gap-6 max-w-[560px] mx-auto">
           {MEAL_TYPES.map((meal) => {
             const isRecommended = meal.id === recommendedMeal;
             
@@ -41,46 +59,34 @@ export default function MealTypeScreen({ onSelect }: MealTypeScreenProps) {
               <button
                 key={meal.id}
                 onClick={() => onSelect(meal.id)}
-                className={`
-                  relative p-6 rounded-2xl border-2
-                  bg-gradient-to-br ${meal.color}
-                  ${meal.borderColor}
-                  hover:scale-105 hover:shadow-xl
-                  active:scale-95
-                  transition-all duration-200
-                  min-h-[180px]
-                  flex flex-col items-center justify-center
-                `}
+                className="relative bg-white rounded-3xl p-8 text-center shadow-[0_2px_12px_rgba(0,0,0,0.08)] border-l-[6px] aspect-square flex flex-col items-center justify-center transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] active:scale-[0.98]"
+                style={{ borderLeftColor: meal.accentColor }}
               >
                 {isRecommended && (
-                  <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
-                    Right now!
+                  <div className="absolute -top-3 -right-3 bg-[#34C759] text-white px-4 py-2 rounded-xl text-sm font-extrabold shadow-[0_4px_12px_rgba(52,199,89,0.4)] animate-pulse">
+                    NOW!
                   </div>
                 )}
                 
-                <span className="text-6xl mb-3">{meal.emoji}</span>
+                <span className="text-7xl mb-4">{meal.emoji}</span>
                 
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                <h3 className="text-2xl font-bold text-[#1C1C1E] mb-2">
                   {meal.name}
                 </h3>
                 
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-[15px] text-[#8E8E93]">
                   {meal.timeRange}
-                </p>
-                
-                <p className="text-xs text-gray-500 text-center line-clamp-2">
-                  e.g. {meal.typical.join(', ')}
                 </p>
               </button>
             );
           })}
         </div>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-500 mb-3">Not sure which meal?</p>
+        <div className="text-center mt-8">
+          <p className="text-[15px] text-[#8E8E93] mb-2">Not sure which meal?</p>
           <button
             onClick={() => onSelect('snack')}
-            className="text-orange-600 font-semibold text-sm hover:text-orange-700 underline"
+            className="text-[#FF6B35] font-semibold text-base hover:underline"
           >
             Just log food without meal type
           </button>

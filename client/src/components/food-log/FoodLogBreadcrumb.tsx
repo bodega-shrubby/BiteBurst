@@ -13,18 +13,22 @@ export default function FoodLogBreadcrumb({ mealType, currentCategory }: FoodLog
     : null;
 
   return (
-    <div className="bg-orange-50 px-4 py-3 border-b border-orange-200">
-      <div className="max-w-md mx-auto flex items-center space-x-2 text-sm">
-        <span className="text-2xl">{meal?.emoji}</span>
-        <span className="font-bold text-orange-900">
+    <div className="bg-white px-6 py-4 border-b border-[#E5E5EA]">
+      <div className="max-w-2xl mx-auto flex items-center gap-2.5 text-[15px]">
+        <span className="text-[#FF6B35] font-semibold">Log Food</span>
+        
+        <ChevronRight className="w-4 h-4 text-[#8E8E93]" />
+        
+        <span className="text-[#FF6B35] font-semibold flex items-center gap-1">
+          <span>{meal?.emoji}</span>
           {meal?.name}
         </span>
         
         {category && (
           <>
-            <ChevronRight className="w-4 h-4 text-orange-400" />
-            <span className="text-lg">{category.emoji}</span>
-            <span className="text-orange-600 font-medium">
+            <ChevronRight className="w-4 h-4 text-[#8E8E93]" />
+            <span className="text-[#1C1C1E] font-bold flex items-center gap-1">
+              <span>{category.emoji}</span>
               {category.name}
             </span>
           </>
