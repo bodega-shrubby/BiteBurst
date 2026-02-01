@@ -6,6 +6,7 @@ import { useActiveChild } from '@/hooks/useActiveChild';
 import { apiRequest } from '@/lib/queryClient';
 import Sidebar from '@/components/Sidebar';
 import BottomNavigation from '@/components/BottomNavigation';
+import LessonMascot from '@/components/LessonMascot';
 import { cleanLessons, type CleanLesson, type LessonState } from '@/data/clean-lessons';
 
 interface ApiLesson {
@@ -595,6 +596,27 @@ export default function Lessons() {
             </div>
 
             <div className="hidden lg:block w-[340px] bg-gray-50 border-l border-gray-200 p-5 space-y-5 flex-shrink-0">
+              {/* Professor Bloop Guide */}
+              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                <LessonMascot
+                  type="professor"
+                  message={completed === 0 
+                    ? "Welcome! Let's start your learning journey!" 
+                    : completed === displayLessons.length 
+                      ? "Amazing work! You've mastered this topic! 🎉"
+                      : "Great progress! Keep learning to unlock more!"}
+                  size="md"
+                />
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className="text-xs text-gray-500 font-medium">Professor's Tip</p>
+                  <p className="text-sm text-gray-700 mt-1">
+                    {completed === 0 
+                      ? "Take your time and have fun learning!"
+                      : "Every lesson brings you closer to being a nutrition expert!"}
+                  </p>
+                </div>
+              </div>
+
               <WeeklyChallenge />
               <TopicLessonsList lessons={displayLessons} completed={completed} />
               <LeaderboardCard userXp={userXp} userName={userName} />
@@ -608,17 +630,13 @@ export default function Lessons() {
         <BottomNavigation />
       </div>
 
-      <div className="hidden md:block fixed bottom-20 left-4 w-[180px]">
-        <div className="bg-gray-50 rounded-2xl p-3 border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center mascot-peek">
-              <span className="text-2xl">🍊</span>
-            </div>
-            <div className="text-xs text-gray-600">
-              <p className="font-semibold">Need help?</p>
-              <p className="text-gray-400">Tap me!</p>
-            </div>
-          </div>
+      <div className="hidden md:block fixed bottom-20 left-4 w-[200px]">
+        <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-lg">
+          <LessonMascot
+            type="professor"
+            message="Need help? Tap me!"
+            size="sm"
+          />
         </div>
       </div>
     </div>

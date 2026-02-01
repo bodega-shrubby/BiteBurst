@@ -15,6 +15,9 @@ import BottomNavigation from "@/components/BottomNavigation";
 import Sidebar from "@/components/Sidebar";
 
 import oniTheOrangeImage from "@assets/Mascots/Oni_the_orange.png";
+import oniCelebrateImage from "@assets/Mascots/Oni_celebrate.png";
+import oniHintImage from "@assets/Mascots/Oni_hint.png";
+import FloatingMascot from "@/components/FloatingMascot";
 
 interface DailySummaryV2 {
   xp_today: number;
@@ -371,14 +374,17 @@ export default function DashboardRedesign() {
 
             {/* LEFT: Main Content Column */}
             <div className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 space-y-6 pb-32">
-              {/* 4. MASCOT GREETING */}
+              {/* 4. MASCOT GREETING - Enhanced with Animation */}
               <div className="flex items-center space-x-4">
-                <img 
-                  src={oniTheOrangeImage}
-                  alt="Oni mascot"
-                  className="w-14 h-14 lg:w-16 lg:h-16 object-contain"
-                />
-                <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1">
+                <div className="relative">
+                  <img 
+                    src={dailySummary.xp_today >= dailySummary.xp_goal ? oniCelebrateImage : oniTheOrangeImage}
+                    alt="Oni mascot"
+                    className="w-14 h-14 lg:w-16 lg:h-16 object-contain animate-mascot-float drop-shadow-lg"
+                  />
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black/10 rounded-full blur-sm animate-shadow-float" />
+                </div>
+                <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1 animate-bubble-appear">
                   <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>
                 </div>
               </div>
@@ -513,6 +519,17 @@ export default function DashboardRedesign() {
 
             {/* RIGHT: Sidebar Column (desktop only) */}
             <div className="hidden lg:block w-[340px] bg-gray-50 border-l border-gray-200 p-5 space-y-5 flex-shrink-0">
+
+              {/* Large Floating Oni Mascot */}
+              <div className="flex justify-center mb-2">
+                <FloatingMascot
+                  src={dailySummary.xp_today >= dailySummary.xp_goal ? oniCelebrateImage : oniHintImage}
+                  alt="Oni the Orange"
+                  size="lg"
+                  showSpeechBubble={dailySummary.xp_today === 0}
+                  speechText="Ready to learn? 🍊"
+                />
+              </div>
 
               {/* Daily XP Goal */}
               <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
