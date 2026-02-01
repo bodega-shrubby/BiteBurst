@@ -58,8 +58,8 @@ export default function ActivityLogNew() {
         await apiRequest(`/api/user/${childUserId}/xp`, {
           method: 'POST',
           body: {
-            amount: xpToAdd,
-            source: 'activity_log'
+            delta_xp: xpToAdd,
+            reason: 'activity_log'
           }
         });
       }

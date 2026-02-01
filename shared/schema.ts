@@ -187,9 +187,9 @@ export const badgeCatalog = pgTable("badge_catalog", {
   active: boolean("active").notNull().default(true),
 });
 
-// User Badges (earned badges tracking) - UUID to match users table
+// User Badges (earned badges tracking) - linked to children table
 export const badges = pgTable("badges", {
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").notNull().references(() => children.id, { onDelete: 'cascade' }),
   badgeCode: varchar("badge_code").notNull().references(() => badgeCatalog.code),
   earnedAt: timestamp("earned_at").notNull().defaultNow(),
   progress: integer("progress").default(0), // Current progress toward threshold
@@ -197,10 +197,10 @@ export const badges = pgTable("badges", {
   pk: { name: "badges_pkey", columns: [table.userId, table.badgeCode] }
 }));
 
-// XP Events table
+// XP Events table - linked to children table
 export const xpEvents = pgTable("xp_events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").notNull().references(() => children.id, { onDelete: 'cascade' }),
   amount: integer("amount").notNull(),
   reason: text("reason"),
   refLog: varchar("ref_log").references(() => logs.id),
