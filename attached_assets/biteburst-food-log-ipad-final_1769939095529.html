@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteBurst Food Log - iPad Wireframes Final</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Screen Navigation */
+        .screen-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .screen-nav button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #333;
+            color: white;
+        }
+
+        .screen-nav button.active {
+            background: #58CC02;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .screen-nav button:hover:not(.active) {
+            background: #555;
+        }
+
+        /* iPad Frame */
+        .ipad-container {
+            display: flex;
+            justify-content: center;
+            padding: 80px 20px 40px;
+        }
+
+        .ipad-frame {
+            width: 1024px;
+            height: 768px;
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .ipad-screen {
+            width: 100%;
+            height: 100%;
+            background: #F5F5F7;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Screen Content */
+        .screen {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8F5C 100%);
+            padding: 24px 40px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .stat-pill.streak {
+            background: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%);
+        }
+
+        .stat-pill.xp {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: white;
+            font-size: 15px;
+            color: #666;
+            border-bottom: 1px solid #E5E5EA;
+        }
+
+        .breadcrumb-item {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        .breadcrumb-item.current {
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 32px 40px;
+            height: calc(100% - 100px);
+            overflow-y: auto;
+        }
+
+        .content-with-breadcrumb {
+            height: calc(100% - 150px);
+        }
+
+        .section-label {
+            font-size: 18px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        /* ==========================================
+           MEAL TYPE CARDS - 2x2 Square Grid
+           ========================================== */
+        .meal-grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        .meal-card {
+            background: white;
+            border-radius: 24px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            border-left: 6px solid #ccc;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meal-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+        }
+
+        .meal-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Colored left borders for meal types */
+        .meal-card.breakfast { border-left-color: #FF9500; }
+        .meal-card.lunch { border-left-color: #34C759; }
+        .meal-card.dinner { border-left-color: #AF52DE; }
+        .meal-card.snack { border-left-color: #007AFF; }
+
+        .meal-emoji {
+            font-size: 72px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .meal-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1C1C1E;
+            margin-bottom: 8px;
+        }
+
+        .meal-time {
+            font-size: 15px;
+            color: #8E8E93;
+        }
+
+        .now-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #34C759;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 800;
+            animation: pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Skip link */
+        .skip-link {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .skip-link p {
+            font-size: 15px;
+            color: #8E8E93;
+            margin-bottom: 8px;
+        }
+
+        .skip-link a {
+            color: #FF6B35;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .skip-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* ==========================================
+           CATEGORY CARDS - 3x2 Grid
+           ========================================== */
+        .category-grid-ipad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 18px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            border-left: 5px solid #ccc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .category-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Colored left borders for categories */
+        .category-card.fruits { border-left-color: #FF3B30; }
+        .category-card.snacks { border-left-color: #FFCC00; }
+        .category-card.veggies { border-left-color: #34C759; }
+        .category-card.drinks { border-left-color: #007AFF; }
+        .category-card.bread { border-left-color: #FF9500; }
+        .category-card.dairy { border-left-color: #AF52DE; }
+
+        .category-emoji {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .category-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1C1C1E;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #34C759;
+            color: white;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Meal Summary Card */
+        .meal-summary-ipad {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 28px;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 5px solid #FF9500;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .summary-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: #1C1C1E;
+            font-size: 18px;
+        }
+
+        .selected-items-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .selected-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #F5F5F7;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1C1C1E;
+        }
+
+        .selected-item span:first-child {
+            font-size: 22px;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #E5E5EA;
+        }
+
+        .balance-categories {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #8E8E93;
+        }
+
+        .balanced-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #34C759;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* Text Input Button */
+        .text-input-section {
+            margin-top: 28px;
+            padding-top: 28px;
+            border-top: 1px solid #E5E5EA;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .text-input-label {
+            font-size: 14px;
+            color: #8E8E93;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .text-input-btn {
+            width: 100%;
+            padding: 18px;
+            background: white;
+            border: 2px dashed #C7C7CC;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #8E8E93;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .text-input-btn:hover {
+            background: #F5F5F7;
+            border-color: #8E8E93;
+            color: #1C1C1E;
+        }
+
+        /* ==========================================
+           FOOD ITEMS - 6 Column Grid
+           ========================================== */
+        .food-grid-ipad {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .food-item {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .food-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .food-item:active {
+            transform: scale(0.95);
+        }
+
+        .food-item.selected {
+            background: #E8FAE8;
+            box-shadow: 0 0 0 3px #34C759;
+        }
+
+        .food-emoji {
+            font-size: 36px;
+            margin-bottom: 6px;
+        }
+
+        .food-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8E8E93;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .food-item.selected .food-name {
+            color: #1C1C1E;
+            font-weight: 700;
+        }
+
+        .food-check {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 24px;
+            height: 24px;
+            background: #34C759;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Search Bar */
+        .search-bar-ipad {
+            max-width: 480px;
+            margin: 0 auto 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            outline: none;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3), 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .search-input::placeholder {
+            color: #C7C7CC;
+        }
+
+        /* Item count display */
+        .items-count {
+            font-size: 15px;
+            color: #8E8E93;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .items-count strong {
+            color: #34C759;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar-ipad {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #E5E5EA;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-summary {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .summary-label {
+            font-weight: 700;
+            color: #1C1C1E;
+            font-size: 16px;
+        }
+
+        .summary-items {
+            display: flex;
+            gap: 8px;
+        }
+
+        .summary-item-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #F5F5F7;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .summary-item-pill span:first-child {
+            font-size: 18px;
+        }
+
+        .bottom-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            padding: 14px 24px;
+            background: white;
+            border: 2px solid #FF6B35;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #FF6B35;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #FFF5F0;
+        }
+
+        .btn-primary {
+            padding: 14px 32px;
+            background: #34C759;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #2DB84D;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        /* ==========================================
+           APPLE BUDDY MASCOT
+           ========================================== */
+        .floating-mascot {
+            position: fixed;
+            bottom: 100px;
+            right: 60px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .mascot-tip-bubble {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            max-width: 260px;
+            position: relative;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mascot-tip-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 35px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+        }
+
+        .tip-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tip-header span:first-child {
+            font-size: 20px;
+        }
+
+        .tip-header span:last-child {
+            font-size: 12px;
+            font-weight: 800;
+            color: #FF6B35;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tip-text {
+            font-size: 15px;
+            color: #1C1C1E;
+            line-height: 1.5;
+        }
+
+        .tip-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #C7C7CC;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .tip-close:hover {
+            color: #8E8E93;
+        }
+
+        .mascot-character {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(145deg, #FF6B6B 0%, #EE5253 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            box-shadow: 0 8px 24px rgba(238, 82, 83, 0.4);
+            cursor: pointer;
+            transition: transform 0.3s;
+            border: 4px solid white;
+        }
+
+        .mascot-character:hover {
+            transform: scale(1.1);
+        }
+
+        .mascot-character:active {
+            transform: scale(0.95);
+        }
+
+        .mascot-tip-bubble.hidden {
+            display: none;
+        }
+
+        .mascot-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-top: 6px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="screen-nav">
+        <button class="active" onclick="showScreen(1)">1. Meal Type</button>
+        <button onclick="showScreen(2)">2. Category Selection</button>
+        <button onclick="showScreen(3)">3. Food Items</button>
+    </nav>
+
+    <div class="ipad-container">
+        <div class="ipad-frame">
+            <div class="ipad-screen">
+
+                <!-- Screen 1: Meal Type Selection - 2x2 Grid -->
+                <div class="screen active" id="screen1">
+                    <div class="header">
+                        <div class="header-left">
+                            <button class="back-btn">←</button>
+                            <div class="header-text">
+                                <h1>Log Your Meal</h1>
+                                <p>What are you eating?</p>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-pill streak">🔥 7</div>
+                            <div class="stat-pill xp">⭐ 1,240</div>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <p class="section-label">Pick your meal type</p>
+
+                        <div class="meal-grid-2x2">
+                            <div class="meal-card breakfast" onclick="showScreen(2)">
+                                <div class="now-badge">NOW!</div>
+                                <span class="meal-emoji">🥞</span>
+                                <div class="meal-name">Breakfast</div>
+                                <div class="meal-time">6am - 10am</div>
+                            </div>
+                            <div class="meal-card lunch" onclick="showScreen(2)">
+                                <span class="meal-emoji">🥪</span>
+                                <div class="meal-name">Lunch</div>
+                                <div class="meal-time">11am - 2pm</div>
+                            </div>
+                            <div class="meal-card dinner" onclick="showScreen(2)">
+                                <span class="meal-emoji">🍝</span>
+                                <div class="meal-name">Dinner</div>
+                                <div class="meal-time">5pm - 9pm</div>
+                            </div>
+                            <div class="meal-card snack" onclick="showScreen(2)">
+                                <span class="meal-emoji">🍎</span>
+                                <div class="meal-name">Snack</div>
+                                <div class="meal-time">Anytime!</div>
+                            </div>
+                        </div>
+
+                        <div class="skip-link">
+                            <p>Not sure which meal?</p>
+                            <a href="#">Just log food without meal type</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen 2: Category Selection -->
+                <div class="screen" id="screen2">
+                    <div class="header">
+                        <div class="header-left">
+                            <button class="back-btn" onclick="showScreen(1)">←</button>
+                            <div class="header-text">
+                                <h1>Breakfast</h1>
+                                <p>What did you have?</p>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-pill streak">🔥 7</div>
+                            <div class="stat-pill xp">⭐ 1,240</div>
+                        </div>
+                    </div>
+
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">Log Food</span>
+                        <span>›</span>
+                        <span class="breadcrumb-item current">Breakfast</span>
+                    </div>
+
+                    <div class="content content-with-breadcrumb" style="padding-bottom: 100px;">
+                        <div class="meal-summary-ipad">
+                            <div class="summary-header">
+                                <div class="summary-title">
+                                    <span>✨</span>
+                                    <span>Your Breakfast</span>
+                                </div>
+                            </div>
+                            <div class="selected-items-row">
+                                <div class="selected-item">
+                                    <span>🍎</span>
+                                    <span>Apple</span>
+                                </div>
+                                <div class="selected-item">
+                                    <span>🥣</span>
+                                    <span>Cereal</span>
+                                </div>
+                                <div class="selected-item">
+                                    <span>🥛</span>
+                                    <span>Milk</span>
+                                </div>
+                            </div>
+                            <div class="balance-row">
+                                <div class="balance-categories">
+                                    <span>Balance:</span>
+                                    <span>🍎 Fruits</span>
+                                    <span>•</span>
+                                    <span>🥣 Grains</span>
+                                    <span>•</span>
+                                    <span>🥛 Dairy</span>
+                                </div>
+                                <div class="balanced-badge">
+                                    <span>✓</span>
+                                    <span>Balanced!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="section-label">Pick a category</p>
+
+                        <div class="category-grid-ipad">
+                            <div class="category-card fruits" onclick="showScreen(3)">
+                                <div class="category-badge">1</div>
+                                <span class="category-emoji">🍎</span>
+                                <div class="category-name">Fruits</div>
+                            </div>
+                            <div class="category-card snacks" onclick="showScreen(3)">
+                                <span class="category-emoji">🧀</span>
+                                <div class="category-name">Snacks</div>
+                            </div>
+                            <div class="category-card veggies" onclick="showScreen(3)">
+                                <span class="category-emoji">🥦</span>
+                                <div class="category-name">Veggies</div>
+                            </div>
+                            <div class="category-card drinks" onclick="showScreen(3)">
+                                <span class="category-emoji">💧</span>
+                                <div class="category-name">Drinks</div>
+                            </div>
+                            <div class="category-card bread" onclick="showScreen(3)">
+                                <div class="category-badge">1</div>
+                                <span class="category-emoji">🍞</span>
+                                <div class="category-name">Bread & Grains</div>
+                            </div>
+                            <div class="category-card dairy" onclick="showScreen(3)">
+                                <div class="category-badge">1</div>
+                                <span class="category-emoji">🥛</span>
+                                <div class="category-name">Dairy</div>
+                            </div>
+                        </div>
+
+                        <div class="text-input-section">
+                            <p class="text-input-label">Can't find what you're looking for?</p>
+                            <button class="text-input-btn">
+                                <span>💬</span>
+                                <span>Type what you ate</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bottom-bar-ipad">
+                        <div></div>
+                        <button class="btn-primary">
+                            <span>✓</span>
+                            <span>Done with Breakfast</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Screen 3: Food Items Selection -->
+                <div class="screen" id="screen3">
+                    <div class="header">
+                        <div class="header-left">
+                            <button class="back-btn" onclick="showScreen(2)">←</button>
+                            <div class="header-text">
+                                <h1>🍎 Fruits</h1>
+                                <p>Tap everything you ate!</p>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-pill streak">🔥 7</div>
+                            <div class="stat-pill xp">⭐ 1,240</div>
+                        </div>
+                    </div>
+
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">Breakfast</span>
+                        <span>›</span>
+                        <span class="breadcrumb-item current">Fruits</span>
+                    </div>
+
+                    <div class="content content-with-breadcrumb" style="padding-bottom: 100px;">
+                        <div class="search-bar-ipad">
+                            <input type="text" class="search-input" placeholder="Search fruits...">
+                        </div>
+
+                        <p class="items-count">Tap to select • <strong>1 item</strong> selected</p>
+
+                        <div class="food-grid-ipad">
+                            <div class="food-item selected" onclick="toggleFood(this)">
+                                <div class="food-check">✓</div>
+                                <span class="food-emoji">🍎</span>
+                                <span class="food-name">Apple</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍌</span>
+                                <span class="food-name">Banana</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍊</span>
+                                <span class="food-name">Orange</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍇</span>
+                                <span class="food-name">Grapes</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍓</span>
+                                <span class="food-name">Strawberry</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🫐</span>
+                                <span class="food-name">Blueberry</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍑</span>
+                                <span class="food-name">Peach</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍉</span>
+                                <span class="food-name">Watermelon</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🥝</span>
+                                <span class="food-name">Kiwi</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍐</span>
+                                <span class="food-name">Pear</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🍒</span>
+                                <span class="food-name">Cherry</span>
+                            </div>
+                            <div class="food-item" onclick="toggleFood(this)">
+                                <span class="food-emoji">🥭</span>
+                                <span class="food-name">Mango</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-bar-ipad">
+                        <div class="bottom-summary">
+                            <span class="summary-label">Your Breakfast:</span>
+                            <div class="summary-items">
+                                <div class="summary-item-pill">
+                                    <span>🍎</span>
+                                    <span>Apple</span>
+                                </div>
+                                <div class="summary-item-pill">
+                                    <span>🥣</span>
+                                    <span>Cereal</span>
+                                </div>
+                                <div class="summary-item-pill">
+                                    <span>🥛</span>
+                                    <span>Milk</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom-buttons">
+                            <button class="btn-secondary" onclick="showScreen(2)">
+                                <span>+</span>
+                                <span>Add More</span>
+                            </button>
+                            <button class="btn-primary">
+                                <span>✓</span>
+                                <span>Done with Breakfast</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLE BUDDY MASCOT -->
+    <div class="floating-mascot" id="floatingMascot">
+        <div class="mascot-tip-bubble" id="tipBubble">
+            <button class="tip-close" onclick="closeTip()">×</button>
+            <div class="tip-header">
+                <span>💡</span>
+                <span>Tip from Apple Buddy!</span>
+            </div>
+            <div class="tip-text" id="tipText">
+                Fruits are packed with vitamins to keep you healthy and strong! 💪
+            </div>
+        </div>
+        <div class="mascot-character" onclick="toggleTip()" title="Apple Buddy">
+            🍎
+        </div>
+        <div class="mascot-label">Apple Buddy</div>
+    </div>
+
+    <script>
+        const tips = {
+            1: "Logging meals helps you track your healthy eating journey! 🌟",
+            2: "Try to eat from different food groups for a balanced meal! 🌈",
+            3: "Fruits are packed with vitamins to keep you healthy and strong! 💪"
+        };
+
+        let currentScreen = 1;
+        let tipVisible = true;
+
+        function showScreen(num) {
+            currentScreen = num;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+            document.querySelectorAll('.screen-nav button')[num - 1].classList.add('active');
+            document.getElementById('tipText').textContent = tips[num];
+            showTip();
+        }
+
+        function toggleFood(el) {
+            el.classList.toggle('selected');
+            if (el.classList.contains('selected')) {
+                if (!el.querySelector('.food-check')) {
+                    const check = document.createElement('div');
+                    check.className = 'food-check';
+                    check.textContent = '✓';
+                    el.appendChild(check);
+                }
+            } else {
+                const check = el.querySelector('.food-check');
+                if (check) check.remove();
+            }
+            updateCount();
+        }
+
+        function updateCount() {
+            const selected = document.querySelectorAll('#screen3 .food-item.selected').length;
+            const countEl = document.querySelector('.items-count strong');
+            if (countEl) {
+                countEl.textContent = selected + ' item' + (selected !== 1 ? 's' : '');
+            }
+        }
+
+        function toggleTip() {
+            const bubble = document.getElementById('tipBubble');
+            if (bubble.classList.contains('hidden')) {
+                showTip();
+            } else {
+                closeTip();
+            }
+        }
+
+        function showTip() {
+            const bubble = document.getElementById('tipBubble');
+            bubble.classList.remove('hidden');
+            tipVisible = true;
+        }
+
+        function closeTip() {
+            const bubble = document.getElementById('tipBubble');
+            bubble.classList.add('hidden');
+            tipVisible = false;
+        }
+
+        setInterval(() => {
+            if (tipVisible) closeTip();
+        }, 10000);
+    </script>
+</body>
+</html>
