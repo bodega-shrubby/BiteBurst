@@ -341,13 +341,13 @@
   animation: subtle-bounce 2s ease-in-out infinite;
 }
 
-/* Floating Mascot Animation - Very gentle, slow float */
+/* Floating Mascot Animation - Ultra gentle, slow float */
 @keyframes mascot-float {
   0%, 100% {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-3px);
   }
 }
 

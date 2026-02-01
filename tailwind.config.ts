@@ -81,7 +81,7 @@ export default {
         },
         "mascot-float": {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-6px)" },
+          "50%": { transform: "translateY(-3px)" },
         },
         "shadow-float": {
           "0%, 100%": { transform: "translateX(-50%) scale(1)", opacity: "0.2" },
