@@ -9,6 +9,7 @@ import { X, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useActiveChild } from "@/hooks/useActiveChild";
 import mascotImage from "@assets/generated_images/Transparent_background_nutrition_mascot_2ce7fda2.png";
 
 interface ActivityOption {
@@ -65,6 +66,7 @@ export default function ActivityLog() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/activity-log");
   const { user } = useAuth();
+  const activeChild = useActiveChild(user);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -173,8 +175,11 @@ export default function ActivityLog() {
   const handleSubmit = async () => {
     if (!user || !state.activityLabel || !state.duration) return;
 
+    // Use active child's ID for logging (supports child switching)
+    const childUserId = activeChild?.childId || (user as any).id;
+
     const logData = {
-      userId: (user as any).id,
+      userId: childUserId,
       type: 'activity' as const,
       entryMethod: state.method,
       content: state.method === 'emoji' 

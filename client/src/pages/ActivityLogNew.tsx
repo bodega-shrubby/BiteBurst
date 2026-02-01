@@ -2,6 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { useActivityLogging } from '@/hooks/useActivityLogging';
 import { useAuth } from '@/hooks/useAuth';
+import { useActiveChild } from '@/hooks/useActiveChild';
 import { useToast } from '@/hooks/use-toast';
 import TimePeriodScreen from '@/components/activity-log/TimePeriodScreen';
 import ActivityTypeScreen from '@/components/activity-log/ActivityTypeScreen';
@@ -11,6 +12,7 @@ import { apiRequest } from '@/lib/queryClient';
 export default function ActivityLogNew() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const activeChild = useActiveChild(user);
   const { toast } = useToast();
   const {
     state,
@@ -32,10 +34,13 @@ export default function ActivityLogNew() {
       const activitySummary = activities.map(a => `${a.activityEmoji} ${a.activityName} (${a.durationMinutes}min)`).join(', ');
       const totalMinutes = getTotalMinutes();
       
+      // Use active child's ID for logging (supports child switching)
+      const childUserId = activeChild?.childId || user.id;
+      
       await apiRequest('/api/logs', {
         method: 'POST',
         body: {
-          userId: user.id,
+          userId: childUserId,
           type: 'activity',
           entryMethod: 'emoji',
           durationMin: totalMinutes,
@@ -50,7 +55,7 @@ export default function ActivityLogNew() {
 
       const xpToAdd = getTotalXP();
       if (xpToAdd > 0) {
-        await apiRequest(`/api/user/${user.id}/xp`, {
+        await apiRequest(`/api/user/${childUserId}/xp`, {
           method: 'POST',
           body: {
             amount: xpToAdd,
