@@ -109,16 +109,31 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
         }
       }
 
-      // Get user's current goal for context
-      const user = await storage.getUser(validatedData.userId);
-      const goalContext = user?.goal;
+      // Get user/child profile for goal context and determine the correct userId for logging
+      let goalContext: "energy" | "focus" | "strength" | null | undefined = undefined;
+      let userIdForLog = validatedData.userId;
+      
+      // First check if userId is a parent user (from users table)
+      const userProfile = await storage.getUser(validatedData.userId);
+      if (userProfile) {
+        goalContext = userProfile.goal as "energy" | "focus" | "strength" | null | undefined;
+        userIdForLog = userProfile.id;
+      } else {
+        // Check if userId is a child (from children table)
+        const childProfile = await storage.getChildById(validatedData.userId);
+        if (childProfile) {
+          goalContext = childProfile.goal as "energy" | "focus" | "strength" | null | undefined;
+          // For children, we need to use the parent's user ID for the log (due to FK constraint)
+          userIdForLog = childProfile.parentId;
+        }
+      }
 
       // Generate quick feedback for the log
       const aiFeedback = getQuickFeedback(goalContext);
 
       // Create log entry with feedback
       const logEntry = await storage.createLog({
-        userId: validatedData.userId,
+        userId: userIdForLog,
         type: validatedData.type,
         entryMethod: validatedData.entryMethod,
         content: validatedData.content,
