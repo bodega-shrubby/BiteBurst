@@ -69,6 +69,35 @@ export default function Subscription() {
     });
   };
 
+  const cancelSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/subscription', {
+        method: 'POST',
+        body: { plan: 'free' },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      toast({
+        title: "Subscription Cancelled",
+        description: "Your subscription has been cancelled. You're now on the free plan.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to cancel subscription. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCancelSubscription = () => {
+    if (window.confirm("Are you sure you want to cancel your subscription? You'll lose access to Pro features.")) {
+      cancelSubscriptionMutation.mutate();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -267,6 +296,24 @@ export default function Subscription() {
               </div>
             </div>
           </div>
+
+          {currentPlan !== 'free' && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+              <h3 className="font-bold text-gray-900 mb-2">Cancel Subscription</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                If you cancel, you'll lose access to Pro features at the end of your billing period. 
+                You can resubscribe anytime.
+              </p>
+              <Button 
+                onClick={handleCancelSubscription}
+                variant="outline"
+                className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-medium"
+                disabled={cancelSubscriptionMutation.isPending}
+              >
+                {cancelSubscriptionMutation.isPending ? 'Cancelling...' : 'Cancel Subscription'}
+              </Button>
+            </div>
+          )}
 
           <div className="mt-6 text-center">
             <a href="#" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
