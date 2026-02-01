@@ -147,7 +147,7 @@ export const children = pgTable("children", {
 // Logs table with UUID and proper types
 export const logs = pgTable("logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").notNull().references(() => children.id, { onDelete: 'cascade' }),
   logDate: date("log_date").notNull().default(sql`CURRENT_DATE`),
   ts: timestamp("ts").notNull().defaultNow(),
   type: logTypeEnum("type").notNull(),

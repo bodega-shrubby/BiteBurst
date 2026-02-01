@@ -109,31 +109,23 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
         }
       }
 
-      // Get user/child profile for goal context and determine the correct userId for logging
+      // Get child profile for goal context (logs are linked to child IDs)
       let goalContext: "energy" | "focus" | "strength" | null | undefined = undefined;
-      let userIdForLog = validatedData.userId;
       
-      // First check if userId is a parent user (from users table)
-      const userProfile = await storage.getUser(validatedData.userId);
-      if (userProfile) {
+      // Check if userId is in children table first (preferred), then users table (legacy)
+      const childProfile = await storage.getChildById(validatedData.userId);
+      if (childProfile) {
+        goalContext = childProfile.goal as "energy" | "focus" | "strength" | null | undefined;
+      } else if (userProfile) {
         goalContext = userProfile.goal as "energy" | "focus" | "strength" | null | undefined;
-        userIdForLog = userProfile.id;
-      } else {
-        // Check if userId is a child (from children table)
-        const childProfile = await storage.getChildById(validatedData.userId);
-        if (childProfile) {
-          goalContext = childProfile.goal as "energy" | "focus" | "strength" | null | undefined;
-          // For children, we need to use the parent's user ID for the log (due to FK constraint)
-          userIdForLog = childProfile.parentId;
-        }
       }
 
       // Generate quick feedback for the log
       const aiFeedback = getQuickFeedback(goalContext);
 
-      // Create log entry with feedback
+      // Create log entry with feedback (userId is the child ID)
       const logEntry = await storage.createLog({
-        userId: userIdForLog,
+        userId: validatedData.userId,
         type: validatedData.type,
         entryMethod: validatedData.entryMethod,
         content: validatedData.content,
