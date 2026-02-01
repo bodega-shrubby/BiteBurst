@@ -71,7 +71,7 @@ export default function Sidebar() {
                 ${item.isPrimary && !active ? 'border-2 border-orange-200 bg-orange-50/50' : ''}
               `}
             >
-              <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-yellow-500 fill-yellow-500' : active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
+              <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-black fill-yellow-500' : active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
               <span className="text-sm">{item.label}</span>
               {item.isPrimary && (
                 <span className="ml-auto text-xs bg-[#FF6A00] text-white px-2 py-0.5 rounded-full">
