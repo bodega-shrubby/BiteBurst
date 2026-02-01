@@ -64,13 +64,10 @@ export default function ActivityLogNew() {
         });
       }
 
-      toast({
-        title: "Activity logged!",
-        description: `You earned +${xpToAdd} XP for ${totalMinutes} minutes of activity!`,
-      });
-
+      // Navigate to success/feedback page with XP data
       reset();
-      setLocation('/dashboard');
+      const successUrl = `/success?logId=temp&xp=${xpToAdd}&type=activity`;
+      setLocation(successUrl);
     } catch (error) {
       console.error('Failed to submit activity log:', error);
       toast({
