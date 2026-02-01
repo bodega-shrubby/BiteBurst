@@ -1,4 +1,4 @@
-import { BookOpen, Medal, Plus, User, MoreHorizontal, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { BookOpen, Medal, User, MoreHorizontal, Settings, HelpCircle, LogOut, Apple, Dumbbell } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,13 +14,13 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'lessons', label: 'Lessons', icon: BookOpen, path: '/lessons', isPrimary: true },
   { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard' },
-  { id: 'log', label: 'LOG', icon: Plus, path: '/food-log' },
   { id: 'profile', label: 'Profile', icon: User, path: '/dashboard' },
 ];
 
 export default function Sidebar() {
   const [location, setLocation] = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [logHoverOpen, setLogHoverOpen] = useState(false);
   const { logout } = useAuth();
 
   const isActive = (path: string) => {
@@ -29,6 +29,8 @@ export default function Sidebar() {
     }
     return location.startsWith(path);
   };
+
+  const isLogActive = location === '/food-log' || location === '/activity-log';
 
   const handleLogout = async () => {
     await logout();
@@ -75,10 +77,60 @@ export default function Sidebar() {
             </button>
           );
         })}
+
+        {/* LOG button with hover dropdown */}
+        <div 
+          className="relative"
+          onMouseEnter={() => setLogHoverOpen(true)}
+          onMouseLeave={() => setLogHoverOpen(false)}
+        >
+          <button
+            className={`
+              w-full flex items-center space-x-3 px-4 py-3 rounded-xl
+              transition-all duration-200
+              ${isLogActive
+                ? 'bg-orange-50 text-[#FF6A00] font-semibold'
+                : 'text-gray-600 hover:bg-gray-50'
+              }
+            `}
+          >
+            {/* 3D + sign */}
+            <div className={`
+              w-6 h-6 rounded-lg flex items-center justify-center font-bold text-lg
+              bg-gradient-to-br from-[#FF8A00] to-[#FF5500] text-white
+              shadow-md shadow-orange-300/50
+              transform transition-transform duration-200
+              ${logHoverOpen ? 'scale-110 rotate-90' : ''}
+            `}>
+              +
+            </div>
+            <span className="text-sm">LOG</span>
+          </button>
+
+          {/* Hover dropdown */}
+          {logHoverOpen && (
+            <div className="absolute left-full top-0 ml-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 min-w-[160px] z-50">
+              <button
+                onClick={() => { setLocation('/food-log'); setLogHoverOpen(false); }}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-[#FF6A00] transition-colors"
+              >
+                <Apple className="w-5 h-5" />
+                <span className="text-sm font-medium">Food</span>
+              </button>
+              <button
+                onClick={() => { setLocation('/activity-log'); setLogHoverOpen(false); }}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-[#FF6A00] transition-colors"
+              >
+                <Dumbbell className="w-5 h-5" />
+                <span className="text-sm font-medium">Activity</span>
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* More dropdown at bottom */}
-      <div className="p-3 border-t border-gray-100 relative">
+      <div className="mt-auto p-3 border-t border-gray-100 relative">
         <button
           onClick={() => setMoreOpen(!moreOpen)}
           className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
