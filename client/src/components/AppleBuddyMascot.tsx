@@ -90,8 +90,6 @@ export default function AppleBuddyMascot({ categoryId, screen }: AppleBuddyMasco
         />
       </button>
       
-      <p className="text-center text-xs font-semibold text-[#1C1C1E] mt-2">Apple Buddy</p>
-      
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
