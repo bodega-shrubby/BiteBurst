@@ -46,17 +46,36 @@ export function registerLogRoutes(app: Express, requireAuth: any) {
       
       // Verify parent owns the child profile
       // req.userId is the Supabase parent auth ID
-      // validatedData.userId is the child profile ID
-      const childProfile = await storage.getUser(validatedData.userId);
-      if (!childProfile) {
-        return res.status(404).json({ error: 'User not found' });
+      // validatedData.userId can be a user ID (from users table) or child ID (from children table)
+      
+      // First check if it's in the users table (legacy flow)
+      let userProfile = await storage.getUser(validatedData.userId);
+      let isAuthorized = false;
+      
+      if (userProfile) {
+        // Found in users table - check authorization
+        const isParentOwned = userProfile.parentAuthId === req.userId;
+        const isDirectMatch = validatedData.userId === req.userId;
+        isAuthorized = isParentOwned || isDirectMatch;
+      } else {
+        // Not found in users table - check children table
+        const childProfile = await storage.getChildById(validatedData.userId);
+        if (childProfile) {
+          // Find the parent user to verify ownership
+          const parentUser = await storage.getParentByAuthId(req.userId);
+          if (parentUser && childProfile.parentId === parentUser.id) {
+            isAuthorized = true;
+          }
+        }
       }
       
-      // Allow if parentAuthId matches OR direct ID match (legacy users)
-      const isParentOwned = childProfile.parentAuthId === req.userId;
-      const isDirectMatch = validatedData.userId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
+      if (!isAuthorized) {
+        // Check if the ID exists in either table
+        const existsInUsers = await storage.getUser(validatedData.userId);
+        const existsInChildren = await storage.getChildById(validatedData.userId);
+        if (!existsInUsers && !existsInChildren) {
+          return res.status(404).json({ error: 'User not found' });
+        }
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
