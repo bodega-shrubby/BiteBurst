@@ -135,20 +135,12 @@ export default function Sidebar() {
         {/* Bottom nav items (Profile) */}
         {NAV_ITEMS_BOTTOM.map((item) => {
           const Icon = item.icon;
-          const active = isActive(item.path);
 
           return (
             <button
               key={item.id}
               onClick={() => setLocation(item.path)}
-              className={`
-                w-full flex items-center space-x-3 px-4 py-3 rounded-xl
-                transition-all duration-200
-                ${active
-                  ? 'bg-orange-50 text-[#FF6A00] font-semibold'
-                  : 'text-gray-600 hover:bg-gray-50'
-                }
-              `}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
             >
               <Icon className="w-5 h-5 text-blue-500 fill-blue-500" />
               <span className="text-sm">{item.label}</span>
