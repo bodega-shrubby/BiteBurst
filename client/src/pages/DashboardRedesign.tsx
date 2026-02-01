@@ -60,18 +60,25 @@ interface DailySummaryV2 {
   };
 }
 
-function HeartsDisplay({ hearts = 3, maxHearts = 5 }: { hearts?: number; maxHearts?: number }) {
+function OrangeStar({ filled = true, size = 20 }: { filled?: boolean; size?: number }) {
   return (
-    <div className="flex items-center space-x-0.5" title="Hearts - keep learning!">
-      {Array.from({ length: maxHearts }).map((_, i) => (
-        <span 
-          key={i} 
-          className={`text-base transition-all duration-200 ${
-            i < hearts ? 'opacity-100 scale-100' : 'opacity-30 scale-90'
-          }`}
-        >
-          {i < hearts ? '❤️' : '🤍'}
-        </span>
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill={filled ? "#FF6A00" : "#E5E5E5"}
+      className={`transition-all duration-200 ${filled ? 'opacity-100 scale-100' : 'opacity-40 scale-90'}`}
+    >
+      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+    </svg>
+  );
+}
+
+function StarsDisplay({ stars = 3, maxStars = 5 }: { stars?: number; maxStars?: number }) {
+  return (
+    <div className="flex items-center space-x-0.5" title="Stars - keep learning!">
+      {Array.from({ length: maxStars }).map((_, i) => (
+        <OrangeStar key={i} filled={i < stars} size={20} />
       ))}
     </div>
   );
@@ -355,8 +362,8 @@ export default function DashboardRedesign() {
               </span>
             </div>
             
-            {/* Hearts */}
-            <HeartsDisplay hearts={3} maxHearts={5} />
+            {/* Stars */}
+            <StarsDisplay stars={3} maxStars={5} />
             
             {/* Settings */}
             <button 
