@@ -150,7 +150,7 @@ export default function Sidebar() {
                 }
               `}
             >
-              <Icon className={`w-5 h-5 ${active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
+              <Icon className="w-5 h-5 text-blue-500 fill-blue-500" />
               <span className="text-sm">{item.label}</span>
             </button>
           );
