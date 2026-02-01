@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import appleBuddyImage from '@assets/Mascots/AppleBuddy.png';
 
 interface AppleBuddyMascotProps {
   categoryId?: string;
@@ -80,9 +81,13 @@ export default function AppleBuddyMascot({ categoryId, screen }: AppleBuddyMasco
       
       <button
         onClick={handleMascotClick}
-        className="relative w-[72px] h-[72px] rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#EE5253] flex items-center justify-center shadow-[0_4px_15px_rgba(238,82,83,0.4)] border-4 border-white animate-[float_3s_ease-in-out_infinite] transition-transform hover:scale-110"
+        className="relative w-20 h-20 rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#EE5253] flex items-center justify-center shadow-[0_4px_15px_rgba(238,82,83,0.4)] border-4 border-white animate-[float_3s_ease-in-out_infinite] transition-transform hover:scale-110 overflow-hidden"
       >
-        <span className="text-4xl">🍎</span>
+        <img 
+          src={appleBuddyImage} 
+          alt="Apple Buddy" 
+          className="w-16 h-16 object-contain"
+        />
       </button>
       
       <p className="text-center text-xs font-semibold text-[#1C1C1E] mt-2">Apple Buddy</p>
