@@ -102,16 +102,16 @@ export default function Sidebar() {
             <div className="absolute left-full top-0 ml-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 min-w-[160px] z-50">
               <button
                 onClick={() => { setLocation('/food-log'); setLogHoverOpen(false); }}
-                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-[#FF6A00] transition-colors"
+                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-green-50 transition-colors"
               >
-                <Apple className="w-5 h-5" />
+                <Apple className="w-5 h-5 text-green-500 fill-green-500" />
                 <span className="text-sm font-medium">Food</span>
               </button>
               <button
                 onClick={() => { setLocation('/activity-log'); setLogHoverOpen(false); }}
-                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-[#FF6A00] transition-colors"
+                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors"
               >
-                <Dumbbell className="w-5 h-5" />
+                <Dumbbell className="w-5 h-5 text-blue-500" />
                 <span className="text-sm font-medium">Activity</span>
               </button>
             </div>
