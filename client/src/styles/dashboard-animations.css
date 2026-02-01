@@ -341,24 +341,24 @@
   animation: subtle-bounce 2s ease-in-out infinite;
 }
 
-/* Floating Mascot Animation - Gentle bobbing up and down */
+/* Floating Mascot Animation - Very gentle, slow float */
 @keyframes mascot-float {
   0%, 100% {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-15px);
+    transform: translateY(-6px);
   }
 }
 
-/* Shadow Animation - Shrinks when mascot floats up */
+/* Shadow Animation - Subtle shrink when mascot floats up */
 @keyframes shadow-float {
   0%, 100% {
     transform: translateX(-50%) scale(1);
-    opacity: 0.3;
+    opacity: 0.2;
   }
   50% {
-    transform: translateX(-50%) scale(0.8);
+    transform: translateX(-50%) scale(0.95);
     opacity: 0.15;
   }
 }
@@ -394,11 +394,11 @@
 
 /* Utility Classes for Mascot Animations */
 .animate-mascot-float {
-  animation: mascot-float 3s ease-in-out infinite;
+  animation: mascot-float 6s ease-in-out infinite;
 }
 
 .animate-shadow-float {
-  animation: shadow-float 3s ease-in-out infinite;
+  animation: shadow-float 6s ease-in-out infinite;
 }
 
 .animate-bounce-mascot {
