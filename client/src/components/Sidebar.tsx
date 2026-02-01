@@ -12,7 +12,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS_TOP: NavItem[] = [
-  { id: 'lessons', label: 'Lessons', icon: BookOpen, path: '/lessons', isPrimary: true },
+  { id: 'lessons', label: 'Lessons', icon: BookOpen, path: '/lessons' },
   { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard' },
 ];
 
@@ -68,16 +68,10 @@ export default function Sidebar() {
                   ? 'bg-orange-50 text-[#FF6A00] font-semibold'
                   : 'text-gray-600 hover:bg-gray-50'
                 }
-                ${item.isPrimary && !active ? 'border-2 border-orange-200 bg-orange-50/50' : ''}
               `}
             >
               <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-black fill-yellow-500' : active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
               <span className="text-sm">{item.label}</span>
-              {item.isPrimary && (
-                <span className="ml-auto text-xs bg-[#FF6A00] text-white px-2 py-0.5 rounded-full">
-                  NEW
-                </span>
-              )}
             </button>
           );
         })}
