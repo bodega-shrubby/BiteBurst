@@ -117,7 +117,7 @@ function Router() {
       <Route path="/dashboard-v2" component={DashboardV2} />
       <Route path="/dashboard-v1" component={Dashboard} />
       <Route path="/food-log" component={FoodLogNew} />
-      <Route path="/activity-log" component={ActivityLogNew} />
+      <Route path="/activity-log" component={ActivityLog} />
       <Route path="/success" component={Success} />
       <Route path="/feedback" component={Feedback} />
       <Route path="/leaderboard" component={Leaderboard} />
