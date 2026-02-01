@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import { useLocation } from 'wouter';
-import { MEAL_TYPES, getRecommendedMealType } from '@/constants/food-data';
+import { MEAL_TYPES } from '@/constants/food-data';
 
 interface MealTypeScreenProps {
   onSelect: (mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack') => void;
@@ -11,7 +11,6 @@ interface MealTypeScreenProps {
 
 export default function MealTypeScreen({ onSelect, streak = 0, totalXP = 0 }: MealTypeScreenProps) {
   const [, setLocation] = useLocation();
-  const recommendedMeal = getRecommendedMealType();
 
   return (
     <motion.div
@@ -52,34 +51,20 @@ export default function MealTypeScreen({ onSelect, streak = 0, totalXP = 0 }: Me
         <p className="text-center text-[#8E8E93] text-lg mb-7">What meal are you logging?</p>
         
         <div className="grid grid-cols-2 gap-6 max-w-[560px] mx-auto">
-          {MEAL_TYPES.map((meal) => {
-            const isRecommended = meal.id === recommendedMeal;
-            
-            return (
+          {MEAL_TYPES.map((meal) => (
               <button
                 key={meal.id}
                 onClick={() => onSelect(meal.id)}
                 className="relative bg-white rounded-3xl p-8 text-center shadow-[0_2px_12px_rgba(0,0,0,0.08)] border-l-[6px] aspect-square flex flex-col items-center justify-center transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] active:scale-[0.98]"
                 style={{ borderLeftColor: meal.accentColor }}
               >
-                {isRecommended && (
-                  <div className="absolute -top-3 -right-3 bg-[#34C759] text-white px-4 py-2 rounded-xl text-sm font-extrabold shadow-[0_4px_12px_rgba(52,199,89,0.4)] animate-pulse">
-                    NOW!
-                  </div>
-                )}
-                
                 <span className="text-7xl mb-4">{meal.emoji}</span>
                 
-                <h3 className="text-2xl font-bold text-[#1C1C1E] mb-2">
+                <h3 className="text-2xl font-bold text-[#1C1C1E]">
                   {meal.name}
                 </h3>
-                
-                <p className="text-[15px] text-[#8E8E93]">
-                  {meal.timeRange}
-                </p>
               </button>
-            );
-          })}
+            ))}
         </div>
 
         <div className="text-center mt-8">
