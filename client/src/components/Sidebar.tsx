@@ -11,9 +11,12 @@ interface NavItem {
   isPrimary?: boolean;
 }
 
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS_TOP: NavItem[] = [
   { id: 'lessons', label: 'Lessons', icon: BookOpen, path: '/lessons', isPrimary: true },
   { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard' },
+];
+
+const NAV_ITEMS_BOTTOM: NavItem[] = [
   { id: 'profile', label: 'Profile', icon: User, path: '/dashboard' },
 ];
 
@@ -49,7 +52,8 @@ export default function Sidebar() {
 
       {/* Navigation Items */}
       <nav className="p-3 space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {/* Top nav items (Lessons, Champs) */}
+        {NAV_ITEMS_TOP.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
 
@@ -127,6 +131,30 @@ export default function Sidebar() {
             </div>
           )}
         </div>
+
+        {/* Bottom nav items (Profile) */}
+        {NAV_ITEMS_BOTTOM.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => setLocation(item.path)}
+              className={`
+                w-full flex items-center space-x-3 px-4 py-3 rounded-xl
+                transition-all duration-200
+                ${active
+                  ? 'bg-orange-50 text-[#FF6A00] font-semibold'
+                  : 'text-gray-600 hover:bg-gray-50'
+                }
+              `}
+            >
+              <Icon className={`w-5 h-5 ${active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
+              <span className="text-sm">{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
 
       {/* More dropdown at bottom */}
