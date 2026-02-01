@@ -102,8 +102,8 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "mascot-float": "mascot-float 6s ease-in-out infinite",
-        "shadow-float": "shadow-float 6s ease-in-out infinite",
+        "mascot-float": "mascot-float 8s ease-in-out infinite",
+        "shadow-float": "shadow-float 8s ease-in-out infinite",
         "bounce-mascot": "bounce-mascot 1s ease-in-out",
         "mascot-wiggle": "mascot-wiggle 0.5s ease-in-out infinite",
       },

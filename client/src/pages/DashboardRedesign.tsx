@@ -380,9 +380,9 @@ export default function DashboardRedesign() {
                   <img 
                     src={dailySummary.xp_today >= dailySummary.xp_goal ? oniCelebrateImage : oniTheOrangeImage}
                     alt="Oni mascot"
-                    className="w-14 h-14 lg:w-16 lg:h-16 object-contain animate-mascot-float drop-shadow-lg"
+                    className="w-14 h-14 lg:w-16 lg:h-16 object-contain animate-mascot-float-fast drop-shadow-lg"
                   />
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black/10 rounded-full blur-sm animate-shadow-float" />
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black/10 rounded-full blur-sm animate-shadow-float-fast" />
                 </div>
                 <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1 animate-bubble-appear">
                   <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>

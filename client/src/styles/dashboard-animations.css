@@ -394,11 +394,20 @@
 
 /* Utility Classes for Mascot Animations */
 .animate-mascot-float {
-  animation: mascot-float 6s ease-in-out infinite;
+  animation: mascot-float 8s ease-in-out infinite;
 }
 
 .animate-shadow-float {
-  animation: shadow-float 6s ease-in-out infinite;
+  animation: shadow-float 8s ease-in-out infinite;
+}
+
+/* Faster float for smaller mascots */
+.animate-mascot-float-fast {
+  animation: mascot-float 4s ease-in-out infinite;
+}
+
+.animate-shadow-float-fast {
+  animation: shadow-float 4s ease-in-out infinite;
 }
 
 .animate-bounce-mascot {
