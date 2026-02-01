@@ -1,6 +1,4 @@
 import { motion } from 'framer-motion';
-import { ChevronLeft } from 'lucide-react';
-import { useLocation } from 'wouter';
 import { FOOD_CATEGORIES } from '@/constants/food-data';
 import FoodLogBreadcrumb from './FoodLogBreadcrumb';
 import MealSummaryCard from './MealSummaryCard';

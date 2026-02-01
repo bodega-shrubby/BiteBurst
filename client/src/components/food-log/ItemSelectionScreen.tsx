@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Check, Plus, Search } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { Check, Plus, Search } from 'lucide-react';
 import { FOOD_ITEMS, FOOD_CATEGORIES } from '@/constants/food-data';
 import { FoodItem } from '@/types/food-logging';
 import FoodLogBreadcrumb from './FoodLogBreadcrumb';
@@ -52,13 +51,12 @@ export default function ItemSelectionScreen({
       )
     : allItems;
 
-  const handleUpdate = useCallback((ids: string[]) => {
-    onUpdate(ids);
-  }, [onUpdate]);
+  const onUpdateRef = useRef(onUpdate);
+  onUpdateRef.current = onUpdate;
 
   useEffect(() => {
-    handleUpdate(selectedIds);
-  }, [selectedIds, handleUpdate]);
+    onUpdateRef.current(selectedIds);
+  }, [selectedIds]);
 
   const toggleItem = (itemId: string) => {
     triggerHaptic();
