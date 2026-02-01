@@ -81,12 +81,12 @@ export default function AppleBuddyMascot({ categoryId, screen }: AppleBuddyMasco
       
       <button
         onClick={handleMascotClick}
-        className="relative w-20 h-20 rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#EE5253] flex items-center justify-center shadow-[0_4px_15px_rgba(238,82,83,0.4)] border-4 border-white animate-[float_3s_ease-in-out_infinite] transition-transform hover:scale-110 overflow-hidden"
+        className="relative animate-[float_3s_ease-in-out_infinite] transition-transform hover:scale-110"
       >
         <img 
           src={appleBuddyImage} 
           alt="Apple Buddy" 
-          className="w-16 h-16 object-contain"
+          className="w-24 h-24 object-contain drop-shadow-lg"
         />
       </button>
       
