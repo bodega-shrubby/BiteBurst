@@ -109,8 +109,8 @@ export default function Settings() {
                   <span className="text-lg">👤</span>
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Profile</p>
-                  <p className="text-sm text-gray-500">Edit your account details</p>
+                  <p className="font-semibold text-gray-900">Account Settings</p>
+                  <p className="text-sm text-gray-500">Manage your email and password</p>
                 </div>
               </div>
               <span className="text-gray-400">→</span>
