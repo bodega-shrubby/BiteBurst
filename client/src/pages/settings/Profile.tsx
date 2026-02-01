@@ -19,22 +19,16 @@ interface ProfileData {
   goal?: string;
 }
 
-const AVATAR_OPTIONS = [
-  { value: '🧒', label: 'Kid' },
-  { value: '👧', label: 'Girl' },
-  { value: '👦', label: 'Boy' },
-  { value: '🧒🏽', label: 'Kid 2' },
-  { value: '👧🏽', label: 'Girl 2' },
-  { value: '👦🏽', label: 'Boy 2' },
-];
-
 export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState("🧒");
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { data: profile, isLoading } = useQuery<ProfileData>({
     queryKey: ['/api/profile'],
@@ -42,39 +36,66 @@ export default function Profile() {
 
   useEffect(() => {
     if (profile) {
-      setName(profile.displayName || "");
       setEmail(profile.email || "");
-      setSelectedAvatar(profile.avatarId || "🧒");
     }
   }, [profile]);
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data: { displayName?: string; avatarId?: string }) => {
-      return apiRequest('/api/profile', {
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      return apiRequest('/api/profile/password', {
         method: 'PUT',
         body: data,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
       toast({
-        title: "Profile Updated",
-        description: "Your changes have been saved.",
+        title: "Password Updated",
+        description: "Your password has been changed successfully.",
       });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: "Failed to change password. Please check your current password and try again.",
         variant: "destructive",
       });
     },
   });
 
-  const handleSave = () => {
-    updateProfileMutation.mutate({
-      displayName: name,
-      avatarId: selectedAvatar,
+  const handleChangePassword = () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Please fill in all password fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast({
+        title: "Error",
+        description: "New password must be at least 8 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    changePasswordMutation.mutate({
+      currentPassword,
+      newPassword,
     });
   };
 
@@ -99,65 +120,13 @@ export default function Profile() {
             >
               <ChevronLeft className="w-4 h-4 text-gray-600" />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Avatar</label>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center border-2 border-orange-200">
-                  <span className="text-4xl">{selectedAvatar}</span>
-                </div>
-                <button 
-                  onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-                  className="absolute -bottom-1 -right-1 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md hover:bg-orange-600 transition"
-                >
-                  <span className="text-sm">✏️</span>
-                </button>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Tap to change avatar</p>
-                <p className="text-xs text-gray-400 mt-1">Choose from fun characters!</p>
-              </div>
-            </div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Email Address</h2>
 
-            {showAvatarPicker && (
-              <div className="mt-4 grid grid-cols-6 gap-2">
-                {AVATAR_OPTIONS.map((avatar) => (
-                  <button
-                    key={avatar.value}
-                    onClick={() => {
-                      setSelectedAvatar(avatar.value);
-                      setShowAvatarPicker(false);
-                    }}
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition ${
-                      selectedAvatar === avatar.value 
-                        ? 'bg-orange-100 border-2 border-orange-500' 
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
-                  >
-                    {avatar.value}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-4">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Account Details</h2>
-
-            <div className="mb-5">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-              <Input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
-              />
-            </div>
-
-            <div className="mb-5">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <Input
                 type="email"
@@ -169,13 +138,78 @@ export default function Profile() {
             </div>
           </div>
 
-          <Button 
-            onClick={handleSave}
-            disabled={updateProfileMutation.isPending}
-            className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition shadow-sm mb-6"
-          >
-            {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
-          </Button>
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-4">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Change Password</h2>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+              <div className="relative">
+                <Input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Must be at least 8 characters</p>
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <Button 
+              onClick={handleChangePassword}
+              disabled={changePasswordMutation.isPending}
+              className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition shadow-sm"
+            >
+              {changePasswordMutation.isPending ? 'Updating...' : 'Update Password'}
+            </Button>
+          </div>
 
           <div className="border-t border-gray-200 pt-6">
             <div className="flex flex-col space-y-3">
