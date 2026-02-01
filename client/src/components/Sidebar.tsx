@@ -55,22 +55,14 @@ export default function Sidebar() {
         {/* Top nav items (Lessons, Champs) */}
         {NAV_ITEMS_TOP.map((item) => {
           const Icon = item.icon;
-          const active = isActive(item.path);
 
           return (
             <button
               key={item.id}
               onClick={() => setLocation(item.path)}
-              className={`
-                w-full flex items-center space-x-3 px-4 py-3 rounded-xl
-                transition-all duration-200
-                ${active
-                  ? 'bg-orange-50 text-[#FF6A00] font-semibold'
-                  : 'text-gray-600 hover:bg-gray-50'
-                }
-              `}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
             >
-              <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-black fill-yellow-500' : active ? 'text-[#FF6A00]' : 'text-gray-500'}`} />
+              <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-black fill-yellow-500' : 'text-gray-500'}`} />
               <span className="text-sm">{item.label}</span>
             </button>
           );
