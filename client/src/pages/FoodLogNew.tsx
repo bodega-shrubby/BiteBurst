@@ -6,6 +6,7 @@ import { ChevronLeft, MessageSquare } from 'lucide-react';
 import { useFoodLogging } from '@/hooks/useFoodLogging';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/useAuth';
+import { useActiveChild } from '@/hooks/useActiveChild';
 import { useToast } from '@/hooks/use-toast';
 import MealTypeScreen from '@/components/food-log/MealTypeScreen';
 import CategoryScreen from '@/components/food-log/CategoryScreen';
@@ -20,6 +21,7 @@ const triggerHaptic = () => {
 export default function FoodLogNew() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const activeChild = useActiveChild(user);
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -72,10 +74,12 @@ export default function FoodLogNew() {
         throw new Error('No items selected');
       }
 
+      const childUserId = activeChild?.childId || user.id;
+
       return await apiRequest('/api/logs', {
         method: 'POST',
         body: {
-          userId: user.id,
+          userId: childUserId,
           type: 'food',
           entryMethod,
           mealType: mealType || 'snack',
@@ -194,6 +198,9 @@ export default function FoodLogNew() {
     );
   }
 
+  const streak = activeChild?.streak ?? 0;
+  const totalXP = activeChild?.xp ?? 0;
+
   return (
     <div className="min-h-screen bg-white">
       <AnimatePresence mode="wait">
@@ -201,6 +208,8 @@ export default function FoodLogNew() {
           <MealTypeScreen
             key="meal-type"
             onSelect={startMeal}
+            streak={streak}
+            totalXP={totalXP}
           />
         )}
 
@@ -211,6 +220,7 @@ export default function FoodLogNew() {
             selectedItems={getAllSelectedItems()}
             totalXP={getTotalXP()}
             currentMealState={state.currentMeal}
+            streak={streak}
             onSelectCategory={selectCategory}
             onBack={() => reset()}
             onFinish={handleFinishLogging}
@@ -225,6 +235,7 @@ export default function FoodLogNew() {
             categoryId={state.currentCategory}
             initialSelectedIds={state.currentMeal.categories[state.currentCategory] || []}
             allSelectedItems={getAllSelectedItems()}
+            streak={streak}
             onUpdate={(itemIds) => addItems(state.currentCategory!, itemIds)}
             onAddMore={backToCategories}
             onFinish={handleFinishLogging}
