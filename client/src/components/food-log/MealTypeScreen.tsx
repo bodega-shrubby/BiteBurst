@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { MEAL_TYPES } from '@/constants/food-data';
+import Sidebar from '@/components/Sidebar';
 
 interface MealTypeScreenProps {
   onSelect: (mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack') => void;
@@ -13,39 +14,42 @@ export default function MealTypeScreen({ onSelect, streak = 0, totalXP = 0 }: Me
   const [, setLocation] = useLocation();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen bg-[#F5F5F7]"
-    >
-      <header className="bg-gradient-to-r from-[#FF6B35] to-[#FF8F5C] px-6 py-6 text-white">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-5">
-            <button 
-              onClick={() => setLocation('/dashboard')}
-              className="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-extrabold mb-1">Log Your Meal</h1>
-              <p className="text-white/90 text-sm">What meal is this?</p>
+    <div className="flex min-h-screen bg-[#F5F5F7]">
+      <Sidebar />
+      
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        className="flex-1 md:ml-[200px]"
+      >
+        <header className="bg-gradient-to-r from-[#FF6B35] to-[#FF8F5C] px-6 py-6 text-white">
+          <div className="max-w-2xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-5">
+              <button 
+                onClick={() => setLocation('/dashboard')}
+                className="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all md:hidden"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-extrabold mb-1">Log Your Meal</h1>
+                <p className="text-white/90 text-sm">What meal is this?</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-[#FF9500] to-[#FF6B00] px-4 py-2 rounded-full font-bold">
+                <span>🔥</span>
+                <span>{streak}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#FFA500] px-4 py-2 rounded-full font-bold">
+                <span>⭐</span>
+                <span>{totalXP}</span>
+              </div>
             </div>
           </div>
-          
-          <div className="flex gap-3">
-            <div className="flex items-center gap-2 bg-gradient-to-r from-[#FF9500] to-[#FF6B00] px-4 py-2 rounded-full font-bold">
-              <span>🔥</span>
-              <span>{streak}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-gradient-to-r from-[#FFD700] to-[#FFA500] px-4 py-2 rounded-full font-bold">
-              <span>⭐</span>
-              <span>{totalXP}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+        </header>
 
       <div className="p-6 max-w-2xl mx-auto">
         <p className="text-center text-[#8E8E93] text-lg mb-7">What meal are you logging?</p>
@@ -77,6 +81,7 @@ export default function MealTypeScreen({ onSelect, streak = 0, totalXP = 0 }: Me
           </button>
         </div>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
