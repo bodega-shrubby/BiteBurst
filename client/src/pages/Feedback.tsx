@@ -587,14 +587,12 @@ export default function Feedback() {
 
             <div className="hidden lg:block w-[280px] bg-gray-50 border-l border-gray-200 p-4 space-y-4 overflow-y-auto">
               <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <div className={`w-14 h-14 ${isActivity ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-orange-400 to-orange-500'} rounded-full flex-shrink-0 overflow-hidden`}>
-                    <img
-                      src={tipMascot}
-                      alt={tipName}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                <div className="flex items-start gap-4">
+                  <img
+                    src={tipMascot}
+                    alt={tipName}
+                    className="w-20 h-20 object-contain flex-shrink-0 drop-shadow-lg"
+                  />
                   <div className="flex-1">
                     <p className="font-bold text-gray-800 text-sm">{tipName} says:</p>
                     {isLoadingFeedback ? (
