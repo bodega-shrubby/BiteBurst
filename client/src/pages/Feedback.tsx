@@ -326,28 +326,47 @@ export default function Feedback() {
   const isLoadingFeedback = feedbackLoading && !logData.feedback;
 
   const renderContent = () => {
+    const emojiLabels: Record<string, string> = {
+      '🍎': 'Apple', '🥕': 'Carrots', '🥛': 'Milk', '🥪': 'Sandwich',
+      '🍌': 'Banana', '🥦': 'Broccoli', '🍊': 'Orange', '🥗': 'Salad',
+      '🥚': 'Eggs', '🍞': 'Bread', '🧀': 'Cheese', '🍗': 'Chicken',
+      '🥑': 'Avocado', '🍇': 'Grapes', '🍓': 'Strawberry', '🥜': 'Nuts',
+      '⚽': 'Soccer', '🏃': 'Running', '🚴': 'Cycling', '🏊': 'Swimming',
+      '🏀': 'Basketball', '🎾': 'Tennis', '💃': 'Dancing', '🧘': 'Yoga',
+      '🤸': 'Gymnastics', '⛹️': 'Sports', '🚶': 'Walking', '🧗': 'Climbing'
+    };
+
     if (logData.entryMethod === 'emoji' && logData.content?.emojis) {
       return (
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {logData.content.emojis.map((emoji: string, index: number) => (
-              <div key={index} className="text-center emoji-bounce" style={{ animationDelay: `${index * 0.1}s` }}>
-                <div className={`w-16 h-16 lg:w-20 lg:h-20 ${isActivity ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300' : 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-300'} rounded-2xl flex items-center justify-center border-2 shadow-md`}>
-                  <span className="text-3xl lg:text-4xl">{emoji}</span>
+          <div className="flex flex-wrap gap-4 justify-center">
+            {logData.content.emojis.map((emoji: string, index: number) => {
+              const label = emojiLabels[emoji] || (isActivity ? 'Activity' : 'Food');
+              return (
+                <div
+                  key={index}
+                  className="text-center bb-emoji-bounce"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className={`w-16 h-16 bg-gradient-to-br ${isActivity ? 'from-blue-50 to-blue-100 border-blue-300' : 'from-orange-50 to-orange-100 border-orange-300'} rounded-2xl flex items-center justify-center border-2 shadow-md`}>
+                    <span className="text-4xl">{emoji}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1.5 font-medium">{label}</p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
           {isActivity && (
-            <div className="flex justify-center gap-3">
+            <div className="flex justify-center gap-3 pt-2">
               {logData.durationMin && (
-                <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold flex items-center gap-2">
-                  <span>⏱️</span> {logData.durationMin} min
+                <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold flex items-center gap-2 text-sm">
+                  ⏱️ {logData.durationMin} min
                 </span>
               )}
               {logData.mood && (
-                <span className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold flex items-center gap-2">
-                  <span>😃</span> {logData.mood === 'happy' ? 'Felt great!' : logData.mood === 'ok' ? 'Okay' : 'Tired'}
+                <span className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold flex items-center gap-2 text-sm">
+                  😃 {logData.mood === 'happy' ? 'Felt great!' : logData.mood === 'ok' ? 'Okay' : 'Tired'}
                 </span>
               )}
             </div>
@@ -513,16 +532,30 @@ export default function Feedback() {
                         <p className="text-sm">Getting your personalized feedback...</p>
                       </div>
                     ) : feedback ? (
-                      <p className="text-gray-700 text-center leading-relaxed">
-                        {typewriterText || feedback}
-                        {isTyping && <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>}
-                      </p>
+                      <div>
+                        <p className="text-gray-700 text-center leading-relaxed">
+                          {typewriterText || feedback}
+                          {isTyping && <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>}
+                        </p>
+                        <p className="text-center mt-3">
+                          <span className={`font-bold ${isActivity ? 'text-blue-500' : 'text-orange-500'}`}>
+                            {isActivity ? 'Keep it up, champion!' : 'SUPER COMBO!'}
+                          </span> {isActivity ? '🏆' : '⭐'}
+                        </p>
+                      </div>
                     ) : (
-                      <p className="text-gray-700 text-center leading-relaxed">
-                        {isActivity 
-                          ? "Great job staying active! Keep moving and having fun!" 
-                          : "Great food choices! You're fueling your body with awesome stuff!"}
-                      </p>
+                      <div>
+                        <p className="text-gray-700 text-center leading-relaxed">
+                          {isActivity 
+                            ? "Great job staying active! Keep moving and having fun!" 
+                            : "Great food choices! You're fueling your body with awesome stuff!"}
+                        </p>
+                        <p className="text-center mt-3">
+                          <span className={`font-bold ${isActivity ? 'text-blue-500' : 'text-orange-500'}`}>
+                            {isActivity ? 'Keep it up, champion!' : 'SUPER COMBO!'}
+                          </span> {isActivity ? '🏆' : '⭐'}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -571,16 +604,30 @@ export default function Feedback() {
                     <p className="text-xs">Getting feedback...</p>
                   </div>
                 ) : feedback ? (
-                  <p className="text-gray-700 text-center leading-relaxed text-sm">
-                    {typewriterText || feedback}
-                    {isTyping && <span className="inline-block w-0.5 h-4 bg-gray-700 ml-0.5 animate-pulse"></span>}
-                  </p>
+                  <div>
+                    <p className="text-gray-700 text-center leading-relaxed text-sm">
+                      {typewriterText || feedback}
+                      {isTyping && <span className="inline-block w-0.5 h-4 bg-gray-700 ml-0.5 animate-pulse"></span>}
+                    </p>
+                    <p className="text-center mt-2 text-sm">
+                      <span className={`font-bold ${isActivity ? 'text-blue-500' : 'text-orange-500'}`}>
+                        {isActivity ? 'Keep it up, champion!' : 'SUPER COMBO!'}
+                      </span> {isActivity ? '🏆' : '⭐'}
+                    </p>
+                  </div>
                 ) : (
-                  <p className="text-gray-700 text-center leading-relaxed text-sm">
-                    {isActivity 
-                      ? "Great job staying active! Keep moving and having fun!" 
-                      : "Great food choices! You're fueling your body with awesome stuff!"}
-                  </p>
+                  <div>
+                    <p className="text-gray-700 text-center leading-relaxed text-sm">
+                      {isActivity 
+                        ? "Great job staying active! Keep moving and having fun!" 
+                        : "Great food choices! You're fueling your body with awesome stuff!"}
+                    </p>
+                    <p className="text-center mt-2 text-sm">
+                      <span className={`font-bold ${isActivity ? 'text-blue-500' : 'text-orange-500'}`}>
+                        {isActivity ? 'Keep it up, champion!' : 'SUPER COMBO!'}
+                      </span> {isActivity ? '🏆' : '⭐'}
+                    </p>
+                  </div>
                 )}
               </div>
 
