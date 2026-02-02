@@ -134,52 +134,52 @@ export default function Sidebar() {
             </button>
           );
         })}
+
+        {/* More dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setMoreOpen(!moreOpen)}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <MoreHorizontal className="w-5 h-5 text-gray-500" />
+            <span className="text-sm">More</span>
+          </button>
+
+          {/* Dropdown menu - shows on click */}
+          {moreOpen && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+              <button
+                onClick={() => { setLocation('/settings'); setMoreOpen(false); }}
+                className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+              >
+                <Settings className="w-4 h-4" />
+                <span className="text-sm">Settings</span>
+              </button>
+              <button
+                onClick={() => { setLocation('/achievements'); setMoreOpen(false); }}
+                className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+              >
+                <Medal className="w-4 h-4" />
+                <span className="text-sm">Achievements</span>
+              </button>
+              <button
+                onClick={() => { setLocation('/streak'); setMoreOpen(false); }}
+                className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span className="text-sm">Streak</span>
+              </button>
+              <button
+                onClick={() => { handleLogout(); setMoreOpen(false); }}
+                className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm">Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
-
-      {/* More dropdown at bottom */}
-      <div className="mt-auto p-3 border-t border-gray-100 relative">
-        <button
-          onClick={() => setMoreOpen(!moreOpen)}
-          className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          <MoreHorizontal className="w-5 h-5 text-gray-500" />
-          <span className="text-sm">More</span>
-        </button>
-
-        {/* Dropdown menu - shows on click */}
-        {moreOpen && (
-          <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2">
-            <button
-              onClick={() => { setLocation('/settings'); setMoreOpen(false); }}
-              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="text-sm">Settings</span>
-            </button>
-            <button
-              onClick={() => { setLocation('/achievements'); setMoreOpen(false); }}
-              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
-            >
-              <Medal className="w-4 h-4" />
-              <span className="text-sm">Achievements</span>
-            </button>
-            <button
-              onClick={() => { setLocation('/streak'); setMoreOpen(false); }}
-              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span className="text-sm">Streak</span>
-            </button>
-            <button
-              onClick={() => { handleLogout(); setMoreOpen(false); }}
-              className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm">Logout</span>
-            </button>
-          </div>
-        )}
-      </div>
     </aside>
   );
 }
