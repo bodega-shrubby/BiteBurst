@@ -591,7 +591,7 @@ export default function Feedback() {
                   <img
                     src={tipMascot}
                     alt={tipName}
-                    className="w-20 h-20 object-contain flex-shrink-0 drop-shadow-lg"
+                    className="w-28 h-28 object-contain flex-shrink-0 drop-shadow-lg"
                   />
                   <div className="flex-1">
                     <p className="font-bold text-gray-800 text-sm">{tipName} says:</p>
