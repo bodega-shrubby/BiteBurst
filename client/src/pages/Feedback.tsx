@@ -7,8 +7,8 @@ import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import * as confettiModule from 'canvas-confetti';
 import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
 import oniProudImage from '@assets/Mascots/Oni_proud.png';
-import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
-import coachFlexImage from '@assets/Mascots/CoachFlex.png';
+import captainCarrot from '@assets/Mascots/CaptainCarrot.png';
+import coachFlex from '@assets/Mascots/CoachFlex.png';
 import SuccessSidebar from '@/components/success/SuccessSidebar';
 import { animateXP, levelFromTotal, percentInLevel, formatLevel } from '@/utils/xpAnimation';
 import { apiRequest } from '@/lib/queryClient';
@@ -85,7 +85,7 @@ export default function Feedback() {
     headerEmoji: '🎉'
   };
 
-  const tipMascot = isActivity ? coachFlexImage : captainCarrotImage;
+  const tipMascot = isActivity ? coachFlex : captainCarrot;
   const tipName = isActivity ? 'Coach Flex' : 'Captain Carrot';
   const oniImage = isActivity ? oniProudImage : oniCelebrateImage;
   const bounceClass = isActivity ? 'oni-celebrate-energetic' : 'oni-celebrate';
