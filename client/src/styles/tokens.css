@@ -1147,6 +1147,133 @@ html {
   animation: bb-bubble-appear 0.4s ease-out forwards;
 }
 
+/* Oni Celebration Animation - Standard (Food logs) */
+@keyframes oni-celebrate {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-15px) rotate(-5deg) scale(1.05); }
+  50% { transform: translateY(0) rotate(0deg) scale(1); }
+  75% { transform: translateY(-15px) rotate(5deg) scale(1.05); }
+}
+
+.oni-celebrate {
+  animation: oni-celebrate 0.6s ease-in-out infinite;
+}
+
+/* Oni Celebration Animation - Energetic (Activity logs) */
+@keyframes oni-celebrate-energetic {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  15% { transform: translateY(-20px) rotate(-8deg) scale(1.08); }
+  30% { transform: translateY(0) rotate(0deg) scale(1); }
+  45% { transform: translateY(-18px) rotate(8deg) scale(1.06); }
+  60% { transform: translateY(0) rotate(0deg) scale(1); }
+  75% { transform: translateY(-15px) rotate(-5deg) scale(1.05); }
+}
+
+.oni-celebrate-energetic {
+  animation: oni-celebrate-energetic 0.8s ease-in-out infinite;
+}
+
+/* Star Float Animation */
+@keyframes star-float {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-100px) rotate(180deg); opacity: 0; }
+}
+
+.star-float {
+  animation: star-float 2s ease-out infinite;
+}
+
+/* Slide Up Animation */
+@keyframes slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+/* Text Pop Animation */
+@keyframes text-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.text-pop {
+  animation: text-pop 0.5s ease-out forwards;
+}
+
+/* XP Glow Animation */
+@keyframes xp-glow {
+  0%, 100% { text-shadow: 0 0 15px currentColor; }
+  50% { text-shadow: 0 0 35px currentColor; }
+}
+
+.xp-glow {
+  animation: xp-glow 1s ease-in-out infinite;
+}
+
+/* Progress Fill Animation */
+@keyframes progress-fill {
+  from { width: 30%; }
+  to { width: 75%; }
+}
+
+.progress-fill {
+  animation: progress-fill 1.5s ease-out forwards;
+  animation-delay: 1s;
+}
+
+/* Flame Pulse Animation */
+@keyframes flame-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.flame-pulse {
+  animation: flame-pulse 0.5s ease-in-out infinite;
+}
+
+/* Bubble Appear Animation */
+@keyframes bubble-appear {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.bubble-appear {
+  animation: bubble-appear 0.4s ease-out forwards;
+}
+
+/* Emoji Bounce Animation */
+@keyframes emoji-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.emoji-bounce {
+  animation: emoji-bounce 0.6s ease-in-out infinite;
+}
+
+.emoji-bounce:nth-child(2) { animation-delay: 0.1s; }
+.emoji-bounce:nth-child(3) { animation-delay: 0.2s; }
+.emoji-bounce:nth-child(4) { animation-delay: 0.3s; }
+
+/* Card Hover Effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(255, 106, 0, 0.2);
+}
+
+/* Button Press Effect */
+.btn-press:active {
+  transform: scale(0.98);
+}
+
 /* Card hover effect for success/feedback pages */
 .bb-card-hover {
   transition: all 0.3s ease;
