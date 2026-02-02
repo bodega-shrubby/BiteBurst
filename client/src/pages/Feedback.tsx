@@ -429,9 +429,15 @@ export default function Feedback() {
                 <span className="text-2xl lg:text-3xl">{theme.headerEmoji}</span>
               </div>
 
-              <div className="flex items-center gap-1 lg:gap-2 bg-white/20 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full">
-                <span className="flame-pulse text-lg lg:text-xl">🔥</span>
-                <span className="font-bold text-sm">{(user as any)?.streak || 5}</span>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 lg:gap-2 bg-white/20 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full">
+                  <span className="flame-pulse text-lg lg:text-xl">🔥</span>
+                  <span className="font-bold text-sm">{(user as any)?.streak || 5}</span>
+                </div>
+                <div className="flex items-center gap-1 lg:gap-2 bg-white/20 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full">
+                  <span className="text-lg lg:text-xl">⭐</span>
+                  <span className="font-bold text-sm">{(user as any)?.totalXp || 0} XP</span>
+                </div>
               </div>
             </div>
           </header>
@@ -490,15 +496,13 @@ export default function Feedback() {
                   </div>
                 </div>
 
-                {showStreakPill && (
-                  <div className="flex justify-center slide-up" style={{ animationDelay: '0.7s' }}>
-                    <div className={`bg-gradient-to-r ${theme.streakBg} text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2`}>
-                      <span className="flame-pulse text-2xl">🔥</span>
-                      <span className="font-black text-lg">{(user as any)?.streak || 5}-DAY STREAK!</span>
-                      <span className="flame-pulse text-2xl">🔥</span>
-                    </div>
+                <div className="flex justify-center slide-up" style={{ animationDelay: '0.7s' }}>
+                  <div className={`bg-gradient-to-r ${theme.streakBg} text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3`}>
+                    <span className="flame-pulse text-2xl">🔥</span>
+                    <span className="font-bold text-lg">{(user as any)?.streak || 1}-day streak!</span>
+                    <span className="flame-pulse text-2xl">🔥</span>
                   </div>
-                )}
+                </div>
 
                 {showBadgePill && newBadges.length > 0 && (
                   <div className="flex justify-center slide-up" style={{ animationDelay: '0.8s' }}>
@@ -560,10 +564,10 @@ export default function Feedback() {
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-2">
+                <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 pt-2">
                   <Button
                     onClick={handleLogAnother}
-                    className={`w-full ${theme.buttonBg} text-white h-14 text-base font-bold uppercase tracking-wider shadow-lg rounded-2xl btn-press`}
+                    className={`flex-1 ${theme.buttonBg} text-white h-14 text-base font-bold uppercase tracking-wider shadow-lg rounded-2xl btn-press`}
                   >
                     <RotateCcw size={20} className="mr-2" />
                     {isActivity ? 'LOG ANOTHER ACTIVITY' : 'LOG ANOTHER MEAL'}
@@ -572,7 +576,7 @@ export default function Feedback() {
                   <Button
                     onClick={handleBackToDashboard}
                     variant="outline"
-                    className={`w-full border-2 ${theme.buttonOutline} h-14 text-base font-bold uppercase tracking-wider rounded-2xl btn-press`}
+                    className={`flex-1 border-2 ${theme.buttonOutline} h-14 text-base font-bold uppercase tracking-wider rounded-2xl btn-press`}
                   >
                     <Home size={20} className="mr-2" />
                     BACK TO DASHBOARD
@@ -582,99 +586,137 @@ export default function Feedback() {
             </main>
 
             <div className="hidden lg:block w-[280px] bg-gray-50 border-l border-gray-200 p-4 space-y-4 overflow-y-auto">
-              <div className="flex justify-center">
-                <img 
-                  src={tipMascot} 
-                  alt={tipName}
-                  className="w-20 h-20 object-contain drop-shadow-lg"
-                />
-              </div>
-              
-              <div className={`relative bg-white rounded-2xl border-2 ${isActivity ? 'border-blue-100' : 'border-orange-100'} shadow-lg p-4 bubble-appear`}>
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-white"></div>
-                <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] ${isActivity ? 'border-b-blue-100' : 'border-b-orange-100'}`}></div>
-                
-                <h3 className="font-bold text-gray-800 mb-2 text-center text-sm">
-                  {tipName} says:
-                </h3>
-                
-                {isLoadingFeedback ? (
-                  <div className="text-center text-gray-500 py-2">
-                    <div className={`animate-spin w-5 h-5 border-2 ${isActivity ? 'border-blue-500' : 'border-orange-500'} border-t-transparent rounded-full mx-auto mb-2`}></div>
-                    <p className="text-xs">Getting feedback...</p>
+              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className={`w-14 h-14 ${isActivity ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-orange-400 to-orange-500'} rounded-full flex-shrink-0 overflow-hidden`}>
+                    <img
+                      src={tipMascot}
+                      alt={tipName}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                ) : feedback ? (
-                  <div>
-                    <p className="text-gray-700 text-center leading-relaxed text-sm">
-                      {typewriterText || feedback}
-                      {isTyping && <span className="inline-block w-0.5 h-4 bg-gray-700 ml-0.5 animate-pulse"></span>}
-                    </p>
-                    <p className="text-center mt-2 text-sm">
-                      <span className={`font-bold ${isActivity ? 'text-blue-500' : 'text-orange-500'}`}>
-                        {isActivity ? 'Keep it up, champion!' : 'SUPER COMBO!'}
-                      </span> {isActivity ? '🏆' : '⭐'}
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-gray-700 text-center leading-relaxed text-sm">
-                      {isActivity 
-                        ? "Great job staying active! Keep moving and having fun!" 
-                        : "Great food choices! You're fueling your body with awesome stuff!"}
-                    </p>
-                    <p className="text-center mt-2 text-sm">
-                      <span className={`font-bold ${isActivity ? 'text-blue-500' : 'text-orange-500'}`}>
-                        {isActivity ? 'Keep it up, champion!' : 'SUPER COMBO!'}
-                      </span> {isActivity ? '🏆' : '⭐'}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className={`bg-gradient-to-br ${theme.accentBg} rounded-2xl border ${isActivity ? 'border-blue-200' : 'border-orange-200'} p-4`}>
-                <h3 className="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2">
-                  <span>💡</span> Fun Fact
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {isActivity 
-                    ? "Did you know? Just 30 minutes of exercise can boost your mood for up to 12 hours!" 
-                    : "Did you know? Eating colorful fruits and veggies gives your body superpowers!"}
-                </p>
-              </div>
-
-              {isActivity && (
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-200">
-                  <h3 className="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2">
-                    <span>📊</span> This Week
-                  </h3>
-                  <div className="flex justify-between gap-1">
-                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-                      <div key={i} className="flex-1 text-center">
-                        <div
-                          className={`rounded-lg mb-1 ${i < ((user as any)?.streak || 5) ? 'bg-blue-500' : 'bg-gray-200'}`}
-                          style={{ height: `${20 + (i < ((user as any)?.streak || 5) ? Math.random() * 30 : 0)}px` }}
-                        />
-                        <span className="text-xs text-gray-500">{day}</span>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-800 text-sm">{tipName} says:</p>
+                    {isLoadingFeedback ? (
+                      <div className="text-gray-500 py-2">
+                        <div className={`animate-spin w-4 h-4 border-2 ${isActivity ? 'border-blue-500' : 'border-orange-500'} border-t-transparent rounded-full mb-1`}></div>
+                        <p className="text-xs">Getting feedback...</p>
                       </div>
-                    ))}
+                    ) : (
+                      <p className="text-sm text-gray-700 leading-relaxed mt-1">
+                        {feedback || (isActivity
+                          ? "Great job staying active! Keep moving and having fun! 💪"
+                          : "Great food choices! You're fueling your body with awesome stuff! 🥕")}
+                      </p>
+                    )}
                   </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className="text-xs text-gray-500 font-medium">
+                    {isActivity ? '💪 Coach\'s Tip' : '🥕 Captain\'s Tip'}
+                  </p>
+                  <p className="text-sm text-gray-700 mt-1">
+                    {isActivity
+                      ? "Keep moving, future champion! Exercise makes you stronger every day! 🏆"
+                      : "You're eating like a true hero! Keep up the super healthy choices! ⭐"}
+                  </p>
+                </div>
+              </div>
+
+              {!isActivity && (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-200 shadow-sm">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <span className="text-xs bg-green-500 text-white px-3 py-1 rounded-full font-medium">
+                      🧠 FUN FOOD FACT
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Carrots were originally purple before orange ones became popular! 🥕
+                  </p>
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl border border-gray-200 p-4">
-                <h3 className="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2">
-                  <span>🔥</span> Streak Power
-                </h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">{(user as any)?.streak || 5} days</span>
-                  <div className="flex gap-0.5">
-                    {[...Array(7)].map((_, i) => (
-                      <div 
-                        key={i} 
-                        className={`w-3 h-3 rounded-full ${i < ((user as any)?.streak || 5) ? (isActivity ? 'bg-blue-500' : 'bg-orange-500') : 'bg-gray-200'}`}
-                      />
-                    ))}
+              {isActivity && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-200 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-base text-gray-800">📊 This Week</h3>
+                    <span className="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-medium">
+                      {Math.min((user as any)?.streak || 5, 7)}/7 Days
+                    </span>
                   </div>
+
+                  <div className="flex justify-between gap-1">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
+                      const activeDays = Math.min((user as any)?.streak || 5, 7);
+                      const isActive = i < activeDays;
+                      const isToday = i === new Date().getDay() - 1 || (new Date().getDay() === 0 && i === 6);
+                      return (
+                        <div key={i} className="flex-1 text-center">
+                          <div
+                            className={`rounded-lg mb-1 ${isActive ? (isToday ? 'bg-indigo-500 ring-2 ring-indigo-300 ring-offset-1' : 'bg-blue-500') : 'bg-gray-200'}`}
+                            style={{ height: `${isActive ? 30 + Math.random() * 30 : 20}px` }}
+                          />
+                          <span className={`text-xs ${isActive ? (isToday ? 'font-bold text-indigo-600' : 'text-gray-500') : 'text-gray-400'}`}>
+                            {day}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-xs text-center text-gray-500 mt-3">
+                    Keep up the great work! 🎉
+                  </p>
+                </div>
+              )}
+
+              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-base text-gray-800">
+                    🏆 {isActivity ? 'Activity' : 'Food'} Badges
+                  </h3>
+                  <span className={`text-sm ${isActivity ? 'text-blue-500' : 'text-orange-500'} font-medium cursor-pointer`}>
+                    View All →
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="text-center">
+                    <div className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${isActivity ? 'from-blue-100 to-blue-200 border-blue-300' : 'from-amber-100 to-amber-200 border-amber-300'} border`}>
+                      {isActivity ? '🏃' : '🌟'}
+                    </div>
+                    <p className="text-xs mt-1 text-gray-700">{isActivity ? 'First Run' : 'First Log'}</p>
+                  </div>
+
+                  <div className="text-center">
+                    <div className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${isActivity ? 'from-blue-100 to-blue-200 border-blue-300' : 'from-amber-100 to-amber-200 border-amber-300'} border`}>
+                      {isActivity ? '⚽' : '🥦'}
+                    </div>
+                    <p className="text-xs mt-1 text-gray-700">{isActivity ? 'Ball Star' : 'Veggie Lover'}</p>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gray-100 opacity-40 grayscale">
+                      {isActivity ? '🔥' : '🍎'}
+                    </div>
+                    <p className="text-xs mt-1 text-gray-400">{isActivity ? 'Week Streak' : 'Fruit Fan'}</p>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gray-100 opacity-40 grayscale">
+                      {isActivity ? '🏊' : '🥞'}
+                    </div>
+                    <p className="text-xs mt-1 text-gray-400">{isActivity ? 'Swimmer' : 'Breakfast'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-100 rounded-2xl p-4 border border-gray-200">
+                <div className="text-center py-8">
+                  <div className="text-3xl mb-2 opacity-50">📣</div>
+                  <p className="text-sm text-gray-400">Ad Placeholder</p>
+                  <p className="text-xs text-gray-300 mt-1">340 x 180</p>
                 </div>
               </div>
             </div>
