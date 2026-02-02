@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst - Food Log Success (iPad Mockup)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+    * {
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* Mascot bounce animation */
+    @keyframes mascotBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      25% { transform: translateY(-15px) rotate(-5deg) scale(1.05); }
+      50% { transform: translateY(0) rotate(0deg) scale(1); }
+      75% { transform: translateY(-15px) rotate(5deg) scale(1.05); }
+    }
+
+    .mascot-bounce {
+      animation: mascotBounce 0.6s ease-in-out infinite;
+    }
+
+    /* Text pop animation */
+    @keyframes textPop {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .text-pop {
+      animation: textPop 0.5s ease-out forwards;
+    }
+
+    /* Slide up animation */
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .slide-up {
+      animation: slideUp 0.5s ease-out forwards;
+    }
+
+    /* XP counter animation */
+    @keyframes xpGlow {
+      0%, 100% { text-shadow: 0 0 15px rgba(255, 106, 0, 0.3); }
+      50% { text-shadow: 0 0 35px rgba(255, 106, 0, 0.6); }
+    }
+
+    .xp-glow {
+      animation: xpGlow 1s ease-in-out infinite;
+    }
+
+    /* Progress bar fill */
+    @keyframes fillProgress {
+      from { width: 30%; }
+      to { width: 75%; }
+    }
+
+    .progress-fill {
+      animation: fillProgress 1.5s ease-out forwards;
+      animation-delay: 1s;
+    }
+
+    /* Streak flame pulse */
+    @keyframes flamePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .flame-pulse {
+      animation: flamePulse 0.5s ease-in-out infinite;
+    }
+
+    /* Card hover */
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 50px rgba(255, 106, 0, 0.2);
+    }
+
+    /* Button press */
+    .btn-press:active {
+      transform: scale(0.98);
+    }
+
+    /* Emoji bounce */
+    @keyframes emojiBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .emoji-bounce {
+      animation: emojiBounce 0.6s ease-in-out infinite;
+    }
+
+    .emoji-bounce:nth-child(2) { animation-delay: 0.1s; }
+    .emoji-bounce:nth-child(3) { animation-delay: 0.2s; }
+    .emoji-bounce:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Speech bubble appear */
+    @keyframes bubbleAppear {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .bubble-appear {
+      animation: bubbleAppear 0.4s ease-out forwards;
+    }
+
+    /* Celebration stars */
+    @keyframes starFloat {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120px) rotate(180deg); opacity: 0; }
+    }
+
+    .star-float {
+      animation: starFloat 2s ease-out infinite;
+    }
+
+    /* Leaf wiggle for Oni */
+    @keyframes leafWiggle {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .leaf-wiggle {
+      animation: leafWiggle 0.4s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+  </style>
+</head>
+<body class="bg-gray-200 min-h-screen flex items-center justify-center p-8">
+  <!-- iPad Frame -->
+  <div class="relative bg-black rounded-[40px] shadow-2xl p-4" style="width: 1024px; height: 768px;">
+    <!-- iPad bezel -->
+    <div class="absolute top-1/2 left-2 transform -translate-y-1/2 w-2 h-2 bg-gray-700 rounded-full"></div>
+
+    <!-- Screen -->
+    <div class="bg-white rounded-[30px] h-full overflow-hidden">
+
+      <!-- App Content -->
+      <div class="h-full flex">
+
+        <!-- Sidebar (200px) -->
+        <aside class="w-[200px] bg-white border-r border-gray-200 flex flex-col">
+          <!-- Logo -->
+          <div class="p-4 border-b border-gray-100">
+            <div class="flex items-center space-x-2">
+              <span class="text-3xl">🍊</span>
+              <span class="text-xl font-bold text-orange-500">BiteBurst</span>
+            </div>
+          </div>
+
+          <!-- Nav Items -->
+          <nav class="p-3 space-y-2">
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span class="text-xl">📚</span>
+              <span class="text-sm font-medium">Lessons</span>
+            </button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span class="text-xl">🏆</span>
+              <span class="text-sm font-medium">Champs</span>
+            </button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-orange-50 text-orange-500 border-2 border-orange-200">
+              <span class="text-xl">➕</span>
+              <span class="text-sm font-bold">LOG</span>
+            </button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span class="text-xl">👤</span>
+              <span class="text-sm font-medium">Profile</span>
+            </button>
+          </nav>
+
+          <!-- Bottom nav -->
+          <div class="mt-auto p-3 border-t border-gray-100">
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+              <span class="text-xl">⚙️</span>
+              <span class="text-sm font-medium">More</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex">
+          <!-- Center Content -->
+          <div class="flex-1 bg-white overflow-y-auto">
+
+            <!-- Header -->
+            <header class="sticky top-0 z-40">
+              <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-6">
+                <div class="flex items-center justify-between">
+                  <button class="p-2 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="font-medium">Back</span>
+                  </button>
+
+                  <div class="flex items-center gap-3">
+                    <span class="text-2xl font-black tracking-wide">AMAZING!</span>
+                    <span class="text-3xl">🎉</span>
+                  </div>
+
+                  <!-- Stats in header -->
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full">
+                      <span class="flame-pulse text-xl">🔥</span>
+                      <span class="font-bold">5</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full">
+                      <span class="text-xl">⭐</span>
+                      <span class="font-bold">185 XP</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="p-8 bg-gray-50">
+              <div class="max-w-2xl mx-auto space-y-6">
+
+                <!-- Mascot Section - ONI THE ORANGE -->
+                <div class="text-center">
+                  <div class="relative inline-block">
+                    <!-- Floating elements -->
+                    <div class="absolute -top-6 -left-12 text-3xl star-float" style="animation-delay: 0s;">⭐</div>
+                    <div class="absolute -top-4 -right-10 text-2xl star-float" style="animation-delay: 0.3s;">✨</div>
+                    <div class="absolute top-10 -left-14 text-2xl star-float" style="animation-delay: 0.6s;">🌟</div>
+                    <div class="absolute top-8 -right-12 text-2xl star-float" style="animation-delay: 0.9s;">⭐</div>
+
+                    <!-- Oni the Orange Mascot (larger for iPad) -->
+                    <div class="mascot-bounce">
+                      <div class="w-44 h-44 mx-auto relative">
+                        <!-- Orange body -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-full shadow-lg"></div>
+
+                        <!-- Orange texture/highlight -->
+                        <div class="absolute top-4 left-6 w-20 h-8 bg-gradient-to-r from-white/30 to-transparent rounded-full blur-sm"></div>
+
+                        <!-- Leaf stem -->
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-3 h-5 bg-gradient-to-b from-green-600 to-green-700 rounded-full"></div>
+
+                        <!-- Leaves -->
+                        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 flex gap-0">
+                          <div class="w-6 h-10 bg-gradient-to-t from-green-600 to-green-500 rounded-full transform -rotate-20 leaf-wiggle" style="border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;"></div>
+                          <div class="w-6 h-10 bg-gradient-to-t from-green-600 to-green-500 rounded-full transform rotate-20 leaf-wiggle" style="border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; animation-delay: 0.2s;"></div>
+                        </div>
+
+                        <!-- Face -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/3">
+                          <!-- Eyes -->
+                          <div class="flex gap-8 mb-3">
+                            <div class="w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-inner">
+                              <div class="w-5 h-5 bg-gray-800 rounded-full relative">
+                                <div class="absolute top-1 left-1 w-2 h-2 bg-white rounded-full"></div>
+                              </div>
+                            </div>
+                            <div class="w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-inner">
+                              <div class="w-5 h-5 bg-gray-800 rounded-full relative">
+                                <div class="absolute top-1 left-1 w-2 h-2 bg-white rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Big smile -->
+                          <div class="w-14 h-7 mx-auto bg-gray-800 rounded-b-full relative overflow-hidden">
+                            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-red-400 rounded-t-full"></div>
+                          </div>
+                        </div>
+
+                        <!-- Cheeks (blush) -->
+                        <div class="absolute top-20 left-4 w-6 h-4 bg-orange-300 rounded-full opacity-60"></div>
+                        <div class="absolute top-20 right-4 w-6 h-4 bg-orange-300 rounded-full opacity-60"></div>
+
+                        <!-- Celebration arms -->
+                        <div class="absolute top-16 -left-6 w-10 h-5 bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transform -rotate-45">
+                          <div class="absolute -left-2 top-0 text-xl">✋</div>
+                        </div>
+                        <div class="absolute top-16 -right-6 w-10 h-5 bg-gradient-to-l from-orange-500 to-orange-400 rounded-full transform rotate-45">
+                          <div class="absolute -right-2 top-0 text-xl">✋</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h1 class="text-4xl font-black text-gray-800 mt-6 text-pop">
+                    Super healthy! 🥕
+                  </h1>
+                </div>
+
+                <!-- What You Logged Card -->
+                <div class="bg-white rounded-3xl border-2 border-orange-200 shadow-xl p-6 card-hover transition-all duration-300 slide-up" style="animation-delay: 0.3s;">
+                  <h3 class="text-center font-bold text-gray-700 text-lg mb-5">What you logged:</h3>
+
+                  <div class="flex justify-center gap-6 mb-4">
+                    <div class="text-center emoji-bounce">
+                      <div class="w-20 h-20 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                        <span class="text-5xl">🍎</span>
+                      </div>
+                      <p class="text-sm text-gray-600 mt-2 font-medium">Apple</p>
+                    </div>
+                    <div class="text-center emoji-bounce">
+                      <div class="w-20 h-20 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                        <span class="text-5xl">🥕</span>
+                      </div>
+                      <p class="text-sm text-gray-600 mt-2 font-medium">Carrots</p>
+                    </div>
+                    <div class="text-center emoji-bounce">
+                      <div class="w-20 h-20 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                        <span class="text-5xl">🥛</span>
+                      </div>
+                      <p class="text-sm text-gray-600 mt-2 font-medium">Milk</p>
+                    </div>
+                    <div class="text-center emoji-bounce">
+                      <div class="w-20 h-20 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                        <span class="text-5xl">🥪</span>
+                      </div>
+                      <p class="text-sm text-gray-600 mt-2 font-medium">Sandwich</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- XP Card -->
+                <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-3xl border-2 border-orange-300 shadow-xl p-6 slide-up" style="animation-delay: 0.5s;">
+                  <div class="text-center">
+                    <div class="text-5xl font-black text-orange-500 xp-glow mb-2" id="xp-counter">
+                      +25 XP
+                    </div>
+                    <p class="text-gray-600 mb-4">Experience points earned!</p>
+
+                    <!-- Progress Bar -->
+                    <div class="relative h-5 bg-gray-200 rounded-full overflow-hidden mb-3 max-w-md mx-auto">
+                      <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full progress-fill" style="width: 30%;"></div>
+                      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                    </div>
+
+                    <!-- Level indicators -->
+                    <div class="flex justify-between text-sm max-w-md mx-auto">
+                      <span class="bg-orange-100 text-orange-600 px-4 py-1.5 rounded-full font-bold border border-orange-200">Lv 3</span>
+                      <span class="bg-orange-100 text-orange-600 px-4 py-1.5 rounded-full font-bold border border-orange-200">Lv 4</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Streak Badge -->
+                <div class="flex justify-center slide-up" style="animation-delay: 0.7s;">
+                  <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+                    <span class="flame-pulse text-2xl">🔥</span>
+                    <span class="font-bold text-lg">5-day streak!</span>
+                    <span class="flame-pulse text-2xl">🔥</span>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 pt-4 slide-up" style="animation-delay: 0.9s;">
+                  <button class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all duration-200 btn-press">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    LOG ANOTHER MEAL
+                  </button>
+
+                  <button class="flex-1 bg-white hover:bg-orange-50 text-orange-500 font-bold py-4 px-6 rounded-2xl border-2 border-orange-300 shadow-md flex items-center justify-center gap-3 transition-all duration-200 btn-press">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    BACK TO DASHBOARD
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column (340px) -->
+          <aside class="w-[340px] bg-gray-50 border-l border-gray-200 p-5 space-y-5 overflow-y-auto">
+
+            <!-- Captain Carrot Message Card (gives food tips) -->
+            <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm bubble-appear">
+              <div class="flex items-start gap-3">
+                <!-- Captain Carrot Mini Avatar -->
+                <div class="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex-shrink-0 relative overflow-hidden">
+                  <!-- Carrot body -->
+                  <div class="absolute inset-1 bg-gradient-to-b from-orange-400 to-orange-600 rounded-t-full" style="clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);"></div>
+                  <!-- Leafy top -->
+                  <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 flex gap-0.5">
+                    <div class="w-2 h-4 bg-green-500 rounded-full transform -rotate-12"></div>
+                    <div class="w-2 h-5 bg-green-600 rounded-full"></div>
+                    <div class="w-2 h-4 bg-green-500 rounded-full transform rotate-12"></div>
+                  </div>
+                  <!-- Mask -->
+                  <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-10 h-3 bg-blue-600 rounded flex items-center justify-center gap-1">
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800 text-sm">Captain Carrot says:</p>
+                  <p class="text-sm text-gray-700 leading-relaxed mt-1">
+                    Wow! Apples give you energy, carrots help your eyes, and milk makes bones strong! 🍎🥕🥛
+                  </p>
+                </div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-gray-100">
+                <p class="text-xs text-gray-500 font-medium">🥕 Captain's Tip</p>
+                <p class="text-sm text-gray-700 mt-1">
+                  You're eating like a true hero! Keep up the super healthy choices! ⭐
+                </p>
+              </div>
+            </div>
+
+            <!-- Food Fact Card -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-200 shadow-sm">
+              <div class="flex items-center space-x-2 mb-3">
+                <span class="text-xs bg-green-500 text-white px-3 py-1 rounded-full font-medium">
+                  🧠 FUN FOOD FACT
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                Carrots were originally purple before orange ones became popular! 🥕
+              </p>
+            </div>
+
+            <!-- Food Badges -->
+            <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-base text-gray-800">🏆 Food Badges</h3>
+                <span class="text-sm text-orange-500 font-medium">View All →</span>
+              </div>
+
+              <div class="grid grid-cols-4 gap-3">
+                <div class="text-center">
+                  <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300">
+                    🌟
+                  </div>
+                  <p class="text-xs mt-1 text-gray-700">First Log</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300">
+                    🥦
+                  </div>
+                  <p class="text-xs mt-1 text-gray-700">Veggie Lover</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gray-100 opacity-40 grayscale">
+                    🍎
+                  </div>
+                  <p class="text-xs mt-1 text-gray-400">Fruit Fan</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-2xl bg-gray-100 opacity-40 grayscale">
+                    🥞
+                  </div>
+                  <p class="text-xs mt-1 text-gray-400">Breakfast</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ad Placeholder -->
+            <div class="bg-gray-100 rounded-2xl p-4 border border-gray-200">
+              <div class="text-center py-8">
+                <div class="text-3xl mb-2 opacity-50">📣</div>
+                <p class="text-sm text-gray-400">Ad Placeholder</p>
+                <p class="text-xs text-gray-300 mt-1">340 x 180</p>
+              </div>
+            </div>
+          </aside>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti Script -->
+  <script>
+    setTimeout(() => {
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        colors: ['#FF6A00', '#FFB800', '#FF4444', '#FFDD00', '#FF8C00', '#22C55E'],
+        origin: { y: 0.5 }
+      });
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 75,
+          angle: 60,
+          spread: 70,
+          colors: ['#FF6A00', '#FFB800', '#22C55E'],
+          origin: { x: 0, y: 0.5 }
+        });
+        confetti({
+          particleCount: 75,
+          angle: 120,
+          spread: 70,
+          colors: ['#FF6A00', '#FFB800', '#22C55E'],
+          origin: { x: 1, y: 0.5 }
+        });
+      }, 200);
+    }, 500);
+
+    // XP counter animation
+    let xpValue = 0;
+    const targetXP = 25;
+    const xpCounter = document.getElementById('xp-counter');
+
+    setTimeout(() => {
+      const interval = setInterval(() => {
+        xpValue += 1;
+        xpCounter.textContent = `+${xpValue} XP`;
+        if (xpValue >= targetXP) {
+          clearInterval(interval);
+        }
+      }, 40);
+    }, 1000);
+  </script>
+</body>
+</html>
