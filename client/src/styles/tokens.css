@@ -1404,7 +1404,15 @@ html {
   .animate-travel-dot,
   .animate-path-tip,
   .animate-node-pop,
-  .animate-bounce-in {
+  .animate-bounce-in,
+  .bb-star-float,
+  .bb-mascot-bounce-success,
+  .bb-xp-glow,
+  .bb-flame-pulse,
+  .bb-slide-up,
+  .bb-emoji-bounce,
+  .bb-bubble-appear,
+  .bb-card-hover {
     animation: none;
   }
   
@@ -1413,16 +1421,27 @@ html {
     width: 100%;
   }
   
+  .bb-star-float,
+  .bb-mascot-bounce-success,
+  .bb-slide-up,
+  .bb-emoji-bounce,
+  .bb-bubble-appear {
+    opacity: 1;
+    transform: none;
+  }
+  
   .bb-enhanced-button,
   .bb-enhanced-card,
-  .lesson-node {
+  .lesson-node,
+  .bb-card-hover {
     transition: none;
     transform: none;
   }
   
   .bb-enhanced-button:hover,
   .bb-enhanced-card:hover,
-  .lesson-node:hover {
+  .lesson-node:hover,
+  .bb-card-hover:hover {
     transform: none;
   }
 }

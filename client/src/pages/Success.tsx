@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import confetti from 'canvas-confetti';
+import * as confettiModule from 'canvas-confetti';
 import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
 import oniProudImage from '@assets/Mascots/Oni_proud.png';
 import '../styles/tokens.css';
+
+const confetti = confettiModule.default || confettiModule;
 
 export default function Success() {
   const [, setLocation] = useLocation();

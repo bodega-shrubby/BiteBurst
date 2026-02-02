@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import * as confettiModule from 'canvas-confetti';
 import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
 import oniProudImage from '@assets/Mascots/Oni_proud.png';
 import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
@@ -12,6 +12,8 @@ import coachFlexImage from '@assets/Mascots/CoachFlex.png';
 import { animateXP, levelFromTotal, percentInLevel, formatLevel } from '@/utils/xpAnimation';
 import { apiRequest } from '@/lib/queryClient';
 import '../styles/tokens.css';
+
+const confetti = confettiModule.default || confettiModule;
 
 interface LogData {
   id: string;
@@ -245,6 +247,8 @@ export default function Feedback() {
         
         if (awardXP > 0) {
           await startXPAnimation(currentTotalXP, awardXP);
+        } else {
+          setXpAnimationComplete(true);
         }
         
         if ((user as any)?.id && awardXP > 0) {
@@ -256,9 +260,9 @@ export default function Feedback() {
         }
         
         hasAnimatedRef.current = true;
-        setXpAnimationComplete(true);
       } catch (e) {
         console.error('XP flow error', e);
+        setXpAnimationComplete(true);
       }
     }, 500);
 
