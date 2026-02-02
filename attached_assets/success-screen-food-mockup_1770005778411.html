@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst - Food Log Success (Mobile Mockup)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+    * { font-family: 'Nunito', sans-serif; }
+
+    @keyframes mascotBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      25% { transform: translateY(-20px) rotate(-5deg) scale(1.05); }
+      50% { transform: translateY(0) rotate(0deg) scale(1); }
+      75% { transform: translateY(-15px) rotate(5deg) scale(1.05); }
+    }
+    .mascot-bounce { animation: mascotBounce 0.8s ease-in-out infinite; }
+
+    @keyframes textPop {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .text-pop { animation: textPop 0.5s ease-out forwards; }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .slide-up { animation: slideUp 0.5s ease-out forwards; }
+
+    @keyframes xpGlow {
+      0%, 100% { text-shadow: 0 0 10px rgba(255, 106, 0, 0.3); }
+      50% { text-shadow: 0 0 25px rgba(255, 106, 0, 0.6); }
+    }
+    .xp-glow { animation: xpGlow 1s ease-in-out infinite; }
+
+    @keyframes fillProgress {
+      from { width: 30%; }
+      to { width: 75%; }
+    }
+    .progress-fill { animation: fillProgress 1.5s ease-out forwards; animation-delay: 1s; }
+
+    @keyframes flamePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    .flame-pulse { animation: flamePulse 0.5s ease-in-out infinite; }
+
+    .btn-press:active { transform: scale(0.98); }
+
+    @keyframes emojiBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .emoji-bounce { animation: emojiBounce 0.6s ease-in-out infinite; }
+    .emoji-bounce:nth-child(2) { animation-delay: 0.1s; }
+    .emoji-bounce:nth-child(3) { animation-delay: 0.2s; }
+
+    @keyframes bubbleAppear {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .bubble-appear { animation: bubbleAppear 0.4s ease-out forwards; }
+
+    @keyframes starFloat {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-100px) rotate(180deg); opacity: 0; }
+    }
+    .star-float { animation: starFloat 2s ease-out infinite; }
+
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(255, 106, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- iPhone Frame -->
+  <div class="flex justify-center items-center min-h-screen p-4">
+    <div class="relative bg-white rounded-[50px] shadow-2xl overflow-hidden" style="width: 390px; height: 844px; border: 12px solid #1a1a1a;">
+      <!-- Notch -->
+      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-50"></div>
+
+      <!-- Screen Content -->
+      <div class="h-full overflow-y-auto bg-white">
+
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-4 pt-10">
+          <div class="flex items-center justify-between">
+            <button class="p-2 hover:bg-white/20 rounded-xl transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-black tracking-wide">AMAZING!</span>
+              <span class="text-2xl">🎉</span>
+            </div>
+
+            <!-- Streak in header -->
+            <div class="flex items-center gap-1 bg-white/20 px-3 py-1.5 rounded-full">
+              <span class="flame-pulse text-lg">🔥</span>
+              <span class="font-bold text-sm">5</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="p-5 space-y-5">
+
+          <!-- ONI THE ORANGE - Main Mascot Section -->
+          <div class="text-center pt-4">
+            <!-- Floating celebration elements -->
+            <div class="relative inline-block">
+              <div class="absolute -top-4 -left-8 text-2xl star-float" style="animation-delay: 0s;">⭐</div>
+              <div class="absolute -top-2 -right-6 text-xl star-float" style="animation-delay: 0.3s;">✨</div>
+              <div class="absolute top-8 -left-10 text-lg star-float" style="animation-delay: 0.6s;">🌟</div>
+              <div class="absolute top-6 -right-8 text-xl star-float" style="animation-delay: 0.9s;">⭐</div>
+
+              <!-- Oni the Orange Mascot (CSS illustration) -->
+              <div class="mascot-bounce">
+                <div class="w-36 h-36 mx-auto relative">
+                  <!-- Orange body -->
+                  <div class="absolute inset-0 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full shadow-lg border-4 border-orange-300">
+                    <!-- Segment lines -->
+                    <div class="absolute inset-4 border-2 border-orange-300/40 rounded-full"></div>
+                  </div>
+                  <!-- Happy face -->
+                  <div class="absolute inset-0 flex flex-col items-center justify-center pt-2">
+                    <!-- Excited eyes (closed happy) -->
+                    <div class="flex gap-5 mb-2">
+                      <div class="w-5 h-2 bg-gray-800 rounded-full transform rotate-12"></div>
+                      <div class="w-5 h-2 bg-gray-800 rounded-full transform -rotate-12"></div>
+                    </div>
+                    <!-- Big open smile -->
+                    <div class="w-12 h-7 bg-gray-800 rounded-b-full relative overflow-hidden">
+                      <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-3 bg-pink-400 rounded-t-full"></div>
+                    </div>
+                    <!-- Rosy cheeks -->
+                    <div class="absolute top-14 left-4 w-4 h-3 bg-orange-300 rounded-full opacity-60"></div>
+                    <div class="absolute top-14 right-4 w-4 h-3 bg-orange-300 rounded-full opacity-60"></div>
+                  </div>
+                  <!-- Leaf -->
+                  <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div class="w-5 h-8 bg-green-500 rounded-full transform rotate-6"></div>
+                    <div class="w-1.5 h-5 bg-green-600 absolute top-6 left-1/2 transform -translate-x-1/2"></div>
+                  </div>
+                  <!-- Arms (celebrating) -->
+                  <div class="absolute top-1/2 -left-8 w-10 h-4 bg-orange-400 rounded-full transform -rotate-45 origin-right"></div>
+                  <div class="absolute top-1/2 -right-8 w-10 h-4 bg-orange-400 rounded-full transform rotate-45 origin-left"></div>
+                  <!-- Tiny hands -->
+                  <div class="absolute top-6 -left-10 text-lg">✋</div>
+                  <div class="absolute top-6 -right-10 text-lg">🤚</div>
+                  <!-- Legs -->
+                  <div class="absolute -bottom-5 left-1/4 w-5 h-7 bg-orange-400 rounded-b-full"></div>
+                  <div class="absolute -bottom-5 right-1/4 w-5 h-7 bg-orange-400 rounded-b-full"></div>
+                </div>
+              </div>
+            </div>
+
+            <h1 class="text-3xl font-black text-gray-800 mt-8 text-pop">
+              Awesome meal choice! 🍊
+            </h1>
+          </div>
+
+          <!-- What You Logged Card -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 shadow-xl p-5 card-hover transition-all duration-300 slide-up" style="animation-delay: 0.3s;">
+            <h3 class="text-center font-bold text-gray-700 mb-4">What you logged:</h3>
+
+            <div class="flex justify-center gap-4 mb-3">
+              <div class="text-center emoji-bounce">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                  <span class="text-4xl">🍎</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1 font-medium">Apple</p>
+              </div>
+              <div class="text-center emoji-bounce">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                  <span class="text-4xl">🥕</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1 font-medium">Carrots</p>
+              </div>
+              <div class="text-center emoji-bounce">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center border-2 border-orange-300 shadow-md">
+                  <span class="text-4xl">🥛</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1 font-medium">Milk</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- XP Card -->
+          <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-3xl border-2 border-orange-300 shadow-xl p-5 slide-up" style="animation-delay: 0.5s;">
+            <div class="text-center">
+              <div class="text-4xl font-black text-orange-500 xp-glow mb-1" id="xp-counter">
+                +25 XP
+              </div>
+              <p class="text-gray-600 text-sm mb-4">Experience points earned!</p>
+
+              <!-- Progress Bar -->
+              <div class="relative h-4 bg-gray-200 rounded-full overflow-hidden mb-2">
+                <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full progress-fill" style="width: 30%;"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+              </div>
+
+              <!-- Level indicators -->
+              <div class="flex justify-between text-sm">
+                <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-bold border border-orange-200">Lv 3</span>
+                <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-bold border border-orange-200">Lv 4</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Streak Badge -->
+          <div class="flex justify-center slide-up" style="animation-delay: 0.7s;">
+            <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-5 py-2 rounded-full shadow-lg flex items-center gap-2">
+              <span class="flame-pulse text-xl">🔥</span>
+              <span class="font-bold">5-day streak!</span>
+              <span class="flame-pulse text-xl">🔥</span>
+            </div>
+          </div>
+
+          <!-- AI Message Card - Captain Carrot for nutrition tips -->
+          <div class="slide-up" style="animation-delay: 0.9s;">
+            <!-- Mascot mini avatar -->
+            <div class="flex justify-center mb-2">
+              <div class="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center relative overflow-hidden">
+                <span class="text-2xl">🥕</span>
+                <div class="absolute top-2 left-0 right-0 h-2 bg-blue-600 rounded-t-full"></div>
+              </div>
+            </div>
+
+            <!-- Speech bubble -->
+            <div class="relative bg-white rounded-3xl border-2 border-orange-100 shadow-lg p-5 bubble-appear">
+              <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-white"></div>
+              <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-b-[14px] border-b-orange-100"></div>
+
+              <h3 class="font-bold text-gray-800 mb-3 text-center text-lg">
+                Captain Carrot says:
+              </h3>
+
+              <p class="text-gray-700 text-center leading-relaxed">
+                Wow! Apples give you energy to run fast, carrots help your eyes see super well, and milk makes your bones strong! 🍎🥕🥛
+                <br><br>
+                That's a <span class="font-bold text-orange-500">SUPER COMBO!</span> ⭐
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3 pt-2 pb-8 slide-up" style="animation-delay: 1.1s;">
+            <button class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all duration-200 btn-press">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              LOG ANOTHER MEAL
+            </button>
+
+            <button class="w-full bg-white hover:bg-orange-50 text-orange-500 font-bold py-4 px-6 rounded-2xl border-2 border-orange-300 shadow-md flex items-center justify-center gap-3 transition-all duration-200 btn-press">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              BACK TO DASHBOARD
+            </button>
+          </div>
+        </div>
+
+        <!-- Home indicator -->
+        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti Script -->
+  <script>
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        colors: ['#FF6A00', '#FFB800', '#FF4444', '#FFDD00', '#FF8C00', '#22C55E'],
+        origin: { y: 0.6 }
+      });
+      setTimeout(() => {
+        confetti({ particleCount: 50, angle: 60, spread: 55, colors: ['#FF6A00', '#FFB800', '#22C55E'], origin: { x: 0, y: 0.6 } });
+        confetti({ particleCount: 50, angle: 120, spread: 55, colors: ['#FF6A00', '#FFB800', '#22C55E'], origin: { x: 1, y: 0.6 } });
+      }, 200);
+    }, 500);
+
+    let xpValue = 0;
+    const targetXP = 25;
+    const xpCounter = document.getElementById('xp-counter');
+    setTimeout(() => {
+      const interval = setInterval(() => {
+        xpValue += 1;
+        xpCounter.textContent = `+${xpValue} XP`;
+        if (xpValue >= targetXP) clearInterval(interval);
+      }, 40);
+    }, 1000);
+  </script>
+</body>
+</html>
