@@ -22,14 +22,77 @@ const setLessonCacheHeaders = (res: any) => {
   });
 };
 
-// Helper to validate childId ownership - ensures child belongs to the parent user
+interface AuthResolution {
+  valid: boolean;
+  error?: string;
+  isChildSelf: boolean;
+  parentId?: string;
+  childFromChildrenTable?: any;
+  userFromUsersTable?: any;
+  curriculumId?: string;
+}
+
+async function resolveUserAuth(userId: string, authId: string): Promise<AuthResolution> {
+  // First check users table
+  const userFromUsersTable = await storage.getUser(userId);
+  
+  if (userFromUsersTable) {
+    // Found in users table
+    const isParentOwned = userFromUsersTable.parentAuthId === authId;
+    const isDirectMatch = userId === authId;
+    
+    if (isParentOwned || isDirectMatch) {
+      return {
+        valid: true,
+        isChildSelf: false,
+        parentId: userId,
+        userFromUsersTable,
+        curriculumId: userFromUsersTable.curriculumId || userFromUsersTable.curriculum || undefined
+      };
+    }
+    return { valid: false, error: 'Unauthorized', isChildSelf: false };
+  }
+  
+  // Not in users table - check children table
+  const childFromChildrenTable = await storage.getChild(userId);
+  
+  if (!childFromChildrenTable) {
+    return { valid: false, error: 'User not found', isChildSelf: false };
+  }
+  
+  // Child exists - check if child is accessing their own data
+  if (childFromChildrenTable.id === authId) {
+    return {
+      valid: true,
+      isChildSelf: true,
+      parentId: childFromChildrenTable.parentId,
+      childFromChildrenTable,
+      curriculumId: childFromChildrenTable.curriculumId
+    };
+  }
+  
+  // Check if parent is authorized
+  const parent = await storage.getUser(childFromChildrenTable.parentId);
+  if (parent && parent.parentAuthId === authId) {
+    return {
+      valid: true,
+      isChildSelf: false,
+      parentId: childFromChildrenTable.parentId,
+      childFromChildrenTable,
+      curriculumId: childFromChildrenTable.curriculumId
+    };
+  }
+  
+  return { valid: false, error: 'Unauthorized', isChildSelf: false };
+}
+
 async function validateChildOwnership(
   childId: string | undefined, 
   parentUserId: string, 
-  parentAuthId: string
+  isChildSelf: boolean
 ): Promise<{ valid: boolean; error?: string }> {
-  if (!childId) {
-    return { valid: true }; // No childId provided, nothing to validate
+  if (!childId || isChildSelf) {
+    return { valid: true };
   }
   
   const child = await storage.getChild(childId);
@@ -37,18 +100,8 @@ async function validateChildOwnership(
     return { valid: false, error: 'Child not found' };
   }
   
-  // Child's parentId should match the parent user ID
   if (child.parentId !== parentUserId) {
     return { valid: false, error: 'Unauthorized child access' };
-  }
-  
-  // Also verify that the parent user belongs to the authenticated parent
-  const parentUser = await storage.getUser(parentUserId);
-  if (!parentUser || parentUser.parentAuthId !== parentAuthId) {
-    // Allow direct match for legacy users
-    if (parentUserId !== parentAuthId) {
-      return { valid: false, error: 'Unauthorized access' };
-    }
   }
   
   return { valid: true };
@@ -60,27 +113,19 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       const { yearGroup } = req.params;
       const childUserId = req.query.userId as string;
-      const childId = req.query.childId as string; // For children from children table
+      const childId = req.query.childId as string;
       
-      // Validate child profile belongs to parent
       if (!childUserId) {
         return res.status(400).json({ error: 'userId query parameter is required' });
       }
       
-      const childProfile = await storage.getUser(childUserId);
-      if (!childProfile) {
-        return res.status(404).json({ error: 'User not found' });
+      const auth = await resolveUserAuth(childUserId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
       }
       
-      const isParentOwned = childProfile.parentAuthId === req.userId;
-      const isDirectMatch = childUserId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
-        return res.status(403).json({ error: 'Unauthorized' });
-      }
-      
-      // Validate childId ownership if provided
-      const childValidation = await validateChildOwnership(childId, childUserId, req.userId);
+      const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
       if (!childValidation.valid) {
         return res.status(403).json({ error: childValidation.error });
       }
@@ -128,27 +173,24 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       let { curriculumId } = req.params;
       const childUserId = req.query.userId as string;
-      const childId = req.query.childId as string; // For children from children table
+      const childId = req.query.childId as string;
       
-      // Validate child profile belongs to parent
       if (!childUserId) {
         return res.status(400).json({ error: 'userId query parameter is required' });
       }
       
-      const childProfile = await storage.getUser(childUserId);
-      if (!childProfile) {
-        return res.status(404).json({ error: 'User not found' });
+      const auth = await resolveUserAuth(childUserId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
       }
       
-      const isParentOwned = childProfile.parentAuthId === req.userId;
-      const isDirectMatch = childUserId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
-        return res.status(403).json({ error: 'Unauthorized' });
+      // Use curriculum from child record if available
+      if (auth.curriculumId) {
+        curriculumId = auth.curriculumId;
       }
       
-      // Validate childId ownership if provided
-      const childValidation = await validateChildOwnership(childId, childUserId, req.userId);
+      const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
       if (!childValidation.valid) {
         return res.status(403).json({ error: childValidation.error });
       }
@@ -608,24 +650,13 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       const validatedData = answerSubmissionSchema.parse(req.body);
       
-      // Verify parent owns the child profile
-      // req.userId is the Supabase parent auth ID
-      // validatedData.userId is the child profile ID
-      const childProfile = await storage.getUser(validatedData.userId);
-      if (!childProfile) {
-        return res.status(404).json({ error: 'User not found' });
+      const auth = await resolveUserAuth(validatedData.userId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
       }
       
-      // Allow if parentAuthId matches OR direct ID match (legacy users)
-      const isParentOwned = childProfile.parentAuthId === req.userId;
-      const isDirectMatch = validatedData.userId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
-        return res.status(403).json({ error: 'Unauthorized' });
-      }
-      
-      // Validate childId ownership if provided
-      const childValidation = await validateChildOwnership(validatedData.childId, validatedData.userId, req.userId);
+      const childValidation = await validateChildOwnership(validatedData.childId, auth.parentId!, auth.isChildSelf);
       if (!childValidation.valid) {
         return res.status(403).json({ error: childValidation.error });
       }
@@ -940,21 +971,13 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     try {
       const validatedData = insertLessonAttemptSchema.parse(req.body);
       
-      // Verify parent owns the child profile (same pattern as /api/lessons/answer)
-      const childProfile = await storage.getUser(validatedData.userId);
-      if (!childProfile) {
-        return res.status(404).json({ error: 'User not found' });
+      const auth = await resolveUserAuth(validatedData.userId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
       }
       
-      const isParentOwned = childProfile.parentAuthId === req.userId;
-      const isDirectMatch = validatedData.userId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
-        return res.status(403).json({ error: 'Unauthorized' });
-      }
-      
-      // Validate childId ownership if provided
-      const childValidation = await validateChildOwnership(validatedData.childId, validatedData.userId, req.userId);
+      const childValidation = await validateChildOwnership(validatedData.childId, auth.parentId!, auth.isChildSelf);
       if (!childValidation.valid) {
         return res.status(403).json({ error: childValidation.error });
       }
@@ -979,25 +1002,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(400).json({ error: 'userId is required' });
       }
       
-      // Verify parent owns the child profile (same pattern as /api/lessons/answer)
-      const childProfile = await storage.getUser(userId);
-      if (!childProfile) {
-        return res.status(404).json({ error: 'User not found' });
+      const auth = await resolveUserAuth(userId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
       }
       
-      const isParentOwned = childProfile.parentAuthId === req.userId;
-      const isDirectMatch = userId === req.userId;
-      
-      if (!isParentOwned && !isDirectMatch) {
-        return res.status(403).json({ error: 'Unauthorized' });
-      }
-      
-      // If childId is provided, verify the child belongs to this parent
-      if (childId) {
-        const child = await storage.getChild(childId);
-        if (!child || child.parentId !== userId) {
-          return res.status(403).json({ error: 'Unauthorized child access' });
-        }
+      const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
       }
       
       await storage.markLessonComplete(userId, lessonId, xpEarned || 0, childId);
