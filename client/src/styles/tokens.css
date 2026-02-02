@@ -843,6 +843,17 @@ html {
   background: rgba(255, 122, 0, 0.05);
 }
 
+/* Blue theme overrides for Activity log */
+.bb-progress-bar.theme-blue {
+  background: linear-gradient(90deg, #3B82F6, #6366F1);
+}
+
+.bb-level-pill.theme-blue {
+  border-color: #3B82F6;
+  color: #3B82F6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
 /* XP Value Display */
 #xpValue {
   font-size: 28px;

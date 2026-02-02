@@ -60,39 +60,32 @@ export default function Feedback() {
   const currentTotalXP = Number((user as any)?.totalXp ?? 0);
   const isActivity = (logData as any)?.type === 'activity';
 
-  const theme = isActivity
-    ? {
-        primary: 'from-blue-500 to-indigo-600',
-        primarySolid: 'bg-blue-500',
-        accent: 'blue-500',
-        accentBorder: 'border-blue-300',
-        accentBg: 'bg-blue-50',
-        accentText: 'text-blue-500',
-        accentGradient: 'from-blue-50 to-indigo-50',
-        streakGradient: 'from-blue-500 to-indigo-600',
-        headerText: 'YOU CRUSHED IT!',
-        headerEmoji: '💪',
-        title: 'Awesome workout!',
-        titleEmoji: '💪',
-        mascotLabel: 'Coach Flex says:',
-        mascotImage: coachFlexImage
-      }
-    : {
-        primary: 'from-orange-500 to-orange-600',
-        primarySolid: 'bg-orange-500',
-        accent: 'orange-500',
-        accentBorder: 'border-orange-300',
-        accentBg: 'bg-orange-50',
-        accentText: 'text-orange-500',
-        accentGradient: 'from-orange-50 to-amber-50',
-        streakGradient: 'from-orange-500 to-red-500',
-        headerText: 'AMAZING!',
-        headerEmoji: '🎉',
-        title: 'Awesome meal choice!',
-        titleEmoji: '🍊',
-        mascotLabel: 'Captain Carrot says:',
-        mascotImage: captainCarrotImage
-      };
+  const theme = isActivity ? {
+    headerBg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
+    cardBorder: 'border-blue-200',
+    accentBg: 'from-blue-50 to-indigo-50',
+    accentColor: 'text-blue-500',
+    streakBg: 'from-blue-500 to-indigo-600',
+    buttonBg: 'bg-blue-500 hover:bg-blue-600',
+    buttonOutline: 'border-blue-500 text-blue-500 hover:bg-blue-50',
+    title: "Fantastic way to keep active!",
+    headerText: 'YOU CRUSHED IT!',
+    headerEmoji: '💪'
+  } : {
+    headerBg: 'bg-gradient-to-r from-orange-500 to-orange-600',
+    cardBorder: 'border-orange-200',
+    accentBg: 'from-orange-50 to-amber-50',
+    accentColor: 'text-orange-500',
+    streakBg: 'from-orange-500 to-red-500',
+    buttonBg: 'bg-orange-500 hover:bg-orange-600',
+    buttonOutline: 'border-orange-500 text-orange-500 hover:bg-orange-50',
+    title: "Awesome meal choice!",
+    headerText: 'AMAZING!',
+    headerEmoji: '🎉'
+  };
+
+  const tipMascot = isActivity ? coachFlexImage : captainCarrotImage;
+  const tipName = isActivity ? 'Coach Flex' : 'Captain Carrot';
 
   const xpUpdateMutation = useMutation({
     mutationFn: async ({ userId, deltaXp, reason }: { userId: string; deltaXp: number; reason: string }) => {
@@ -226,14 +219,14 @@ export default function Feedback() {
     if (!user || !logData || hasAnimatedRef.current) return;
 
     const colors = isActivity
-      ? ['#3B82F6', '#10B981', '#8B5CF6', '#06B6D4', '#6366F1']
-      : ['#FF6A00', '#FFB800', '#FF4444', '#FFDD00', '#22C55E'];
+      ? ['#3B82F6', '#10B981', '#8B5CF6', '#06B6D4']
+      : ['#FF6A00', '#FFB800', '#FF4444', '#22C55E'];
 
     confetti({
       particleCount: 100,
       spread: 80,
       colors,
-      origin: { y: 0.5 }
+      origin: { y: 0.3 }
     });
 
     const t = setTimeout(async () => {
@@ -335,13 +328,9 @@ export default function Feedback() {
         <div className="space-y-4">
           <div className="flex flex-wrap gap-3 justify-center">
             {logData.content.emojis.map((emoji: string, index: number) => (
-              <div 
-                key={index} 
-                className={`text-center bb-emoji-bounce`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className={`w-16 h-16 ${theme.accentBg} ${theme.accentBorder} rounded-2xl flex items-center justify-center border-2 shadow-md`}>
-                  <span className="text-4xl">{emoji}</span>
+              <div key={index} className="text-center">
+                <div className={`w-16 h-16 ${isActivity ? 'bg-blue-50 border-blue-300' : 'bg-orange-50 border-orange-300'} rounded-xl flex items-center justify-center border-2`}>
+                  <span className="text-3xl">{emoji}</span>
                 </div>
               </div>
             ))}
@@ -349,7 +338,7 @@ export default function Feedback() {
           {isActivity && (
             <div className="flex justify-center gap-3">
               {logData.durationMin && (
-                <span className={`${theme.accentBg} ${theme.accentText} px-4 py-2 rounded-full font-bold flex items-center gap-2`}>
+                <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold flex items-center gap-2">
                   <span>⏱️</span> {logData.durationMin} min
                 </span>
               )}
@@ -366,18 +355,8 @@ export default function Feedback() {
     
     if (logData.entryMethod === 'text' && logData.content?.description) {
       return (
-        <div className="space-y-4">
-          <div className={`${theme.accentBg} ${theme.accentBorder} rounded-2xl px-6 py-4 border-2 text-center`}>
-            <div className="text-2xl mb-2">{isActivity ? '🏃' : '📝'}</div>
-            <p className="text-lg font-medium text-gray-800">"{logData.content.description}"</p>
-          </div>
-          {isActivity && logData.durationMin && (
-            <div className="flex justify-center">
-              <span className={`${theme.accentBg} ${theme.accentText} px-4 py-2 rounded-full font-bold`}>
-                ⏱️ {logData.durationMin} min
-              </span>
-            </div>
-          )}
+        <div className={`${isActivity ? 'bg-blue-50 border-blue-300' : 'bg-orange-50 border-orange-300'} rounded-xl px-6 py-4 border-2 text-center`}>
+          <p className="text-lg font-medium text-gray-800">"{logData.content.description}"</p>
         </div>
       );
     }
@@ -389,10 +368,10 @@ export default function Feedback() {
             <img 
               src={logData.content.photoUrl} 
               alt="Logged meal photo" 
-              className={`w-32 h-32 object-cover rounded-2xl shadow-lg border-2 ${theme.accentBorder} mx-auto`}
+              className={`w-32 h-32 object-cover rounded-xl shadow-lg border-2 ${isActivity ? 'border-blue-300' : 'border-orange-300'} mx-auto`}
             />
           ) : (
-            <div className={`w-32 h-32 ${theme.accentBg} ${theme.accentBorder} rounded-2xl mx-auto flex items-center justify-center border-2 shadow-lg`}>
+            <div className={`w-32 h-32 ${isActivity ? 'bg-blue-50 border-blue-300' : 'bg-orange-50 border-orange-300'} rounded-xl mx-auto flex items-center justify-center border-2 shadow-lg`}>
               <span className="text-4xl">📷</span>
             </div>
           )}
@@ -405,7 +384,7 @@ export default function Feedback() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className={`sticky top-0 z-40 bg-gradient-to-r ${theme.primary} text-white px-4 py-4`}>
+      <header className={`sticky top-0 z-40 ${theme.headerBg} text-white px-4 py-4`}>
         <div className="flex items-center justify-between max-w-md mx-auto">
           <Button
             variant="ghost"
@@ -422,53 +401,53 @@ export default function Feedback() {
           </div>
 
           <div className="flex items-center gap-1 bg-white/20 px-3 py-1.5 rounded-full">
-            <span className="bb-flame-pulse text-lg">🔥</span>
+            <span className="text-lg">🔥</span>
             <span className="font-bold text-sm">{(user as any)?.streak || 5}</span>
           </div>
         </div>
       </header>
 
-      <div className="p-4 space-y-5 max-w-md mx-auto">
-        <div className="text-center pt-4">
+      <div className="p-6 space-y-5 max-w-md mx-auto">
+        <div className="text-center">
           <div className="relative inline-block">
-            <div className="absolute -top-4 -left-8 text-2xl bb-star-float" style={{ animationDelay: '0s' }}>⭐</div>
-            <div className="absolute -top-2 -right-6 text-xl bb-star-float" style={{ animationDelay: '0.3s' }}>{isActivity ? '💪' : '✨'}</div>
-            <div className="absolute top-8 -left-10 text-lg bb-star-float" style={{ animationDelay: '0.6s' }}>✨</div>
-            <div className="absolute top-6 -right-8 text-xl bb-star-float" style={{ animationDelay: '0.9s' }}>{isActivity ? '⚡' : '⭐'}</div>
+            <div className="absolute -top-4 -left-8 text-2xl animate-bounce">⭐</div>
+            <div className="absolute -top-2 -right-6 text-xl animate-pulse">✨</div>
+            <div className="absolute top-8 -left-10 text-xl animate-bounce" style={{ animationDelay: '0.3s' }}>🌟</div>
+            <div className="absolute top-6 -right-8 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>⭐</div>
 
             <img
               src={isActivity ? oniProudImage : oniCelebrateImage}
               alt="Oni the Orange celebrating"
-              className={`w-36 h-36 mx-auto object-contain ${showCelebration ? 'bb-mascot-bounce-success' : ''}`}
+              className={`w-36 h-36 mx-auto object-contain ${showCelebration ? 'bb-mascot-bounce' : 'opacity-0'}`}
             />
           </div>
 
-          <h1 className={`text-3xl font-black text-gray-800 mt-4 ${showCelebration ? 'bb-slide-in' : ''}`}>
-            {theme.title} {theme.titleEmoji}
+          <h1 className={`text-3xl font-black text-gray-800 mt-4 ${showCelebration ? 'bb-slide-in' : 'opacity-0'}`}>
+            {theme.title}
           </h1>
         </div>
 
-        <div className={`bg-white rounded-3xl border-2 ${theme.accentBorder} shadow-xl p-5 bb-card-hover bb-slide-up`}>
+        <div className={`bg-white rounded-3xl border-2 ${theme.cardBorder} shadow-xl p-5`}>
           <h3 className="text-center font-bold text-gray-700 mb-4">What you logged:</h3>
           {renderContent()}
         </div>
 
-        <div className={`bg-gradient-to-br ${theme.accentGradient} rounded-3xl border-2 ${theme.accentBorder} shadow-xl p-5 bb-slide-up`} style={{ animationDelay: '0.2s' }}>
+        <div className={`bg-gradient-to-br ${theme.accentBg} rounded-3xl border-2 ${theme.cardBorder} shadow-xl p-5`}>
           <div className="text-center">
-            <div ref={xpValueRef} className={`text-4xl font-black ${theme.accentText} bb-xp-glow mb-1`}>
+            <div ref={xpValueRef} className={`text-4xl font-black ${theme.accentColor} mb-2`}>
               +{awardXP} XP
             </div>
-            <p className="text-gray-600 text-sm mb-4">Experience points earned!</p>
+            <p className="text-gray-600 text-sm mb-3">Experience points earned!</p>
 
             <div className="bb-progress mb-2">
-              <div ref={xpBarRef} className={`bb-progress-bar ${isActivity ? 'bg-blue-500' : ''}`} style={{ width: '0%' }}></div>
+              <div ref={xpBarRef} className={`bb-progress-bar ${isActivity ? 'theme-blue' : ''}`} style={{ width: '0%' }}></div>
             </div>
 
             <div className="bb-level-pills">
-              <span ref={levelFromRef} className={`bb-level-pill ${isActivity ? 'border-blue-500 text-blue-500' : ''}`}>
+              <span ref={levelFromRef} className={`bb-level-pill ${isActivity ? 'theme-blue' : ''}`}>
                 {formatLevel(levelFromTotal(currentTotalXP).level + 1)}
               </span>
-              <span ref={levelToRef} className={`bb-level-pill ${isActivity ? 'border-blue-500 text-blue-500' : ''}`}>
+              <span ref={levelToRef} className={`bb-level-pill ${isActivity ? 'theme-blue' : ''}`}>
                 {formatLevel(levelFromTotal(currentTotalXP).level + 2)}
               </span>
             </div>
@@ -476,17 +455,17 @@ export default function Feedback() {
         </div>
 
         {showStreakPill && (
-          <div className="flex justify-center bb-slide-up" style={{ animationDelay: '0.4s' }}>
-            <div className={`bg-gradient-to-r ${theme.streakGradient} text-white px-5 py-2 rounded-full shadow-lg flex items-center gap-2`}>
-              <span className="text-lg bb-flame-pulse">🔥</span>
+          <div className="flex justify-center">
+            <div className={`bg-gradient-to-r ${theme.streakBg} text-white px-5 py-2 rounded-full shadow-lg flex items-center gap-2`}>
+              <span className="text-lg">🔥</span>
               <span className="font-bold">{(user as any)?.streak || 5}-day streak!</span>
-              <span className="text-lg bb-flame-pulse">🔥</span>
+              <span className="text-lg">🔥</span>
             </div>
           </div>
         )}
 
         {showBadgePill && newBadges.length > 0 && (
-          <div className="flex justify-center bb-slide-up" style={{ animationDelay: '0.5s' }}>
+          <div className="flex justify-center">
             <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white px-5 py-2 rounded-full shadow-lg flex items-center gap-2">
               <span className="text-lg">🏅</span>
               <span className="font-bold">{newBadges[0]} unlocked!</span>
@@ -494,21 +473,21 @@ export default function Feedback() {
           </div>
         )}
 
-        <div className="bb-slide-up bb-bubble-appear" style={{ animationDelay: '0.6s' }}>
+        <div>
           <div className="flex justify-center mb-3">
             <img 
-              src={theme.mascotImage} 
-              alt={isActivity ? 'Coach Flex' : 'Captain Carrot'}
+              src={tipMascot} 
+              alt={tipName}
               className="w-16 h-16 object-contain drop-shadow-lg"
             />
           </div>
           
           <div className={`relative bg-white rounded-3xl border-2 ${isActivity ? 'border-blue-100' : 'border-orange-100'} shadow-lg p-5`}>
-            <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-white`}></div>
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-white"></div>
             <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-b-[14px] ${isActivity ? 'border-b-blue-100' : 'border-b-orange-100'}`}></div>
             
-            <h3 className="font-bold text-gray-800 mb-3 text-lg text-center">
-              {theme.mascotLabel}
+            <h3 className="font-bold text-gray-800 mb-3 text-center text-lg">
+              {tipName} says:
             </h3>
             
             {isLoading ? (
@@ -517,16 +496,12 @@ export default function Feedback() {
                 <p className="text-sm">Getting your personalized feedback...</p>
               </div>
             ) : feedback ? (
-              <div className="relative">
-                <p className={`text-base text-gray-700 leading-relaxed text-center ${isTyping ? 'bb-typewriter' : ''}`}>
-                  {typewriterText || feedback}
-                </p>
-                {isTyping && (
-                  <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>
-                )}
-              </div>
+              <p className="text-gray-700 text-center leading-relaxed">
+                {typewriterText || feedback}
+                {isTyping && <span className="inline-block w-0.5 h-5 bg-gray-700 ml-0.5 animate-pulse"></span>}
+              </p>
             ) : (
-              <p className="text-base text-gray-700 leading-relaxed text-center">
+              <p className="text-gray-700 text-center leading-relaxed">
                 {isActivity 
                   ? "Great job staying active! Keep moving and having fun!" 
                   : "Great food choices! You're fueling your body with awesome stuff!"}
@@ -535,11 +510,10 @@ export default function Feedback() {
           </div>
         </div>
 
-        <div className="space-y-3 pt-4">
+        <div className="space-y-3 pt-2">
           <Button
             onClick={handleLogAnother}
-            className={`w-full ${isActivity ? 'bg-blue-500 hover:bg-blue-600' : 'bg-orange-500 hover:bg-orange-600'} text-white h-14 text-base font-bold uppercase tracking-wider shadow-lg`}
-            style={{ borderRadius: '16px' }}
+            className={`w-full ${theme.buttonBg} text-white h-14 text-base font-bold uppercase tracking-wider shadow-lg rounded-2xl`}
           >
             <RotateCcw size={20} className="mr-2" />
             {isActivity ? 'LOG ANOTHER ACTIVITY' : 'LOG ANOTHER MEAL'}
@@ -548,8 +522,7 @@ export default function Feedback() {
           <Button
             onClick={handleBackToDashboard}
             variant="outline"
-            className={`w-full border-2 ${isActivity ? 'border-blue-500 text-blue-500 hover:bg-blue-50' : 'border-orange-500 text-orange-500 hover:bg-orange-50'} h-14 text-base font-bold uppercase tracking-wider`}
-            style={{ borderRadius: '16px' }}
+            className={`w-full border-2 ${theme.buttonOutline} h-14 text-base font-bold uppercase tracking-wider rounded-2xl`}
           >
             <Home size={20} className="mr-2" />
             BACK TO DASHBOARD
