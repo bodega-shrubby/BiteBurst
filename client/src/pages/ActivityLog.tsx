@@ -128,7 +128,7 @@ export default function ActivityLog() {
       };
       
       localStorage.setItem('lastLogData', JSON.stringify(logData));
-      setLocation(`/success?logId=${response.id}&xp=${response.xpAwarded}&type=activity`);
+      setLocation(`/feedback?logId=${response.id}&xp=${response.xpAwarded}&type=activity`);
     },
     onError: (error) => {
       console.error('Activity log error:', error);

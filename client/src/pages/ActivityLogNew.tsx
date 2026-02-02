@@ -64,10 +64,10 @@ export default function ActivityLogNew() {
         });
       }
 
-      // Navigate to success/feedback page with XP data
+      // Navigate to feedback page with XP data
       reset();
-      const successUrl = `/success?logId=temp&xp=${xpToAdd}&type=activity`;
-      setLocation(successUrl);
+      const feedbackUrl = `/feedback?logId=temp&xp=${xpToAdd}&type=activity`;
+      setLocation(feedbackUrl);
     } catch (error) {
       console.error('Failed to submit activity log:', error);
       toast({

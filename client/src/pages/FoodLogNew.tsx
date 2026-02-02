@@ -94,8 +94,8 @@ export default function FoodLogNew() {
         localStorage.setItem('lastLogData', JSON.stringify(data));
       }
       reset();
-      const successUrl = `/success?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || getTotalXP()}`;
-      setLocation(successUrl);
+      const feedbackUrl = `/feedback?logId=${data?.id || 'temp'}&xp=${(data as any)?.xpAwarded || getTotalXP()}&type=food`;
+      setLocation(feedbackUrl);
     },
     onError: (error: any) => {
       toast({
