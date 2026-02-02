@@ -587,34 +587,32 @@ export default function Feedback() {
 
             <div className="hidden lg:block w-[280px] bg-gray-50 border-l border-gray-200 p-4 space-y-4 overflow-y-auto">
               <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center text-center">
                   <img
                     src={tipMascot}
                     alt={tipName}
-                    className="w-28 h-28 object-contain flex-shrink-0 drop-shadow-lg"
+                    className="w-28 h-28 object-contain drop-shadow-lg mb-3"
                   />
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-800 text-sm">{tipName} says:</p>
-                    {isLoadingFeedback ? (
-                      <div className="text-gray-500 py-2">
-                        <div className={`animate-spin w-4 h-4 border-2 ${isActivity ? 'border-blue-500' : 'border-orange-500'} border-t-transparent rounded-full mb-1`}></div>
-                        <p className="text-xs">Getting feedback...</p>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-700 leading-relaxed mt-1">
-                        {feedback || (isActivity
-                          ? "Great job staying active! Keep moving and having fun! 💪"
-                          : "Great food choices! You're fueling your body with awesome stuff! 🥕")}
-                      </p>
-                    )}
-                  </div>
+                  <p className="font-bold text-gray-800 text-base mb-2">{tipName} says:</p>
+                  {isLoadingFeedback ? (
+                    <div className="text-gray-500 py-2">
+                      <div className={`animate-spin w-4 h-4 border-2 ${isActivity ? 'border-blue-500' : 'border-orange-500'} border-t-transparent rounded-full mx-auto mb-1`}></div>
+                      <p className="text-xs">Getting feedback...</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {feedback || (isActivity
+                        ? "Great job staying active! Keep moving and having fun! 💪"
+                        : "Great food choices! You're fueling your body with awesome stuff! 🥕")}
+                    </p>
+                  )}
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-gray-100">
-                  <p className="text-xs text-gray-500 font-medium">
+                <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+                  <p className="text-xs text-gray-500 font-medium mb-1">
                     {isActivity ? '💪 Coach\'s Tip' : '🥕 Captain\'s Tip'}
                   </p>
-                  <p className="text-sm text-gray-700 mt-1">
+                  <p className="text-sm text-gray-700">
                     {isActivity
                       ? "Keep moving, future champion! Exercise makes you stronger every day! 🏆"
                       : "You're eating like a true hero! Keep up the super healthy choices! ⭐"}
