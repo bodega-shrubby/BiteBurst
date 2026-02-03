@@ -5,6 +5,7 @@ import { useActiveChild } from '@/hooks/useActiveChild';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { X } from 'lucide-react';
+import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
 
 function OrangeBurst({ filled = true, size = 20 }: { filled?: boolean; size?: number }) {
   return (
@@ -580,8 +581,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           </div>
 
           <div className="bg-white rounded-2xl p-6 border border-orange-200 shadow-sm">
-            <div className="w-24 h-24 mx-auto bg-orange-100 rounded-full flex items-center justify-center animate-bounce">
-              <span className="text-5xl">🥕</span>
+            <div className="w-32 h-32 mx-auto animate-bounce">
+              <img
+                src={captainCarrotImage}
+                alt="Captain Carrot"
+                className="w-full h-full object-contain drop-shadow-lg"
+              />
             </div>
 
             <div className="bg-orange-50 rounded-xl p-4 border border-orange-200 mt-4">
