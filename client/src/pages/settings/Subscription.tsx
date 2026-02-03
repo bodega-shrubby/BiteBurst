@@ -103,14 +103,25 @@ export default function Subscription() {
         method: 'POST',
         body: data,
       });
-      return response.json();
+      const result = await response.json();
+      console.log('Checkout session response:', result);
+      return result;
     },
     onSuccess: (data) => {
+      console.log('Checkout success, redirecting to:', data.url);
       if (data.url) {
-        window.location.href = data.url;
+        window.location.assign(data.url);
+      } else {
+        console.error('No URL in response:', data);
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
       }
     },
     onError: (error: any) => {
+      console.error('Checkout error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to start checkout. Please try again.",
