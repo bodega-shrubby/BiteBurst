@@ -91,7 +91,18 @@ export interface IStorage {
   markLessonComplete(userId: string, lessonId: string, xpEarned: number, childId?: string): Promise<void>;
   
   // Lesson operations
-  getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined>;
+  getLessonWithSteps(lessonId: string): Promise<{ 
+    id: string; 
+    title: string; 
+    description?: string; 
+    totalSteps: number; 
+    steps: any[];
+    learningTakeaway?: string;
+    mascotIntro?: string;
+    mascotId?: string;
+    orderInUnit?: number;
+    iconEmoji?: string;
+  } | undefined>;
   
   // Mascot operations
   getMascots(): Promise<Mascot[]>;
@@ -104,6 +115,7 @@ export interface IStorage {
   // Topic operations
   getTopicsByCurriculum(curriculumId: string): Promise<Topic[]>;
   getTopicsByYearGroup(yearGroup: string): Promise<Topic[]>;
+  getTopicById(topicId: string): Promise<Topic | undefined>;
   
   // Lesson by topic operations
   getLessonsByTopic(topicId: string): Promise<Lesson[]>;
@@ -343,7 +355,18 @@ export class DatabaseStorage implements IStorage {
     return attempt;
   }
   
-  async getLessonWithSteps(lessonId: string): Promise<{ id: string; title: string; description?: string; totalSteps: number; steps: any[] } | undefined> {
+  async getLessonWithSteps(lessonId: string): Promise<{ 
+    id: string; 
+    title: string; 
+    description?: string; 
+    totalSteps: number; 
+    steps: any[];
+    learningTakeaway?: string;
+    mascotIntro?: string;
+    mascotId?: string;
+    orderInUnit?: number;
+    iconEmoji?: string;
+  } | undefined> {
     // Get lesson data
     const [lesson] = await db
       .select()
@@ -373,6 +396,11 @@ export class DatabaseStorage implements IStorage {
       title: lesson.title,
       description: lesson.description || undefined,
       totalSteps: lesson.totalSteps || steps.length,
+      learningTakeaway: lesson.learningTakeaway || undefined,
+      mascotIntro: lesson.mascotIntro || undefined,
+      mascotId: lesson.mascotId || undefined,
+      orderInUnit: lesson.orderInUnit || undefined,
+      iconEmoji: lesson.iconEmoji || undefined,
       steps: steps.map(step => ({
         id: step.id,
         stepNumber: step.stepNumber,
@@ -418,6 +446,11 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(topics)
       .where(and(eq(topics.yearGroup, yearGroup), eq(topics.isActive, true)))
       .orderBy(topics.orderPosition);
+  }
+  
+  async getTopicById(topicId: string): Promise<Topic | undefined> {
+    const [topic] = await db.select().from(topics).where(eq(topics.id, topicId));
+    return topic || undefined;
   }
   
   // Lesson by topic operations

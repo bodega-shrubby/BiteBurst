@@ -20,6 +20,23 @@ interface ApiLesson {
   state: LessonState;
 }
 
+interface TopicData {
+  id: string;
+  title: string;
+  description: string | null;
+  iconEmoji: string | null;
+  defaultMascotId: string | null;
+  yearGroup: string | null;
+  curriculumId: string;
+  mascot: {
+    id: string;
+    name: string;
+    emoji: string;
+    imagePath: string | null;
+  } | null;
+  lessonCount: number;
+}
+
 interface LessonDisplayData {
   id: string;
   title: string;
@@ -363,6 +380,14 @@ export default function Lessons() {
     enabled: !!user && !!curriculumId,
   });
 
+  const topicId = apiLessons?.[0]?.topicId;
+
+  const { data: topicData, isLoading: topicLoading } = useQuery<TopicData>({
+    queryKey: ['/api/topics', topicId],
+    queryFn: () => apiRequest(`/api/topics/${topicId}`),
+    enabled: !!topicId,
+  });
+
   const displayLessons: LessonDisplayData[] = useMemo(() => {
     if (apiLessons && apiLessons.length > 0) {
       const mappedLessons: CleanLesson[] = apiLessons.map(l => ({
@@ -390,7 +415,7 @@ export default function Lessons() {
     return current?.id || displayLessons[0]?.id || 'fuel-for-football';
   };
 
-  if (loading || lessonsLoading) {
+  if (loading || lessonsLoading || topicLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -453,27 +478,39 @@ export default function Lessons() {
                   className="px-6 py-6"
                   style={{ background: 'linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%)' }}
                 >
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-2 mb-3">
                     <button 
                       onClick={() => setLocation('/dashboard')}
                       className="text-white/80 hover:text-white text-sm flex items-center space-x-1"
                     >
                       <span>←</span>
-                      <span>Back</span>
+                      <span>Back to Topics</span>
                     </button>
                     <span className="text-white/40">|</span>
                     <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium">
-                      Week 1 of 8
+                      Unit 1
                     </span>
                   </div>
-                  <h1 className="text-2xl font-bold text-white">Sports Nutrition: Week 1</h1>
-                  <p className="text-orange-100 text-sm mt-1 flex items-center space-x-2">
-                    <span>⚽ Football Edition</span>
-                    <span>•</span>
-                    <span>{displayLessons.length} Lessons</span>
-                    <span>•</span>
-                    <span>~{displayLessons.length * 5} min</span>
-                  </p>
+                  <h1 className="text-2xl font-bold text-white flex items-center space-x-2">
+                    <span>{topicData?.iconEmoji || '📚'}</span>
+                    <span>{topicData?.title || 'Lessons'}</span>
+                  </h1>
+                  {topicData?.description && (
+                    <p className="text-orange-100 text-sm mt-2 max-w-lg">
+                      {topicData.description}
+                    </p>
+                  )}
+                  <div className="flex items-center space-x-3 mt-3">
+                    <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
+                      {topicData?.mascot?.emoji || '🥕'} {topicData?.mascot?.name || 'Captain Carrot'}
+                    </span>
+                    <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
+                      {displayLessons.length} Lessons
+                    </span>
+                    <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
+                      ~{displayLessons.length * 5} min
+                    </span>
+                  </div>
                 </div>
 
                 <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">

@@ -26,7 +26,7 @@ interface LessonPlayerProps {
   lessonId: string;
 }
 
-type LessonState = 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
+type LessonState = 'intro' | 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
 
 type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
 
@@ -66,6 +66,11 @@ interface LessonData {
   description: string;
   totalSteps: number;
   steps: LessonStep[];
+  learningTakeaway?: string;
+  mascotIntro?: string;
+  mascotId?: string;
+  orderInUnit?: number;
+  iconEmoji?: string;
 }
 
 export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
@@ -74,7 +79,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [, setLocation] = useLocation();
   
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [lessonState, setLessonState] = useState<LessonState>('asking');
+  const [lessonState, setLessonState] = useState<LessonState>('intro');
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
   const [lives, setLives] = useState(5);
@@ -552,6 +557,54 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-orange-100 to-white flex items-center justify-center">
         <div className="text-lg font-semibold text-red-600">Lesson not found</div>
+      </div>
+    );
+  }
+
+  if (lessonState === 'intro') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4">
+        <div className="max-w-sm w-full text-center space-y-6">
+          <div>
+            <span className="bg-orange-100 text-orange-600 text-xs px-3 py-1 rounded-full font-medium">
+              Lesson {lessonData.orderInUnit || 1}
+            </span>
+            <h2 className="text-2xl font-bold text-gray-900 mt-3">
+              {lessonData.iconEmoji || '📚'} {lessonData.title}
+            </h2>
+            {lessonData.description && (
+              <p className="text-gray-600 text-sm mt-1">
+                {lessonData.description}
+              </p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-orange-200 shadow-sm">
+            <div className="w-24 h-24 mx-auto bg-orange-100 rounded-full flex items-center justify-center animate-bounce">
+              <span className="text-5xl">🥕</span>
+            </div>
+
+            <div className="bg-orange-50 rounded-xl p-4 border border-orange-200 mt-4">
+              <p className="text-gray-800 text-sm leading-relaxed">
+                {lessonData.mascotIntro || "Hey Superhero! 🦸‍♀️ Let's learn something new today! Tap the healthy choices to power up!"}
+              </p>
+            </div>
+          </div>
+
+          {lessonData.learningTakeaway && (
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <p className="text-xs text-blue-600 font-medium mb-1">🎯 LEARNING GOAL</p>
+              <p className="text-sm text-blue-800">"{lessonData.learningTakeaway}"</p>
+            </div>
+          )}
+
+          <button
+            onClick={() => setLessonState('asking')}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl text-lg transition shadow-lg"
+          >
+            Let's Go! 🚀
+          </button>
+        </div>
       </div>
     );
   }

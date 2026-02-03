@@ -10,6 +10,7 @@ import { registerDailySummaryV2Routes } from "./routes/dailySummaryV2";
 import { registerBadgeRoutes } from "./routes/badges";
 import { registerLeaderboardRoutes } from "./routes/leaderboard";
 import { registerLessonRoutes } from "./routes/lessons";
+import { registerTopicRoutes } from "./routes/topics";
 import { registerSettingsRoutes } from "./routes/settings";
 import { updateStreak, getCurrentTime } from "./utils/streakTracker";
 import { requireAuth } from "./middleware/auth";
@@ -441,6 +442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerBadgeRoutes(app, requireAuth);
   registerLeaderboardRoutes(app, requireAuth);
   registerLessonRoutes(app, requireAuth);
+  registerTopicRoutes(app, requireAuth);
   registerSettingsRoutes(app, requireAuth);
   registerDevRoutes(app); // Development testing routes
 
