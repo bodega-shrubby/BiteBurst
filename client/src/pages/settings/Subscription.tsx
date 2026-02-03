@@ -274,6 +274,12 @@ export default function Subscription() {
                   </div>
 
                   <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (individualPrice) {
+                        handleChoosePlan('individual', individualPrice.price_id);
+                      }
+                    }}
                     className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition"
                     disabled={checkoutMutation.isPending || !individualPrice}
                   >
