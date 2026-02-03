@@ -502,9 +502,6 @@ export default function Lessons() {
                   )}
                   <div className="flex items-center space-x-3 mt-3">
                     <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
-                      {topicData?.mascot?.emoji || '🥕'} {topicData?.mascot?.name || 'Captain Carrot'}
-                    </span>
-                    <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
                       {displayLessons.length} Lessons
                     </span>
                     <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
