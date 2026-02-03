@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Lesson UI Wireframes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-yellow-50 min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-3 mb-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+          <span class="text-3xl">🍊</span>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-900">BiteBurst</h1>
+      </div>
+      <h2 class="text-2xl font-semibold text-orange-600 mb-2">Lesson UI Wireframes</h2>
+      <p class="text-gray-600">Mobile-first interactive wireframes for the redesigned lesson experience</p>
+    </div>
+
+    <!-- Wireframe Grid -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Question Types Section -->
+      <div class="col-span-full">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">❓</span>
+          Question Types
+        </h3>
+      </div>
+
+      <a href="01-question-multiple-choice.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-orange-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">🔘</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Multiple Choice</h4>
+            <p class="text-sm text-gray-500">Tap to select from options</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="02-question-true-false.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-orange-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl">✓✗</div>
+          <div>
+            <h4 class="font-bold text-gray-900">True / False</h4>
+            <p class="text-sm text-gray-500">Binary choice with swipe support</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="03-question-drag-drop.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-orange-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl">↕️</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Drag & Drop</h4>
+            <p class="text-sm text-gray-500">Sort items into categories</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="04-question-fill-blank.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-orange-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-2xl">📝</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Fill in the Blank</h4>
+            <p class="text-sm text-gray-500">Select words to complete sentence</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="05-question-matching-pairs.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-orange-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center text-2xl">🔗</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Matching Pairs</h4>
+            <p class="text-sm text-gray-500">Connect related items</p>
+          </div>
+        </div>
+      </a>
+
+      <!-- Feedback States Section -->
+      <div class="col-span-full mt-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">💬</span>
+          Feedback States
+        </h3>
+      </div>
+
+      <a href="06-feedback-correct.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-green-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl">🎉</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Correct Answer</h4>
+            <p class="text-sm text-gray-500">Celebration + XP reward</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="07-feedback-try-again.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-red-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-2xl">😅</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Try Again (1st Wrong)</h4>
+            <p class="text-sm text-gray-500">Encouraging retry with Oni_oops</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="08-feedback-incorrect-hint.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-blue-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">💡</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Hint Mode (2nd Wrong)</h4>
+            <p class="text-sm text-gray-500">Helpful hint with Oni_hint</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="09-feedback-learn-card.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-purple-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl">📚</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Learn Card (3rd Wrong)</h4>
+            <p class="text-sm text-gray-500">Educational content reveal</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="10-lesson-complete.html" class="block bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border-2 border-transparent hover:border-orange-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-2xl">🏆</div>
+          <div>
+            <h4 class="font-bold text-gray-900">Lesson Complete</h4>
+            <p class="text-sm text-gray-500">Stats + celebration + achievements</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Footer Info -->
+    <div class="mt-12 text-center text-gray-500 text-sm">
+      <p>These wireframes use Tailwind CSS and are designed for mobile-first responsive views.</p>
+      <p class="mt-1">Open each file directly in a browser to preview the design.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Wireframe - Learn Card (3rd Attempt)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    .animate-pulse-slow { animation: pulse 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-8">
+  <div class="max-w-sm w-full">
+    <div class="text-white text-center mb-4">
+      <h1 class="text-xl font-bold">Learn Card (After 3 Attempts)</h1>
+      <p class="text-gray-400 text-sm">Mobile View • State: Learn - Educational Content</p>
+    </div>
+
+    <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border-8 border-gray-800">
+      <div class="bg-gradient-to-b from-purple-50 to-white min-h-[650px]">
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 p-4 bg-white border-b border-gray-100">
+          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100">
+            <span class="text-gray-500 text-xl">✕</span>
+          </button>
+          <div class="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full" style="width: 40%"></div>
+          </div>
+          <div class="flex gap-0.5">
+            <!-- 2 filled bursts, 3 dimmed -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#E5E5E5" class="opacity-40 scale-90"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#E5E5E5" class="opacity-40 scale-90"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#E5E5E5" class="opacity-40 scale-90"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="p-6 space-y-4">
+          <!-- Sad Mascot (but supportive) -->
+          <div class="flex justify-center">
+            <div class="w-20 h-20 bg-purple-400 rounded-full flex items-center justify-center shadow-lg border-4 border-purple-500">
+              <span class="text-3xl">📚</span>
+            </div>
+          </div>
+          <p class="text-center text-xs text-gray-500">[Oni_sad → Teaching mode]</p>
+
+          <!-- Learning Moment Header -->
+          <div class="text-center">
+            <p class="text-purple-600 font-semibold text-sm">Let's learn together!</p>
+            <h2 class="text-lg font-bold text-gray-900">
+              Living vs Non-Living Things
+            </h2>
+          </div>
+
+          <!-- Learn Card Content -->
+          <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 space-y-4 animate-fade-in">
+            <!-- The Correct Answer -->
+            <div class="flex items-center gap-3 p-3 bg-green-100 rounded-xl border border-green-300">
+              <span class="text-green-500 text-lg">✓</span>
+              <span class="text-2xl">👧</span>
+              <div>
+                <span class="font-medium text-gray-900">Little Girl</span>
+                <p class="text-xs text-green-600">This is the correct answer!</p>
+              </div>
+            </div>
+
+            <!-- Educational Explanation -->
+            <div class="space-y-3">
+              <p class="text-gray-700 text-sm leading-relaxed">
+                <strong>Living things</strong> need certain things to survive:
+              </p>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-2 bg-white rounded-xl">
+                  <span class="text-xl">💧</span>
+                  <p class="text-xs text-gray-600">Water</p>
+                </div>
+                <div class="p-2 bg-white rounded-xl">
+                  <span class="text-xl">🍎</span>
+                  <p class="text-xs text-gray-600">Food</p>
+                </div>
+                <div class="p-2 bg-white rounded-xl">
+                  <span class="text-xl">💨</span>
+                  <p class="text-xs text-gray-600">Air</p>
+                </div>
+              </div>
+              <p class="text-gray-700 text-sm leading-relaxed">
+                A teddy bear and toy car are <strong>non-living</strong> - they don't breathe, eat, or grow!
+              </p>
+            </div>
+
+            <!-- Fun Fact -->
+            <div class="flex items-start gap-2 p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+              <span class="text-lg">⭐</span>
+              <div>
+                <p class="text-xs font-semibold text-yellow-800">Fun Fact!</p>
+                <p class="text-xs text-yellow-700">
+                  Your body is about 60% water - that's why drinking water is so important!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partial XP -->
+          <div class="flex items-center justify-center">
+            <div class="px-4 py-2 bg-gray-100 rounded-full border border-gray-200">
+              <span class="text-gray-600 font-medium">+2 XP</span>
+              <span class="ml-1 text-sm text-gray-400">(for learning)</span>
+            </div>
+          </div>
+
+          <!-- CTA Button -->
+          <button class="w-full py-4 rounded-2xl bg-purple-500 text-white font-bold text-lg uppercase tracking-wide shadow-lg hover:bg-purple-600">
+            Got It! Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

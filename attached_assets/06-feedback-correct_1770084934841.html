@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Wireframe - Correct Answer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.05); }
+    }
+    @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+    .animate-bounce-slow { animation: bounce 0.6s ease-in-out infinite; }
+    .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+  </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-8">
+  <div class="max-w-sm w-full">
+    <div class="text-white text-center mb-4">
+      <h1 class="text-xl font-bold">Correct Answer</h1>
+      <p class="text-gray-400 text-sm">Mobile View • State: Success</p>
+    </div>
+
+    <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border-8 border-gray-800">
+      <div class="bg-gradient-to-b from-green-50 to-white min-h-[650px]">
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 p-4 bg-white border-b border-gray-100">
+          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100">
+            <span class="text-gray-500 text-xl">✕</span>
+          </button>
+          <div class="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full" style="width: 40%"></div>
+          </div>
+          <div class="flex gap-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="p-6 space-y-5">
+          <!-- Celebrating Mascot with Sparkles -->
+          <div class="flex justify-center relative">
+            <span class="absolute -top-2 -left-8 text-2xl animate-ping">✨</span>
+            <span class="absolute -top-2 -right-8 text-2xl animate-ping" style="animation-delay: 0.1s">⭐</span>
+            <div class="w-28 h-28 bg-orange-400 rounded-full flex items-center justify-center shadow-lg border-4 border-orange-500 animate-bounce-slow">
+              <span class="text-5xl">🎉</span>
+            </div>
+            <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xl animate-ping" style="animation-delay: 0.2s">🌟</span>
+          </div>
+          <p class="text-center text-xs text-gray-500">[Oni_celebrate] - Bounce + sparkles animation</p>
+
+          <!-- Question Recap -->
+          <div class="text-center">
+            <h2 class="text-lg font-bold text-gray-900 mb-2">
+              Which one needs water to stay alive?
+            </h2>
+          </div>
+
+          <!-- Correct Answer Highlighted -->
+          <div class="p-4 rounded-2xl border-2 border-green-400 bg-green-50">
+            <div class="flex items-center justify-center gap-3">
+              <span class="text-green-500 text-xl">✓</span>
+              <span class="text-2xl">👧</span>
+              <span class="text-lg font-medium text-gray-900">Little Girl</span>
+            </div>
+          </div>
+
+          <!-- Success Feedback Speech Bubble -->
+          <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4">
+            <p class="text-green-800 font-semibold mb-2">🎉 Correct! You're amazing!</p>
+            <p class="text-green-700 text-sm">
+              You are alive, so you need water. Teddy bears are toys - they don't need water!
+            </p>
+          </div>
+
+          <!-- XP Reward -->
+          <div class="flex items-center justify-center">
+            <div class="px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full shadow-lg animate-bounce-slow">
+              <span class="text-white font-bold text-xl">+10 XP</span>
+              <span class="ml-2 text-2xl">✨</span>
+            </div>
+          </div>
+
+          <!-- Success Banner -->
+          <div class="bg-blue-500 text-white p-4 rounded-xl text-center">
+            <div class="flex items-center justify-center gap-2">
+              <span class="text-2xl">✓</span>
+              <span class="text-lg font-bold">Nice!</span>
+            </div>
+          </div>
+
+          <!-- CTA Button -->
+          <button class="w-full py-4 rounded-2xl bg-green-500 text-white font-bold text-lg uppercase tracking-wide shadow-lg hover:bg-green-600">
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Wireframe - Lesson Complete</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100px) rotate(720deg); opacity: 0; }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-15px) scale(1.1); }
+    }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-bounce-slow { animation: bounce 1s ease-in-out infinite; }
+    .animate-pulse-slow { animation: pulse 2s ease-in-out infinite; }
+    .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
+    .confetti-1 { animation: confetti 2s ease-out infinite; animation-delay: 0s; }
+    .confetti-2 { animation: confetti 2s ease-out infinite; animation-delay: 0.2s; }
+    .confetti-3 { animation: confetti 2s ease-out infinite; animation-delay: 0.4s; }
+    .confetti-4 { animation: confetti 2s ease-out infinite; animation-delay: 0.6s; }
+  </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-8">
+  <div class="max-w-sm w-full">
+    <div class="text-white text-center mb-4">
+      <h1 class="text-xl font-bold">Lesson Complete!</h1>
+      <p class="text-gray-400 text-sm">Mobile View • State: Complete - Celebration</p>
+    </div>
+
+    <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border-8 border-gray-800">
+      <div class="bg-gradient-to-b from-orange-100 via-yellow-50 to-white min-h-[650px] relative overflow-hidden">
+
+        <!-- Confetti Background -->
+        <div class="absolute inset-0 pointer-events-none">
+          <span class="absolute top-4 left-8 text-2xl confetti-1">🎊</span>
+          <span class="absolute top-4 right-8 text-2xl confetti-2">🎉</span>
+          <span class="absolute top-8 left-1/4 text-xl confetti-3">⭐</span>
+          <span class="absolute top-8 right-1/4 text-xl confetti-4">✨</span>
+          <span class="absolute top-12 left-12 text-lg confetti-2">🌟</span>
+          <span class="absolute top-12 right-12 text-lg confetti-1">🎊</span>
+        </div>
+
+        <!-- Header (Progress Complete) -->
+        <div class="flex items-center gap-3 p-4 bg-white/80 backdrop-blur border-b border-gray-100">
+          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100">
+            <span class="text-gray-500 text-xl">✕</span>
+          </button>
+          <div class="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-orange-500 rounded-full w-full"></div>
+          </div>
+          <div class="flex gap-0.5">
+            <!-- All 5 bursts filled -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="p-6 space-y-4 relative z-10">
+          <!-- Celebrating Mascot -->
+          <div class="flex justify-center">
+            <div class="relative">
+              <div class="w-32 h-32 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-xl border-4 border-orange-300 animate-bounce-slow">
+                <span class="text-6xl">🥳</span>
+              </div>
+              <span class="absolute -top-2 -right-2 text-3xl">🎉</span>
+              <span class="absolute -bottom-1 -left-2 text-2xl">⭐</span>
+            </div>
+          </div>
+          <p class="text-center text-xs text-gray-500">[Oni_proud] - Big celebration animation</p>
+
+          <!-- Completion Message -->
+          <div class="text-center animate-slide-up" style="animation-delay: 0.2s">
+            <h2 class="text-2xl font-bold text-gray-900 mb-1">Lesson Complete!</h2>
+            <p class="text-orange-600 font-medium">Amazing work, you're a star! ⭐</p>
+          </div>
+
+          <!-- Stats Card -->
+          <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-orange-100 animate-slide-up" style="animation-delay: 0.4s">
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div class="text-3xl font-bold text-orange-500">85</div>
+                <div class="text-xs text-gray-500">Total XP</div>
+              </div>
+              <div>
+                <div class="text-3xl font-bold text-green-500">8/10</div>
+                <div class="text-xs text-gray-500">Correct</div>
+              </div>
+              <div>
+                <div class="text-3xl font-bold text-yellow-500">80%</div>
+                <div class="text-xs text-gray-500">Accuracy</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Achievement Unlocked (Optional) -->
+          <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 text-white animate-slide-up animate-pulse-slow" style="animation-delay: 0.6s">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <span class="text-2xl">🏆</span>
+              </div>
+              <div>
+                <p class="text-xs opacity-80">Achievement Unlocked!</p>
+                <p class="font-bold">Water Wisdom Expert</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Streak Bonus -->
+          <div class="flex items-center justify-center gap-3 bg-orange-50 rounded-xl p-3 animate-slide-up" style="animation-delay: 0.8s">
+            <span class="text-2xl">🔥</span>
+            <div>
+              <p class="font-bold text-orange-600">7 Day Streak!</p>
+              <p class="text-xs text-orange-500">+5 bonus XP</p>
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="space-y-3 animate-slide-up" style="animation-delay: 1s">
+            <button class="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-lg uppercase tracking-wide shadow-lg hover:from-orange-600 hover:to-orange-700">
+              Continue Learning
+            </button>
+            <button class="w-full py-3 rounded-2xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200">
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
