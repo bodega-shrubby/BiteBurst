@@ -626,13 +626,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         
         {lessonState === 'learn' && currentStep && (
           <LessonLearn
-            title="Living vs Non-Living Things"
+            title={currentStep.question || "Learning Time"}
             body={currentStep.retryConfig?.messages.learnCard || getStepFeedbackMessage(currentStep, 'motivating_fail') || "Let's learn more about this!"}
             onContinue={handleLearnContinue}
             xpEarned={calculateXP(currentStep, 3)}
             correctAnswer={getCorrectAnswerText(currentStep)}
             correctAnswerEmoji={getCorrectAnswerEmoji(currentStep)}
-            funFact="Your body is about 60% water - that's why drinking water is so important!"
           />
         )}
         

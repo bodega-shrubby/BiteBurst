@@ -10,7 +10,6 @@ interface LessonLearnProps {
   message?: string;
   correctAnswer?: string;
   correctAnswerEmoji?: string;
-  funFact?: string;
 }
 
 export default function LessonLearn({ 
@@ -21,8 +20,7 @@ export default function LessonLearn({
   xpEarned = 0,
   message,
   correctAnswer,
-  correctAnswerEmoji,
-  funFact
+  correctAnswerEmoji
 }: LessonLearnProps) {
   const content = body || message || "";
   
@@ -91,35 +89,8 @@ export default function LessonLearn({
             )}
           </div>
 
-          {/* Visual Icons Grid - if content suggests it */}
-          {content && typeof content === 'string' && content.toLowerCase().includes('water') && (
-            <div className="grid grid-cols-3 gap-2 text-center pt-2">
-              <div className="p-2 bg-white rounded-xl">
-                <span className="text-xl">💧</span>
-                <p className="text-xs text-gray-600">Water</p>
-              </div>
-              <div className="p-2 bg-white rounded-xl">
-                <span className="text-xl">🍎</span>
-                <p className="text-xs text-gray-600">Food</p>
-              </div>
-              <div className="p-2 bg-white rounded-xl">
-                <span className="text-xl">💨</span>
-                <p className="text-xs text-gray-600">Air</p>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Fun Fact Callout */}
-        {funFact && (
-          <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-xl border border-yellow-200">
-            <span className="text-lg">⭐</span>
-            <div>
-              <p className="text-xs font-semibold text-yellow-800">Fun Fact!</p>
-              <p className="text-xs text-yellow-700">{funFact}</p>
-            </div>
-          </div>
-        )}
 
         {/* Encouraging message */}
         <p className="text-center text-gray-600 text-sm">
