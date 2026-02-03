@@ -54,11 +54,10 @@ export default function Subscription() {
 
   const processCheckoutSuccess = async (sessionId: string) => {
     try {
-      const response = await apiRequest('/api/stripe/checkout-success', {
+      const data = await apiRequest('/api/stripe/checkout-success', {
         method: 'POST',
         body: { sessionId },
       });
-      const data = await response.json();
       
       if (data.success) {
         toast({
@@ -99,11 +98,10 @@ export default function Subscription() {
   // Create checkout session mutation
   const checkoutMutation = useMutation({
     mutationFn: async (data: { priceId: string; childrenLimit: number }) => {
-      const response = await apiRequest('/api/stripe/create-checkout-session', {
+      const result = await apiRequest('/api/stripe/create-checkout-session', {
         method: 'POST',
         body: data,
       });
-      const result = await response.json();
       console.log('Checkout session response:', result);
       return result;
     },
@@ -133,10 +131,9 @@ export default function Subscription() {
   // Create portal session mutation (for managing subscription)
   const portalMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('/api/stripe/create-portal-session', {
+      return await apiRequest('/api/stripe/create-portal-session', {
         method: 'POST',
       });
-      return response.json();
     },
     onSuccess: (data) => {
       if (data.url) {
@@ -155,10 +152,9 @@ export default function Subscription() {
   // Cancel subscription mutation
   const cancelMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('/api/stripe/cancel-subscription', {
+      return await apiRequest('/api/stripe/cancel-subscription', {
         method: 'POST',
       });
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription'] });
