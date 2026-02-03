@@ -1,14 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
-import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
+import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
 
 type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
 
-// Helper to extract feedback text from string or object
 function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | 'hint' | 'fail' = 'success'): string | undefined {
   if (!feedback) return undefined;
   if (typeof feedback === 'string') return feedback;
-  // It's an object with structured feedback
   switch (type) {
     case 'success': return feedback.success;
     case 'hint': return feedback.hint_after_2;
@@ -62,7 +60,6 @@ export default function LessonSuccess({
 
   const correctOption = getCorrectOption();
 
-  // Special handling for matching game success
   const renderMatchingSuccess = () => {
     if (!step.content.matchingPairs) return null;
     
@@ -72,7 +69,6 @@ export default function LessonSuccess({
           ✅ Nice! Perfect matches!
         </div>
         
-        {/* Show each correct match */}
         <div className="space-y-3">
           {step.content.matchingPairs.map((pair, index) => (
             <div
@@ -88,7 +84,6 @@ export default function LessonSuccess({
           ))}
         </div>
         
-        {/* Show lesson feedback with player references */}
         {getFeedbackText(step.content.feedback, 'success') && (
           <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
             <div className="text-sm text-green-700 whitespace-pre-line">
@@ -100,7 +95,6 @@ export default function LessonSuccess({
     );
   };
   
-  // Special handling for ordering game success
   const renderOrderingSuccess = () => {
     if (!step.content.orderingItems) return null;
     
@@ -112,7 +106,6 @@ export default function LessonSuccess({
           ✅ Nice! Perfect order!
         </div>
         
-        {/* Show the correct sequence */}
         <div className="space-y-2">
           {sortedItems.map((item, index) => (
             <div
@@ -129,7 +122,6 @@ export default function LessonSuccess({
           ))}
         </div>
         
-        {/* Show lesson feedback with player references */}
         {getFeedbackText(step.content.feedback, 'success') && (
           <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
             <div className="text-sm text-green-700">
@@ -143,13 +135,16 @@ export default function LessonSuccess({
 
   return (
     <div className="max-w-md mx-auto space-y-6">
-      {/* Sunny Celebrating */}
-      <div className="flex justify-center">
-        <img 
-          src={sunnyCelebrateImage} 
-          alt="Sunny Celebrating" 
-          className="w-24 h-24 object-contain animate-bounce"
+      {/* Celebrating Mascot with Sparkles */}
+      <div className="flex justify-center relative">
+        <span className="absolute -top-2 -left-8 text-2xl animate-ping" style={{ animationDuration: '1.5s' }}>✨</span>
+        <span className="absolute -top-2 -right-8 text-2xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }}>⭐</span>
+        <img
+          src={oniCelebrateImage}
+          alt="Oni Celebrating"
+          className="w-24 h-24 object-contain mascot-celebrate"
         />
+        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.6s' }}>🌟</span>
       </div>
 
       {/* Success Content */}
@@ -180,7 +175,6 @@ export default function LessonSuccess({
           </div>
         ) : (
           <>
-            {/* Show correct answer highlighted for non-matching questions */}
             {correctOption && (
               <div className="p-4 rounded-2xl border-2 border-green-400 bg-green-50">
                 <div className="flex items-center justify-center space-x-3">
@@ -197,7 +191,6 @@ export default function LessonSuccess({
               </div>
             )}
             
-            {/* Feedback */}
             {getFeedbackText(step.content.feedback, 'success') && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <p className="text-gray-700 leading-relaxed">
@@ -209,11 +202,11 @@ export default function LessonSuccess({
         )}
       </div>
 
-      {/* XP Animation */}
+      {/* XP Animation with Enhanced Styling */}
       <div className="text-center">
-        <div className="inline-flex items-center space-x-2 bg-yellow-100 border border-yellow-300 rounded-full px-4 py-2">
-          <span className="text-yellow-600 font-bold">+{xpEarned} XP</span>
-          <span className="text-xl animate-pulse">✨</span>
+        <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full px-6 py-3 shadow-lg animate-bounce">
+          <span className="text-white font-bold text-xl">+{xpEarned} XP</span>
+          <span className="text-2xl">✨</span>
         </div>
       </div>
 

@@ -4,7 +4,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { useActiveChild } from '@/hooks/useActiveChild';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { X, Heart } from 'lucide-react';
+import { X } from 'lucide-react';
+
+function OrangeBurst({ filled = true, size = 20 }: { filled?: boolean; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={filled ? "#FF6A00" : "#E5E5E5"}
+      className={`transition-all duration-200 ${filled ? 'opacity-100 scale-100' : 'opacity-40 scale-90'}`}
+    >
+      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+    </svg>
+  );
+}
 import { Button } from '@/components/ui/button';
 import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, ProgressBar } from './components';
 import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
@@ -543,14 +557,9 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           <ProgressBar progress={progress} />
         </div>
         
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center gap-0.5" title="Bursts remaining">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Heart
-              key={i}
-              className={`w-6 h-6 ${
-                i < lives ? 'text-red-500 fill-current' : 'text-gray-300'
-              }`}
-            />
+            <OrangeBurst key={i} filled={i < lives} size={20} />
           ))}
         </div>
       </div>
@@ -576,6 +585,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         {lessonState === 'incorrect' && currentStep && (
           <LessonIncorrect
             message={tryAgainMessage || "Not quite right. Try again!"}
+            hint={getStepFeedbackMessage(currentStep, 'hint_after_2')}
+            attemptNumber={currentAttempt}
             onTryAgain={handleTryAgain}
             canTryAgain={true}
           />
@@ -585,6 +596,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           <LessonLearn
             body={currentStep.retryConfig?.messages.learnCard || getStepFeedbackMessage(currentStep, 'motivating_fail') || "Let's learn more about this!"}
             onContinue={handleLearnContinue}
+            xpEarned={calculateXP(currentStep, 3)}
           />
         )}
         

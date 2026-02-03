@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
 import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
 import oniTheOrangeImage from '@assets/Mascots/Oni_the_orange.png';
@@ -100,7 +99,7 @@ export default function LessonAsking({
   const getOrderingItems = () => {
     if (step.content.orderingItems) return step.content.orderingItems;
     if (step.content.items) {
-      const categories = [...new Set(step.content.items.map(i => i.category))];
+      const categories = Array.from(new Set(step.content.items.map(i => i.category)));
       return step.content.items.map((item, index) => ({
         id: item.id,
         text: item.text,
@@ -786,26 +785,19 @@ export default function LessonAsking({
 
   return (
     <div className="max-w-md mx-auto space-y-6">
-      {/* Try Again Banner */}
+      {/* Hint Banner - shown when retrying after wrong answer */}
       {banner && banner.variant === 'tryAgain' && (
         <div 
-          className="p-4 rounded-2xl border border-red-200"
-          style={{ backgroundColor: '#FDEBEC' }}
+          className="p-4 rounded-2xl border-2 bg-blue-50 border-blue-200"
           role="alert"
-          aria-live="assertive"
+          aria-live="polite"
           data-testid="try-again-banner"
         >
           <div className="flex items-start space-x-3">
-            <AlertTriangle 
-              className="w-5 h-5 mt-0.5 flex-shrink-0" 
-              style={{ color: '#9B1C1C' }} 
-              aria-hidden="true" 
-            />
+            <span className="text-2xl flex-shrink-0">💡</span>
             <div className="flex-1">
-              <p 
-                className="font-medium text-sm leading-relaxed" 
-                style={{ color: '#9B1C1C' }}
-              >
+              <p className="font-semibold text-blue-800 mb-1">Hint:</p>
+              <p className="text-blue-700 text-sm leading-relaxed">
                 {banner.text}
               </p>
             </div>
@@ -813,12 +805,12 @@ export default function LessonAsking({
         </div>
       )}
 
-      {/* Mascot - dynamic based on mascotAction or lesson */}
+      {/* Mascot - dynamic based on mascotAction or lesson with animation */}
       <div className="flex justify-center">
         <img 
-          src={getMascotImage(step.mascotAction, lessonId)} 
+          src={banner ? oniHintImage : getMascotImage(step.mascotAction, lessonId)} 
           alt="Lesson Mascot" 
-          className="w-24 h-24 object-contain"
+          className={`w-24 h-24 object-contain ${banner ? 'mascot-hint' : 'mascot-thinking'}`}
         />
       </div>
 
