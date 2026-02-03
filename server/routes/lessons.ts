@@ -108,6 +108,81 @@ async function validateChildOwnership(
 }
 
 export function registerLessonRoutes(app: Express, requireAuth: any) {
+  // Get current lesson for a user (for dashboard hero)
+  app.get('/api/user/:userId/current-lesson', requireAuth, async (req: any, res: any) => {
+    try {
+      const { userId } = req.params;
+      
+      const auth = await resolveUserAuth(userId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
+      }
+      
+      // Get user's curriculum/year group
+      const curriculumId = auth.curriculumId;
+      let yearGroup = auth.childFromChildrenTable?.yearGroup || auth.userFromUsersTable?.yearGroup;
+      
+      if (!curriculumId && !yearGroup) {
+        // Return default lesson if no curriculum set
+        return res.json({
+          id: 'default',
+          title: 'Welcome to BiteBurst',
+          emoji: '🌟',
+          current_slide: 1,
+          total_slides: 5,
+          progress_percent: 0,
+        });
+      }
+      
+      // Get all lessons for the user's year group
+      const allLessons = yearGroup ? await storage.getLessonsByYearGroup(yearGroup) : [];
+      
+      if (!allLessons || allLessons.length === 0) {
+        return res.json({
+          id: 'getting-started',
+          title: 'Getting Started',
+          emoji: '🚀',
+          current_slide: 1,
+          total_slides: 3,
+          progress_percent: 0,
+        });
+      }
+      
+      // Get completed lessons for this user
+      const completedLessons = await storage.getCompletedLessonIds(userId, undefined);
+      const completedLessonIds = new Set(completedLessons);
+      
+      // Find the first incomplete lesson (current lesson)
+      let currentLesson = allLessons.find((lesson: any) => !completedLessonIds.has(lesson.id));
+      
+      // If all lessons completed, return the last one
+      if (!currentLesson) {
+        currentLesson = allLessons[allLessons.length - 1];
+      }
+      
+      // Get the lesson's steps count
+      const lessonWithSteps = await storage.getLessonWithSteps(currentLesson.id);
+      const totalSlides = lessonWithSteps?.steps?.length || 5;
+      
+      // Get user's progress from lesson_attempts table
+      const currentSlide = 1; // Default to first step
+      const progressPercent = completedLessonIds.has(currentLesson.id) ? 100 : 0;
+      
+      res.json({
+        id: currentLesson.id,
+        title: currentLesson.title,
+        emoji: currentLesson.iconEmoji || '📚',
+        current_slide: currentSlide,
+        total_slides: totalSlides,
+        progress_percent: completedLessonIds.has(currentLesson.id) ? 100 : progressPercent,
+      });
+    } catch (error) {
+      console.error('Failed to get current lesson:', error);
+      res.status(500).json({ error: 'Failed to load current lesson' });
+    }
+  });
+
   // Get lessons by year group
   app.get('/api/lessons/year-group/:yearGroup', requireAuth, async (req: any, res: any) => {
     try {
