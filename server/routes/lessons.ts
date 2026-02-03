@@ -804,9 +804,13 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   break;
                   
                 case 'multiple-choice':
-                  // Validate multiple-choice: answer matches correct option ID
-                  if (step.content?.options) {
-                    const correctOption = step.content.options.find((o: any) => o.correct === true);
+                  // Validate multiple-choice: answer matches correct option ID or correctAnswer field
+                  if (step.content?.correctAnswer) {
+                    // Direct correctAnswer field (preferred)
+                    isCorrect = validatedData.answer === step.content.correctAnswer;
+                  } else if (step.content?.options) {
+                    // Fallback to finding correct option (check both 'correct' and 'isCorrect' fields)
+                    const correctOption = step.content.options.find((o: any) => o.correct === true || o.isCorrect === true);
                     isCorrect = correctOption && validatedData.answer === correctOption.id;
                   }
                   break;
@@ -816,8 +820,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   if (step.content?.correctAnswer !== undefined) {
                     isCorrect = validatedData.answer === String(step.content.correctAnswer);
                   } else if (step.content?.options && Array.isArray(step.content.options)) {
-                    // New format: options array with correct field
-                    const correctOption = step.content.options.find((o: any) => o.correct === true);
+                    // Options array - check both 'correct' and 'isCorrect' fields
+                    const correctOption = step.content.options.find((o: any) => o.correct === true || o.isCorrect === true);
                     isCorrect = correctOption && validatedData.answer === correctOption.id;
                   }
                   break;
