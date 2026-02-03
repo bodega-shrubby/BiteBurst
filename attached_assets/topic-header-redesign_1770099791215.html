@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteBurst Topic Header Redesign - Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .mascot-bounce {
+      animation: bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .speech-bubble {
+      position: relative;
+    }
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 30px;
+      border-width: 10px 10px 0;
+      border-style: solid;
+      border-color: white transparent transparent transparent;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+
+  <div class="max-w-4xl mx-auto space-y-8">
+
+    <!-- Title -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-800">Topic Header Redesign Wireframe</h1>
+      <p class="text-gray-600">Adding Topic Title & Description from Supabase</p>
+    </div>
+
+    <!-- ==================== -->
+    <!-- OPTION A: Enhanced Header with Topic Info -->
+    <!-- ==================== -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="bg-blue-600 text-white text-center py-2 text-sm font-bold">
+        OPTION A: Topic Info in Header (Recommended)
+      </div>
+
+      <div class="relative overflow-hidden">
+        <!-- Gradient background -->
+        <div class="px-6 py-6" style="background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%);">
+          <div class="relative z-10">
+            <!-- Back button row -->
+            <div class="flex items-center space-x-2 mb-3">
+              <button class="text-white/80 hover:text-white text-sm flex items-center space-x-1">
+                <span>←</span>
+                <span>Back to Topics</span>
+              </button>
+              <span class="text-white/40">|</span>
+              <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium">
+                Unit 1
+              </span>
+            </div>
+
+            <!-- Topic Title from DB -->
+            <h1 class="text-2xl font-bold text-white flex items-center space-x-2">
+              <span>⚡</span>
+              <span>Operation Power Up!</span>
+            </h1>
+
+            <!-- Topic Description from DB -->
+            <p class="text-orange-100 text-sm mt-2 max-w-lg">
+              Learn how food, water, and sleep fuel your body battery.
+            </p>
+
+            <!-- Meta info -->
+            <div class="flex items-center space-x-3 mt-3">
+              <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
+                🥕 Captain Carrot
+              </span>
+              <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
+                3 Lessons
+              </span>
+              <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full">
+                ~15 min
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+          <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">🏅</span>
+              <div>
+                <div class="text-base font-bold text-gray-900">0/3</div>
+                <div class="text-xs text-gray-500">Completed</div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">⚡</span>
+              <div>
+                <div class="text-base font-bold text-gray-700">0 XP</div>
+                <div class="text-xs text-gray-500">Earned</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-40">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Progress</span>
+              <span>0%</span>
+            </div>
+            <div class="bg-gray-200 rounded-full h-2">
+              <div class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-gray-50 text-sm text-gray-600">
+        <strong>Data Source:</strong> <code>topics.title</code>, <code>topics.description</code>, <code>topics.icon_emoji</code>
+      </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- OPTION B: Header + Mascot Welcome Card -->
+    <!-- ==================== -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="bg-green-600 text-white text-center py-2 text-sm font-bold">
+        OPTION B: Header + Mascot Welcome Card Below
+      </div>
+
+      <div class="relative overflow-hidden">
+        <!-- Compact Header -->
+        <div class="px-6 py-4" style="background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%);">
+          <div class="flex items-center space-x-2 mb-2">
+            <button class="text-white/80 hover:text-white text-sm">← Back</button>
+          </div>
+          <h1 class="text-xl font-bold text-white flex items-center space-x-2">
+            <span>⚡</span>
+            <span>Operation Power Up!</span>
+          </h1>
+          <p class="text-orange-100 text-sm mt-1">
+            Learn how food, water, and sleep fuel your body battery.
+          </p>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <span class="text-sm">🏅 0/3</span>
+            <span class="text-sm">⚡ 0 XP</span>
+          </div>
+          <div class="w-32 bg-gray-200 rounded-full h-2">
+            <div class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mascot Welcome Card -->
+      <div class="p-4 bg-gray-50">
+        <div class="bg-white rounded-2xl p-5 border-2 border-orange-200 shadow-sm">
+          <div class="flex items-start space-x-4">
+            <!-- Mascot -->
+            <div class="flex-shrink-0">
+              <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mascot-bounce">
+                <span class="text-4xl">🥕</span>
+              </div>
+            </div>
+
+            <!-- Speech Bubble -->
+            <div class="flex-1">
+              <div class="speech-bubble bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+                <p class="text-gray-800 font-medium">
+                  "Hey Superhero! 🦸‍♀️ I'm Captain Carrot! Let's wake up your body battery. Tap the healthy choices to charge up!"
+                </p>
+              </div>
+              <p class="text-xs text-gray-400 mt-2 ml-2">— Captain Carrot, Your Guide</p>
+            </div>
+          </div>
+
+          <!-- Start button -->
+          <button class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition">
+            🚀 Start Learning!
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 bg-gray-100 text-sm text-gray-600">
+        <strong>Data Source:</strong> <code>lessons.mascot_intro</code> for the speech bubble
+      </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- MASCOT INTRO PLACEMENT OPTIONS -->
+    <!-- ==================== -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="bg-purple-600 text-white text-center py-2 text-sm font-bold">
+        MASCOT INTRO PLACEMENT: Two Options
+      </div>
+
+      <div class="p-6 space-y-6">
+
+        <!-- Option 1: On Journey Page -->
+        <div class="border-2 border-blue-200 rounded-xl p-4 bg-blue-50">
+          <h3 class="font-bold text-blue-800 flex items-center space-x-2">
+            <span>📍</span>
+            <span>OPTION 1: On the Lessons Journey Page</span>
+          </h3>
+          <p class="text-sm text-blue-700 mt-2">Show mascot intro as a welcome card when viewing the topic's lesson list.</p>
+
+          <div class="mt-4 grid grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg p-3 border border-blue-200">
+              <p class="text-xs font-bold text-green-600 mb-2">✅ PROS</p>
+              <ul class="text-xs text-gray-600 space-y-1">
+                <li>• Sets context before starting</li>
+                <li>• User sees mascot character early</li>
+                <li>• Can skip if returning user</li>
+                <li>• Good for topic-level intro</li>
+              </ul>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-blue-200">
+              <p class="text-xs font-bold text-red-600 mb-2">❌ CONS</p>
+              <ul class="text-xs text-gray-600 space-y-1">
+                <li>• Takes up screen space</li>
+                <li>• Same intro for all 3 lessons</li>
+                <li>• May feel repetitive on return visits</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="text-xs text-blue-600 mt-3">
+            <strong>Best for:</strong> Topic-level mascot intro (same intro for all lessons in topic)
+          </p>
+        </div>
+
+        <!-- Option 2: Just Before Lesson Starts -->
+        <div class="border-2 border-green-200 rounded-xl p-4 bg-green-50">
+          <h3 class="font-bold text-green-800 flex items-center space-x-2">
+            <span>🎬</span>
+            <span>OPTION 2: Just Before the Lesson Starts (RECOMMENDED)</span>
+          </h3>
+          <p class="text-sm text-green-700 mt-2">Show a dedicated intro screen after tapping "Start" but before Q1 appears.</p>
+
+          <div class="mt-4 grid grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg p-3 border border-green-200">
+              <p class="text-xs font-bold text-green-600 mb-2">✅ PROS</p>
+              <ul class="text-xs text-gray-600 space-y-1">
+                <li>• Each lesson gets unique intro</li>
+                <li>• Builds anticipation</li>
+                <li>• Like Duolingo's lesson start</li>
+                <li>• Better for storytelling/narrative</li>
+                <li>• Can show learning_takeaway too</li>
+              </ul>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-green-200">
+              <p class="text-xs font-bold text-red-600 mb-2">❌ CONS</p>
+              <ul class="text-xs text-gray-600 space-y-1">
+                <li>• Extra tap to get to questions</li>
+                <li>• Some users may want to skip</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="text-xs text-green-600 mt-3">
+            <strong>Best for:</strong> Lesson-specific mascot intro (uses <code>lessons.mascot_intro</code>)
+          </p>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="bg-gradient-to-r from-orange-100 to-yellow-100 rounded-xl p-4 border border-orange-300">
+          <h3 class="font-bold text-orange-800">💡 MY RECOMMENDATION: Use BOTH!</h3>
+          <ul class="text-sm text-orange-700 mt-2 space-y-2">
+            <li><strong>Journey Page Header:</strong> Show topic title + description (from <code>topics</code> table)</li>
+            <li><strong>Lesson Start Screen:</strong> Show mascot intro + learning takeaway (from <code>lessons</code> table)</li>
+          </ul>
+          <p class="text-xs text-orange-600 mt-3">
+            This way, the topic sets the overall theme, and each lesson has its own unique mascot greeting!
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- LESSON START INTRO SCREEN -->
+    <!-- ==================== -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="bg-orange-500 text-white text-center py-2 text-sm font-bold">
+        LESSON START INTRO SCREEN (Before Q1)
+      </div>
+
+      <div class="p-6 bg-gradient-to-b from-orange-50 to-white">
+        <div class="max-w-sm mx-auto text-center space-y-6">
+
+          <!-- Lesson Title -->
+          <div>
+            <span class="bg-orange-100 text-orange-600 text-xs px-3 py-1 rounded-full font-medium">
+              Lesson 1 of 3
+            </span>
+            <h2 class="text-2xl font-bold text-gray-900 mt-3">🌅 The Warm Up</h2>
+            <p class="text-gray-600 text-sm mt-1">Start your engine! Learn the simple basics of food, water, and sleep.</p>
+          </div>
+
+          <!-- Mascot with Intro -->
+          <div class="bg-white rounded-2xl p-6 border border-orange-200 shadow-sm">
+            <div class="w-24 h-24 mx-auto bg-orange-100 rounded-full flex items-center justify-center mascot-bounce mb-4">
+              <span class="text-5xl">🥕</span>
+            </div>
+
+            <div class="speech-bubble bg-orange-50 rounded-xl p-4 border border-orange-200">
+              <p class="text-gray-800 text-sm leading-relaxed">
+                "Hey Superhero! 🦸‍♀️ I'm Captain Carrot! Let's wake up your body battery. Tap the healthy choices to charge up!"
+              </p>
+            </div>
+          </div>
+
+          <!-- Learning Takeaway -->
+          <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+            <p class="text-xs text-blue-600 font-medium mb-1">🎯 LEARNING GOAL</p>
+            <p class="text-sm text-blue-800">"I can recognize the basic fuels that give my body energy."</p>
+          </div>
+
+          <!-- Start Button -->
+          <button class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl text-lg transition shadow-lg">
+            Let's Go! 🚀
+          </button>
+
+        </div>
+      </div>
+
+      <div class="p-4 bg-gray-100 text-sm text-gray-600">
+        <strong>Data Source:</strong>
+        <code>lessons.title</code>,
+        <code>lessons.description</code>,
+        <code>lessons.mascot_intro</code>,
+        <code>lessons.learning_takeaway</code>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
