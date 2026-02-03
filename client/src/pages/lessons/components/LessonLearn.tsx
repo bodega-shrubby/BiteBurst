@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import oniHappyImage from '@assets/Mascots/Oni_the_orange.png';
+import oniSadImage from '@assets/Mascots/Oni_sad.png';
 
 interface LessonLearnProps {
   title?: string;
@@ -8,93 +8,143 @@ interface LessonLearnProps {
   onContinue: () => void;
   xpEarned?: number;
   message?: string;
+  correctAnswer?: string;
+  correctAnswerEmoji?: string;
+  funFact?: string;
 }
 
 export default function LessonLearn({ 
   title,
   body,
-  actionLabel = "Continue",
+  actionLabel = "Got It! Continue",
   onContinue,
   xpEarned = 0,
-  message
+  message,
+  correctAnswer,
+  correctAnswerEmoji,
+  funFact
 }: LessonLearnProps) {
   const content = body || message || "";
   
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      {/* Supportive Mascot */}
-      <div className="flex justify-center">
-        <img
-          src={oniHappyImage}
-          alt="Oni encouraging"
-          className="w-24 h-24 object-contain"
-        />
-      </div>
-
-      {/* Learn card with gradient */}
-      <div
-        className="p-6 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50"
-        role="region"
-        aria-live="polite"
-        data-testid="learn-card"
-      >
-        <div className="flex items-start space-x-4">
-          <div className="bg-indigo-100 p-3 rounded-full flex-shrink-0">
-            <span className="text-3xl">📚</span>
+    <div className="min-h-[400px] rounded-3xl bg-gradient-to-b from-purple-50 to-white p-6">
+      <div className="max-w-md mx-auto space-y-5">
+        {/* Teaching Mode Mascot */}
+        <div className="flex justify-center">
+          <div className="w-24 h-24 bg-purple-400 rounded-full flex items-center justify-center shadow-lg border-4 border-purple-500">
+            <img
+              src={oniSadImage}
+              alt="Oni teaching"
+              className="w-16 h-16 object-contain"
+            />
           </div>
+        </div>
+        <p className="text-center text-xs text-gray-500">[Teaching mode]</p>
 
-          <div className="flex-1">
-            <h3 className="font-bold text-indigo-800 text-lg mb-3">
-              {title || "Let's Learn!"}
-            </h3>
-            <div className="text-indigo-700 space-y-2">
-              {Array.isArray(content) ? (
-                <ul className="space-y-2 list-disc list-inside">
-                  {content.map((item, index) => (
-                    <li key={index} className="leading-relaxed">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : typeof content === 'string' && (content.includes('🥦') || content.includes('🥣') || content.includes('🥚') || content.includes('\n')) ? (
-                <div className="space-y-2">
-                  {content.split('\n').map((line, index) => (
-                    <div key={index} className="leading-relaxed">
-                      {line}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="leading-relaxed">{content}</p>
-              )}
+        {/* Learning Moment Header */}
+        <div className="text-center">
+          <p className="text-purple-600 font-semibold text-sm">Let's learn together!</p>
+          <h2 className="text-lg font-bold text-gray-900">
+            {title || "Learning Time"}
+          </h2>
+        </div>
+
+        {/* Correct Answer Reveal */}
+        {correctAnswer && (
+          <div className="flex items-center gap-3 p-4 bg-green-100 rounded-xl border border-green-300">
+            <span className="text-green-500 text-xl">✓</span>
+            {correctAnswerEmoji && <span className="text-2xl">{correctAnswerEmoji}</span>}
+            <div>
+              <span className="font-medium text-gray-900">{correctAnswer}</span>
+              <p className="text-xs text-green-600">This is the correct answer!</p>
             </div>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Encouraging message */}
-      <p className="text-center text-gray-600 text-sm">
-        Don't worry - everyone learns differently! Let's move on. 💪
-      </p>
-
-      {/* Reduced XP still awarded */}
-      {xpEarned > 0 && (
-        <div className="text-center">
-          <div className="inline-flex items-center space-x-2 bg-yellow-100 border border-yellow-300 rounded-full px-4 py-2">
-            <span className="text-yellow-600 font-bold">+{xpEarned} XP</span>
-            <span className="text-xl">✨</span>
+        {/* Learn card with gradient */}
+        <div
+          className="p-5 rounded-2xl border-2 border-purple-200 bg-purple-50 space-y-4"
+          role="region"
+          aria-live="polite"
+          data-testid="learn-card"
+        >
+          {/* Educational Explanation */}
+          <div className="text-gray-700 space-y-3">
+            {Array.isArray(content) ? (
+              <ul className="space-y-2 list-disc list-inside text-sm">
+                {content.map((item, index) => (
+                  <li key={index} className="leading-relaxed">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : typeof content === 'string' && (content.includes('🥦') || content.includes('🥣') || content.includes('🥚') || content.includes('\n')) ? (
+              <div className="space-y-2 text-sm">
+                {content.split('\n').map((line, index) => (
+                  <div key={index} className="leading-relaxed">
+                    {line}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="leading-relaxed text-sm">{content}</p>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Continue Button */}
-      <Button
-        onClick={onContinue}
-        className="w-full h-12 text-base font-bold uppercase tracking-wider bg-[#FF6A00] hover:bg-[#E55A00] text-white"
-        data-testid="continue-button"
-      >
-        {actionLabel}
-      </Button>
+          {/* Visual Icons Grid - if content suggests it */}
+          {content && typeof content === 'string' && content.toLowerCase().includes('water') && (
+            <div className="grid grid-cols-3 gap-2 text-center pt-2">
+              <div className="p-2 bg-white rounded-xl">
+                <span className="text-xl">💧</span>
+                <p className="text-xs text-gray-600">Water</p>
+              </div>
+              <div className="p-2 bg-white rounded-xl">
+                <span className="text-xl">🍎</span>
+                <p className="text-xs text-gray-600">Food</p>
+              </div>
+              <div className="p-2 bg-white rounded-xl">
+                <span className="text-xl">💨</span>
+                <p className="text-xs text-gray-600">Air</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Fun Fact Callout */}
+        {funFact && (
+          <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+            <span className="text-lg">⭐</span>
+            <div>
+              <p className="text-xs font-semibold text-yellow-800">Fun Fact!</p>
+              <p className="text-xs text-yellow-700">{funFact}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Encouraging message */}
+        <p className="text-center text-gray-600 text-sm">
+          Don't worry - everyone learns differently! Let's move on. 💪
+        </p>
+
+        {/* Partial XP */}
+        {xpEarned > 0 && (
+          <div className="flex items-center justify-center">
+            <div className="px-4 py-2 bg-gray-100 rounded-full border border-gray-200">
+              <span className="text-gray-600 font-medium">+{xpEarned} XP</span>
+              <span className="ml-1 text-sm text-gray-400">(for learning)</span>
+            </div>
+          </div>
+        )}
+
+        {/* Continue Button */}
+        <Button
+          onClick={onContinue}
+          className="w-full h-14 text-base font-bold uppercase tracking-wider rounded-2xl bg-purple-500 hover:bg-purple-600 text-white"
+          data-testid="continue-button"
+        >
+          {actionLabel}
+        </Button>
+      </div>
     </div>
   );
 }

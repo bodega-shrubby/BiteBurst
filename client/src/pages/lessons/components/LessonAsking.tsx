@@ -226,22 +226,22 @@ export default function LessonAsking({
             onClick={() => onAnswerSelect(option.id)}
             disabled={isSubmitting}
             className={`
-              w-full p-4 rounded-2xl border-2 text-left transition-all duration-200
+              w-full p-5 rounded-3xl border-3 text-left transition-all duration-200
               ${selectedAnswer === option.id
-                ? 'border-orange-400 bg-orange-50'
-                : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-25'
+                ? 'border-orange-500 bg-orange-50 shadow-lg transform scale-[1.02]'
+                : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-md'
               }
-              ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-[0.98]'}
             `}
             data-testid={`option-${option.id}`}
           >
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               {option.emoji && (
-                <span className="text-2xl" role="img" aria-hidden="true">
+                <span className="text-3xl" role="img" aria-hidden="true">
                   {option.emoji}
                 </span>
               )}
-              <span className="text-lg font-medium text-gray-900">
+              <span className="text-lg font-medium text-gray-800">
                 {option.text}
               </span>
             </div>
@@ -252,38 +252,45 @@ export default function LessonAsking({
   };
 
   const renderTrueFalse = () => {
-    const options = [
-      { id: 'true', text: 'True', emoji: '✅' },
-      { id: 'false', text: 'False', emoji: '❌' }
-    ];
-
     return (
-      <div className="space-y-3">
-        {options.map((option) => (
-          <button
-            key={option.id}
-            onClick={() => onAnswerSelect(option.id)}
-            disabled={isSubmitting}
-            className={`
-              w-full p-4 rounded-2xl border-2 text-left transition-all duration-200
-              ${selectedAnswer === option.id
-                ? 'border-orange-400 bg-orange-50'
-                : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-25'
-              }
-              ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-            `}
-            data-testid={`option-${option.id}`}
-          >
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl" role="img" aria-hidden="true">
-                {option.emoji}
-              </span>
-              <span className="text-lg font-medium text-gray-900">
-                {option.text}
-              </span>
-            </div>
-          </button>
-        ))}
+      <div className="grid grid-cols-2 gap-4">
+        {/* TRUE Button */}
+        <button
+          onClick={() => onAnswerSelect('true')}
+          disabled={isSubmitting}
+          className={`
+            p-6 rounded-3xl border-4 transition-all duration-200
+            flex flex-col items-center justify-center gap-2 min-h-[140px]
+            ${selectedAnswer === 'true'
+              ? 'border-green-500 bg-green-50 shadow-lg scale-105'
+              : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50/50'
+            }
+            ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+          `}
+          data-testid="option-true"
+        >
+          <span className="text-5xl">✓</span>
+          <span className="text-xl font-bold text-gray-900">TRUE</span>
+        </button>
+
+        {/* FALSE Button */}
+        <button
+          onClick={() => onAnswerSelect('false')}
+          disabled={isSubmitting}
+          className={`
+            p-6 rounded-3xl border-4 transition-all duration-200
+            flex flex-col items-center justify-center gap-2 min-h-[140px]
+            ${selectedAnswer === 'false'
+              ? 'border-red-500 bg-red-50 shadow-lg scale-105'
+              : 'border-gray-200 bg-white hover:border-red-300 hover:bg-red-50/50'
+            }
+            ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+          `}
+          data-testid="option-false"
+        >
+          <span className="text-5xl">✗</span>
+          <span className="text-xl font-bold text-gray-900">FALSE</span>
+        </button>
       </div>
     );
   };

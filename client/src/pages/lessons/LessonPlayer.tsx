@@ -20,8 +20,7 @@ function OrangeBurst({ filled = true, size = 20 }: { filled?: boolean; size?: nu
   );
 }
 import { Button } from '@/components/ui/button';
-import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, ProgressBar } from './components';
-import sunnyCelebrateImage from '@assets/Mascots/sunny_celebrate.png';
+import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, LessonComplete, ProgressBar } from './components';
 
 interface LessonPlayerProps {
   lessonId: string;
@@ -89,6 +88,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [hasSelectionChanged, setHasSelectionChanged] = useState(false);
   const [lastSelectedAnswer, setLastSelectedAnswer] = useState<string | null>(null); // Track previous selection for change detection
   const [showRetryBanner, setShowRetryBanner] = useState(false); // Show hint banner after retry
+  const [correctAnswerCount, setCorrectAnswerCount] = useState(0); // Track correct answers for stats
 
   // Helper to extract feedback message from step content
   const getStepFeedbackMessage = (step: LessonStep | undefined, type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
@@ -97,6 +97,46 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     if (!feedback) return undefined;
     if (typeof feedback === 'string') return undefined;
     return type === 'hint_after_2' ? feedback.hint_after_2 : feedback.motivating_fail;
+  };
+
+  // Helper to get selected answer text for display in LessonIncorrect
+  const getSelectedAnswerText = (step: LessonStep, answerId: string | null): string | undefined => {
+    if (!answerId || !step.content.options) return undefined;
+    const option = step.content.options.find(opt =>
+      typeof opt === 'string' ? opt === answerId : opt.id === answerId
+    );
+    if (!option) return answerId;
+    return typeof option === 'string' ? option : option.text;
+  };
+
+  // Helper to get selected answer emoji for display in LessonIncorrect
+  const getSelectedAnswerEmoji = (step: LessonStep, answerId: string | null): string | undefined => {
+    if (!answerId || !step.content.options) return undefined;
+    const option = step.content.options.find(opt =>
+      typeof opt === 'object' && opt.id === answerId
+    );
+    return option && typeof option === 'object' ? option.emoji : undefined;
+  };
+
+  // Helper to get correct answer text for LessonLearn
+  const getCorrectAnswerText = (step: LessonStep): string | undefined => {
+    if (step.content.options) {
+      const correctOpt = step.content.options.find(opt => typeof opt === 'object' && opt.correct);
+      return correctOpt && typeof correctOpt === 'object' ? correctOpt.text : undefined;
+    }
+    if (step.content.correctAnswer !== undefined) {
+      return String(step.content.correctAnswer);
+    }
+    return undefined;
+  };
+
+  // Helper to get correct answer emoji for LessonLearn
+  const getCorrectAnswerEmoji = (step: LessonStep): string | undefined => {
+    if (step.content.options) {
+      const correctOpt = step.content.options.find(opt => typeof opt === 'object' && opt.correct);
+      return correctOpt && typeof correctOpt === 'object' ? correctOpt.emoji : undefined;
+    }
+    return undefined;
   };
 
   // Fetch lesson data with cache invalidation
@@ -181,6 +221,9 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             usedLearnCard: false
           });
         }
+        
+        // Track correct answer for stats
+        setCorrectAnswerCount(prev => prev + 1);
         
         // Transition to SUCCESS state
         setLessonState('success');
@@ -515,29 +558,15 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   if (lessonState === 'complete') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-100 to-white flex items-center justify-center px-4">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="flex justify-center">
-            <img 
-              src={sunnyCelebrateImage} 
-              alt="Sunny Celebrating" 
-              className="w-24 h-24 object-contain animate-bounce"
-            />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Lesson Complete!</h1>
-          <p className="text-gray-600">
-            You earned {totalXpEarned} XP completing "{lessonData.title}"
-          </p>
-          <div className="space-y-3">
-            <Button
-              onClick={handleClose}
-              className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white h-12 text-base font-bold"
-            >
-              Continue Learning
-            </Button>
-          </div>
-        </div>
-      </div>
+      <LessonComplete
+        lessonTitle={lessonData.title}
+        totalXp={totalXpEarned}
+        correctAnswers={correctAnswerCount}
+        totalQuestions={lessonData.totalSteps}
+        streakDays={7}
+        onContinue={handleClose}
+        onBackToDashboard={handleClose}
+      />
     );
   }
 
@@ -589,14 +618,21 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
             attemptNumber={currentAttempt}
             onTryAgain={handleTryAgain}
             canTryAgain={true}
+            selectedAnswer={selectedAnswer || lastSelectedAnswer || undefined}
+            selectedAnswerText={getSelectedAnswerText(currentStep, selectedAnswer || lastSelectedAnswer)}
+            selectedAnswerEmoji={getSelectedAnswerEmoji(currentStep, selectedAnswer || lastSelectedAnswer)}
           />
         )}
         
         {lessonState === 'learn' && currentStep && (
           <LessonLearn
+            title="Living vs Non-Living Things"
             body={currentStep.retryConfig?.messages.learnCard || getStepFeedbackMessage(currentStep, 'motivating_fail') || "Let's learn more about this!"}
             onContinue={handleLearnContinue}
             xpEarned={calculateXP(currentStep, 3)}
+            correctAnswer={getCorrectAnswerText(currentStep)}
+            correctAnswerEmoji={getCorrectAnswerEmoji(currentStep)}
+            funFact="Your body is about 60% water - that's why drinking water is so important!"
           />
         )}
         
