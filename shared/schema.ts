@@ -86,6 +86,9 @@ export const users = pgTable("users", {
   subscriptionPlan: text("subscription_plan").notNull().default('free'), // 'free', 'individual', 'family'
   subscriptionChildrenLimit: integer("subscription_children_limit").notNull().default(1), // 1 for free/individual, 2-4 for family
   activeChildId: varchar("active_child_id"), // Reference to active child profile in children table
+  // Stripe fields
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   // Legacy fields (kept for backwards compatibility during migration)

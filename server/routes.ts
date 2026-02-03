@@ -12,6 +12,7 @@ import { registerLeaderboardRoutes } from "./routes/leaderboard";
 import { registerLessonRoutes } from "./routes/lessons";
 import { registerTopicRoutes } from "./routes/topics";
 import { registerSettingsRoutes } from "./routes/settings";
+import { registerStripeRoutes } from "./routes/stripe";
 import { updateStreak, getCurrentTime } from "./utils/streakTracker";
 import { requireAuth } from "./middleware/auth";
 import { supabaseAdmin } from "./lib/supabase";
@@ -444,6 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerLessonRoutes(app, requireAuth);
   registerTopicRoutes(app, requireAuth);
   registerSettingsRoutes(app, requireAuth);
+  registerStripeRoutes(app, requireAuth);
   registerDevRoutes(app); // Development testing routes
 
   const httpServer = createServer(app);

@@ -1,104 +1,193 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { ChevronLeft, Check } from "lucide-react";
+import { useLocation, useSearch } from "wouter";
+import { ChevronLeft, Check, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/Sidebar";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
+interface StripePrice {
+  product_id: string;
+  product_name: string;
+  product_description: string;
+  product_metadata: any;
+  price_id: string;
+  unit_amount: number;
+  currency: string;
+  recurring: any;
+}
+
 interface SubscriptionResponse {
+  subscription: any;
   plan: 'free' | 'individual' | 'family';
   childrenLimit: number;
-  childrenCount: number;
 }
 
 export default function Subscription() {
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [familySize, setFamilySize] = useState(3);
 
-  const { data: subscription, isLoading } = useQuery<SubscriptionResponse>({
-    queryKey: ['/api/subscription'],
+  // Check for success/cancel in URL params
+  useEffect(() => {
+    const params = new URLSearchParams(searchString);
+    const success = params.get('success');
+    const canceled = params.get('canceled');
+    const sessionId = params.get('session_id');
+
+    if (success === 'true' && sessionId) {
+      // Process the successful checkout
+      processCheckoutSuccess(sessionId);
+    } else if (canceled === 'true') {
+      toast({
+        title: "Checkout Cancelled",
+        description: "You can upgrade anytime.",
+      });
+      // Clean up URL
+      setLocation('/settings/subscription', { replace: true });
+    }
+  }, [searchString]);
+
+  const processCheckoutSuccess = async (sessionId: string) => {
+    try {
+      const response = await apiRequest('/api/stripe/checkout-success', {
+        method: 'POST',
+        body: { sessionId },
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({
+          title: "Subscription Activated!",
+          description: data.plan === 'family' 
+            ? `You can now add up to ${data.childrenLimit} children.`
+            : "Your Pro plan is now active.",
+        });
+        queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription'] });
+        
+        // Redirect to Manage Children if upgraded to Family Plan
+        if (data.plan === 'family') {
+          setTimeout(() => setLocation('/settings/children'), 1000);
+        } else {
+          setLocation('/settings/subscription', { replace: true });
+        }
+      }
+    } catch (error) {
+      console.error('Error processing checkout:', error);
+      toast({
+        title: "Error",
+        description: "There was an issue activating your subscription. Please contact support.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Fetch subscription status
+  const { data: subscription, isLoading: subscriptionLoading } = useQuery<SubscriptionResponse>({
+    queryKey: ['/api/stripe/subscription'],
   });
 
-  const updateSubscriptionMutation = useMutation({
-    mutationFn: async (data: { plan: string; childrenLimit?: number }) => {
-      return apiRequest('/api/subscription', {
+  // Fetch Stripe prices
+  const { data: pricesData, isLoading: pricesLoading } = useQuery<{ prices: StripePrice[] }>({
+    queryKey: ['/api/stripe/prices'],
+  });
+
+  // Create checkout session mutation
+  const checkoutMutation = useMutation({
+    mutationFn: async (data: { priceId: string; childrenLimit: number }) => {
+      const response = await apiRequest('/api/stripe/create-checkout-session', {
         method: 'POST',
         body: data,
       });
+      return response.json();
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
-      toast({
-        title: "Subscription Updated!",
-        description: variables.plan === 'family' 
-          ? "You can now add up to " + (variables.childrenLimit || 4) + " children." 
-          : "Your plan has been updated successfully.",
-      });
-      setSelectedPlan(null);
-      
-      // Redirect to Manage Children if upgraded to Family Plan
-      if (variables.plan === 'family') {
-        setTimeout(() => setLocation('/settings/children'), 500);
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
       }
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to update subscription. Please try again.",
+        description: error.message || "Failed to start checkout. Please try again.",
         variant: "destructive",
       });
     },
   });
 
-  const handleChoosePlan = (plan: string) => {
-    setSelectedPlan(plan);
-    if (plan !== 'family') {
-      updateSubscriptionMutation.mutate({ plan });
-    }
-  };
-
-  const handleConfirmFamily = () => {
-    updateSubscriptionMutation.mutate({ 
-      plan: 'family', 
-      childrenLimit: familySize 
-    });
-  };
-
-  const cancelSubscriptionMutation = useMutation({
+  // Create portal session mutation (for managing subscription)
+  const portalMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/subscription', {
+      const response = await apiRequest('/api/stripe/create-portal-session', {
         method: 'POST',
-        body: { plan: 'free' },
       });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to open billing portal.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Cancel subscription mutation
+  const cancelMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('/api/stripe/cancel-subscription', {
+        method: 'POST',
+      });
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription'] });
       toast({
         title: "Subscription Cancelled",
-        description: "Your subscription has been cancelled. You're now on the free plan.",
+        description: "Your subscription will end at the end of the billing period.",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to cancel subscription. Please try again.",
+        description: error.message || "Failed to cancel subscription.",
         variant: "destructive",
       });
     },
   });
 
-  const handleCancelSubscription = () => {
-    if (window.confirm("Are you sure you want to cancel your subscription? You'll lose access to Pro features.")) {
-      cancelSubscriptionMutation.mutate();
+  const handleChoosePlan = (planType: 'individual' | 'family', priceId: string) => {
+    setSelectedPlan(planType);
+    
+    if (planType === 'individual') {
+      checkoutMutation.mutate({ priceId, childrenLimit: 1 });
     }
   };
 
-  if (isLoading) {
+  const handleConfirmFamily = (priceId: string) => {
+    checkoutMutation.mutate({ priceId, childrenLimit: familySize });
+  };
+
+  const handleManageSubscription = () => {
+    portalMutation.mutate();
+  };
+
+  const handleCancelSubscription = () => {
+    if (window.confirm("Are you sure you want to cancel your subscription? You'll lose access to Pro features at the end of your billing period.")) {
+      cancelMutation.mutate();
+    }
+  };
+
+  if (subscriptionLoading || pricesLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
@@ -107,6 +196,21 @@ export default function Subscription() {
   }
 
   const currentPlan = subscription?.plan || 'free';
+  const prices = pricesData?.prices || [];
+  
+  // Find individual and family prices from Stripe
+  const individualPrice = prices.find(p => 
+    p.product_metadata?.plan_type === 'individual' || 
+    p.product_name?.toLowerCase().includes('individual')
+  );
+  const familyPrice = prices.find(p => 
+    p.product_metadata?.plan_type === 'family' || 
+    p.product_name?.toLowerCase().includes('family')
+  );
+
+  // Fallback display prices if Stripe prices not loaded yet
+  const displayIndividualPrice = individualPrice ? (individualPrice.unit_amount / 100).toFixed(2) : '4.50';
+  const displayFamilyPrice = familyPrice ? (familyPrice.unit_amount / 100).toFixed(2) : '7.99';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -151,10 +255,10 @@ export default function Subscription() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div 
-                  onClick={() => handleChoosePlan('individual')}
+                  onClick={() => individualPrice && handleChoosePlan('individual', individualPrice.price_id)}
                   className={`bg-white rounded-2xl border-2 p-5 cursor-pointer hover:border-orange-300 transition ${
                     selectedPlan === 'individual' ? 'border-orange-500' : 'border-gray-200'
-                  }`}
+                  } ${!individualPrice ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className="text-center mb-4">
                     <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -165,25 +269,27 @@ export default function Subscription() {
                   </div>
 
                   <div className="text-center mb-4">
-                    <span className="text-3xl font-bold text-gray-900">$4.50</span>
+                    <span className="text-3xl font-bold text-gray-900">${displayIndividualPrice}</span>
                     <span className="text-gray-500">/month</span>
                   </div>
 
                   <Button 
                     className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition"
-                    disabled={updateSubscriptionMutation.isPending}
+                    disabled={checkoutMutation.isPending || !individualPrice}
                   >
-                    {updateSubscriptionMutation.isPending && selectedPlan === 'individual' 
-                      ? 'Processing...' 
-                      : 'Choose Plan'}
+                    {checkoutMutation.isPending && selectedPlan === 'individual' ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                    ) : (
+                      'Choose Plan'
+                    )}
                   </Button>
                 </div>
 
                 <div 
-                  onClick={() => setSelectedPlan('family')}
+                  onClick={() => familyPrice && setSelectedPlan('family')}
                   className={`bg-white rounded-2xl border-2 p-5 cursor-pointer relative overflow-hidden ${
                     selectedPlan === 'family' ? 'border-orange-500' : 'border-gray-200'
-                  }`}
+                  } ${!familyPrice ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
                     BEST VALUE
@@ -198,7 +304,7 @@ export default function Subscription() {
                   </div>
 
                   <div className="text-center mb-4">
-                    <span className="text-3xl font-bold text-gray-900">$7.99</span>
+                    <span className="text-3xl font-bold text-gray-900">${displayFamilyPrice}</span>
                     <span className="text-gray-500">/month</span>
                     <p className="text-xs text-green-600 mt-1">Save up to 55%</p>
                   </div>
@@ -209,11 +315,12 @@ export default function Subscription() {
                       setSelectedPlan('family');
                     }}
                     className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition"
+                    disabled={!familyPrice}
                   >
                     Choose Plan
                   </Button>
 
-                  {selectedPlan === 'family' && (
+                  {selectedPlan === 'family' && familyPrice && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <label className="text-sm text-gray-600 mb-2 block">How many children?</label>
                       <div className="flex space-x-2 mb-3">
@@ -237,17 +344,29 @@ export default function Subscription() {
                       <Button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleConfirmFamily();
+                          handleConfirmFamily(familyPrice.price_id);
                         }}
                         className="w-full bg-purple-600 text-white font-semibold py-3 rounded-xl hover:bg-purple-700 transition"
-                        disabled={updateSubscriptionMutation.isPending}
+                        disabled={checkoutMutation.isPending}
                       >
-                        {updateSubscriptionMutation.isPending ? 'Processing...' : 'Confirm Family Plan'}
+                        {checkoutMutation.isPending ? (
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                        ) : (
+                          'Confirm Family Plan'
+                        )}
                       </Button>
                     </div>
                   )}
                 </div>
               </div>
+
+              {prices.length === 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-center">
+                  <p className="text-sm text-yellow-800">
+                    Subscription plans are being set up. Please check back in a moment.
+                  </p>
+                </div>
+              )}
             </>
           )}
 
@@ -299,19 +418,31 @@ export default function Subscription() {
 
           {currentPlan !== 'free' && (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-              <h3 className="font-bold text-gray-900 mb-2">Cancel Subscription</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Manage Your Subscription</h3>
               <p className="text-sm text-gray-500 mb-4">
-                If you cancel, you'll lose access to Pro features at the end of your billing period. 
-                You can resubscribe anytime.
+                Update your payment method, view invoices, or cancel your subscription.
               </p>
-              <Button 
-                onClick={handleCancelSubscription}
-                variant="outline"
-                className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-medium"
-                disabled={cancelSubscriptionMutation.isPending}
-              >
-                {cancelSubscriptionMutation.isPending ? 'Cancelling...' : 'Cancel Subscription'}
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  onClick={handleManageSubscription}
+                  className="w-full bg-gray-900 text-white font-medium hover:bg-gray-800"
+                  disabled={portalMutation.isPending}
+                >
+                  {portalMutation.isPending ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Opening...</>
+                  ) : (
+                    <><ExternalLink className="w-4 h-4 mr-2" /> Manage Billing</>
+                  )}
+                </Button>
+                <Button 
+                  onClick={handleCancelSubscription}
+                  variant="outline"
+                  className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-medium"
+                  disabled={cancelMutation.isPending}
+                >
+                  {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Subscription'}
+                </Button>
+              </div>
             </div>
           )}
 
