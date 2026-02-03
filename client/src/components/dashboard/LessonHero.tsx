@@ -66,7 +66,7 @@ export default function LessonHero() {
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-gray-800 text-lg lg:text-xl truncate">{currentLesson.title}</div>
           <div className="text-sm lg:text-base text-gray-500 mt-1">
-            {currentLesson.current_slide} of {currentLesson.total_slides} slides
+            {currentLesson.total_slides} questions
           </div>
           <div className="mt-3 bg-gray-200 rounded-full h-2.5 lg:h-3 overflow-hidden">
             <div 
