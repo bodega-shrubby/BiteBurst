@@ -178,6 +178,29 @@ export function registerStripeRoutes(app: Express, requireAuth: any) {
         expand: ['subscription'],
       });
 
+      // Security: Verify session belongs to the authenticated user
+      // Primary check: metadata userId MUST match current user
+      // Secondary check: if user has stripeCustomerId, session customer must match
+      const sessionUserId = session.metadata?.userId;
+      const sessionCustomer = session.customer as string;
+      
+      // Require metadata userId to be present and match
+      if (!sessionUserId) {
+        console.error('Session missing userId metadata:', session.id);
+        return res.status(400).json({ error: 'Invalid session - missing user metadata' });
+      }
+      
+      if (sessionUserId !== parentUser.id) {
+        console.error('Session userId mismatch:', { sessionUserId, parentUserId: parentUser.id });
+        return res.status(403).json({ error: 'Session does not belong to this user' });
+      }
+      
+      // If user already has a stripeCustomerId, customer must also match
+      if (parentUser.stripeCustomerId && sessionCustomer !== parentUser.stripeCustomerId) {
+        console.error('Session customer mismatch:', { sessionCustomer, parentCustomerId: parentUser.stripeCustomerId });
+        return res.status(403).json({ error: 'Session customer does not match' });
+      }
+
       if (session.payment_status === 'paid' && session.subscription) {
         const subscription = session.subscription as any;
         const childrenLimit = parseInt(session.metadata?.childrenLimit || '1', 10);
@@ -191,7 +214,8 @@ export function registerStripeRoutes(app: Express, requireAuth: any) {
         // Update user subscription info
         await storage.updateSubscription(parentUser.id, plan, childrenLimit);
         await storage.updateUser(parentUser.id, { 
-          stripeSubscriptionId: subscription.id 
+          stripeSubscriptionId: subscription.id,
+          stripeCustomerId: sessionCustomer
         } as any);
 
         res.json({ 
