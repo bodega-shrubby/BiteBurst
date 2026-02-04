@@ -96,15 +96,17 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                 <div
                   className={`flex items-center mb-12 ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
                 >
-                  <div className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
+                  <div 
+                    className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'} ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+                    onClick={() => isClickable && onLessonClick(lesson.id)}
+                  >
                     <div
-                      className={`w-16 h-16 rounded-full border-4 flex items-center justify-center text-2xl transition-transform ${isClickable ? 'cursor-pointer hover:scale-110' : 'cursor-default'} ${getNodeStyle(lesson.state)}`}
-                      onClick={() => isClickable && onLessonClick(lesson.id)}
+                      className={`w-16 h-16 rounded-full border-4 flex items-center justify-center text-2xl transition-transform ${isClickable ? 'hover:scale-110' : ''} ${getNodeStyle(lesson.state)}`}
                     >
                       {getNodeContent(lesson)}
                     </div>
 
-                    <div className={`bg-white rounded-xl px-4 py-2 shadow-lg max-w-[160px] border ${getBorderStyle(lesson.state)}`}>
+                    <div className={`bg-white rounded-xl px-4 py-2 shadow-lg max-w-[160px] border transition-shadow ${isClickable ? 'hover:shadow-xl' : ''} ${getBorderStyle(lesson.state)}`}>
                       <p className="font-bold text-sm text-gray-800">{lesson.title}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs text-green-600 font-medium">+{lesson.xp} XP</span>
