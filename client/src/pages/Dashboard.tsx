@@ -59,24 +59,6 @@ export default function Dashboard() {
     return <div>Redirecting to login...</div>;
   }
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
-
-  if (!dashboardData) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <img 
-            src={mascotImage} 
-            alt="BiteBurst Mascot" 
-            className="w-20 h-20 mx-auto mb-4 rounded-full"
-          />
-          <p className="text-gray-600">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
 
   const goalEmojis = {
     energy: '⚡',
@@ -105,7 +87,7 @@ export default function Dashboard() {
             />
             <div>
               <h1 className="text-lg font-bold text-gray-900">
-                Good morning, {dashboardData.user.displayName}
+                Good morning, {dashboardData?.user?.displayName || 'there'}
               </h1>
             </div>
           </div>
@@ -117,11 +99,11 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mt-2">
           <span className="text-sm text-gray-600">{getCurrentDate()}</span>
           <div className="flex items-center space-x-1">
-            {dashboardData.streakData.current > 0 && (
+            {(dashboardData?.streakData?.current || 0) > 0 && (
               <Flame className="w-4 h-4 text-orange-500" />
             )}
             <span className="text-sm text-gray-600">
-              Day {dashboardData.streakData.current} of your streak
+              Day {dashboardData?.streakData?.current || 0} of your streak
             </span>
           </div>
         </div>
@@ -152,18 +134,18 @@ export default function Dashboard() {
                     stroke="#FF6A00"
                     strokeWidth="8"
                     fill="none"
-                    strokeDasharray={`${(dashboardData.todayXp / dashboardData.dailyGoal) * 226} 226`}
+                    strokeDasharray={`${((dashboardData?.todayXp || 0) / (dashboardData?.dailyGoal || 100)) * 226} 226`}
                     className="transition-all duration-300"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-lg font-bold text-gray-900">
-                    {dashboardData.todayXp}
+                    {dashboardData?.todayXp || 0}
                   </span>
                 </div>
               </div>
               <p className="text-sm text-gray-600">XP Today</p>
-              <p className="text-xs text-gray-500">Goal: {dashboardData.dailyGoal}</p>
+              <p className="text-xs text-gray-500">Goal: {dashboardData?.dailyGoal || 100}</p>
             </div>
 
             {/* Streak Counter */}
@@ -171,11 +153,11 @@ export default function Dashboard() {
               <div className="relative w-20 h-20 mx-auto mb-2 flex items-center justify-center">
                 <Flame className="w-12 h-12 text-orange-500" />
                 <span className="absolute text-lg font-bold text-white">
-                  {dashboardData.streakData.current}
+                  {dashboardData?.streakData?.current || 0}
                 </span>
               </div>
               <p className="text-sm text-gray-600">Day Streak</p>
-              <p className="text-xs text-gray-500">Best: {dashboardData.streakData.longest}</p>
+              <p className="text-xs text-gray-500">Best: {dashboardData?.streakData?.longest || 0}</p>
             </div>
           </div>
         </div>
@@ -184,15 +166,15 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <h2 className="text-xl font-bold text-[#FF6A00] mb-4">Your Goal</h2>
           <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl">{goalEmojis[dashboardData.user.goal]}</span>
+            <span className="text-2xl">{goalEmojis[dashboardData?.user?.goal || 'energy']}</span>
             <div>
               <h3 className="font-semibold text-gray-900 capitalize">
-                {dashboardData.user.goal}
+                {dashboardData?.user?.goal || 'energy'}
               </h3>
               <p className="text-sm text-gray-600">
-                {dashboardData.user.goal === 'energy' && "Fuel your day with balanced nutrition"}
-                {dashboardData.user.goal === 'focus' && "Sharpen your mind with brain-boosting foods"}
-                {dashboardData.user.goal === 'strength' && "Build power with protein and movement"}
+                {(dashboardData?.user?.goal || 'energy') === 'energy' && "Fuel your day with balanced nutrition"}
+                {dashboardData?.user?.goal === 'focus' && "Sharpen your mind with brain-boosting foods"}
+                {dashboardData?.user?.goal === 'strength' && "Build power with protein and movement"}
               </p>
             </div>
           </div>

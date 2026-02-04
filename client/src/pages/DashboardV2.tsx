@@ -396,9 +396,6 @@ export default function DashboardV2() {
     return <div>Redirecting to login...</div>;
   }
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
 
   if (error || !dailySummary) {
     return (

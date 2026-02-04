@@ -546,13 +546,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setStepStartTime(Date.now());
   }, [currentStepIndex]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-orange-100 to-white flex items-center justify-center">
-        <div className="text-lg font-semibold text-gray-600">Loading lesson...</div>
-      </div>
-    );
-  }
 
   if (!lessonData) {
     return (
