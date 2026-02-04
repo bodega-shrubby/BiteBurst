@@ -238,7 +238,7 @@ export default function Subscription() {
           <div className="bg-gray-100 rounded-2xl p-4 mb-6 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                <span className="text-lg">🍊</span>
+                <img src="/assets/mascot-orange.svg" alt="Oni" className="w-8 h-8" />
               </div>
               <div>
                 <p className="font-semibold text-gray-800">
