@@ -50,45 +50,26 @@ export default function Sidebar() {
 
       {/* Navigation Items */}
       <nav className="p-3 space-y-1">
-        {/* Top nav items (Lessons, Champs) */}
-        {NAV_ITEMS_TOP.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => setLocation(item.path)}
-              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
-            >
-              <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-black fill-yellow-500' : 'text-gray-500'}`} />
-              <span className="text-sm">{item.label}</span>
-            </button>
-          );
-        })}
-
-        {/* LOG button with hover dropdown */}
+        {/* LOG CTA Button - Primary Action */}
         <div 
-          className="relative"
+          className="relative mb-3"
           onMouseEnter={() => setLogHoverOpen(true)}
           onMouseLeave={() => setLogHoverOpen(false)}
         >
           <button
             className={`
-              w-full flex items-center space-x-3 px-4 py-3 rounded-xl
-              transition-all duration-200
-              ${isLogActive
-                ? 'bg-orange-50 text-[#FF6A00] font-semibold'
-                : 'text-gray-600 hover:bg-gray-50'
-              }
+              w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl
+              bg-gradient-to-r from-[#FF8A00] to-[#FF5500] text-white font-semibold
+              shadow-lg shadow-orange-300/40 hover:shadow-orange-400/50
+              transform transition-all duration-200 hover:scale-[1.02]
+              ${isLogActive ? 'ring-2 ring-orange-300 ring-offset-2' : ''}
             `}
           >
-            {/* 3D + sign */}
             <div className={`
               w-6 h-6 rounded-lg flex items-center justify-center font-bold text-lg
-              bg-gradient-to-br from-[#FF8A00] to-[#FF5500] text-white
-              shadow-md shadow-orange-300/50
+              bg-white/20 backdrop-blur-sm
               transform transition-transform duration-200
-              ${logHoverOpen ? 'scale-110 rotate-90' : ''}
+              ${logHoverOpen ? 'rotate-90' : ''}
             `}>
               +
             </div>
@@ -115,6 +96,22 @@ export default function Sidebar() {
             </div>
           )}
         </div>
+
+        {/* Top nav items (Lessons, Champs) */}
+        {NAV_ITEMS_TOP.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => setLocation(item.path)}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
+            >
+              <Icon className={`w-5 h-5 ${item.id === 'lessons' ? 'text-red-500 fill-red-500' : item.id === 'champs' ? 'text-black fill-yellow-500' : 'text-gray-500'}`} />
+              <span className="text-sm">{item.label}</span>
+            </button>
+          );
+        })}
 
         {/* Profile button with user avatar */}
         <button
