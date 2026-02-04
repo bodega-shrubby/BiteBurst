@@ -137,12 +137,6 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
           })}
         </div>
 
-        <div className="flex justify-center mt-4 mb-8">
-          <div className="text-center">
-            <span className="text-4xl">🏆</span>
-            <p className="text-sm font-bold text-gray-600 mt-1">Complete All!</p>
-          </div>
-        </div>
       </div>
     </div>
   );
