@@ -446,6 +446,12 @@ export default function DashboardRedesign() {
                   })) || dailySummary.badges.locked}
                   onBadgeUnlock={handleBadgeUnlock}
                 />
+
+                {/* Ad Placement - Mobile */}
+                <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center">
+                  <div className="text-sm font-semibold text-gray-400">Ad Placement</div>
+                  <div className="text-xs text-gray-300 mt-1">320 x 50</div>
+                </div>
               </div>
             </div>
 
@@ -516,6 +522,12 @@ export default function DashboardRedesign() {
                 })) || dailySummary.badges.locked}
                 onBadgeUnlock={handleBadgeUnlock}
               />
+
+              {/* 6. Ad Placement Placeholder */}
+              <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center">
+                <div className="text-sm font-semibold text-gray-400">Ad Placement</div>
+                <div className="text-xs text-gray-300 mt-1">300 x 250</div>
+              </div>
 
             </div>
 
