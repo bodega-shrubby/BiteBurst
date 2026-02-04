@@ -633,22 +633,11 @@ export default function LessonAsking({
         </div>
         
         {/* Progress Indicator */}
-        <div className="text-center text-sm">
-          {(() => {
-            const allPlaced = orderedItems.length === items.length;
-            const allCorrect = orderedItems.every((itemId, index) => {
-              const item = items.find(i => i.id === itemId);
-              return item && item.correctOrder === index + 1;
-            });
-            
-            if (allPlaced && allCorrect) {
-              return <div className="text-green-600 font-medium">✅ Perfect order!</div>;
-            } else if (allPlaced && !allCorrect) {
-              return <div className="text-red-600 font-medium">❌ Wrong order - try rearranging!</div>;
-            } else {
-              return <div className="text-gray-600">Keep arranging...</div>;
-            }
-          })()} 
+        <div className="text-center text-sm text-gray-600">
+          {orderedItems.length < items.length 
+            ? `${orderedItems.length} of ${items.length} placed`
+            : "Ready to check!"
+          }
         </div>
       </div>
     );
