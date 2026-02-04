@@ -4,7 +4,7 @@ export const MEAL_TYPES: MealType[] = [
   {
     id: 'breakfast',
     name: 'Breakfast',
-    emoji: '🥞',
+    emoji: '🍳',
     timeRange: '6am - 10am',
     color: 'bg-white',
     borderColor: 'border-l-[#FF9500]',
