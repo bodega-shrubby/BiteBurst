@@ -382,7 +382,27 @@ export default function DashboardRedesign() {
 
             {/* LEFT: Main Content Column */}
             <div className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 space-y-6 pb-32">
-              {/* 4. STATISTICS GRID */}
+              {/* 1. AVATAR/GREETING SECTION */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-6">
+                  <div className="w-[100px] h-[100px] bg-gradient-to-br from-orange-500 to-orange-400 rounded-full flex items-center justify-center border-4 border-white shadow-lg flex-shrink-0">
+                    <CharacterAvatar size="lg" />
+                  </div>
+                  <div className="flex-1">
+                    <h1 className="text-2xl font-extrabold text-gray-800">
+                      Hey <span className="text-orange-500">{dailySummary.user.display_name}</span>! 🌟
+                    </h1>
+                    <p className="text-gray-500 mt-1">
+                      Ready to fuel your body and get moving?
+                    </p>
+                    <span className="inline-block bg-orange-50 text-orange-500 px-4 py-1.5 rounded-full text-sm font-bold mt-2">
+                      🍊 Health Hero 🏃
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. STATISTICS GRID */}
               <div>
                 <h2 className="font-bold text-xl mb-4">Statistics</h2>
                 <div className="grid grid-cols-2 gap-5">
