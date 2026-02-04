@@ -148,13 +148,11 @@ export default function LessonSuccess({
         <div className="flex justify-center relative">
           <span className="absolute -top-2 -left-8 text-2xl animate-ping" style={{ animationDuration: '1.5s' }}>✨</span>
           <span className="absolute -top-2 -right-8 text-2xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }}>⭐</span>
-          <div className="w-28 h-28 bg-orange-400 rounded-full flex items-center justify-center shadow-lg border-4 border-orange-500 mascot-celebrate">
-            <img
-              src={oniCelebrateImage}
-              alt="Oni Celebrating"
-              className="w-20 h-20 object-contain"
-            />
-          </div>
+          <img
+            src={oniCelebrateImage}
+            alt="Oni Celebrating"
+            className="w-28 h-28 object-contain mascot-celebrate"
+          />
           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.6s' }}>🌟</span>
         </div>
 

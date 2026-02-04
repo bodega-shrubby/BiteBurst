@@ -63,13 +63,11 @@ export default function LessonComplete({
         {/* Celebrating Mascot */}
         <div className="flex justify-center mb-6 relative">
           <div className="relative">
-            <div className="w-32 h-32 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-xl border-4 border-orange-300 mascot-celebrate">
-              <img
-                src={oniProudImage}
-                alt="Oni Celebrating"
-                className="w-24 h-24 object-contain"
-              />
-            </div>
+            <img
+              src={oniProudImage}
+              alt="Oni Celebrating"
+              className="w-32 h-32 object-contain mascot-celebrate"
+            />
             <span className="absolute -top-2 -right-2 text-3xl">🎉</span>
             <span className="absolute -bottom-1 -left-2 text-2xl">⭐</span>
           </div>
