@@ -216,11 +216,8 @@ export default function Lessons() {
 
   const journeyLessons = useMemo(() => {
     if (apiLessons && apiLessons.length > 0) {
-      // Filter to only show lessons from the current topic
-      const topicLessons = currentTopicId 
-        ? apiLessons.filter(lesson => lesson.topicId === currentTopicId)
-        : apiLessons;
-      return topicLessons.map(lesson => ({
+      // Show all lessons including previous completed ones
+      return apiLessons.map(lesson => ({
         id: lesson.id,
         title: lesson.title,
         icon: lesson.icon || '📚',
@@ -237,7 +234,7 @@ export default function Lessons() {
       state: lesson.state as 'completed' | 'current' | 'unlocked' | 'locked',
       xp: 15
     }));
-  }, [apiLessons, currentTopicId]);
+  }, [apiLessons]);
 
   const completed = journeyLessons.filter(l => l.state === 'completed').length;
   const progressPercent = journeyLessons.length > 0 ? (completed / journeyLessons.length) * 100 : 0;
