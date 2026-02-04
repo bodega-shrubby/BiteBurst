@@ -397,7 +397,7 @@ export default function DashboardV2() {
   }
 
 
-  if (error || !dailySummary) {
+  if (error || (!isLoading && !dailySummary)) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center space-y-4 max-w-3xl">
@@ -413,6 +413,10 @@ export default function DashboardV2() {
         </div>
       </div>
     );
+  }
+
+  if (!dailySummary) {
+    return null;
   }
 
   return (

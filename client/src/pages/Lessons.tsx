@@ -416,7 +416,7 @@ export default function Lessons() {
   };
 
 
-  if (!user) {
+  if (!loading && !user) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -426,6 +426,10 @@ export default function Lessons() {
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (

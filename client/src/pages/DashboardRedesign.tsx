@@ -246,7 +246,7 @@ export default function DashboardRedesign() {
   }
 
 
-  if (error || !dailySummary) {
+  if (error || (!isLoading && !dailySummary)) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
         <div className="text-center space-y-4 max-w-3xl">
@@ -262,6 +262,10 @@ export default function DashboardRedesign() {
         </div>
       </div>
     );
+  }
+
+  if (!dailySummary) {
+    return null;
   }
 
   const greeting = getMascotGreeting(
