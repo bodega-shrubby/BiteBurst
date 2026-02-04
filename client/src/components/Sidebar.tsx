@@ -156,18 +156,11 @@ export default function Sidebar() {
                 <span className="text-sm">Settings</span>
               </button>
               <button
-                onClick={() => { setLocation('/achievements'); setMoreOpen(false); }}
-                className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
-              >
-                <Medal className="w-4 h-4" />
-                <span className="text-sm">Achievements</span>
-              </button>
-              <button
-                onClick={() => { setLocation('/streak'); setMoreOpen(false); }}
+                onClick={() => { setLocation('/help'); setMoreOpen(false); }}
                 className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50"
               >
                 <HelpCircle className="w-4 h-4" />
-                <span className="text-sm">Streak</span>
+                <span className="text-sm">Help & Support</span>
               </button>
               <button
                 onClick={() => { handleLogout(); setMoreOpen(false); }}
