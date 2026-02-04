@@ -1026,9 +1026,10 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         try {
           const user = await storage.getUser(validatedData.userId);
           if (user) {
+            const currentXp = user.totalXp ?? 0;
             await storage.updateUser(validatedData.userId, {
-              totalXp: user.totalXp + xpAwarded,
-              level: Math.floor((user.totalXp + xpAwarded) / 100) + 1
+              totalXp: currentXp + xpAwarded,
+              level: Math.floor((currentXp + xpAwarded) / 100) + 1
             });
             
             // Log XP event (simplified for now)
@@ -1062,7 +1063,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(statusCode).json({ error: auth.error });
       }
       
-      const childValidation = await validateChildOwnership(validatedData.childId, auth.parentId!, auth.isChildSelf);
+      const childValidation = await validateChildOwnership(validatedData.childId ?? undefined, auth.parentId!, auth.isChildSelf);
       if (!childValidation.valid) {
         return res.status(403).json({ error: childValidation.error });
       }
