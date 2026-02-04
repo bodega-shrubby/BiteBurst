@@ -198,17 +198,29 @@ export default function Lessons() {
     enabled: !!user && !!curriculumId,
   });
 
-  const topicId = apiLessons?.[0]?.topicId;
+  // Get the topic of the current/next lesson to work on (not just the first lesson)
+  const currentTopicId = useMemo(() => {
+    if (!apiLessons || apiLessons.length === 0) return undefined;
+    // Find the current lesson or first unlocked lesson
+    const currentLesson = apiLessons.find(l => l.state === 'current') 
+      || apiLessons.find(l => l.state === 'unlocked')
+      || apiLessons[0]; // Fallback to first lesson
+    return currentLesson?.topicId;
+  }, [apiLessons]);
 
   const { data: topicData } = useQuery<TopicData>({
-    queryKey: ['/api/topics', topicId],
-    queryFn: () => apiRequest(`/api/topics/${topicId}`),
-    enabled: !!topicId,
+    queryKey: ['/api/topics', currentTopicId],
+    queryFn: () => apiRequest(`/api/topics/${currentTopicId}`),
+    enabled: !!currentTopicId,
   });
 
   const journeyLessons = useMemo(() => {
     if (apiLessons && apiLessons.length > 0) {
-      return apiLessons.map(lesson => ({
+      // Filter to only show lessons from the current topic
+      const topicLessons = currentTopicId 
+        ? apiLessons.filter(lesson => lesson.topicId === currentTopicId)
+        : apiLessons;
+      return topicLessons.map(lesson => ({
         id: lesson.id,
         title: lesson.title,
         icon: lesson.icon || '📚',
@@ -225,7 +237,7 @@ export default function Lessons() {
       state: lesson.state as 'completed' | 'current' | 'unlocked' | 'locked',
       xp: 15
     }));
-  }, [apiLessons]);
+  }, [apiLessons, currentTopicId]);
 
   const completed = journeyLessons.filter(l => l.state === 'completed').length;
   const progressPercent = journeyLessons.length > 0 ? (completed / journeyLessons.length) * 100 : 0;
