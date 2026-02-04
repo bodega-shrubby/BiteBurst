@@ -58,21 +58,13 @@ export default function Sidebar() {
         >
           <button
             className={`
-              w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl
+              w-full flex items-center justify-center px-4 py-3 rounded-xl
               bg-gradient-to-r from-[#FF8A00] to-[#FF5500] text-white font-semibold
               shadow-lg shadow-orange-300/40 hover:shadow-orange-400/50
               transform transition-all duration-200 hover:scale-[1.02]
               ${isLogActive ? 'ring-2 ring-orange-300 ring-offset-2' : ''}
             `}
           >
-            <div className={`
-              w-6 h-6 rounded-lg flex items-center justify-center font-bold text-lg
-              bg-white/20 backdrop-blur-sm
-              transform transition-transform duration-200
-              ${logHoverOpen ? 'rotate-90' : ''}
-            `}>
-              +
-            </div>
             <span className="text-sm">LOG</span>
           </button>
 
