@@ -415,16 +415,6 @@ export default function Lessons() {
     return current?.id || displayLessons[0]?.id || 'fuel-for-football';
   };
 
-  if (loading || lessonsLoading || topicLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="text-5xl animate-bounce">🍊</div>
-          <p className="text-gray-600 font-medium">Loading lessons...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!user) {
     return (
