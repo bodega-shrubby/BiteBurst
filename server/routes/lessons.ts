@@ -291,14 +291,20 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             icon: lesson.iconEmoji || '📚',
             topicId: topic.id,
             topicTitle: topic.title,
+            topicOrder: topic.orderPosition ?? 0,
             sortOrder: lesson.orderInUnit ?? 0,
             description: lesson.description
           });
         }
       }
       
-      // Sort by unit order then lesson order
-      allLessons.sort((a, b) => a.sortOrder - b.sortOrder);
+      // Sort by topic order first, then lesson order within each topic
+      allLessons.sort((a, b) => {
+        if (a.topicOrder !== b.topicOrder) {
+          return a.topicOrder - b.topicOrder;
+        }
+        return a.sortOrder - b.sortOrder;
+      });
       
       // Get completed lessons for either the additional child (childId) or primary child (userId)
       const completedLessons = await storage.getCompletedLessonIds(childUserId, childId || undefined);
