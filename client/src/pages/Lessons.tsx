@@ -79,6 +79,65 @@ function AdPlaceholder() {
   );
 }
 
+interface LessonListItem {
+  id: string;
+  title: string;
+  state: 'completed' | 'current' | 'unlocked' | 'locked';
+}
+
+function TopicLessonsList({ lessons, completed }: { lessons: LessonListItem[]; completed: number }) {
+  return (
+    <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold text-base text-gray-800">Topic Lessons</h3>
+        <span className="text-sm text-gray-400">{completed}/{lessons.length}</span>
+      </div>
+
+      <div className="space-y-1 max-h-[300px] overflow-y-auto">
+        {lessons.map((lesson, index) => {
+          const isCurrent = lesson.state === 'current';
+          const isLocked = lesson.state === 'locked';
+          const isCompleted = lesson.state === 'completed';
+
+          return (
+            <div key={lesson.id}>
+              <div 
+                className={`flex items-center space-x-3 py-2 px-2 rounded-lg ${
+                  isCurrent ? 'bg-orange-50 cursor-pointer' : 
+                  isCompleted ? 'bg-green-50' : 
+                  isLocked ? 'opacity-50' : 'hover:bg-gray-50'
+                }`}
+              >
+                <span className={`w-6 h-6 ${
+                  isCurrent ? 'bg-orange-500' : 
+                  isCompleted ? 'bg-green-500' : 
+                  'bg-gray-300'
+                } rounded-full flex items-center justify-center text-white text-xs font-bold`}>
+                  {isCompleted ? '✓' : index + 1}
+                </span>
+                <span className={`text-sm flex-1 ${isCurrent || isCompleted ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
+                  {lesson.title}
+                </span>
+                {isCurrent && <span className="text-green-500 text-xs">▶</span>}
+                {isCompleted && <span className="text-green-500 text-xs">✓</span>}
+                {isLocked && <span className="text-gray-400 text-xs">🔒</span>}
+              </div>
+              
+              {(index === 2 || index === 5) && (
+                <div className="flex items-center space-x-3 py-2 px-2 rounded-lg opacity-50">
+                  <span className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 text-xs">📦</span>
+                  <span className="text-sm text-amber-700 flex-1">Checkpoint Reward</span>
+                  <span className="text-amber-600 text-xs">{Math.min(completed, index + 1)}/{index + 1}</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function LeaderboardCard({ userXp, userName }: { userXp: number; userName: string }) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
@@ -314,6 +373,7 @@ export default function Lessons() {
               </div>
 
               <WeeklyChallenge />
+              <TopicLessonsList lessons={journeyLessons} completed={completed} />
               <LeaderboardCard userXp={userXp} userName={userName} />
               <AdPlaceholder />
             </div>
