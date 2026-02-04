@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteBurst Dashboard - V4 Design 1: UPDATED (All Elements)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #FEFCFB;
+            min-height: 100vh;
+        }
+
+        /* Color Theme: Warm Orange + Shades of Blue */
+        :root {
+            --primary-orange: #FF8C42;
+            --orange-deep: #FF6B35;
+            --orange-light: #FFAA6C;
+            --orange-pale: #FFF4ED;
+            --peach: #FFD5C2;
+
+            /* Blue shades */
+            --blue-primary: #4A90D9;
+            --blue-light: #7AB8F5;
+            --blue-dark: #2E6BB5;
+            --blue-pale: #E8F4FD;
+            --blue-sky: #87CEEB;
+
+            --amber: #F9A826;
+            --green-success: #4CAF50;
+            --text-dark: #3D3D3D;
+            --text-medium: #707070;
+            --bg-white: #ffffff;
+        }
+
+        .view-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-toggle button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-toggle button.active {
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .view-toggle button:not(.active) {
+            background: white;
+            color: var(--text-dark);
+            border: 2px solid #eee;
+        }
+
+        /* Desktop Layout */
+        .desktop-view {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .mobile-view {
+            display: none;
+            max-width: 390px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #FEFCFB;
+        }
+
+        /* Left Sidebar - White Background */
+        .sidebar {
+            width: 220px;
+            background: var(--bg-white);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #F5EDE8;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.35);
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--orange-deep);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        .nav-item:hover {
+            background: var(--orange-pale);
+            color: var(--orange-deep);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--orange-pale), #FFF9F5);
+            color: var(--orange-deep);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.1);
+        }
+
+        .nav-item.active .nav-icon {
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .nav-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: #F8F8F8;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, #FEFCFB 0%, var(--orange-pale) 100%);
+        }
+
+        /* Avatar Section - AT THE TOP */
+        .avatar-header {
+            background: white;
+            border-radius: 24px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #F5F0ED;
+        }
+
+        .avatar-character {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.35);
+            border: 4px solid white;
+            flex-shrink: 0;
+        }
+
+        .avatar-info {
+            flex: 1;
+        }
+
+        .greeting {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .greeting span {
+            color: var(--orange-deep);
+        }
+
+        .sub-greeting {
+            color: var(--text-medium);
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .avatar-title {
+            display: inline-block;
+            background: var(--orange-pale);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--orange-deep);
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card.xp::before {
+            background: linear-gradient(90deg, var(--orange-deep), var(--primary-orange));
+        }
+
+        .stat-card.active-min::before {
+            background: linear-gradient(90deg, var(--blue-primary), var(--blue-light));
+        }
+
+        .stat-card.streak::before {
+            background: linear-gradient(90deg, var(--amber), #FFD54F);
+        }
+
+        .stat-card.level::before {
+            background: linear-gradient(90deg, var(--blue-dark), var(--blue-primary));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card.xp .stat-icon {
+            background: linear-gradient(135deg, var(--orange-pale), var(--peach));
+        }
+
+        .stat-card.active-min .stat-icon {
+            background: linear-gradient(135deg, var(--blue-pale), #BBDEFB);
+        }
+
+        .stat-card.streak .stat-icon {
+            background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+        }
+
+        .stat-card.level .stat-icon {
+            background: linear-gradient(135deg, var(--blue-pale), #B3E5FC);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        /* Continue Learning / Lesson Hero Section - NEW */
+        .continue-learning {
+            background: linear-gradient(135deg, var(--orange-pale), #FFF9F5);
+            border: 2px solid var(--orange-light);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .lesson-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--blue-primary), var(--blue-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(74, 144, 217, 0.3);
+        }
+
+        .lesson-content {
+            flex: 1;
+        }
+
+        .lesson-badge {
+            display: inline-block;
+            background: var(--blue-pale);
+            color: var(--blue-dark);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        .lesson-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .lesson-title-row h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .lesson-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--orange-deep);
+            margin-bottom: 8px;
+        }
+
+        .lesson-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .lesson-progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .lesson-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green-success), #66BB6A);
+            border-radius: 10px;
+            width: 60%;
+        }
+
+        .lesson-progress-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-medium);
+        }
+
+        .start-lesson-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.35);
+        }
+
+        .start-lesson-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.45);
+        }
+
+        /* Quick Log Section */
+        .quick-log {
+            background: white;
+            border-radius: 22px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .log-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .log-btn.food {
+            background: linear-gradient(135deg, var(--orange-pale), var(--peach));
+            color: var(--orange-deep);
+        }
+
+        .log-btn.food:hover {
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .log-btn.exercise {
+            background: linear-gradient(135deg, var(--blue-pale), #BBDEFB);
+            color: var(--blue-dark);
+        }
+
+        .log-btn.exercise:hover {
+            background: linear-gradient(135deg, var(--blue-primary), var(--blue-light));
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 144, 217, 0.4);
+        }
+
+        .log-btn .btn-icon { font-size: 32px; }
+        .log-btn .btn-text { font-weight: 700; font-size: 14px; }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            width: 340px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: linear-gradient(180deg, #FEFCFB 0%, var(--blue-pale) 100%);
+        }
+
+        /* Oni Mascot Card - TOP OF RIGHT COLUMN */
+        .oni-mascot-card {
+            background: white;
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 2px solid var(--blue-pale);
+        }
+
+        .oni-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--orange-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+            flex-shrink: 0;
+        }
+
+        .oni-info {
+            flex: 1;
+        }
+
+        .oni-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--orange-deep);
+            margin-bottom: 4px;
+        }
+
+        .oni-message {
+            font-size: 14px;
+            color: var(--text-medium);
+            line-height: 1.4;
+        }
+
+        /* Daily XP Goal Card */
+        .xp-goal-card {
+            background: white;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .xp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .xp-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .xp-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--orange-deep);
+        }
+
+        .xp-progress-bg {
+            height: 16px;
+            background: #F5EDE8;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .xp-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--orange-deep), var(--primary-orange), var(--orange-light));
+            border-radius: 12px;
+            width: 65%;
+        }
+
+        .xp-subtitle {
+            font-size: 13px;
+            color: var(--text-medium);
+        }
+
+        /* Today's Journey Card */
+        .journey-card {
+            background: white;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .journey-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .journey-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .journey-item.completed {
+            background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+        }
+
+        .journey-item.active {
+            background: linear-gradient(135deg, var(--orange-pale), #FFF9F5);
+            border: 2px solid var(--orange-light);
+        }
+
+        .journey-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .journey-item.completed .journey-icon {
+            background: #66BB6A;
+            color: white;
+        }
+
+        .journey-item.active .journey-icon {
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+        }
+
+        .journey-item.locked .journey-icon {
+            background: #EEEEEE;
+        }
+
+        .journey-info { flex: 1; }
+        .journey-name { font-weight: 700; font-size: 15px; color: var(--text-dark); }
+        .journey-xp { font-size: 13px; color: var(--text-medium); }
+        .journey-status { font-size: 20px; }
+
+        /* Today's Activity Card - NEW */
+        .activity-card {
+            background: white;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-empty {
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .activity-empty-icon {
+            font-size: 50px;
+            margin-bottom: 12px;
+        }
+
+        .activity-empty-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .activity-empty-subtext {
+            font-size: 14px;
+            color: var(--text-medium);
+            margin-bottom: 20px;
+        }
+
+        .activity-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .activity-btn {
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .activity-btn.primary {
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .activity-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.4);
+        }
+
+        .activity-btn.secondary {
+            background: white;
+            color: var(--blue-dark);
+            border: 2px solid var(--blue-light);
+        }
+
+        .activity-btn.secondary:hover {
+            background: var(--blue-pale);
+        }
+
+        /* Badges Card */
+        .badges-card {
+            background: white;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .badges-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .badge-item {
+            aspect-ratio: 1;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .badge-item.earned {
+            background: linear-gradient(135deg, var(--orange-pale), var(--blue-pale));
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
+        }
+
+        .badge-item.earned:hover {
+            transform: scale(1.12);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.25);
+        }
+
+        .badge-item.locked {
+            background: #F5F5F5;
+            opacity: 0.5;
+            font-size: 22px;
+        }
+
+        /* Ad Placeholder */
+        .ad-placeholder {
+            background: #F5F5F5;
+            border: 2px dashed #CCCCCC;
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .ad-placeholder-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #999999;
+        }
+
+        .ad-placeholder-size {
+            font-size: 12px;
+            color: #BBBBBB;
+            margin-top: 5px;
+        }
+
+        /* Mobile Styles */
+        .mobile-header {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .mobile-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .mobile-logo-text {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--orange-deep);
+        }
+
+        .mobile-header-oni {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--orange-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(255, 140, 66, 0.3);
+        }
+
+        .mobile-content {
+            padding: 20px;
+            padding-bottom: 100px;
+            background: linear-gradient(180deg, #FEFCFB 0%, var(--orange-pale) 100%);
+        }
+
+        .mobile-ad-banner {
+            background: #F5F5F5;
+            border: 2px dashed #CCCCCC;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .mobile-ad-banner .ad-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999999;
+        }
+
+        .mobile-avatar-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .mobile-avatar-big {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .mobile-avatar-info {
+            flex: 1;
+        }
+
+        .mobile-avatar-info h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .mobile-avatar-info h2 span {
+            color: var(--orange-deep);
+        }
+
+        .mobile-avatar-info p {
+            font-size: 13px;
+            color: var(--text-medium);
+        }
+
+        .mobile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .mobile-stat {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .mobile-stat.xp::before { background: linear-gradient(90deg, var(--orange-deep), var(--primary-orange)); }
+        .mobile-stat.active-min::before { background: linear-gradient(90deg, var(--blue-primary), var(--blue-light)); }
+        .mobile-stat.streak::before { background: linear-gradient(90deg, var(--amber), #FFD54F); }
+        .mobile-stat.level::before { background: linear-gradient(90deg, var(--blue-dark), var(--blue-primary)); }
+
+        .mobile-stat-icon { font-size: 26px; }
+        .mobile-stat-value { font-size: 22px; font-weight: 800; color: var(--text-dark); }
+        .mobile-stat-label { font-size: 12px; color: var(--text-medium); }
+
+        /* Mobile Continue Learning */
+        .mobile-continue-learning {
+            background: linear-gradient(135deg, var(--orange-pale), #FFF9F5);
+            border: 2px solid var(--orange-light);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .mobile-lesson-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .mobile-lesson-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--blue-primary), var(--blue-light));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .mobile-lesson-info h3 {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .mobile-lesson-info .lesson-name-mobile {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--orange-deep);
+        }
+
+        .mobile-lesson-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .mobile-lesson-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .mobile-lesson-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green-success), #66BB6A);
+            border-radius: 10px;
+            width: 60%;
+        }
+
+        .mobile-start-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .mobile-quick-log {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .mobile-log-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .mobile-log-buttons { display: flex; gap: 12px; }
+
+        .mobile-log-btn {
+            flex: 1;
+            padding: 18px 10px;
+            border-radius: 14px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .mobile-log-btn.food {
+            background: linear-gradient(135deg, var(--orange-pale), var(--peach));
+            color: var(--orange-deep);
+        }
+
+        .mobile-log-btn.exercise {
+            background: linear-gradient(135deg, var(--blue-pale), #BBDEFB);
+            color: var(--blue-dark);
+        }
+
+        .mobile-log-btn .btn-icon { font-size: 28px; }
+        .mobile-log-btn .btn-text { font-size: 13px; font-weight: 700; }
+
+        .mobile-xp-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .mobile-journey {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Mobile Today's Activity */
+        .mobile-activity {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .mobile-activity-empty {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .mobile-activity-empty .emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .mobile-activity-empty .text {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .mobile-activity-empty .subtext {
+            font-size: 13px;
+            color: var(--text-medium);
+            margin-bottom: 15px;
+        }
+
+        .mobile-activity-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mobile-activity-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .mobile-activity-btn.primary {
+            background: linear-gradient(135deg, var(--orange-deep), var(--primary-orange));
+            color: white;
+        }
+
+        .mobile-activity-btn.secondary {
+            background: white;
+            color: var(--blue-dark);
+            border: 2px solid var(--blue-light);
+        }
+
+        /* Mobile Bottom Nav */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 390px;
+            background: white;
+            padding: 12px 20px 25px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.08);
+            border-radius: 28px 28px 0 0;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-medium);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .mobile-nav-item.active { color: var(--orange-deep); }
+        .mobile-nav-icon { font-size: 24px; }
+
+        /* Theme Info Banner */
+        .theme-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-width: 450px;
+        }
+
+        .theme-info h3 { font-size: 14px; color: var(--text-dark); margin-bottom: 8px; }
+        .theme-info p { font-size: 11px; color: var(--text-medium); line-height: 1.5; }
+        .color-swatches { display: flex; gap: 8px; margin-top: 10px; }
+        .swatch { width: 24px; height: 24px; border-radius: 6px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="view-toggle">
+        <button class="active" onclick="showDesktop()">Desktop</button>
+        <button onclick="showMobile()">Mobile</button>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="desktop-view" id="desktopView">
+        <!-- Left Sidebar - White Background (No Oni here) -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🍊</div>
+                <span class="logo-text">BiteBurst</span>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📚</div>
+                    <span>Lessons</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <span>Progress</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">🏆</div>
+                    <span>Achievements</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Avatar Section at TOP -->
+            <div class="avatar-header">
+                <div class="avatar-character">🦸</div>
+                <div class="avatar-info">
+                    <h1 class="greeting">Hey <span>Alex</span>! 🌟</h1>
+                    <p class="sub-greeting">Ready to fuel your body and get moving?</p>
+                    <span class="avatar-title">🍊 Health Hero 🏃</span>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card xp">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value">1,250</div>
+                    <div class="stat-label">Total XP</div>
+                </div>
+                <div class="stat-card active-min">
+                    <div class="stat-icon">🏃</div>
+                    <div class="stat-value">45</div>
+                    <div class="stat-label">Active Minutes</div>
+                </div>
+                <div class="stat-card streak">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+                <div class="stat-card level">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <!-- Continue Learning Section - NEW -->
+            <div class="continue-learning">
+                <div class="lesson-icon">⚽</div>
+                <div class="lesson-content">
+                    <span class="lesson-badge">📚 CONTINUE LEARNING</span>
+                    <div class="lesson-name">The Boss Battle</div>
+                    <div class="lesson-progress">
+                        <div class="lesson-progress-bar">
+                            <div class="lesson-progress-fill"></div>
+                        </div>
+                        <span class="lesson-progress-text">3 of 5</span>
+                    </div>
+                    <button class="start-lesson-btn">
+                        📖 START LESSON
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Log -->
+            <div class="quick-log">
+                <h3 class="section-title"><span class="icon">⚡</span> Quick Log</h3>
+                <div class="log-buttons">
+                    <button class="log-btn food">
+                        <span class="btn-icon">🍎</span>
+                        <span class="btn-text">Log Food</span>
+                    </button>
+                    <button class="log-btn exercise">
+                        <span class="btn-icon">🏃</span>
+                        <span class="btn-text">Log Exercise</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="right-sidebar">
+            <!-- Oni Mascot - TOP OF RIGHT COLUMN -->
+            <div class="oni-mascot-card">
+                <div class="oni-avatar">🍊</div>
+                <div class="oni-info">
+                    <div class="oni-name">Oni the Orange</div>
+                    <div class="oni-message">Great job logging your breakfast! Keep it up! 🎉</div>
+                </div>
+            </div>
+
+            <!-- Daily XP Goal -->
+            <div class="xp-goal-card">
+                <div class="xp-header">
+                    <span class="xp-title">🎯 Daily XP Goal</span>
+                    <span class="xp-value">65/100 XP</span>
+                </div>
+                <div class="xp-progress-bg">
+                    <div class="xp-progress-fill"></div>
+                </div>
+                <div class="xp-subtitle">35 XP to complete today's goal!</div>
+            </div>
+
+            <!-- Today's Journey -->
+            <div class="journey-card">
+                <h3 class="journey-title">🗺️ Today's Journey</h3>
+
+                <div class="journey-item completed">
+                    <div class="journey-icon">✓</div>
+                    <div class="journey-info">
+                        <div class="journey-name">Log one fruit</div>
+                        <div class="journey-xp">+15 XP</div>
+                    </div>
+                    <div class="journey-status">✅</div>
+                </div>
+
+                <div class="journey-item active">
+                    <div class="journey-icon">🏃</div>
+                    <div class="journey-info">
+                        <div class="journey-name">Move for 15 minutes</div>
+                        <div class="journey-xp">+20 XP</div>
+                    </div>
+                    <div class="journey-status">▶️</div>
+                </div>
+
+                <div class="journey-item locked">
+                    <div class="journey-icon">💧</div>
+                    <div class="journey-info">
+                        <div class="journey-name">Drink water</div>
+                        <div class="journey-xp">+10 XP</div>
+                    </div>
+                    <div class="journey-status">🔒</div>
+                </div>
+            </div>
+
+            <!-- Today's Activity - NEW -->
+            <div class="activity-card">
+                <h3 class="activity-title">📋 Today's Activity</h3>
+                <div class="activity-empty">
+                    <div class="activity-empty-icon">🍊</div>
+                    <div class="activity-empty-text">No activity yet today</div>
+                    <div class="activity-empty-subtext">Time to fuel up! 🍎</div>
+                    <div class="activity-buttons">
+                        <button class="activity-btn primary">🍽️ Log a Meal</button>
+                        <button class="activity-btn secondary">🏃 Log Activity</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges & Rewards -->
+            <div class="badges-card">
+                <h3 class="badges-title">🏅 Badges & Rewards</h3>
+                <div class="badges-grid">
+                    <div class="badge-item earned">🍎</div>
+                    <div class="badge-item earned">🏃</div>
+                    <div class="badge-item earned">💧</div>
+                    <div class="badge-item earned">🥕</div>
+                    <div class="badge-item locked">🔒</div>
+                    <div class="badge-item locked">🔒</div>
+                    <div class="badge-item locked">🔒</div>
+                    <div class="badge-item locked">🔒</div>
+                </div>
+            </div>
+
+            <!-- Ad Placeholder -->
+            <div class="ad-placeholder">
+                <div class="ad-placeholder-text">Ad Placement</div>
+                <div class="ad-placeholder-size">300 x 250</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view" id="mobileView">
+        <div class="mobile-header">
+            <div class="mobile-logo">
+                <div class="mobile-logo-icon">🍊</div>
+                <span class="mobile-logo-text">BiteBurst</span>
+            </div>
+            <!-- Oni in header -->
+            <div class="mobile-header-oni">🍊</div>
+        </div>
+
+        <div class="mobile-content">
+            <!-- Mobile Ad Banner -->
+            <div class="mobile-ad-banner">
+                <div class="ad-text">Ad Placement (320 x 50)</div>
+            </div>
+
+            <!-- Avatar Section at TOP -->
+            <div class="mobile-avatar-section">
+                <div class="mobile-avatar-big">🦸</div>
+                <div class="mobile-avatar-info">
+                    <h2>Hey <span>Alex</span>! 🌟</h2>
+                    <p>Fuel up & get moving!</p>
+                </div>
+            </div>
+
+            <div class="mobile-stats">
+                <div class="mobile-stat xp">
+                    <span class="mobile-stat-icon">⭐</span>
+                    <div>
+                        <div class="mobile-stat-value">1,250</div>
+                        <div class="mobile-stat-label">Total XP</div>
+                    </div>
+                </div>
+                <div class="mobile-stat active-min">
+                    <span class="mobile-stat-icon">🏃</span>
+                    <div>
+                        <div class="mobile-stat-value">45</div>
+                        <div class="mobile-stat-label">Active Min</div>
+                    </div>
+                </div>
+                <div class="mobile-stat streak">
+                    <span class="mobile-stat-icon">🔥</span>
+                    <div>
+                        <div class="mobile-stat-value">7</div>
+                        <div class="mobile-stat-label">Day Streak</div>
+                    </div>
+                </div>
+                <div class="mobile-stat level">
+                    <span class="mobile-stat-icon">🎯</span>
+                    <div>
+                        <div class="mobile-stat-value">5</div>
+                        <div class="mobile-stat-label">Level</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Continue Learning - NEW -->
+            <div class="mobile-continue-learning">
+                <div class="mobile-lesson-header">
+                    <div class="mobile-lesson-icon">⚽</div>
+                    <div class="mobile-lesson-info">
+                        <h3>📚 Continue Learning</h3>
+                        <div class="lesson-name-mobile">The Boss Battle</div>
+                    </div>
+                </div>
+                <div class="mobile-lesson-progress">
+                    <div class="mobile-lesson-progress-bar">
+                        <div class="mobile-lesson-progress-fill"></div>
+                    </div>
+                    <span class="lesson-progress-text">3 of 5</span>
+                </div>
+                <button class="mobile-start-btn">📖 START LESSON</button>
+            </div>
+
+            <!-- Quick Log -->
+            <div class="mobile-quick-log">
+                <h3 class="mobile-log-title">⚡ Quick Log</h3>
+                <div class="mobile-log-buttons">
+                    <button class="mobile-log-btn food">
+                        <span class="btn-icon">🍎</span>
+                        <span class="btn-text">Log Food</span>
+                    </button>
+                    <button class="mobile-log-btn exercise">
+                        <span class="btn-icon">🏃</span>
+                        <span class="btn-text">Log Exercise</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- XP Goal Card -->
+            <div class="mobile-xp-card">
+                <div class="xp-header">
+                    <span class="xp-title">🎯 Daily Goal</span>
+                    <span class="xp-value">65/100 XP</span>
+                </div>
+                <div class="xp-progress-bg">
+                    <div class="xp-progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Journey Card -->
+            <div class="mobile-journey">
+                <h3 class="journey-title">🗺️ Today's Journey</h3>
+                <div class="journey-item completed">
+                    <div class="journey-icon">✓</div>
+                    <div class="journey-info">
+                        <div class="journey-name">Log one fruit</div>
+                        <div class="journey-xp">+15 XP</div>
+                    </div>
+                    <div class="journey-status">✅</div>
+                </div>
+                <div class="journey-item active">
+                    <div class="journey-icon">🏃</div>
+                    <div class="journey-info">
+                        <div class="journey-name">Move for 15 minutes</div>
+                        <div class="journey-xp">+20 XP</div>
+                    </div>
+                    <div class="journey-status">▶️</div>
+                </div>
+            </div>
+
+            <!-- Mobile Today's Activity - NEW -->
+            <div class="mobile-activity">
+                <h3 class="journey-title">📋 Today's Activity</h3>
+                <div class="mobile-activity-empty">
+                    <div class="emoji">🍊</div>
+                    <div class="text">No activity yet today</div>
+                    <div class="subtext">Time to fuel up! 🍎</div>
+                    <div class="mobile-activity-buttons">
+                        <button class="mobile-activity-btn primary">🍽️ Log a Meal</button>
+                        <button class="mobile-activity-btn secondary">🏃 Log Activity</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-nav">
+            <div class="mobile-nav-item active">
+                <span class="mobile-nav-icon">🏠</span>
+                <span>Home</span>
+            </div>
+            <div class="mobile-nav-item">
+                <span class="mobile-nav-icon">📚</span>
+                <span>Learn</span>
+            </div>
+            <div class="mobile-nav-item">
+                <span class="mobile-nav-icon">📊</span>
+                <span>Progress</span>
+            </div>
+            <div class="mobile-nav-item">
+                <span class="mobile-nav-icon">🏆</span>
+                <span>Badges</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="theme-info">
+        <h3>🎨 V4 Design 1: UPDATED - All Elements</h3>
+        <p>✅ Oni moved to TOP of right column | ✅ Continue Learning section added | ✅ Today's Activity section added | ✅ Journey tasks match existing ("Log one fruit", "Move for 15 min", "Drink water") | ✅ Mobile includes all sections</p>
+        <div class="color-swatches">
+            <div class="swatch" style="background: #FF6B35;" title="Deep Orange"></div>
+            <div class="swatch" style="background: #FF8C42;" title="Primary Orange"></div>
+            <div class="swatch" style="background: #4A90D9;" title="Blue Primary"></div>
+            <div class="swatch" style="background: #7AB8F5;" title="Blue Light"></div>
+            <div class="swatch" style="background: #4CAF50;" title="Success Green"></div>
+        </div>
+    </div>
+
+    <script>
+        function showDesktop() {
+            document.getElementById('desktopView').style.display = 'flex';
+            document.getElementById('mobileView').style.display = 'none';
+            document.querySelectorAll('.view-toggle button')[0].classList.add('active');
+            document.querySelectorAll('.view-toggle button')[1].classList.remove('active');
+        }
+
+        function showMobile() {
+            document.getElementById('desktopView').style.display = 'none';
+            document.getElementById('mobileView').style.display = 'block';
+            document.querySelectorAll('.view-toggle button')[0].classList.remove('active');
+            document.querySelectorAll('.view-toggle button')[1].classList.add('active');
+        }
+    </script>
+</body>
+</html>
