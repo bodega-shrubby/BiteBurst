@@ -1,7 +1,8 @@
-import { BookOpen, Medal, User, MoreHorizontal, Settings, HelpCircle, LogOut, Apple, Dumbbell } from 'lucide-react';
+import { BookOpen, Medal, MoreHorizontal, Settings, HelpCircle, LogOut, Apple, Dumbbell } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
+import { CharacterAvatar } from '@/components/dashboard/CharacterAvatar';
 
 interface NavItem {
   id: string;
@@ -16,9 +17,6 @@ const NAV_ITEMS_TOP: NavItem[] = [
   { id: 'champs', label: 'Champs', icon: Medal, path: '/leaderboard' },
 ];
 
-const NAV_ITEMS_BOTTOM: NavItem[] = [
-  { id: 'profile', label: 'Profile', icon: User, path: '/dashboard' },
-];
 
 export default function Sidebar() {
   const [location, setLocation] = useLocation();
@@ -118,22 +116,17 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* Bottom nav items (Profile) */}
-        {NAV_ITEMS_BOTTOM.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setLocation(item.path)}
-              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
-            >
-              <Icon className="w-5 h-5 text-blue-500 fill-blue-500" />
-              <span className="text-sm">{item.label}</span>
-            </button>
-          );
-        })}
+        {/* Profile button with user avatar */}
+        <button
+          type="button"
+          onClick={() => setLocation('/dashboard')}
+          className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
+        >
+          <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+            <CharacterAvatar size="sm" />
+          </div>
+          <span className="text-sm">Profile</span>
+        </button>
 
         {/* More dropdown */}
         <div className="relative">
