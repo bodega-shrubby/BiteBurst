@@ -40,9 +40,7 @@ export default function ContinueLearning({ lesson, onStartLesson }: ContinueLear
   return (
     <div className="bg-gradient-to-br from-orange-50 to-white border-2 border-orange-200 rounded-3xl p-6">
       <div className="flex items-center gap-5">
-        <div className="w-[90px] h-[90px] bg-gradient-to-br from-[#4A90D9] to-[#7AB8F5] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
-          <img src={brainyBolt} alt="Brainy Bolt" className="w-full h-full object-cover" />
-        </div>
+        <img src={brainyBolt} alt="Brainy Bolt" className="w-[90px] h-[90px] flex-shrink-0 object-contain" />
 
         <div className="flex-1 min-w-0">
           <span className="inline-block bg-[#E8F4FD] text-[#2E6BB5] text-xs font-bold px-3 py-1 rounded-full mb-2">
