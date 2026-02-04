@@ -2,15 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
-import { Settings, Pencil } from "lucide-react";
 
 import { CharacterAvatar } from "@/components/dashboard/CharacterAvatar";
-import LessonHero from "@/components/dashboard/LessonHero";
 import StatisticsGrid from "@/components/dashboard/StatisticsGrid";
 import XPProgressBar from "@/components/dashboard/XPProgressBar";
 import TodaysJourney from "@/components/dashboard/TodaysJourney";
 import BadgesShelf from "@/components/dashboard/BadgesShelf";
-import RecentLogsList from "@/components/dashboard/RecentLogsList";
 import OniMascotCard from "@/components/dashboard/OniMascotCard";
 import ContinueLearning from "@/components/dashboard/ContinueLearning";
 import TodaysActivity from "@/components/dashboard/TodaysActivity";
@@ -59,30 +56,6 @@ interface DailySummaryV2 {
     goal: 'energy' | 'focus' | 'strength';
     display_name: string;
   };
-}
-
-function OrangeStar({ filled = true, size = 20 }: { filled?: boolean; size?: number }) {
-  return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill={filled ? "#FF6A00" : "#E5E5E5"}
-      className={`transition-all duration-200 ${filled ? 'opacity-100 scale-100' : 'opacity-40 scale-90'}`}
-    >
-      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-    </svg>
-  );
-}
-
-function StarsDisplay({ stars = 3, maxStars = 5 }: { stars?: number; maxStars?: number }) {
-  return (
-    <div className="flex items-center space-x-0.5" title="Stars - keep learning!">
-      {Array.from({ length: maxStars }).map((_, i) => (
-        <OrangeStar key={i} filled={i < stars} size={20} />
-      ))}
-    </div>
-  );
 }
 
 function Confetti() {
@@ -191,12 +164,16 @@ function getMascotGreeting(displayName: string, xpToday: number, xpGoal: number)
 function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
-      <div className="h-48 bg-gradient-to-b from-[#E8E0F0] to-[#DDD6E8] animate-pulse" />
-      <div className="h-32 bg-[#1A1B4B] animate-pulse" />
-      <div className="p-4 space-y-4">
-        <div className="h-24 bg-gray-200 rounded-2xl animate-pulse" />
+      <div className="p-4 md:p-6 lg:p-8 space-y-6 md:ml-[200px]">
         <div className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
-        <div className="h-24 bg-gray-200 rounded-2xl animate-pulse" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
+          <div className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
+          <div className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
+          <div className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
+        </div>
+        <div className="h-40 bg-gray-200 rounded-2xl animate-pulse" />
+        <div className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
       </div>
     </div>
   );
@@ -303,80 +280,7 @@ export default function DashboardRedesign() {
       
       {/* Main content - offset for sidebar on larger screens */}
       <div className="md:ml-[200px]">
-        {/* 1. AVATAR HERO SECTION - Light lavender background */}
-        <div 
-          className="w-full py-8 px-4 flex flex-col items-center"
-          style={{ background: 'linear-gradient(180deg, #E8E0F0 0%, #DDD6E8 100%)' }}
-        >
-          <div className="relative">
-            <CharacterAvatar size="lg" />
-            <button 
-              className="absolute bottom-0 right-0 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-              aria-label="Edit avatar"
-            >
-              <Pencil className="w-4 h-4 text-gray-600" />
-            </button>
-          </div>
-        </div>
-
-        {/* 2. USER INFO BAR - Dark navy blue */}
-        <div 
-          className="text-white py-5 px-4 text-center"
-          style={{ backgroundColor: '#1A1B4B' }}
-        >
-          <h1 className="text-2xl font-bold">{dailySummary.user.display_name}</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            @{dailySummary.user.display_name.toLowerCase().replace(/\s+/g, '')}
-          </p>
-          
-          {/* Level Badge */}
-          <div className="flex justify-center mt-3">
-            <span className="bg-[#FF6A00] text-white text-sm font-bold px-4 py-1.5 rounded-full">
-              Level {dailySummary.user.level}
-            </span>
-          </div>
-          
-          {/* Level Progress */}
-          <div className="max-w-[240px] mx-auto mt-4 space-y-2">
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Lvl {dailySummary.user.level}</span>
-              <span>{dailySummary.user.lifetime_xp % 100} / 100 XP</span>
-              <span>Lvl {dailySummary.user.level + 1}</span>
-            </div>
-            <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
-              <div 
-                className="bg-[#FF6A00] h-2 rounded-full transition-all duration-500"
-                style={{ width: `${dailySummary.user.lifetime_xp % 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 3. STATUS BAR - Streak, Hearts, Settings - FULL WIDTH */}
-        <div className="w-full bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center justify-center space-x-6">
-            {/* Streak Pill */}
-            <div className="flex items-center space-x-2 bg-orange-50 px-4 py-2.5 rounded-full">
-              <span className="text-xl lg:text-2xl">🔥</span>
-              <span className="text-sm lg:text-base font-bold text-orange-600">
-                {dailySummary.streak_days} day streak
-              </span>
-            </div>
-            
-            {/* Stars */}
-            <StarsDisplay stars={3} maxStars={5} />
-            
-            {/* Settings */}
-            <button 
-              className="p-2.5 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Settings"
-            >
-              <Settings className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
-            </button>
-          </div>
-        </div>
-
-        {/* TWO-COLUMN LAYOUT for content below status bar */}
+        {/* TWO-COLUMN LAYOUT */}
         <div className="flex justify-center">
           <div className="flex max-w-[1100px] w-full">
 
@@ -402,10 +306,10 @@ export default function DashboardRedesign() {
                 </div>
               </div>
 
-              {/* 2. STATISTICS GRID */}
+              {/* 2. STATISTICS GRID - 4 columns */}
               <div>
                 <h2 className="font-bold text-xl mb-4">Statistics</h2>
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {/* XP Today */}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
@@ -464,51 +368,35 @@ export default function DashboardRedesign() {
                 </div>
               </div>
 
-              {/* 5. CONTINUE LEARNING - NEW */}
+              {/* 3. CONTINUE LEARNING */}
               <ContinueLearning />
 
-              {/* 6. LESSON HERO - PRIMARY CTA */}
-              <LessonHero />
-
-              {/* 7. QUICK LOG - Larger Grid */}
+              {/* 4. QUICK LOG - Two buttons only */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex justify-between items-center mb-5">
-                  <h3 className="font-bold text-xl">Quick Log</h3>
-                  <span className="text-sm text-gray-400">Tap to log</span>
-                </div>
+                <h3 className="font-bold text-xl mb-5 flex items-center gap-2">
+                  <span>⚡</span> Quick Log
+                </h3>
 
-                {/* 4-column emoji grid with larger items */}
-                <div className="grid grid-cols-4 gap-4 mb-6">
-                  {['🍎', '🥦', '🍞', '🧃', '⚽', '🧘', '🏃', '🚴'].map((emoji, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setLocation(i < 4 ? '/food-log' : '/activity-log')}
-                      className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-4xl hover:bg-orange-50 hover:scale-105 cursor-pointer transition"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Larger buttons */}
-                <div className="grid grid-cols-2 gap-5">
+                <div className="flex gap-4">
+                  {/* Log Food Button - Orange theme */}
                   <button
                     onClick={() => setLocation('/food-log')}
-                    className="border-2 border-orange-500 text-orange-500 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition"
+                    className="flex-1 flex flex-col items-center gap-3 p-5 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-500 hover:to-orange-400 hover:text-white text-orange-600 transition-all hover:shadow-lg hover:-translate-y-1"
                   >
-                    Log Food
+                    <span className="text-4xl">🍎</span>
+                    <span className="font-bold text-base">Log Food</span>
                   </button>
+
+                  {/* Log Exercise Button - Blue theme */}
                   <button
                     onClick={() => setLocation('/activity-log')}
-                    className="border-2 border-orange-500 text-orange-500 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition"
+                    className="flex-1 flex flex-col items-center gap-3 p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 hover:from-[#4A90D9] hover:to-[#7AB8F5] hover:text-white text-[#2E6BB5] transition-all hover:shadow-lg hover:-translate-y-1"
                   >
-                    Log Activity
+                    <span className="text-4xl">🏃</span>
+                    <span className="font-bold text-base">Log Exercise</span>
                   </button>
                 </div>
               </div>
-
-              {/* 8. RECENT ACTIVITY - with AI feedback dropdown (main column for all screens) */}
-              <RecentLogsList logs={dailySummary.recent_logs} />
 
               {/* MOBILE ONLY: Show sidebar content stacked below */}
               <div className="lg:hidden space-y-6">
