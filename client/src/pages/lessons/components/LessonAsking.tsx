@@ -97,13 +97,19 @@ export default function LessonAsking({
   
   // Get ordering items from either legacy or new format
   const getOrderingItems = () => {
-    if (step.content.orderingItems) return step.content.orderingItems;
-    if (step.content.items) {
-      const categories = Array.from(new Set(step.content.items.map(i => i.category)));
-      return step.content.items.map((item, index) => ({
-        id: item.id,
+    if (step.content.orderingItems) {
+      return step.content.orderingItems.map((item: any, index: number) => ({
+        id: item.id || `order-item-${index}`,
         text: item.text,
-        correctOrder: index + 1,
+        correctOrder: item.correctOrder ?? index + 1,
+        category: item.category
+      }));
+    }
+    if (step.content.items) {
+      return step.content.items.map((item: any, index: number) => ({
+        id: item.id || `order-item-${index}`,
+        text: item.text,
+        correctOrder: item.correctOrder ?? index + 1,
         category: item.category
       }));
     }

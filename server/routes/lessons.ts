@@ -930,10 +930,15 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                 case 'ordering':
                   // Validate ordering: answer is JSON array in correct order
                   // Support both orderingItems (legacy) and items with category (new format)
+                  // Generate IDs for items that don't have them (matching frontend logic)
                   if (step.content?.orderingItems) {
                     try {
                       const submittedOrder = JSON.parse(validatedData.answer);
-                      const items = step.content.orderingItems as Array<{id: string; correctOrder: number}>;
+                      const items = (step.content.orderingItems as Array<{id?: string; correctOrder: number; text: string}>)
+                        .map((item, index) => ({
+                          ...item,
+                          id: item.id || `order-item-${index}`
+                        }));
                       const correctOrderIds = items
                         .sort((a, b) => a.correctOrder - b.correctOrder)
                         .map(item => item.id);
@@ -943,13 +948,19 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                       isCorrect = false;
                     }
                   } else if (step.content?.items && Array.isArray(step.content.items)) {
-                    // New format: items array with id, text, category
-                    // For category-based ordering (NEED vs WANT), validate by matching categories
+                    // New format: items array with id, text, category or correctOrder
                     try {
                       const submittedOrder = JSON.parse(validatedData.answer);
-                      const items = step.content.items as Array<{id: string; text: string; category: string}>;
-                      // The correct order is the original order in the array (as defined in DB)
-                      const correctOrderIds = items.map(item => item.id);
+                      const items = (step.content.items as Array<{id?: string; text: string; correctOrder?: number; category?: string}>)
+                        .map((item, index) => ({
+                          ...item,
+                          id: item.id || `order-item-${index}`,
+                          correctOrder: item.correctOrder ?? index + 1
+                        }));
+                      // Sort by correctOrder and get IDs
+                      const correctOrderIds = items
+                        .sort((a, b) => a.correctOrder - b.correctOrder)
+                        .map(item => item.id);
                       isCorrect = JSON.stringify(submittedOrder) === JSON.stringify(correctOrderIds);
                     } catch (e) {
                       console.error('Failed to parse ordering answer:', e);
