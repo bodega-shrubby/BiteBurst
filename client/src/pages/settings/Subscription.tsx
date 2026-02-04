@@ -376,6 +376,110 @@ export default function Subscription() {
             </>
           )}
 
+          {currentPlan !== 'free' && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
+              <h3 className="font-bold text-gray-900 mb-4">Change Your Plan</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div 
+                  className={`rounded-2xl border-2 p-4 ${
+                    currentPlan === 'individual' 
+                      ? 'border-orange-500 bg-orange-50' 
+                      : 'border-gray-200 bg-white cursor-pointer hover:border-orange-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">👤</span>
+                      <h4 className="font-bold text-gray-900">Individual</h4>
+                    </div>
+                    {currentPlan === 'individual' && (
+                      <span className="text-xs bg-orange-500 text-white px-2 py-1 rounded-full">Current</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mb-2">1 child profile</p>
+                  <p className="font-bold text-gray-900">${displayIndividualPrice}<span className="text-sm font-normal text-gray-500">/month</span></p>
+                  {currentPlan !== 'individual' && (
+                    <Button 
+                      onClick={() => {
+                        if (individualPrice) handleChoosePlan('individual', individualPrice.price_id);
+                      }}
+                      className="w-full mt-3 bg-orange-500 text-white hover:bg-orange-600"
+                      disabled={checkoutMutation.isPending || !individualPrice}
+                    >
+                      {checkoutMutation.isPending && selectedPlan === 'individual' ? 'Processing...' : 'Switch to Individual'}
+                    </Button>
+                  )}
+                </div>
+
+                <div 
+                  className={`rounded-2xl border-2 p-4 relative ${
+                    currentPlan === 'family' 
+                      ? 'border-purple-500 bg-purple-50' 
+                      : 'border-gray-200 bg-white cursor-pointer hover:border-purple-300'
+                  }`}
+                >
+                  {currentPlan !== 'family' && (
+                    <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-bl-xl">
+                      SAVE 55%
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">👨‍👩‍👧‍👦</span>
+                      <h4 className="font-bold text-gray-900">Family</h4>
+                    </div>
+                    {currentPlan === 'family' && (
+                      <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded-full">Current</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mb-2">2-4 child profiles</p>
+                  <p className="font-bold text-gray-900">${displayFamilyPrice}<span className="text-sm font-normal text-gray-500">/month</span></p>
+                  {currentPlan !== 'family' && (
+                    <>
+                      {selectedPlan === 'family' ? (
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          <label className="text-sm text-gray-600 mb-2 block">How many children?</label>
+                          <div className="flex space-x-2 mb-3">
+                            {[2, 3, 4].map((num) => (
+                              <button
+                                key={num}
+                                onClick={() => setFamilySize(num)}
+                                className={`flex-1 py-2 rounded-lg transition ${
+                                  familySize === num 
+                                    ? 'bg-purple-500 text-white' 
+                                    : 'bg-gray-100 text-gray-600 hover:bg-purple-100'
+                                }`}
+                              >
+                                {num}
+                              </button>
+                            ))}
+                          </div>
+                          <Button 
+                            onClick={() => {
+                              if (familyPrice) handleConfirmFamily(familyPrice.price_id);
+                            }}
+                            className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                            disabled={checkoutMutation.isPending}
+                          >
+                            {checkoutMutation.isPending ? 'Processing...' : 'Upgrade to Family'}
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          onClick={() => setSelectedPlan('family')}
+                          className="w-full mt-3 bg-purple-600 text-white hover:bg-purple-700"
+                          disabled={!familyPrice}
+                        >
+                          Switch to Family
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h3 className="font-bold text-gray-900 mb-4">What's included with Pro</h3>
 
@@ -423,137 +527,33 @@ export default function Subscription() {
           </div>
 
           {currentPlan !== 'free' && (
-            <>
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-                <h3 className="font-bold text-gray-900 mb-4">Change Your Plan</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div 
-                    className={`rounded-2xl border-2 p-4 ${
-                      currentPlan === 'individual' 
-                        ? 'border-orange-500 bg-orange-50' 
-                        : 'border-gray-200 bg-white cursor-pointer hover:border-orange-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl">👤</span>
-                        <h4 className="font-bold text-gray-900">Individual</h4>
-                      </div>
-                      {currentPlan === 'individual' && (
-                        <span className="text-xs bg-orange-500 text-white px-2 py-1 rounded-full">Current</span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-500 mb-2">1 child profile</p>
-                    <p className="font-bold text-gray-900">${displayIndividualPrice}<span className="text-sm font-normal text-gray-500">/month</span></p>
-                    {currentPlan !== 'individual' && (
-                      <Button 
-                        onClick={() => {
-                          if (individualPrice) handleChoosePlan('individual', individualPrice.price_id);
-                        }}
-                        className="w-full mt-3 bg-orange-500 text-white hover:bg-orange-600"
-                        disabled={checkoutMutation.isPending || !individualPrice}
-                      >
-                        {checkoutMutation.isPending && selectedPlan === 'individual' ? 'Processing...' : 'Switch to Individual'}
-                      </Button>
-                    )}
-                  </div>
-
-                  <div 
-                    className={`rounded-2xl border-2 p-4 relative ${
-                      currentPlan === 'family' 
-                        ? 'border-purple-500 bg-purple-50' 
-                        : 'border-gray-200 bg-white cursor-pointer hover:border-purple-300'
-                    }`}
-                  >
-                    {currentPlan !== 'family' && (
-                      <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-bl-xl">
-                        SAVE 55%
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl">👨‍👩‍👧‍👦</span>
-                        <h4 className="font-bold text-gray-900">Family</h4>
-                      </div>
-                      {currentPlan === 'family' && (
-                        <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded-full">Current</span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-500 mb-2">2-4 child profiles</p>
-                    <p className="font-bold text-gray-900">${displayFamilyPrice}<span className="text-sm font-normal text-gray-500">/month</span></p>
-                    {currentPlan !== 'family' && (
-                      <>
-                        {selectedPlan === 'family' ? (
-                          <div className="mt-3 pt-3 border-t border-gray-100">
-                            <label className="text-sm text-gray-600 mb-2 block">How many children?</label>
-                            <div className="flex space-x-2 mb-3">
-                              {[2, 3, 4].map((num) => (
-                                <button
-                                  key={num}
-                                  onClick={() => setFamilySize(num)}
-                                  className={`flex-1 py-2 rounded-lg transition ${
-                                    familySize === num 
-                                      ? 'bg-purple-500 text-white' 
-                                      : 'bg-gray-100 text-gray-600 hover:bg-purple-100'
-                                  }`}
-                                >
-                                  {num}
-                                </button>
-                              ))}
-                            </div>
-                            <Button 
-                              onClick={() => {
-                                if (familyPrice) handleConfirmFamily(familyPrice.price_id);
-                              }}
-                              className="w-full bg-purple-600 text-white hover:bg-purple-700"
-                              disabled={checkoutMutation.isPending}
-                            >
-                              {checkoutMutation.isPending ? 'Processing...' : 'Upgrade to Family'}
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button 
-                            onClick={() => setSelectedPlan('family')}
-                            className="w-full mt-3 bg-purple-600 text-white hover:bg-purple-700"
-                            disabled={!familyPrice}
-                          >
-                            Switch to Family
-                          </Button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+              <h3 className="font-bold text-gray-900 mb-2">Manage Your Subscription</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Update your payment method, view invoices, or cancel your subscription.
+              </p>
+              <div className="space-y-3">
+                <Button 
+                  onClick={handleManageSubscription}
+                  className="w-full bg-gray-900 text-white font-medium hover:bg-gray-800"
+                  disabled={portalMutation.isPending}
+                >
+                  {portalMutation.isPending ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Opening...</>
+                  ) : (
+                    <><ExternalLink className="w-4 h-4 mr-2" /> Manage Billing</>
+                  )}
+                </Button>
+                <Button 
+                  onClick={handleCancelSubscription}
+                  variant="outline"
+                  className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-medium"
+                  disabled={cancelMutation.isPending}
+                >
+                  {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Subscription'}
+                </Button>
               </div>
-
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-                <h3 className="font-bold text-gray-900 mb-2">Manage Your Subscription</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  Update your payment method, view invoices, or cancel your subscription.
-                </p>
-                <div className="space-y-3">
-                  <Button 
-                    onClick={handleManageSubscription}
-                    className="w-full bg-gray-900 text-white font-medium hover:bg-gray-800"
-                    disabled={portalMutation.isPending}
-                  >
-                    {portalMutation.isPending ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Opening...</>
-                    ) : (
-                      <><ExternalLink className="w-4 h-4 mr-2" /> Manage Billing</>
-                    )}
-                  </Button>
-                  <Button 
-                    onClick={handleCancelSubscription}
-                    variant="outline"
-                    className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-medium"
-                    disabled={cancelMutation.isPending}
-                  >
-                    {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Subscription'}
-                  </Button>
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           <div className="mt-6 text-center">
