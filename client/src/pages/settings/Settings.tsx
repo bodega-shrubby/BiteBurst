@@ -82,14 +82,9 @@ export default function Settings() {
                 onClick={() => setLocation('/settings/children')}
                 className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg">👨‍👩‍👧‍👦</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Manage Children</p>
-                    <p className="text-sm text-gray-500">Add, edit, or switch profiles</p>
-                  </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Manage Children</p>
+                  <p className="text-sm text-gray-500">Add, edit, or switch profiles</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
@@ -104,14 +99,9 @@ export default function Settings() {
               onClick={() => setLocation('/settings/profile')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                  <span className="text-lg">👤</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900">Account Settings</p>
-                  <p className="text-sm text-gray-500">Manage your email and password</p>
-                </div>
+              <div>
+                <p className="font-semibold text-gray-900">Account Settings</p>
+                <p className="text-sm text-gray-500">Manage your email and password</p>
               </div>
               <span className="text-gray-400">→</span>
             </button>
@@ -120,14 +110,9 @@ export default function Settings() {
               onClick={() => setLocation('/settings/subscription')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-lg">⭐</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900">Subscription</p>
-                  <p className="text-sm text-gray-500">Manage your plan</p>
-                </div>
+              <div>
+                <p className="font-semibold text-gray-900">Subscription</p>
+                <p className="text-sm text-gray-500">Manage your plan</p>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
@@ -140,14 +125,9 @@ export default function Settings() {
             <button
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-lg">❓</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900">Help & Support</p>
-                  <p className="text-sm text-gray-500">FAQs and contact us</p>
-                </div>
+              <div>
+                <p className="font-semibold text-gray-900">Help & Support</p>
+                <p className="text-sm text-gray-500">FAQs and contact us</p>
               </div>
               <span className="text-gray-400">→</span>
             </button>
@@ -156,14 +136,9 @@ export default function Settings() {
               onClick={handleLogout}
               className="w-full flex items-center justify-between p-4 hover:bg-red-50 cursor-pointer transition text-left"
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-lg">🚪</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-red-600">Log Out</p>
-                  <p className="text-sm text-gray-500">Sign out of your account</p>
-                </div>
+              <div>
+                <p className="font-semibold text-red-600">Log Out</p>
+                <p className="text-sm text-gray-500">Sign out of your account</p>
               </div>
             </button>
           </div>
