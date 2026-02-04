@@ -32,8 +32,10 @@ export default function ContinueLearning({ lesson, onStartLesson }: ContinueLear
   const handleStartLesson = () => {
     if (onStartLesson) {
       onStartLesson();
-    } else {
+    } else if (currentLesson.id && currentLesson.id !== 'default') {
       setLocation(`/lessons/${currentLesson.id}`);
+    } else {
+      setLocation('/lessons');
     }
   };
 
