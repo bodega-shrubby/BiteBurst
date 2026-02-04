@@ -11,13 +11,14 @@ import XPProgressBar from "@/components/dashboard/XPProgressBar";
 import TodaysJourney from "@/components/dashboard/TodaysJourney";
 import BadgesShelf from "@/components/dashboard/BadgesShelf";
 import RecentLogsList from "@/components/dashboard/RecentLogsList";
+import OniMascotCard from "@/components/dashboard/OniMascotCard";
+import ContinueLearning from "@/components/dashboard/ContinueLearning";
+import TodaysActivity from "@/components/dashboard/TodaysActivity";
 import BottomNavigation from "@/components/BottomNavigation";
 import Sidebar from "@/components/Sidebar";
 
 import oniTheOrangeImage from "@assets/Mascots/Oni_the_orange.png";
 import oniCelebrateImage from "@assets/Mascots/Oni_celebrate.png";
-import oniHintImage from "@assets/Mascots/Oni_hint.png";
-import FloatingMascot from "@/components/FloatingMascot";
 
 interface DailySummaryV2 {
   xp_today: number;
@@ -381,70 +382,70 @@ export default function DashboardRedesign() {
 
             {/* LEFT: Main Content Column */}
             <div className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 space-y-6 pb-32">
-              {/* 4. MASCOT GREETING - Enhanced with Animation */}
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <img 
-                    src={dailySummary.xp_today >= dailySummary.xp_goal ? oniCelebrateImage : oniTheOrangeImage}
-                    alt="Oni mascot"
-                    className="w-14 h-14 lg:w-16 lg:h-16 object-contain animate-mascot-float-fast drop-shadow-lg"
-                  />
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black/10 rounded-full blur-sm animate-shadow-float-fast" />
-                </div>
-                <div className="bg-gray-100 rounded-2xl px-5 py-3 flex-1 animate-bubble-appear">
-                  <p className="text-sm lg:text-base font-medium text-gray-800">{greeting}</p>
-                </div>
-              </div>
-
-              {/* 5. STATISTICS GRID - MOVED UP */}
+              {/* 4. STATISTICS GRID */}
               <div>
                 <h2 className="font-bold text-xl mb-4">Statistics</h2>
                 <div className="grid grid-cols-2 gap-5">
+                  {/* XP Today */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
+                    <div className="flex items-center space-x-4">
+                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+                        <span className="text-2xl">⚡</span>
+                      </div>
+                      <div>
+                        <div className="text-3xl font-bold text-gray-900">{dailySummary.xp_today}</div>
+                        <div className="text-sm text-gray-500 font-medium">XP Today</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Active Minutes */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#4A90D9] to-[#7AB8F5]" />
+                    <div className="flex items-center space-x-4">
+                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-[#E8F4FD] to-[#BBDEFB] flex items-center justify-center">
+                        <span className="text-2xl">🏃</span>
+                      </div>
+                      <div>
+                        <div className="text-3xl font-bold text-gray-900">45</div>
+                        <div className="text-sm text-gray-500 font-medium">Active Min</div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Day Streak */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-yellow-400" />
                     <div className="flex items-center space-x-4">
-                      <span className="text-4xl">🔥</span>
+                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+                        <span className="text-2xl">🔥</span>
+                      </div>
                       <div>
-                        <div className="text-4xl font-bold text-gray-900">{dailySummary.streak_days}</div>
-                        <div className="text-sm text-gray-500 font-medium">Day streak</div>
+                        <div className="text-3xl font-bold text-gray-900">{dailySummary.streak_days}</div>
+                        <div className="text-sm text-gray-500 font-medium">Day Streak</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Total XP */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                  {/* Level */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2E6BB5] to-[#4A90D9]" />
                     <div className="flex items-center space-x-4">
-                      <span className="text-4xl">⚡</span>
-                      <div>
-                        <div className="text-4xl font-bold text-gray-900">{dailySummary.user.lifetime_xp}</div>
-                        <div className="text-sm text-gray-500 font-medium">Total XP</div>
+                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-[#E8F4FD] to-[#B3E5FC] flex items-center justify-center">
+                        <span className="text-2xl">⭐</span>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* League */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
-                    <div className="flex items-center space-x-4">
-                      <span className="text-4xl">🥉</span>
                       <div>
-                        <div className="text-2xl font-bold text-orange-600">Bronze</div>
-                        <div className="text-sm text-gray-500 font-medium">League</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Best Streak */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
-                    <div className="flex items-center space-x-4">
-                      <span className="text-4xl">🏅</span>
-                      <div>
-                        <div className="text-4xl font-bold text-gray-900">{dailySummary.best_streak}</div>
-                        <div className="text-sm text-gray-500 font-medium">Best Streak</div>
+                        <div className="text-3xl font-bold text-gray-900">{dailySummary.user.level}</div>
+                        <div className="text-sm text-gray-500 font-medium">Level</div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* 5. CONTINUE LEARNING - NEW */}
+              <ContinueLearning />
 
               {/* 6. LESSON HERO - PRIMARY CTA */}
               <LessonHero />
@@ -491,6 +492,12 @@ export default function DashboardRedesign() {
 
               {/* MOBILE ONLY: Show sidebar content stacked below */}
               <div className="lg:hidden space-y-6">
+                {/* Oni Mascot Card - Mobile */}
+                <OniMascotCard 
+                  userName={dailySummary.user.display_name}
+                  message={greeting}
+                />
+
                 {/* Daily XP Goal - Mobile */}
                 <XPProgressBar 
                   xpToday={dailySummary.xp_today} 
@@ -501,6 +508,16 @@ export default function DashboardRedesign() {
                 <TodaysJourney 
                   milestones={dailySummary.milestones} 
                   onTaskComplete={handleXpBurst}
+                />
+
+                {/* Today's Activity - Mobile */}
+                <TodaysActivity 
+                  recentLogs={dailySummary.recent_logs.map((log: any) => ({
+                    id: log.id,
+                    type: log.type,
+                    summary: log.summary,
+                    xpAwarded: log.xpAwarded,
+                  }))}
                 />
 
                 {/* Badges - Mobile */}
@@ -527,18 +544,13 @@ export default function DashboardRedesign() {
             {/* RIGHT: Sidebar Column (desktop only) */}
             <div className="hidden lg:block w-[340px] bg-gray-50 border-l border-gray-200 p-5 space-y-5 flex-shrink-0">
 
-              {/* Large Floating Oni Mascot */}
-              <div className="flex justify-center mb-2">
-                <FloatingMascot
-                  src={dailySummary.xp_today >= dailySummary.xp_goal ? oniCelebrateImage : oniHintImage}
-                  alt="Oni the Orange"
-                  size="lg"
-                  showSpeechBubble={dailySummary.xp_today === 0}
-                  speechText="Ready to learn? 🍊"
-                />
-              </div>
+              {/* 1. Oni Mascot Card - TOP OF SIDEBAR */}
+              <OniMascotCard 
+                userName={dailySummary.user.display_name}
+                message={greeting}
+              />
 
-              {/* Daily XP Goal */}
+              {/* 2. Daily XP Goal */}
               <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
@@ -562,51 +574,23 @@ export default function DashboardRedesign() {
                 </p>
               </div>
 
-              {/* Today's Journey */}
+              {/* 3. Today's Journey */}
               <TodaysJourney 
                 milestones={dailySummary.milestones} 
                 onTaskComplete={handleXpBurst}
               />
 
-              {/* Today's Activity */}
-              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                <h3 className="font-bold text-lg mb-4">Today's Activity</h3>
-                {dailySummary.recent_logs.length === 0 ? (
-                  <div className="text-center py-4">
-                    <div className="text-5xl mb-3">🍊</div>
-                    <p className="font-bold text-gray-800">No activity yet today</p>
-                    <p className="text-sm text-gray-500">Time to fuel up! 🍎</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {dailySummary.recent_logs.slice(0, 3).map((log: any, i: number) => (
-                      <div key={i} className="flex items-center space-x-3 py-2 border-b border-gray-100 last:border-0">
-                        <span className="text-xl">{log.type === 'food' ? '🍽️' : '🏃'}</span>
-                        <span className="text-sm flex-1 truncate">{log.summary}</span>
-                        {log.xpAwarded && (
-                          <span className="text-xs text-orange-500 font-bold">+{log.xpAwarded} XP</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="space-y-2 mt-4">
-                  <button
-                    onClick={() => setLocation('/food-log')}
-                    className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition"
-                  >
-                    🍽️ Log a Meal
-                  </button>
-                  <button
-                    onClick={() => setLocation('/activity-log')}
-                    className="w-full border-2 border-orange-200 text-orange-500 py-3 rounded-xl font-bold hover:bg-orange-50 transition"
-                  >
-                    ⚽ Log Activity
-                  </button>
-                </div>
-              </div>
+              {/* 4. Today's Activity */}
+              <TodaysActivity 
+                recentLogs={dailySummary.recent_logs.map((log: any) => ({
+                  id: log.id,
+                  type: log.type,
+                  summary: log.summary,
+                  xpAwarded: log.xpAwarded,
+                }))}
+              />
 
-              {/* Badges & Rewards */}
+              {/* 5. Badges & Rewards */}
               <BadgesShelf
                 earnedBadges={badgeData?.earned?.map((badge: any) => ({
                   code: badge.code,
