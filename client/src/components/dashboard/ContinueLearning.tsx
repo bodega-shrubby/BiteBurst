@@ -1,4 +1,5 @@
 import { useLocation } from 'wouter';
+import brainyBolt from '@/assets/Mascots/BrainyBolt.png';
 
 interface ContinueLearningProps {
   lesson?: {
@@ -39,8 +40,8 @@ export default function ContinueLearning({ lesson, onStartLesson }: ContinueLear
   return (
     <div className="bg-gradient-to-br from-orange-50 to-white border-2 border-orange-200 rounded-3xl p-6">
       <div className="flex items-center gap-5">
-        <div className="w-[90px] h-[90px] bg-gradient-to-br from-[#4A90D9] to-[#7AB8F5] rounded-2xl flex items-center justify-center text-5xl flex-shrink-0 shadow-md">
-          {currentLesson.emoji || '📚'}
+        <div className="w-[90px] h-[90px] bg-gradient-to-br from-[#4A90D9] to-[#7AB8F5] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
+          <img src={brainyBolt} alt="Brainy Bolt" className="w-full h-full object-cover" />
         </div>
 
         <div className="flex-1 min-w-0">
