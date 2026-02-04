@@ -308,62 +308,55 @@ export default function DashboardRedesign() {
               </div>
 
               {/* 2. STATISTICS GRID - 4 columns */}
-              <div>
-                <h2 className="font-bold text-xl mb-4">Statistics</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {/* XP Today */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
-                    <div className="flex items-center space-x-4">
-                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
-                        <span className="text-2xl">⚡</span>
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900">{dailySummary.xp_today}</div>
-                        <div className="text-sm text-gray-500 font-medium">XP Today</div>
-                      </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* XP Today */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+                      <span className="text-2xl">⚡</span>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900">{dailySummary.xp_today}</div>
+                      <div className="text-sm text-gray-500 font-medium">XP Today</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Active Minutes */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#4A90D9] to-[#7AB8F5]" />
-                    <div className="flex items-center space-x-4">
-                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-[#E8F4FD] to-[#BBDEFB] flex items-center justify-center">
-                        <span className="text-2xl">🏃</span>
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900">45</div>
-                        <div className="text-sm text-gray-500 font-medium">Active Min</div>
-                      </div>
+                {/* Active Minutes */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-[#E8F4FD] to-[#BBDEFB] flex items-center justify-center">
+                      <span className="text-2xl">🏃</span>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900">45</div>
+                      <div className="text-sm text-gray-500 font-medium">Active Min</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Day Streak */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-yellow-400" />
-                    <div className="flex items-center space-x-4">
-                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
-                        <span className="text-2xl">🔥</span>
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900">{dailySummary.streak_days}</div>
-                        <div className="text-sm text-gray-500 font-medium">Day Streak</div>
-                      </div>
+                {/* Day Streak */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+                      <span className="text-2xl">🔥</span>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900">{dailySummary.streak_days}</div>
+                      <div className="text-sm text-gray-500 font-medium">Day Streak</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Level */}
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2E6BB5] to-[#4A90D9]" />
-                    <div className="flex items-center space-x-4">
-                      <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-[#E8F4FD] to-[#B3E5FC] flex items-center justify-center">
-                        <span className="text-2xl">⭐</span>
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900">{dailySummary.user.level}</div>
-                        <div className="text-sm text-gray-500 font-medium">Level</div>
-                      </div>
+                {/* Level */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition min-h-[140px] flex flex-col justify-center">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-[46px] h-[46px] rounded-xl bg-gradient-to-br from-[#E8F4FD] to-[#B3E5FC] flex items-center justify-center">
+                      <span className="text-2xl">⭐</span>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900">{dailySummary.user.level}</div>
+                      <div className="text-sm text-gray-500 font-medium">Level</div>
                     </div>
                   </div>
                 </div>
