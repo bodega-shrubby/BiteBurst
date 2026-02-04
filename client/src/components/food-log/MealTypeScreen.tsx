@@ -42,8 +42,7 @@ export default function MealTypeScreen({ onSelect, streak = 0, totalXP = 0 }: Me
                     <button
                       key={meal.id}
                       onClick={() => onSelect(meal.id)}
-                      className="relative bg-white rounded-3xl p-8 text-center shadow-sm border-l-[6px] aspect-square flex flex-col items-center justify-center transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg active:scale-[0.98]"
-                      style={{ borderLeftColor: meal.accentColor }}
+                      className="relative bg-white rounded-3xl p-8 text-center shadow-sm border border-gray-200 aspect-square flex flex-col items-center justify-center transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg active:scale-[0.98]"
                     >
                       <span className="text-7xl mb-4">{meal.emoji}</span>
                       <h3 className="text-2xl font-bold text-gray-900">{meal.name}</h3>
