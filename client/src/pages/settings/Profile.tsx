@@ -15,7 +15,7 @@ interface ProfileData {
   email: string;
   parentEmail?: string;
   avatarId?: string;
-  yearGroup?: string;
+  age?: number;
   goal?: string;
 }
 

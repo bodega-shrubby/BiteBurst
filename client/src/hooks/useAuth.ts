@@ -6,15 +6,15 @@ interface User {
   id: string;
   displayName: string;
   email: string;
-  yearGroup?: string;
   goal: string;
-  curriculum?: string;
   avatarId: string | null;
   parentEmail?: string;
   totalXp: number;
   level: number;
   streak: number;
   activeChildId?: string;
+  age?: number;
+  locale?: string;
 }
 
 interface SignupData {
@@ -22,8 +22,8 @@ interface SignupData {
   password: string;
   parentConsent: boolean;
   childName: string;
-  yearGroup: string;
-  curriculum: string;
+  age: number;
+  locale: string;
   goal: string;
   avatarId?: string;
   timezone?: string;

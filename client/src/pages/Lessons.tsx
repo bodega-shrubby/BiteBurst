@@ -28,8 +28,7 @@ interface TopicData {
   description: string | null;
   iconEmoji: string | null;
   defaultMascotId: string | null;
-  yearGroup: string | null;
-  curriculumId: string;
+  age: number | null;
   mascot: {
     id: string;
     name: string;
@@ -184,18 +183,18 @@ export default function Lessons() {
   const [, setLocation] = useLocation();
   const activeChild = useActiveChild(user);
   
-  const curriculumId = activeChild?.curriculumId || user?.curriculum || 'uk-ks2';
+  const childAge = activeChild?.age || 7; // Default to age 7 if not set
   
   const { data: apiLessons, isLoading: lessonsLoading } = useQuery<ApiLesson[]>({
-    queryKey: [`/api/curriculum/${curriculumId}/lessons`, user?.id, activeChild?.childId],
+    queryKey: [`/api/age/${childAge}/lessons`, user?.id, activeChild?.childId],
     queryFn: () => {
       const params = new URLSearchParams({ userId: user?.id || '' });
       if (activeChild?.childId) {
         params.append('childId', activeChild.childId);
       }
-      return apiRequest(`/api/curriculum/${curriculumId}/lessons?${params.toString()}`);
+      return apiRequest(`/api/age/${childAge}/lessons?${params.toString()}`);
     },
-    enabled: !!user && !!curriculumId,
+    enabled: !!user && !!childAge,
   });
 
   // Get the topic of the current/next lesson to work on (not just the first lesson)

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useActiveChild } from '@/hooks/useActiveChild';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, Home } from 'lucide-react';
 import * as confettiModule from 'canvas-confetti';
@@ -37,6 +38,7 @@ interface LogData {
 export default function Feedback() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const activeChild = useActiveChild(user);
   const [logData, setLogData] = useState<LogData | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [xpAnimationComplete, setXpAnimationComplete] = useState(false);
@@ -203,8 +205,8 @@ export default function Feedback() {
           'x-session-id': localStorage.getItem('sessionId') || '',
         },
         body: JSON.stringify({
-          yearGroup: user.yearGroup,
-          goal: user.goal,
+          age: activeChild?.age || 7,
+          goal: activeChild?.goal || user.goal,
           mealLog: logData.content,
           logId: logData.id,
         }),

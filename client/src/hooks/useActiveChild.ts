@@ -6,8 +6,6 @@ interface AuthUser {
   displayName: string;
   avatarId?: string | null;
   goal?: string;
-  yearGroup?: string;
-  curriculum?: string;
   activeChildId?: string;
 }
 
@@ -18,8 +16,8 @@ export interface ActiveChildProfile {
   name: string;
   avatar: string;
   goal: string | null;
-  yearGroup: string | null;
-  curriculumId: string | null;
+  age: number | null;
+  locale: string | null;
   xp: number | null;
   streak: number | null;
 }
@@ -33,8 +31,8 @@ export function useActiveChild(user: AuthUser | null | undefined) {
       type: 'primary' | 'additional';
       name: string;
       avatar: string;
-      yearGroup: string;
-      curriculumId: string;
+      age: number;
+      locale: string;
       goal: string | null;
       xp: number;
       streak: number;
@@ -62,24 +60,27 @@ export function useActiveChild(user: AuthUser | null | undefined) {
         name: additionalChild.name,
         avatar: additionalChild.avatar,
         goal: additionalChild.goal,
-        yearGroup: additionalChild.yearGroup,
-        curriculumId: additionalChild.curriculumId,
+        age: additionalChild.age,
+        locale: additionalChild.locale,
         xp: additionalChild.xp,
         streak: additionalChild.streak,
       };
     }
   }
 
+  // Get primary child from subscription data
+  const primaryChild = subscriptionData?.children?.find(c => c.type === 'primary');
+
   return {
     type: 'primary' as const,
     id: user.id,
-    childId: undefined,
-    name: user.displayName,
-    avatar: user.avatarId || 'child',
-    goal: user.goal || null,
-    yearGroup: user.yearGroup || null,
-    curriculumId: user.curriculum || null,
-    xp: 0,
-    streak: 0,
+    childId: primaryChild?.id,
+    name: primaryChild?.name || user.displayName,
+    avatar: primaryChild?.avatar || user.avatarId || 'child',
+    goal: primaryChild?.goal || user.goal || null,
+    age: primaryChild?.age || null,
+    locale: primaryChild?.locale || 'en-GB',
+    xp: primaryChild?.xp || 0,
+    streak: primaryChild?.streak || 0,
   };
 }

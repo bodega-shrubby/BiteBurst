@@ -28,9 +28,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password,
         parentConsent,
         childName,
-        yearGroup,
-        curriculum,
-        curriculumCountry,
+        age,
+        locale,
         goal,
         avatarId,
         timezone,
@@ -41,8 +40,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
 
       // Validate required fields
-      if (!parentEmail || !password || !childName || !yearGroup || !curriculum) {
+      if (!parentEmail || !password || !childName || !age) {
         return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Validate age range
+      if (age < 6 || age > 14) {
+        return res.status(400).json({ error: 'Age must be between 6 and 14' });
       }
 
       if (!parentConsent) {
@@ -97,9 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: childName,
         username,
         avatar: avatarId || '🧒',
-        yearGroup,
-        curriculumId: curriculum,
-        curriculumCountry: curriculumCountry || (curriculum.startsWith('uk-') ? 'uk' : 'us'),
+        age,
+        locale: locale || 'en-GB',
         goal: goal || null,
         favoriteFruits: favoriteFruits || [],
         favoriteVeggies: favoriteVeggies || [],
@@ -126,10 +129,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: childProfile.id,  // Child ID for all API calls
           displayName: childProfile.name,
           email: parentEmail,
-          yearGroup: childProfile.yearGroup,
+          age: childProfile.age,
+          locale: childProfile.locale,
           goal: childProfile.goal,
-          curriculum: childProfile.curriculumId,
-          curriculumCountry: childProfile.curriculumCountry,
           avatarId: childProfile.avatar,
           totalXp: childProfile.totalXp || 0,
           level: childProfile.level || 1,
@@ -211,10 +213,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: activeChild.id,  // Child ID for all API calls
           displayName: activeChild.name,
           email: parentUser.email,
-          yearGroup: activeChild.yearGroup,
+          age: activeChild.age,
+          locale: activeChild.locale,
           goal: activeChild.goal,
-          curriculum: activeChild.curriculumId,
-          curriculumCountry: activeChild.curriculumCountry,
           avatarId: activeChild.avatar,
           totalXp: activeChild.totalXp || 0,
           level: activeChild.level || 1,
@@ -277,10 +278,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: activeChild.id,  // Child ID for all API calls
         displayName: activeChild.name,
         email: parentUser.email,
-        yearGroup: activeChild.yearGroup,
+        age: activeChild.age,
+        locale: activeChild.locale,
         goal: activeChild.goal,
-        curriculum: activeChild.curriculumId,
-        curriculumCountry: activeChild.curriculumCountry,
         avatarId: activeChild.avatar,
         totalXp: activeChild.totalXp || 0,
         level: activeChild.level || 1,

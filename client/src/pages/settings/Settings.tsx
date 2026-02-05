@@ -9,14 +9,14 @@ interface SubscriptionResponse {
   plan: 'free' | 'individual' | 'family';
   childrenLimit: number;
   childrenCount: number;
-  curriculumCountry: 'uk' | 'us';
+  locale: string;
   activeChildId?: string;
   children: Array<{
     id: string;
     name: string;
     username: string;
     avatar: string;
-    yearGroup: string;
+    age: number;
     isActive: boolean;
   }>;
 }
@@ -31,7 +31,7 @@ export default function Settings() {
 
   const isFamilyPlan = subscription?.plan === 'family';
   const activeChild = subscription?.children?.find(c => c.isActive);
-  const curriculumLabel = subscription?.curriculumCountry === 'uk' ? 'UK' : 'US';
+  const localeLabel = subscription?.locale === 'en-US' ? 'US' : 'UK';
 
   const handleLogout = async () => {
     await logout();
@@ -100,19 +100,30 @@ export default function Settings() {
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
             >
               <div>
-                <p className="font-semibold text-gray-900">Account Settings</p>
-                <p className="text-sm text-gray-500">Manage your email and password</p>
+                <p className="font-semibold text-gray-900">Profile Settings</p>
+                <p className="text-sm text-gray-500">Edit name, avatar & learning goal</p>
+              </div>
+              <span className="text-gray-400">→</span>
+            </button>
+
+            <button
+              onClick={() => setLocation('/settings/notifications')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
+            >
+              <div>
+                <p className="font-semibold text-gray-900">Notifications</p>
+                <p className="text-sm text-gray-500">Manage reminders & alerts</p>
               </div>
               <span className="text-gray-400">→</span>
             </button>
 
             <button
               onClick={() => setLocation('/settings/subscription')}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer transition text-left"
             >
               <div>
                 <p className="font-semibold text-gray-900">Subscription</p>
-                <p className="text-sm text-gray-500">Manage your plan</p>
+                <p className="text-sm text-gray-500">View plan & billing</p>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
@@ -121,13 +132,16 @@ export default function Settings() {
                 <span className="text-gray-400">→</span>
               </div>
             </button>
+          </div>
 
+          <div className="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <button
+              onClick={() => window.open('mailto:support@biteburst.app', '_blank')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
             >
-              <div>
+              <div className="flex items-center space-x-3">
+                <HelpCircle className="w-5 h-5 text-gray-400" />
                 <p className="font-semibold text-gray-900">Help & Support</p>
-                <p className="text-sm text-gray-500">FAQs and contact us</p>
               </div>
               <span className="text-gray-400">→</span>
             </button>
@@ -136,29 +150,16 @@ export default function Settings() {
               onClick={handleLogout}
               className="w-full flex items-center justify-between p-4 hover:bg-red-50 cursor-pointer transition text-left"
             >
-              <div>
-                <p className="font-semibold text-red-600">Log Out</p>
-                <p className="text-sm text-gray-500">Sign out of your account</p>
+              <div className="flex items-center space-x-3">
+                <LogOut className="w-5 h-5 text-red-500" />
+                <p className="font-semibold text-red-500">Log Out</p>
               </div>
             </button>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-400">BiteBurst v1.0.0</p>
-            <div className="flex justify-center space-x-4 mt-2">
-              <a href="#" className="text-xs text-gray-400 hover:text-gray-600">Privacy Policy</a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="text-xs text-gray-400 hover:text-gray-600">Terms of Service</a>
-            </div>
+          <div className="mt-6 text-center text-xs text-gray-400">
+            <p>BiteBurst v1.0 • {localeLabel} English</p>
           </div>
-
-          {subscription?.plan === 'free' && (
-            <div className="mt-8 p-4 bg-gray-100 rounded-xl text-center">
-              <p className="text-xs text-gray-500">
-                <strong>Tip:</strong> Upgrade to Family Plan to add multiple children and unlock all features.
-              </p>
-            </div>
-          )}
         </div>
       </main>
 

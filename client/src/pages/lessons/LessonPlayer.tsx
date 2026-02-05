@@ -479,13 +479,13 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     },
     onSuccess: () => {
       console.log('✅ Lesson marked as complete');
-      // Invalidate all lesson and curriculum queries so the next lessons show as unlocked
+      // Invalidate all lesson and age-based queries so the next lessons show as unlocked
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey[0];
           return typeof key === 'string' && (
             key.startsWith('/api/lessons') || 
-            key.startsWith('/api/curriculum')
+            key.startsWith('/api/age')
           );
         }
       });

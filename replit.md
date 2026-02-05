@@ -32,12 +32,12 @@ Preferred communication style: Simple, everyday language.
 - **Meal-Based Food Logging**: A 3-step flow (Meal Type → Categories → Items) with time-based recommendations, multi-category support, running total display, text input fallback, and touch-optimized design. Includes activity tracking (sports, meditation, movement).
 - **Gamification Engine**: XP system with progress meters, badge collection, streak counter, and level progression with animations.
 - **AI Integration**: OpenAI API for personalized feedback, age-appropriate nutritional explanations, and science-backed habit formation guidance.
-- **Curriculum-Aware Lesson Delivery**: Onboarding flow with country-specific curriculum selection (UK/US) and age bracket mapping (e.g., Key Stages vs. Grades). Lessons are organized into topics with mascot integration.
+- **Age-Based Lesson Delivery**: Content is filtered by child's age (6-14 years) with locale selection (en-GB for UK, en-US for US). Lessons are organized into topics with mascot integration.
 - **Parent-First Onboarding**: Parents create accounts and link child profiles, with support for multiple children.
 
 ### Database Architecture (Parent/Child Separation)
-- **Users Table (Parent Accounts)**: Stores authentication credentials (email, password hash, parentAuthId), subscription info (plan, children limit), and activeChildId reference. No child-specific data like XP, streak, or curriculum.
-- **Children Table (Child Profiles)**: Stores ALL child profiles including the first child created during onboarding. Contains: name, username, avatar, yearGroup, curriculumId, curriculumCountry, goal, favorites, totalXp, level, streak, lastLogAt, tz.
+- **Users Table (Parent Accounts)**: Stores authentication credentials (email, password hash, parentAuthId), subscription info (plan, children limit), and activeChildId reference. No child-specific data like XP, streak, or age.
+- **Children Table (Child Profiles)**: Stores ALL child profiles including the first child created during onboarding. Contains: name, username, avatar, age (6-14), locale (en-GB/en-US), goal, favorites, totalXp, level, streak, lastLogAt, tz.
 - **Data Access Pattern**: All data fetching uses child IDs, not parent IDs. Logs, badges, and progress are keyed to childId.
 - **Key Storage Methods**: 
   - `getParentByAuthId()` - Find parent account

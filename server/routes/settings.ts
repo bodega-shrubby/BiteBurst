@@ -17,27 +17,75 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
       // Get all children
       const children = await storage.getChildrenByParentId(parentUser.id);
 
-      // Determine curriculum country from first child
-      let curriculumCountry: 'uk' | 'us' = 'us';
-      if (children.length > 0 && children[0].curriculumCountry) {
-        curriculumCountry = children[0].curriculumCountry as 'uk' | 'us';
+      // Determine locale from first child
+      let locale = 'en-GB';
+      if (children.length > 0 && children[0].locale) {
+        locale = children[0].locale;
       }
 
       res.json({
         plan: parentUser.subscriptionPlan || 'free',
         childrenLimit: parentUser.subscriptionChildrenLimit || 1,
         childrenCount: children.length,
-        curriculumCountry,
+        locale,
         activeChildId: parentUser.activeChildId || (children.length > 0 ? children[0].id : null),
         children: children.map(child => ({
           id: child.id,
+          type: child.id === children[0]?.id ? 'primary' : 'additional',
           name: child.name,
           username: child.username,
           avatar: child.avatar,
-          yearGroup: child.yearGroup,
-          curriculumId: child.curriculumId,
+          age: child.age,
+          locale: child.locale || 'en-GB',
           goal: child.goal,
-          totalXp: child.totalXp || 0,
+          xp: child.totalXp || 0,
+          level: child.level || 1,
+          streak: child.streak || 0,
+          isActive: child.id === parentUser.activeChildId,
+        })),
+      });
+    } catch (error) {
+      console.error("Get subscription error:", error);
+      res.status(500).json({ error: "Failed to get subscription data" });
+    }
+  });
+  
+  // GET /api/settings/subscription - Alias for subscription endpoint
+  app.get("/api/settings/subscription", requireAuth, async (req: any, res) => {
+    try {
+      const parentAuthId = req.userId;
+
+      // Find parent user
+      const parentUser = await storage.getParentByAuthId(parentAuthId);
+      if (!parentUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Get all children
+      const children = await storage.getChildrenByParentId(parentUser.id);
+
+      // Determine locale from first child
+      let locale = 'en-GB';
+      if (children.length > 0 && children[0].locale) {
+        locale = children[0].locale;
+      }
+
+      res.json({
+        plan: parentUser.subscriptionPlan || 'free',
+        childrenLimit: parentUser.subscriptionChildrenLimit || 1,
+        childrenCount: children.length,
+        locale,
+        activeChildId: parentUser.activeChildId || (children.length > 0 ? children[0].id : null),
+        children: children.map(child => ({
+          id: child.id,
+          type: child.id === children[0]?.id ? 'primary' : 'additional',
+          name: child.name,
+          username: child.username,
+          avatar: child.avatar,
+          age: child.age,
+          locale: child.locale || 'en-GB',
+          goal: child.goal,
+          xp: child.totalXp || 0,
           level: child.level || 1,
           streak: child.streak || 0,
           isActive: child.id === parentUser.activeChildId,
@@ -108,8 +156,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         name: child.name,
         username: child.username,
         avatar: child.avatar,
-        yearGroup: child.yearGroup,
-        curriculumId: child.curriculumId,
+        age: child.age,
+        locale: child.locale || 'en-GB',
         goal: child.goal,
         favoriteFruits: child.favoriteFruits,
         favoriteVeggies: child.favoriteVeggies,
@@ -134,9 +182,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         name,
         username,
         avatar,
-        yearGroup,
-        curriculumId,
-        curriculumCountry,
+        age,
+        locale,
         goal,
         favoriteFruits,
         favoriteVeggies,
@@ -146,8 +193,13 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
       } = req.body;
 
       // Validate required fields
-      if (!name || !yearGroup || !curriculumId) {
-        return res.status(400).json({ error: 'Name, year group, and curriculum are required' });
+      if (!name || !age) {
+        return res.status(400).json({ error: 'Name and age are required' });
+      }
+
+      // Validate age range
+      if (age < 6 || age > 14) {
+        return res.status(400).json({ error: 'Age must be between 6 and 14' });
       }
 
       // Find parent user
@@ -176,9 +228,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         name,
         username: finalUsername,
         avatar: avatar || '🧒',
-        yearGroup,
-        curriculumId,
-        curriculumCountry: curriculumCountry || (curriculumId.startsWith('uk-') ? 'uk' : 'us'),
+        age,
+        locale: locale || 'en-GB',
         goal: goal || null,
         favoriteFruits: favoriteFruits || [],
         favoriteVeggies: favoriteVeggies || [],
@@ -194,8 +245,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
           name: child.name,
           username: child.username,
           avatar: child.avatar,
-          yearGroup: child.yearGroup,
-          curriculumId: child.curriculumId,
+          age: child.age,
+          locale: child.locale,
           goal: child.goal,
           totalXp: child.totalXp,
           level: child.level,
@@ -237,8 +288,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
           name: updatedChild.name,
           username: updatedChild.username,
           avatar: updatedChild.avatar,
-          yearGroup: updatedChild.yearGroup,
-          curriculumId: updatedChild.curriculumId,
+          age: updatedChild.age,
+          locale: updatedChild.locale,
           goal: updatedChild.goal,
           totalXp: updatedChild.totalXp || 0,
           level: updatedChild.level || 1,
@@ -322,8 +373,8 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
           name: child.name,
           username: child.username,
           avatar: child.avatar,
-          yearGroup: child.yearGroup,
-          curriculumId: child.curriculumId,
+          age: child.age,
+          locale: child.locale,
           goal: child.goal,
           totalXp: child.totalXp,
           level: child.level,
@@ -369,10 +420,9 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
         id: child?.id || parentUser.id,
         displayName: child?.name || parentUser.displayName,
         avatarId: child?.avatar || parentUser.avatarId,
-        yearGroup: child?.yearGroup || parentUser.yearGroup,
+        age: child?.age || null,
+        locale: child?.locale || 'en-GB',
         goal: child?.goal || parentUser.goal,
-        curriculum: child?.curriculumId || parentUser.curriculum,
-        curriculumCountry: child?.curriculumCountry || parentUser.curriculumCountry,
         totalXp: child?.totalXp || 0,
         level: child?.level || 1,
         streak: child?.streak || 0,
@@ -387,7 +437,7 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
   app.put("/api/profile", requireAuth, async (req: any, res) => {
     try {
       const parentAuthId = req.userId;
-      const { displayName, avatarId, yearGroup, goal, name, avatar } = req.body;
+      const { displayName, avatarId, age, goal, name, avatar } = req.body;
 
       // Find parent user
       const parentUser = await storage.getParentByAuthId(parentAuthId);
@@ -410,7 +460,7 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
       const childUpdates: any = {};
       if (displayName !== undefined || name !== undefined) childUpdates.name = name || displayName;
       if (avatarId !== undefined || avatar !== undefined) childUpdates.avatar = avatar || avatarId;
-      if (yearGroup !== undefined) childUpdates.yearGroup = yearGroup;
+      if (age !== undefined) childUpdates.age = age;
       if (goal !== undefined) childUpdates.goal = goal;
 
       // Update child
@@ -422,7 +472,7 @@ export function registerSettingsRoutes(app: Express, requireAuth: any) {
           id: updatedChild.id,
           displayName: updatedChild.name,
           avatarId: updatedChild.avatar,
-          yearGroup: updatedChild.yearGroup,
+          age: updatedChild.age,
           goal: updatedChild.goal,
         }
       });

@@ -11,8 +11,8 @@ interface Child {
   name: string;
   username: string;
   avatar: string;
-  yearGroup: string;
-  curriculumId: string;
+  age: number;
+  locale: string;
   goal?: string;
   xp: number;
   streak: number;
@@ -23,7 +23,7 @@ interface SubscriptionResponse {
   plan: 'free' | 'individual' | 'family';
   childrenLimit: number;
   childrenCount: number;
-  curriculumCountry: 'uk' | 'us';
+  locale: string;
   children: Child[];
 }
 
@@ -61,14 +61,12 @@ export default function ManageChildren() {
     },
   });
 
-  const formatYearGroup = (yearGroup: string) => {
-    if (yearGroup.startsWith('year-')) {
-      return yearGroup.replace('year-', 'Year ');
+  const getLocaleLabel = (locale: string) => {
+    switch (locale) {
+      case 'en-GB': return '🇬🇧 UK';
+      case 'en-US': return '🇺🇸 US';
+      default: return locale;
     }
-    if (yearGroup.startsWith('grade-')) {
-      return yearGroup.replace('grade-', 'Grade ');
-    }
-    return yearGroup;
   };
 
   const getAvatarBgColor = (index: number) => {
@@ -85,7 +83,7 @@ export default function ManageChildren() {
   const children = subscription?.children || [];
   const childrenLimit = subscription?.childrenLimit || 4;
   const canAddMore = children.length < childrenLimit;
-  const curriculumLabel = subscription?.curriculumCountry === 'uk' ? 'UK Curriculum' : 'US Curriculum';
+  const localeLabel = subscription?.locale === 'en-US' ? 'US English' : 'UK English';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,7 +111,7 @@ export default function ManageChildren() {
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-xs bg-white text-purple-600 px-2 py-1 rounded-full border border-purple-200">
-                {subscription?.curriculumCountry === 'uk' ? '🇬🇧' : '🇺🇸'} {curriculumLabel}
+                {localeLabel}
               </span>
               <div className="w-20 bg-purple-200 rounded-full h-2">
                 <div 
@@ -149,7 +147,7 @@ export default function ManageChildren() {
                     <div>
                       <p className="font-bold text-gray-900">{child.name}</p>
                       <p className="text-sm text-gray-500">
-                        @{child.username} • <span className="text-orange-600 font-medium">{formatYearGroup(child.yearGroup)}</span>
+                        @{child.username} • <span className="text-orange-600 font-medium">{child.age} years old</span>
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         {child.streak > 0 && (
@@ -210,9 +208,9 @@ export default function ManageChildren() {
             <div className="flex items-start space-x-3">
               <span className="text-lg">💡</span>
               <div>
-                <p className="font-medium text-blue-800 text-sm">About Year Groups</p>
+                <p className="font-medium text-blue-800 text-sm">About Ages</p>
                 <p className="text-sm text-blue-600 mt-1">
-                  Year groups are based on the {curriculumLabel} you selected. Each child's lessons are tailored to their specific year group.
+                  Each child's lessons are tailored to their age (6-14 years). The content is also adapted to their location ({localeLabel}).
                 </p>
               </div>
             </div>
