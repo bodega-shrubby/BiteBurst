@@ -84,15 +84,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parentAuthId = authData.user.id;
 
       // 2. Create parent record in users table (NO child data here)
-      const parentUser = await storage.createParentUser({
-        parentAuthId,
-        email: parentEmail,
-        parentEmail,
-        parentConsent: true,
-        authProvider: 'supabase',
-        subscriptionPlan: 'free',
-        subscriptionChildrenLimit: 1,
-      });
+      let parentUser;
+      try {
+        parentUser = await storage.createParentUser({
+          parentAuthId,
+          email: parentEmail,
+          parentEmail,
+          parentConsent: true,
+          authProvider: 'supabase',
+          subscriptionPlan: 'free',
+          subscriptionChildrenLimit: 1,
+        });
+      } catch (parentError: any) {
+        console.error("Parent user creation failed:", parentError);
+        // Clean up the Supabase auth user
+        try {
+          await supabaseAdmin.auth.admin.deleteUser(parentAuthId);
+          console.log("Cleaned up auth user after parent creation failure");
+        } catch (cleanupError) {
+          console.error("Cleanup failed:", cleanupError);
+        }
+        // Return appropriate error
+        if (parentError.code === '23505') {
+          return res.status(409).json({ error: 'This email is already registered.' });
+        }
+        throw parentError;
+      }
 
       console.log("Parent user created:", parentUser.id);
 
