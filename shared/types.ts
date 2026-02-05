@@ -8,7 +8,7 @@ export type UserStatus = "active" | "deleted";
 export interface User {
   uid: string;
   displayName: string;
-  yearGroup?: string;
+  age?: number;
   goal: Goal;
   avatar: string;
   email?: string;
@@ -27,7 +27,8 @@ export interface OnboardingSession {
   step: number;
   answers: {
     displayName?: string;
-    yearGroup?: string;
+    age?: number;
+    locale?: string;
     goal?: Goal;
     avatar?: string;
     email?: string;

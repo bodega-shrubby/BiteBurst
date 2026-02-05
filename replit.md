@@ -59,3 +59,16 @@ Preferred communication style: Simple, everyday language.
 - **Type Checking**: TypeScript
 - **Database Tools**: Drizzle Kit (migrations, schema management)
 - **Bundling**: ESBuild (backend), Vite (frontend)
+
+## Recent Changes
+
+### Schema & API Migration (Feb 2026)
+- **Simplified filtering system**: Replaced `yearGroup` + `curriculumId` with simple `age` (6-14) based filtering for lessons and topics
+- **Locale support**: Added explicit `locale` field (en-GB or en-US) for UK/US English content variants
+- **New question type**: Added `lesson-content` question type for educational learning steps (no quiz validation)
+- **Content localization**: Lesson steps now support `contentVariants` for locale-specific content (e.g., "crisps" vs "chips")
+- **Removed tables**: `curriculums` and `year_group_mappings` tables removed from database
+- **API endpoints**: 
+  - `/api/lessons/age/:age` - Get lessons by age
+  - `/api/topics/age/:age` - Get topics by age
+  - `/api/lessons/:lessonId?locale=en-GB` - Get lesson with locale-specific content

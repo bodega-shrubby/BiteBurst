@@ -19,7 +19,7 @@ import { z } from "zod";
 export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
 export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
-export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading']);
+export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading', 'lesson-content']);
 export const subscriptionPlanEnum = pgEnum('subscription_plan', ['free', 'individual', 'family']);
 
 // Catalog tables

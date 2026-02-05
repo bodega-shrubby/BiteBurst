@@ -22,6 +22,14 @@ const setLessonCacheHeaders = (res: any) => {
   });
 };
 
+function getLocalizedContent(step: any, locale: string) {
+  const variants = step.contentVariants as Record<string, any> | null;
+  if (variants && variants[locale]) {
+    return { ...step.content, ...variants[locale] };
+  }
+  return step.content;
+}
+
 interface AuthResolution {
   valid: boolean;
   error?: string;
@@ -364,6 +372,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
   app.get('/api/lessons/:lessonId', requireAuth, async (req: any, res: any) => {
     try {
       const { lessonId } = req.params;
+      const childLocale = req.query.locale as string || 'en-GB';
 
       const lessonFromDb = await storage.getLessonWithSteps(lessonId);
 
@@ -381,7 +390,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             stepNumber: step.stepNumber,
             questionType: step.questionType,
             question: step.question,
-            content: step.content,
+            content: getLocalizedContent(step, childLocale),
             xpReward: step.xpReward,
             mascotAction: step.mascotAction ?? undefined,
             retryConfig: step.retryConfig ?? undefined,
@@ -861,6 +870,12 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               });
               
               switch (step.questionType) {
+                case 'lesson-content':
+                  // No validation needed - this is a learning step, not a quiz
+                  // Always return correct with 0 XP
+                  isCorrect = true;
+                  break;
+                  
                 case 'tap-pair':
                   // Validate tap-pair: answer is JSON array of 2 IDs
                   if (step.content?.correctPair) {
