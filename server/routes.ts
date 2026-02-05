@@ -1,6 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { registerDashboardRoutes } from "./routes/dashboard";
 import { registerLogRoutes } from "./routes/logs";
 import { registerAIRoutes } from "./routes/ai";
@@ -96,20 +99,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 3. Create first child profile in children table
       const username = childName.toUpperCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000);
 
-      const childProfile = await storage.createChildProfile({
+      console.log("Creating child profile with:", {
         parentId: parentUser.id,
         name: childName,
         username,
-        avatar: avatarId || '🧒',
         age,
         locale: locale || 'en-GB',
         goal: goal || null,
-        favoriteFruits: favoriteFruits || [],
-        favoriteVeggies: favoriteVeggies || [],
-        favoriteFoods: favoriteFoods || [],
-        favoriteSports: favoriteSports || [],
-        tz: timezone || null,
       });
+
+      let childProfile;
+      try {
+        childProfile = await storage.createChildProfile({
+          parentId: parentUser.id,
+          name: childName,
+          username,
+          avatar: avatarId || '🧒',
+          age,
+          locale: locale || 'en-GB',
+          goal: goal || null,
+          favoriteFruits: favoriteFruits || [],
+          favoriteVeggies: favoriteVeggies || [],
+          favoriteFoods: favoriteFoods || [],
+          favoriteSports: favoriteSports || [],
+          tz: timezone || null,
+        });
+      } catch (childError) {
+        console.error("Child profile creation failed:", childError);
+        // Clean up: delete the parent user in database and auth user
+        try {
+          await db.delete(users).where(eq(users.id, parentUser.id));
+          console.log("Cleaned up database parent user after child creation failure");
+          await supabaseAdmin.auth.admin.deleteUser(parentAuthId);
+          console.log("Cleaned up auth user after child creation failure");
+        } catch (cleanupError) {
+          console.error("Cleanup failed:", cleanupError);
+        }
+        throw childError;
+      }
 
       console.log("Child profile created:", childProfile.id);
 
