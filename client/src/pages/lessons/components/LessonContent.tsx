@@ -126,15 +126,15 @@ export function LessonContent({
               <span className="absolute -top-1 left-0 text-lg md:text-xl animate-pulse" style={{ animationDelay: '0.3s' }}>⭐</span>
               <span className="absolute bottom-0 -right-2 text-base md:text-lg animate-pulse" style={{ animationDelay: '0.6s' }}>💫</span>
 
-              {/* Circle */}
+              {/* Mascot Image */}
               <div
-                className="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br from-orange-400 via-yellow-400 to-orange-500 border-4 border-white shadow-xl flex items-center justify-center animate-bounce overflow-hidden"
-                style={{ animationDuration: '3s', boxShadow: '0 0 30px rgba(255, 106, 0, 0.4)' }}
+                className="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 flex items-center justify-center animate-bounce"
+                style={{ animationDuration: '3s' }}
               >
                 <img 
                   src={mascot.imagePath || brainyBoltImage} 
                   alt={mascot.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
 
