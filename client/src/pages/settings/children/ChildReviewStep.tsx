@@ -9,7 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function ChildReviewStep() {
   const [, setLocation] = useLocation();
-  const { profile, resetProfile, curriculumCountry } = useAddChildContext();
+  const { profile, resetProfile } = useAddChildContext();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,8 +21,8 @@ export default function ChildReviewStep() {
           name: profile.name,
           username: profile.username,
           avatar: profile.avatar,
-          yearGroup: profile.yearGroup,
-          curriculumId: profile.curriculumId,
+          age: profile.age,
+          locale: profile.locale,
           goal: profile.goal,
           favoriteFruits: profile.favoriteFruits,
           favoriteVeggies: profile.favoriteVeggies,
@@ -56,22 +56,20 @@ export default function ChildReviewStep() {
     createChildMutation.mutate();
   };
 
-  const formatYearGroup = (yearGroup: string) => {
-    if (yearGroup.startsWith('year-')) {
-      return yearGroup.replace('year-', 'Year ');
-    }
-    if (yearGroup.startsWith('grade-')) {
-      return yearGroup.replace('grade-', 'Grade ');
-    }
-    return yearGroup;
-  };
-
   const getGoalLabel = (goal: string) => {
     switch (goal) {
       case 'energy': return '⚡ Energy';
       case 'focus': return '🧠 Focus';
       case 'strength': return '💪 Strength';
       default: return goal;
+    }
+  };
+
+  const getLocaleLabel = (locale: string) => {
+    switch (locale) {
+      case 'en-GB': return '🇬🇧 United Kingdom';
+      case 'en-US': return '🇺🇸 United States';
+      default: return locale;
     }
   };
 
@@ -96,15 +94,13 @@ export default function ChildReviewStep() {
 
             <div className="border-t border-gray-200 pt-4 space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Year Group</span>
-                <span className="font-medium text-gray-900">{formatYearGroup(profile.yearGroup)}</span>
+                <span className="text-gray-600">Age</span>
+                <span className="font-medium text-gray-900">{profile.age} years old</span>
               </div>
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Curriculum</span>
-                <span className="font-medium text-gray-900">
-                  {curriculumCountry === 'uk' ? '🇬🇧 UK' : '🇺🇸 US'}
-                </span>
+                <span className="text-gray-600">Location</span>
+                <span className="font-medium text-gray-900">{getLocaleLabel(profile.locale)}</span>
               </div>
 
               <div className="flex justify-between">
@@ -149,7 +145,7 @@ export default function ChildReviewStep() {
               <div>
                 <p className="font-medium text-green-800 text-sm">Ready to learn!</p>
                 <p className="text-sm text-green-600 mt-1">
-                  {profile.name}'s lessons will be personalized based on their year group and preferences.
+                  {profile.name}'s lessons will be personalized based on their age and preferences.
                 </p>
               </div>
             </div>

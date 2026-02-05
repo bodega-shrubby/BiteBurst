@@ -29,7 +29,8 @@ interface AuthResolution {
   parentId?: string;
   childFromChildrenTable?: any;
   userFromUsersTable?: any;
-  curriculumId?: string;
+  age?: number;
+  locale?: string;
 }
 
 async function resolveUserAuth(userId: string, authId: string): Promise<AuthResolution> {
@@ -47,7 +48,8 @@ async function resolveUserAuth(userId: string, authId: string): Promise<AuthReso
         isChildSelf: false,
         parentId: userId,
         userFromUsersTable,
-        curriculumId: userFromUsersTable.curriculumId || userFromUsersTable.curriculum || undefined
+        age: undefined, // Parent doesn't have age, child records do
+        locale: userFromUsersTable.locale || 'en-GB'
       };
     }
     return { valid: false, error: 'Unauthorized', isChildSelf: false };
@@ -67,7 +69,8 @@ async function resolveUserAuth(userId: string, authId: string): Promise<AuthReso
       isChildSelf: true,
       parentId: childFromChildrenTable.parentId,
       childFromChildrenTable,
-      curriculumId: childFromChildrenTable.curriculumId
+      age: childFromChildrenTable.age,
+      locale: childFromChildrenTable.locale || 'en-GB'
     };
   }
   
@@ -79,7 +82,8 @@ async function resolveUserAuth(userId: string, authId: string): Promise<AuthReso
       isChildSelf: false,
       parentId: childFromChildrenTable.parentId,
       childFromChildrenTable,
-      curriculumId: childFromChildrenTable.curriculumId
+      age: childFromChildrenTable.age,
+      locale: childFromChildrenTable.locale || 'en-GB'
     };
   }
   
@@ -119,12 +123,11 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(statusCode).json({ error: auth.error });
       }
       
-      // Get user's curriculum/year group
-      const curriculumId = auth.curriculumId;
-      let yearGroup = auth.childFromChildrenTable?.yearGroup || auth.userFromUsersTable?.yearGroup;
+      // Get child's age for filtering lessons
+      const childAge = auth.age;
       
-      if (!curriculumId && !yearGroup) {
-        // Return default lesson if no curriculum set
+      if (!childAge) {
+        // Return default lesson if no age set
         return res.json({
           id: 'default',
           title: 'Welcome to BiteBurst',
@@ -135,8 +138,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         });
       }
       
-      // Get all lessons for the user's year group
-      const allLessons = yearGroup ? await storage.getLessonsByYearGroup(yearGroup) : [];
+      // Get all lessons for the child's age
+      const allLessons = await storage.getLessonsByAge(childAge);
       
       if (!allLessons || allLessons.length === 0) {
         return res.json({
@@ -183,12 +186,16 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     }
   });
 
-  // Get lessons by year group
-  app.get('/api/lessons/year-group/:yearGroup', requireAuth, async (req: any, res: any) => {
+  // Get lessons by age
+  app.get('/api/lessons/age/:age', requireAuth, async (req: any, res: any) => {
     try {
-      const { yearGroup } = req.params;
+      const age = parseInt(req.params.age, 10);
       const childUserId = req.query.userId as string;
       const childId = req.query.childId as string;
+      
+      if (isNaN(age) || age < 6 || age > 14) {
+        return res.status(400).json({ error: 'Invalid age. Must be between 6 and 14.' });
+      }
       
       if (!childUserId) {
         return res.status(400).json({ error: 'userId query parameter is required' });
@@ -205,7 +212,7 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(403).json({ error: childValidation.error });
       }
       
-      const allLessons = await storage.getLessonsByYearGroup(yearGroup);
+      const allLessons = await storage.getLessonsByAge(age);
       
       // Get completed lessons for either the additional child (childId) or primary child (userId)
       const completedLessons = await storage.getCompletedLessonIds(childUserId, childId || undefined);
@@ -238,17 +245,21 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       
       res.json(lessonsWithState);
     } catch (error) {
-      console.error('Failed to get lessons by year group:', error);
+      console.error('Failed to get lessons by age:', error);
       res.status(500).json({ error: 'Failed to load lessons' });
     }
   });
 
-  // Get all lessons for a curriculum (combines topics + lessons)
-  app.get('/api/curriculum/:curriculumId/lessons', requireAuth, async (req: any, res: any) => {
+  // Get all lessons for a child by age (combines topics + lessons)
+  app.get('/api/age/:age/lessons', requireAuth, async (req: any, res: any) => {
     try {
-      let { curriculumId } = req.params;
+      const age = parseInt(req.params.age, 10);
       const childUserId = req.query.userId as string;
       const childId = req.query.childId as string;
+      
+      if (isNaN(age) || age < 6 || age > 14) {
+        return res.status(400).json({ error: 'Invalid age. Must be between 6 and 14.' });
+      }
       
       if (!childUserId) {
         return res.status(400).json({ error: 'userId query parameter is required' });
@@ -260,29 +271,23 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         return res.status(statusCode).json({ error: auth.error });
       }
       
-      // Use curriculum from child record if available
-      if (auth.curriculumId) {
-        curriculumId = auth.curriculumId;
-      }
-      
       const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
       if (!childValidation.valid) {
         return res.status(403).json({ error: childValidation.error });
       }
       
-      // Get topics for this curriculum
-      let curriculumTopics = await storage.getTopicsByCurriculum(curriculumId);
+      // Get topics for this age
+      let ageTopics = await storage.getTopicsByAge(age);
       
-      // If no topics found, fall back to uk-ks1 which has sample lessons
-      if (curriculumTopics.length === 0 && curriculumId !== 'uk-ks1') {
-        console.log(`No topics found for curriculum ${curriculumId}, falling back to uk-ks1`);
-        curriculumId = 'uk-ks1';
-        curriculumTopics = await storage.getTopicsByCurriculum('uk-ks1');
+      // If no topics found for this age, fall back to age 6 which should have sample lessons
+      if (ageTopics.length === 0 && age !== 6) {
+        console.log(`No topics found for age ${age}, falling back to age 6`);
+        ageTopics = await storage.getTopicsByAge(6);
       }
       
       // Get lessons for each topic
       const allLessons: any[] = [];
-      for (const topic of curriculumTopics) {
+      for (const topic of ageTopics) {
         const topicLessons = await storage.getLessonsByTopic(topic.id);
         for (const lesson of topicLessons) {
           allLessons.push({
@@ -335,19 +340,22 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       setLessonCacheHeaders(res);
       res.json(lessonsWithState);
     } catch (error) {
-      console.error('Failed to get curriculum lessons:', error);
+      console.error('Failed to get age-based lessons:', error);
       res.status(500).json({ error: 'Failed to load lessons' });
     }
   });
 
-  // Get topics for a curriculum
-  app.get('/api/curriculum/:curriculumId/topics', requireAuth, async (req: any, res: any) => {
+  // Get topics for an age
+  app.get('/api/age/:age/topics', requireAuth, async (req: any, res: any) => {
     try {
-      const { curriculumId } = req.params;
-      const curriculumTopics = await storage.getTopicsByCurriculum(curriculumId);
-      res.json(curriculumTopics);
+      const age = parseInt(req.params.age, 10);
+      if (isNaN(age) || age < 6 || age > 14) {
+        return res.status(400).json({ error: 'Invalid age. Must be between 6 and 14.' });
+      }
+      const ageTopics = await storage.getTopicsByAge(age);
+      res.json(ageTopics);
     } catch (error) {
-      console.error('Failed to get curriculum topics:', error);
+      console.error('Failed to get topics by age:', error);
       res.status(500).json({ error: 'Failed to load topics' });
     }
   });

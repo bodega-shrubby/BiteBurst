@@ -11,7 +11,6 @@ import {
   lessonAttempts,
   userLessonProgress,
   mascots,
-  curriculums,
   topics,
   children,
   type User,
@@ -27,7 +26,6 @@ import {
   type LessonAttempt,
   type InsertLessonAttempt,
   type Mascot,
-  type Curriculum,
   type Topic,
   type Child,
   type InsertChild,
@@ -108,13 +106,8 @@ export interface IStorage {
   getMascots(): Promise<Mascot[]>;
   getMascotById(id: string): Promise<Mascot | undefined>;
   
-  // Curriculum operations  
-  getCurriculums(): Promise<Curriculum[]>;
-  getCurriculumsByCountry(country: string): Promise<Curriculum[]>;
-  
-  // Topic operations
-  getTopicsByCurriculum(curriculumId: string): Promise<Topic[]>;
-  getTopicsByYearGroup(yearGroup: string): Promise<Topic[]>;
+  // Topic operations (age-based)
+  getTopicsByAge(age: number): Promise<Topic[]>;
   getTopicById(topicId: string): Promise<Topic | undefined>;
   
   // Lesson by topic operations
@@ -123,8 +116,8 @@ export interface IStorage {
   // Lesson progress operations
   getCompletedLessonIds(userId: string, childId?: string): Promise<string[]>;
   
-  // Lesson by year group operations
-  getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]>;
+  // Lesson by age operations
+  getLessonsByAge(age: number): Promise<Lesson[]>;
   
   // Children operations (new architecture - ALL children including first)
   getChildren(parentId: string): Promise<Child[]>;
@@ -137,15 +130,13 @@ export interface IStorage {
     name: string;
     username: string;
     avatar?: string;
-    yearGroup: string;
-    curriculumId: string;
-    curriculumCountry?: string;
+    age: number;
+    locale?: string;
     goal?: string;
     favoriteFruits?: string[];
     favoriteVeggies?: string[];
     favoriteFoods?: string[];
     favoriteSports?: string[];
-    locale?: string;
     tz?: string;
   }): Promise<Child>;
   updateChild(childId: string, updates: Partial<InsertChild>): Promise<Child>;
@@ -205,11 +196,7 @@ export class DatabaseStorage implements IStorage {
       parentConsent: data.parentConsent,
       authProvider: data.authProvider,
       displayName: data.displayName || data.email.split('@')[0],
-      // Default values for legacy fields (child data now in children table)
       goal: 'energy',
-      yearGroup: 'year-1',
-      curriculum: 'uk-ks1',
-      curriculumCountry: 'uk',
       subscriptionPlan: data.subscriptionPlan || 'free',
       subscriptionChildrenLimit: data.subscriptionChildrenLimit || 1,
       createdAt: new Date(),
@@ -407,6 +394,7 @@ export class DatabaseStorage implements IStorage {
         questionType: step.questionType,
         question: step.question,
         content: step.content,
+        contentVariants: step.contentVariants || undefined,
         xpReward: step.xpReward,
         mascotAction: step.mascotAction || undefined,
         retryConfig: step.retryConfig || undefined,
@@ -424,27 +412,10 @@ export class DatabaseStorage implements IStorage {
     return mascot || undefined;
   }
   
-  // Curriculum operations
-  async getCurriculums(): Promise<Curriculum[]> {
-    return await db.select().from(curriculums).where(eq(curriculums.isActive, true));
-  }
-  
-  async getCurriculumsByCountry(country: string): Promise<Curriculum[]> {
-    return await db.select().from(curriculums).where(
-      and(eq(curriculums.country, country), eq(curriculums.isActive, true))
-    );
-  }
-  
-  // Topic operations
-  async getTopicsByCurriculum(curriculumId: string): Promise<Topic[]> {
+  // Topic operations (age-based)
+  async getTopicsByAge(age: number): Promise<Topic[]> {
     return await db.select().from(topics)
-      .where(and(eq(topics.curriculumId, curriculumId), eq(topics.isActive, true)))
-      .orderBy(topics.orderPosition);
-  }
-  
-  async getTopicsByYearGroup(yearGroup: string): Promise<Topic[]> {
-    return await db.select().from(topics)
-      .where(and(eq(topics.yearGroup, yearGroup), eq(topics.isActive, true)))
+      .where(and(eq(topics.age, age), eq(topics.isActive, true)))
       .orderBy(topics.orderPosition);
   }
   
@@ -563,11 +534,11 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  // Get lessons by year group
-  async getLessonsByYearGroup(yearGroup: string): Promise<Lesson[]> {
+  // Get lessons by age
+  async getLessonsByAge(age: number): Promise<Lesson[]> {
     return await db.select().from(lessons)
       .where(and(
-        eq(lessons.yearGroup, yearGroup),
+        eq(lessons.age, age),
         eq(lessons.isActive, true)
       ))
       .orderBy(lessons.orderInUnit);
@@ -609,15 +580,13 @@ export class DatabaseStorage implements IStorage {
     name: string;
     username: string;
     avatar?: string;
-    yearGroup: string;
-    curriculumId: string;
-    curriculumCountry?: string;
+    age: number;
+    locale?: string;
     goal?: string;
     favoriteFruits?: string[];
     favoriteVeggies?: string[];
     favoriteFoods?: string[];
     favoriteSports?: string[];
-    locale?: string;
     tz?: string;
   }): Promise<Child> {
     const [child] = await db.insert(children).values({
@@ -625,9 +594,8 @@ export class DatabaseStorage implements IStorage {
       name: data.name,
       username: data.username,
       avatar: data.avatar || '🧒',
-      yearGroup: data.yearGroup,
-      curriculumId: data.curriculumId,
-      curriculumCountry: data.curriculumCountry || null,
+      age: data.age,
+      locale: data.locale || 'en-GB',
       goal: data.goal || null,
       totalXp: 0,
       level: 1,
@@ -636,7 +604,6 @@ export class DatabaseStorage implements IStorage {
       favoriteVeggies: data.favoriteVeggies || [],
       favoriteFoods: data.favoriteFoods || [],
       favoriteSports: data.favoriteSports || [],
-      locale: data.locale || null,
       tz: data.tz || null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -691,10 +658,10 @@ export class DatabaseStorage implements IStorage {
   async updateSubscription(userId: string, plan: string, childrenLimit: number): Promise<User> {
     const [user] = await db
       .update(users)
-      .set({ 
+      .set({
         subscriptionPlan: plan,
         subscriptionChildrenLimit: childrenLimit,
-        updatedAt: new Date() 
+        updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
       .returning();
@@ -704,20 +671,19 @@ export class DatabaseStorage implements IStorage {
   async setActiveChild(userId: string, childId: string | null): Promise<User> {
     const [user] = await db
       .update(users)
-      .set({ 
+      .set({
         activeChildId: childId,
-        updatedAt: new Date() 
+        updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
       .returning();
     return user;
   }
   
-  // Alias for consistency with new architecture
+  // Alias for consistency
   async setActiveChildId(parentId: string, childId: string | null): Promise<User> {
     return this.setActiveChild(parentId, childId);
   }
 }
 
-// Use PostgreSQL as primary database
 export const storage = new DatabaseStorage();

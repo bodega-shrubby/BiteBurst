@@ -24,8 +24,7 @@ export function registerTopicRoutes(app: Express, requireAuth: any) {
         description: topic.description,
         iconEmoji: topic.iconEmoji,
         defaultMascotId: topic.defaultMascotId,
-        yearGroup: topic.yearGroup,
-        curriculumId: topic.curriculumId,
+        age: topic.age,
         mascot: mascot ? {
           id: mascot.id,
           name: mascot.name,
@@ -93,6 +92,22 @@ export function registerTopicRoutes(app: Express, requireAuth: any) {
     } catch (error) {
       console.error('Error fetching lessons for topic:', error);
       res.status(500).json({ error: 'Failed to fetch lessons' });
+    }
+  });
+
+  // Get topics by age
+  app.get('/api/age/:age/topics', requireAuth, async (req: any, res: any) => {
+    try {
+      const age = parseInt(req.params.age, 10);
+      if (isNaN(age) || age < 6 || age > 14) {
+        return res.status(400).json({ error: 'Invalid age. Must be between 6 and 14.' });
+      }
+      
+      const ageTopics = await storage.getTopicsByAge(age);
+      res.json(ageTopics);
+    } catch (error) {
+      console.error('Failed to get topics by age:', error);
+      res.status(500).json({ error: 'Failed to load topics' });
     }
   });
 }

@@ -1,11 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
 
 interface ChildOnboardingProfile {
   name: string;
   username: string;
-  yearGroup: string;
-  curriculumId: string;
+  age: number | null; // Child's age 6-14
+  locale: string; // 'en-GB' or 'en-US'
   goal: string;
   avatar: string;
   favoriteFruits: string[];
@@ -18,14 +17,13 @@ interface AddChildContextType {
   profile: ChildOnboardingProfile;
   updateProfile: (updates: Partial<ChildOnboardingProfile>) => void;
   resetProfile: () => void;
-  curriculumCountry: 'uk' | 'us';
 }
 
 const defaultProfile: ChildOnboardingProfile = {
   name: "",
   username: "",
-  yearGroup: "",
-  curriculumId: "",
+  age: null,
+  locale: "en-GB", // Default to UK English
   goal: "",
   avatar: "🧒",
   favoriteFruits: [],
@@ -39,12 +37,6 @@ const AddChildContext = createContext<AddChildContextType | undefined>(undefined
 export function AddChildProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ChildOnboardingProfile>(defaultProfile);
 
-  const { data: subscription } = useQuery<{ curriculumCountry: 'uk' | 'us' }>({
-    queryKey: ['/api/subscription'],
-  });
-
-  const curriculumCountry = subscription?.curriculumCountry || 'us';
-
   const updateProfile = (updates: Partial<ChildOnboardingProfile>) => {
     setProfile(prev => ({ ...prev, ...updates }));
   };
@@ -54,7 +46,7 @@ export function AddChildProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AddChildContext.Provider value={{ profile, updateProfile, resetProfile, curriculumCountry }}>
+    <AddChildContext.Provider value={{ profile, updateProfile, resetProfile }}>
       {children}
     </AddChildContext.Provider>
   );

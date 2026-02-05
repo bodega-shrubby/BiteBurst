@@ -35,7 +35,7 @@ export default function ChildNameStep() {
     
     const username = name.toUpperCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000);
     updateProfile({ name: name.trim(), username });
-    setLocation("/settings/children/add/year-group");
+    setLocation("/settings/children/add/age");
   };
 
   const handleChange = (value: string) => {

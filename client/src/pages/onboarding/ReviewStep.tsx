@@ -13,33 +13,9 @@ const GOAL_LABELS = {
   strength: "💪 Strength"
 };
 
-
-const YEAR_GROUP_LABELS: Record<string, string> = {
-  "year-2": "Year 2",
-  "year-3": "Year 3",
-  "year-4": "Year 4",
-  "year-5": "Year 5",
-  "year-6": "Year 6",
-  "year-7": "Year 7",
-  "year-8": "Year 8",
-  "year-9": "Year 9",
-  "grade-1": "Grade 1",
-  "grade-2": "Grade 2",
-  "grade-3": "Grade 3",
-  "grade-4": "Grade 4",
-  "grade-5": "Grade 5",
-  "grade-6": "Grade 6",
-  "grade-7": "Grade 7",
-  "grade-8": "Grade 8",
-};
-
-const CURRICULUM_LABELS: Record<string, string> = {
-  "uk-ks1": "🇬🇧 UK Key Stage 1",
-  "uk-ks2": "🇬🇧 UK Key Stage 2",
-  "uk-ks3": "🇬🇧 UK Key Stage 3",
-  "us-k2": "🇺🇸 US Grades K-2",
-  "us-35": "🇺🇸 US Grades 3-5",
-  "us-68": "🇺🇸 US Grades 6-8"
+const LOCALE_LABELS: Record<string, string> = {
+  "en-GB": "🇬🇧 United Kingdom",
+  "en-US": "🇺🇸 United States"
 };
 
 const maskEmail = (email: string) => {
@@ -70,8 +46,8 @@ export default function ReviewStep() {
           password: profile.password,
           parentConsent: profile.hasParentConsent,
           childName: profile.displayName,
-          yearGroup: profile.yearGroup,
-          curriculum: profile.curriculum || "us-35",
+          age: profile.age,
+          locale: profile.locale || "en-GB",
           goal: profile.goal,
           avatarId: profile.avatar,
           timezone,
@@ -139,13 +115,13 @@ export default function ReviewStep() {
           {/* Profile Details */}
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">Year/Grade</span>
-              <span className="font-medium">{YEAR_GROUP_LABELS[profile.yearGroup] || profile.yearGroup}</span>
+              <span className="text-gray-600">Age</span>
+              <span className="font-medium">{profile.age} years old</span>
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">Curriculum</span>
-              <span className="font-medium">{CURRICULUM_LABELS[profile.curriculum as keyof typeof CURRICULUM_LABELS] || "Not set"}</span>
+              <span className="text-gray-600">Location</span>
+              <span className="font-medium">{LOCALE_LABELS[profile.locale] || profile.locale}</span>
             </div>
             
             <div className="flex justify-between items-center py-2 border-b border-gray-100">

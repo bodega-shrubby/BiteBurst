@@ -35,7 +35,7 @@ export default function NameStep() {
   const handleNext = () => {
     if (isValid) {
       updateProfile({ displayName: name.trim() });
-      setLocation("/profile/curriculum");
+      setLocation("/profile/location");
     }
   };
 

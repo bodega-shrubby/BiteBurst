@@ -34,7 +34,7 @@ import ManageChildren from "@/pages/settings/ManageChildren";
 // Child onboarding components
 import { AddChildProvider } from "@/pages/settings/children/AddChildContext";
 import ChildNameStep from "@/pages/settings/children/ChildNameStep";
-import ChildYearGroupStep from "@/pages/settings/children/ChildYearGroupStep";
+import ChildAgeStep from "@/pages/settings/children/ChildAgeStep";
 import ChildGoalStep from "@/pages/settings/children/ChildGoalStep";
 import ChildFruitsStep from "@/pages/settings/children/ChildFruitsStep";
 import ChildVeggiesStep from "@/pages/settings/children/ChildVeggiesStep";
@@ -48,6 +48,7 @@ import { OnboardingProvider } from "@/pages/onboarding/OnboardingContext";
 import MascotIntroStep from "@/pages/onboarding/MascotIntroStep";
 import QuickQuestionsStep from "@/pages/onboarding/QuickQuestionsStep";
 import NameStep from "@/pages/onboarding/NameStep";
+import LocationStep from "@/pages/onboarding/LocationStep";
 import AgeStep from "@/pages/onboarding/AgeStep";
 import GoalStep from "@/pages/onboarding/GoalStep";
 import FruitsStep from "@/pages/onboarding/FruitsStep";
@@ -60,7 +61,6 @@ import ParentEmailStep from "@/pages/onboarding/ParentEmailStep";
 import ParentAccountStep from "@/pages/onboarding/ParentAccountStep";
 import PasswordStep from "@/pages/onboarding/PasswordStep";
 import ConsentStep from "@/pages/onboarding/ConsentStep";
-import CurriculumStep from "@/pages/onboarding/CurriculumStep";
 import ReviewStep from "@/pages/onboarding/ReviewStep";
 
 function OnboardingRoutes() {
@@ -71,8 +71,8 @@ function OnboardingRoutes() {
         <Route path="/profile/account" component={ParentAccountStep} />
         <Route path="/profile/questions" component={QuickQuestionsStep} />
         <Route path="/profile/name" component={NameStep} />
+        <Route path="/profile/location" component={LocationStep} />
         <Route path="/profile/age" component={AgeStep} />
-        <Route path="/profile/curriculum" component={CurriculumStep} />
         <Route path="/profile/goal" component={GoalStep} />
         <Route path="/profile/preferences/fruits" component={FruitsStep} />
         <Route path="/profile/preferences/veggies" component={VeggiesStep} />
@@ -94,7 +94,7 @@ function AddChildRoutes() {
     <AddChildProvider>
       <Switch>
         <Route path="/settings/children/add/name" component={ChildNameStep} />
-        <Route path="/settings/children/add/year-group" component={ChildYearGroupStep} />
+        <Route path="/settings/children/add/age" component={ChildAgeStep} />
         <Route path="/settings/children/add/goal" component={ChildGoalStep} />
         <Route path="/settings/children/add/fruits" component={ChildFruitsStep} />
         <Route path="/settings/children/add/veggies" component={ChildVeggiesStep} />
@@ -139,7 +139,7 @@ function Router() {
       
       {/* Add Child Onboarding Flow */}
       <Route path="/settings/children/add/name" component={AddChildRoutes} />
-      <Route path="/settings/children/add/year-group" component={AddChildRoutes} />
+      <Route path="/settings/children/add/age" component={AddChildRoutes} />
       <Route path="/settings/children/add/goal" component={AddChildRoutes} />
       <Route path="/settings/children/add/fruits" component={AddChildRoutes} />
       <Route path="/settings/children/add/veggies" component={AddChildRoutes} />
@@ -153,8 +153,8 @@ function Router() {
       <Route path="/profile/account" component={OnboardingRoutes} />
       <Route path="/profile/questions" component={OnboardingRoutes} />
       <Route path="/profile/name" component={OnboardingRoutes} />
+      <Route path="/profile/location" component={OnboardingRoutes} />
       <Route path="/profile/age" component={OnboardingRoutes} />
-      <Route path="/profile/curriculum" component={OnboardingRoutes} />
       <Route path="/profile/goal" component={OnboardingRoutes} />
       <Route path="/profile/preferences/fruits" component={OnboardingRoutes} />
       <Route path="/profile/preferences/veggies" component={OnboardingRoutes} />
