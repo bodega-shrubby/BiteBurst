@@ -83,9 +83,42 @@ interface LessonListItem {
   id: string;
   title: string;
   state: 'completed' | 'current' | 'unlocked' | 'locked';
+  difficultyLevel: number;
+}
+
+interface LessonGroup {
+  baseId: string;
+  baseName: string;
+  levels: LessonListItem[];
+}
+
+function groupLessonsForSidebar(lessons: LessonListItem[]): LessonGroup[] {
+  const groups = new Map<string, LessonGroup>();
+
+  lessons.forEach(lesson => {
+    const baseId = lesson.id.replace(/-medium$/, '').replace(/-hard$/, '');
+    const baseName = lesson.title
+      .replace(/ - Level \d$/, '')
+      .replace(/ - Level 1$/, '')
+      .replace(/ - Level 2$/, '')
+      .replace(/ - Level 3$/, '');
+
+    if (!groups.has(baseId)) {
+      groups.set(baseId, { baseId, baseName, levels: [] });
+    }
+    groups.get(baseId)!.levels.push(lesson);
+  });
+
+  groups.forEach(group => {
+    group.levels.sort((a, b) => a.difficultyLevel - b.difficultyLevel);
+  });
+
+  return Array.from(groups.values());
 }
 
 function TopicLessonsList({ lessons, completed }: { lessons: LessonListItem[]; completed: number }) {
+  const groups = groupLessonsForSidebar(lessons);
+  
   return (
     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
       <div className="flex justify-between items-center mb-4">
@@ -93,42 +126,60 @@ function TopicLessonsList({ lessons, completed }: { lessons: LessonListItem[]; c
         <span className="text-sm text-gray-400">{completed}/{lessons.length}</span>
       </div>
 
-      <div className="space-y-1 max-h-[300px] overflow-y-auto">
-        {lessons.map((lesson, index) => {
-          const isCurrent = lesson.state === 'current';
-          const isLocked = lesson.state === 'locked';
-          const isCompleted = lesson.state === 'completed';
-
+      <div className="space-y-3 max-h-[300px] overflow-y-auto">
+        {groups.map((group, groupIndex) => {
+          const allComplete = group.levels.every(l => l.state === 'completed');
+          
           return (
-            <div key={lesson.id}>
-              <div 
-                className={`flex items-center space-x-3 py-2 px-2 rounded-lg ${
-                  isCurrent ? 'bg-orange-50 cursor-pointer' : 
-                  isCompleted ? 'bg-green-50' : 
-                  isLocked ? 'opacity-50' : 'hover:bg-gray-50'
-                }`}
-              >
-                <span className={`w-6 h-6 ${
-                  isCurrent ? 'bg-orange-500' : 
-                  isCompleted ? 'bg-green-500' : 
-                  'bg-gray-300'
-                } rounded-full flex items-center justify-center text-white text-xs font-bold`}>
-                  {isCompleted ? '✓' : index + 1}
-                </span>
-                <span className={`text-sm flex-1 ${isCurrent || isCompleted ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
-                  {lesson.title}
-                </span>
-                {isCurrent && <span className="text-green-500 text-xs">▶</span>}
-                {isCompleted && <span className="text-green-500 text-xs">✓</span>}
-                {isLocked && <span className="text-gray-400 text-xs">🔒</span>}
+            <div key={group.baseId} className="space-y-1">
+              <div className="text-xs font-semibold text-gray-500 px-2">
+                {group.baseName}
               </div>
               
-              {(index === 2 || index === 5) && (
-                <div className="flex items-center space-x-3 py-2 px-2 rounded-lg opacity-50">
-                  <span className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 text-xs">📦</span>
-                  <span className="text-sm text-amber-700 flex-1">Checkpoint Reward</span>
-                  <span className="text-amber-600 text-xs">{Math.min(completed, index + 1)}/{index + 1}</span>
-                </div>
+              {group.levels.map((lesson) => {
+                const isCurrent = lesson.state === 'current';
+                const isLocked = lesson.state === 'locked';
+                const isCompleted = lesson.state === 'completed';
+
+                return (
+                  <div key={lesson.id}>
+                    <div 
+                      className={`flex items-center space-x-3 py-2 px-2 rounded-lg ${
+                        isCurrent ? 'bg-orange-50 cursor-pointer' : 
+                        isCompleted ? 'bg-green-50' : 
+                        isLocked ? 'opacity-50' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className={`w-6 h-6 ${
+                        isCurrent ? 'bg-orange-500' : 
+                        isCompleted ? 'bg-green-500' : 
+                        'bg-gray-300'
+                      } rounded-full flex items-center justify-center text-white text-xs font-bold`}>
+                        {isCompleted ? '✓' : lesson.difficultyLevel}
+                      </span>
+                      <span className={`text-sm flex-1 ${isCurrent || isCompleted ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
+                        Level {lesson.difficultyLevel}
+                      </span>
+                      {isCurrent && <span className="text-green-500 text-xs">▶</span>}
+                      {isCompleted && <span className="text-green-500 text-xs">✓</span>}
+                      {isLocked && <span className="text-gray-400 text-xs">🔒</span>}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              <div className={`flex items-center space-x-3 py-2 px-2 rounded-lg ${allComplete ? 'bg-amber-50' : 'opacity-50'}`}>
+                <span className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 text-xs">🎁</span>
+                <span className="text-sm text-amber-700 flex-1">Checkpoint Reward</span>
+                {allComplete ? (
+                  <span className="text-amber-600 text-xs font-bold">CLAIM</span>
+                ) : (
+                  <span className="text-amber-600 text-xs">{group.levels.filter(l => l.state === 'completed').length}/{group.levels.length}</span>
+                )}
+              </div>
+
+              {groupIndex < groups.length - 1 && (
+                <div className="border-b border-gray-100 my-2" />
               )}
             </div>
           );
