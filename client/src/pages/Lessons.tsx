@@ -20,6 +20,7 @@ interface ApiLesson {
   topicOrder?: number;
   description: string | null;
   state: LessonState;
+  difficultyLevel: number;
 }
 
 interface TopicData {
@@ -225,7 +226,8 @@ export default function Lessons() {
           state: lesson.state as 'completed' | 'current' | 'unlocked' | 'locked',
           xp: 15,
           topicId: lesson.topicId,
-          topicTitle: lesson.topicTitle
+          topicTitle: lesson.topicTitle,
+          difficultyLevel: lesson.difficultyLevel || 1
         }));
     }
     if (apiLessons && apiLessons.length > 0) {
@@ -236,7 +238,8 @@ export default function Lessons() {
         state: lesson.state as 'completed' | 'current' | 'unlocked' | 'locked',
         xp: 15,
         topicId: lesson.topicId,
-        topicTitle: lesson.topicTitle
+        topicTitle: lesson.topicTitle,
+        difficultyLevel: lesson.difficultyLevel || 1
       }));
     }
     return cleanLessons.map(lesson => ({
@@ -244,7 +247,8 @@ export default function Lessons() {
       title: lesson.title,
       icon: lesson.icon,
       state: lesson.state as 'completed' | 'current' | 'unlocked' | 'locked',
-      xp: 15
+      xp: 15,
+      difficultyLevel: 1
     }));
   }, [apiLessons, currentTopicId]);
 

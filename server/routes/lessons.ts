@@ -306,17 +306,21 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             topicTitle: topic.title,
             topicOrder: topic.orderPosition ?? 0,
             sortOrder: lesson.orderInUnit ?? 0,
-            description: lesson.description
+            description: lesson.description,
+            difficultyLevel: lesson.difficultyLevel ?? 1
           });
         }
       }
       
-      // Sort by topic order first, then lesson order within each topic
+      // Sort by topic order first, then lesson order, then difficulty level
       allLessons.sort((a, b) => {
         if (a.topicOrder !== b.topicOrder) {
           return a.topicOrder - b.topicOrder;
         }
-        return a.sortOrder - b.sortOrder;
+        if (a.sortOrder !== b.sortOrder) {
+          return a.sortOrder - b.sortOrder;
+        }
+        return a.difficultyLevel - b.difficultyLevel;
       });
       
       // Get completed lessons for either the additional child (childId) or primary child (userId)
