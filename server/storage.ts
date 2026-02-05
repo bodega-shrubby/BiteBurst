@@ -196,7 +196,7 @@ export class DatabaseStorage implements IStorage {
       parentConsent: data.parentConsent,
       authProvider: data.authProvider,
       displayName: data.displayName || data.email.split('@')[0],
-      goal: 'energy',
+      isParent: true,
       subscriptionPlan: data.subscriptionPlan || 'free',
       subscriptionChildrenLimit: data.subscriptionChildrenLimit || 1,
       createdAt: new Date(),
