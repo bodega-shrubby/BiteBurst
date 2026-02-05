@@ -424,15 +424,14 @@ export class DatabaseStorage implements IStorage {
     return topic || undefined;
   }
   
-  // Lesson by topic operations - only returns base difficulty (level 1) lessons
+  // Lesson by topic operations - returns all difficulty levels for 3-level flow
   async getLessonsByTopic(topicId: string): Promise<Lesson[]> {
     return await db.select().from(lessons)
       .where(and(
         eq(lessons.topicId, topicId), 
-        eq(lessons.isActive, true),
-        or(eq(lessons.difficultyLevel, 1), isNull(lessons.difficultyLevel))
+        eq(lessons.isActive, true)
       ))
-      .orderBy(lessons.orderInUnit);
+      .orderBy(lessons.orderInUnit, lessons.difficultyLevel);
   }
   
   // Get completed lesson IDs for a user or child
