@@ -20,7 +20,6 @@ export const goalEnum = pgEnum('goal_enum', ['energy', 'focus', 'strength']);
 export const logTypeEnum = pgEnum('log_type', ['food', 'activity']);
 export const entryMethodEnum = pgEnum('entry_method', ['emoji', 'text', 'photo']);
 export const questionTypeEnum = pgEnum('question_type', ['multiple-choice', 'true-false', 'matching', 'tap-pair', 'fill-blank', 'ordering', 'label-reading']);
-export const curriculumEnum = pgEnum('curriculum', ['us-common-core', 'uk-ks2-ks3']);
 export const subscriptionPlanEnum = pgEnum('subscription_plan', ['free', 'individual', 'family']);
 
 // Catalog tables
@@ -47,26 +46,15 @@ export const mascots = pgTable("mascots", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Curriculums table for UK/US educational standards
-export const curriculums = pgTable("curriculums", {
-  id: varchar("id").primaryKey(),
-  name: text("name").notNull(),
-  country: text("country").notNull(),
-  description: text("description"),
-  isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// Topics table for organizing lessons within a curriculum
+// Topics table for organizing lessons by age
 export const topics = pgTable("topics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id, { onDelete: 'cascade' }),
+  age: integer("age").notNull(), // Target age for topic (6-14)
   title: text("title").notNull(),
   description: text("description"),
   iconEmoji: text("icon_emoji"),
   orderPosition: integer("order_position").notNull(),
   defaultMascotId: varchar("default_mascot_id").references(() => mascots.id),
-  yearGroup: varchar("year_group"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -91,12 +79,9 @@ export const users = pgTable("users", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  // Legacy fields (kept for backwards compatibility during migration)
+  // Legacy fields (kept for backwards compatibility)
   displayName: text("display_name"),
-  yearGroup: text("year_group"),
   goal: text("goal"),
-  curriculum: text("curriculum"),
-  curriculumId: varchar("curriculum_id"),
   avatarId: text("avatar_id"),
   locale: text("locale").default('en-GB'),
   tz: text("tz"),
@@ -109,7 +94,6 @@ export const users = pgTable("users", {
   leagueTier: text("league_tier").default("bronze"),
   isMock: boolean("is_mock").default(false),
   isParent: boolean("is_parent").default(false),
-  curriculumCountry: text("curriculum_country"),
 }, (table) => ({
   emailIdx: index("users_email_idx").on(table.email),
   parentAuthIdx: index("users_parent_auth_idx").on(table.parentAuthId),
@@ -123,10 +107,9 @@ export const children = pgTable("children", {
   name: text("name").notNull(),
   username: text("username").notNull(),
   avatar: text("avatar").notNull().default('🧒'),
-  // Year Group / Grade (NOT age)
-  yearGroup: text("year_group").notNull(), // e.g., 'year-5', 'grade-3'
-  curriculumId: text("curriculum_id").notNull(), // e.g., 'uk-ks2', 'us-35'
-  curriculumCountry: text("curriculum_country"), // 'uk' or 'us'
+  // Age-based system (replaces year group / curriculum)
+  age: integer("age").notNull(), // Child's age 6-14
+  locale: text("locale").default('en-GB'), // 'en-GB' or 'en-US' for UK/US English
   // Learning preferences
   goal: text("goal"), // 'energy', 'focus', 'strength'
   favoriteFruits: text("favorite_fruits").array(),
@@ -138,8 +121,7 @@ export const children = pgTable("children", {
   level: integer("level").notNull().default(1),
   streak: integer("streak").notNull().default(0),
   lastLogAt: timestamp("last_log_at"),
-  // Localization
-  locale: text("locale"),
+  // Timezone
   tz: text("tz"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -238,15 +220,13 @@ export const lessons = pgTable("lessons", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description"),
-  yearGroup: varchar("year_group"),
+  age: integer("age").notNull(), // Target age for lesson (6-14)
   totalSteps: integer("total_steps").notNull(),
   category: text("category").notNull().default('nutrition'),
   isActive: boolean("is_active").notNull().default(true),
-  // New columns for curriculum-aware lesson system
   learningTakeaway: text("learning_takeaway"),
   mascotId: varchar("mascot_id").references(() => mascots.id),
   mascotIntro: text("mascot_intro"),
-  curriculumId: varchar("curriculum_id").references(() => curriculums.id),
   topicId: varchar("topic_id").references(() => topics.id),
   difficultyLevel: integer("difficulty_level").default(1),
   orderInUnit: integer("order_in_unit"),
@@ -263,6 +243,7 @@ export const lessonSteps = pgTable("lesson_steps", {
   questionType: questionTypeEnum("question_type").notNull(),
   question: text("question").notNull(),
   content: jsonb("content").notNull(), // Stores options, correct answers, feedback, etc.
+  contentVariants: jsonb("content_variants"), // UK/US locale-specific content variants
   xpReward: integer("xp_reward").notNull().default(10),
   mascotAction: text("mascot_action"), // For future mascot integration
   retryConfig: jsonb("retry_config"), // Stores maxAttempts, XP tiers, and messages for retry flow
@@ -307,19 +288,7 @@ export const lessonAttempts = pgTable("lesson_attempts", {
   stepIdx: index("lesson_attempts_step_idx").on(table.stepId)
 }));
 
-// Note: Indexes are created via SQL commands, not in Drizzle schema
-
-// Year group mappings table for UK/US year group labels
-export const yearGroupMappings = pgTable("year_group_mappings", {
-  id: varchar("id").primaryKey(),
-  label: text("label").notNull(),
-  country: text("country").notNull(),
-  curriculumId: varchar("curriculum_id").notNull().references(() => curriculums.id),
-  displayOrder: integer("display_order").notNull(),
-});
-
 // Type exports
-export type YearGroupMapping = typeof yearGroupMappings.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Log = typeof logs.$inferSelect;
@@ -334,7 +303,6 @@ export type LeagueBoard = typeof leagueBoards.$inferSelect;
 export type InsertLeagueBoard = typeof leagueBoards.$inferInsert;
 export type LeaderboardCache = typeof leaderboardCache.$inferSelect;
 export type Mascot = typeof mascots.$inferSelect;
-export type Curriculum = typeof curriculums.$inferSelect;
 export type Topic = typeof topics.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 export type InsertLesson = typeof lessons.$inferInsert;
@@ -351,10 +319,7 @@ export type InsertChild = typeof children.$inferInsert;
 export const insertUserSchema = createInsertSchema(users).pick({
   parentAuthId: true,
   displayName: true,
-  yearGroup: true,
   goal: true,
-  curriculum: true,
-  curriculumId: true,
   email: true,
   parentEmail: true,
   parentConsent: true,
@@ -379,14 +344,13 @@ export const insertLogSchema = createInsertSchema(logs).pick({
 export const insertLessonSchema = createInsertSchema(lessons).pick({
   title: true,
   description: true,
-  yearGroup: true,
+  age: true,
   totalSteps: true,
   category: true,
   isActive: true,
   learningTakeaway: true,
   mascotId: true,
   mascotIntro: true,
-  curriculumId: true,
   topicId: true,
   difficultyLevel: true,
   orderInUnit: true,
@@ -400,6 +364,7 @@ export const insertLessonStepSchema = createInsertSchema(lessonSteps).pick({
   questionType: true,
   question: true,
   content: true,
+  contentVariants: true,
   xpReward: true,
   mascotAction: true,
   retryConfig: true,
@@ -432,15 +397,13 @@ export const insertChildSchema = createInsertSchema(children).pick({
   name: true,
   username: true,
   avatar: true,
-  yearGroup: true,
-  curriculumId: true,
-  curriculumCountry: true,
+  age: true,
+  locale: true,
   goal: true,
   favoriteFruits: true,
   favoriteVeggies: true,
   favoriteFoods: true,
   favoriteSports: true,
-  locale: true,
   tz: true,
 });
 

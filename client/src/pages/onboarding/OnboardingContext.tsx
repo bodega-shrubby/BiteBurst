@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface OnboardingProfile {
   displayName: string;
-  yearGroup: string; // e.g., "year-5", "grade-3"
+  age: number | null; // Child's age 6-14
+  locale: string; // 'en-GB' or 'en-US'
   goal: string;
-  curriculumCountry: string; // 'uk' or 'us'
-  curriculum: string; // derived curriculum ID (e.g., 'uk-ks1', 'us-k2')
   avatar: string;
   email?: string;
   parentEmail?: string;
@@ -25,10 +24,9 @@ interface OnboardingContextType {
 
 const defaultProfile: OnboardingProfile = {
   displayName: "",
-  yearGroup: "",
+  age: null,
+  locale: "",
   goal: "",
-  curriculumCountry: "",
-  curriculum: "",
   avatar: "",
   email: "",
   parentEmail: "",
