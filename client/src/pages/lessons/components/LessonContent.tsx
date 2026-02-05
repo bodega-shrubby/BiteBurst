@@ -1,3 +1,5 @@
+import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
+
 interface LessonSection {
   emoji: string;
   color: 'blue' | 'green' | 'yellow' | 'cyan' | 'orange';
@@ -11,6 +13,7 @@ interface LessonContentProps {
   mascot: {
     name: string;
     emoji: string;
+    imagePath?: string | null;
   };
   intro: {
     greeting: string;
@@ -125,10 +128,14 @@ export function LessonContent({
 
               {/* Circle */}
               <div
-                className="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br from-orange-400 via-yellow-400 to-orange-500 border-4 border-white shadow-xl flex items-center justify-center animate-bounce"
+                className="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br from-orange-400 via-yellow-400 to-orange-500 border-4 border-white shadow-xl flex items-center justify-center animate-bounce overflow-hidden"
                 style={{ animationDuration: '3s', boxShadow: '0 0 30px rgba(255, 106, 0, 0.4)' }}
               >
-                <span className="text-4xl md:text-5xl lg:text-7xl">{mascot.emoji}</span>
+                <img 
+                  src={mascot.imagePath || brainyBoltImage} 
+                  alt={mascot.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Name Badge */}
