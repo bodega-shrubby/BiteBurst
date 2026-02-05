@@ -31,7 +31,7 @@ import {
   type InsertChild,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, or, isNull } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -424,10 +424,14 @@ export class DatabaseStorage implements IStorage {
     return topic || undefined;
   }
   
-  // Lesson by topic operations
+  // Lesson by topic operations - only returns base difficulty (level 1) lessons
   async getLessonsByTopic(topicId: string): Promise<Lesson[]> {
     return await db.select().from(lessons)
-      .where(and(eq(lessons.topicId, topicId), eq(lessons.isActive, true)))
+      .where(and(
+        eq(lessons.topicId, topicId), 
+        eq(lessons.isActive, true),
+        or(eq(lessons.difficultyLevel, 1), isNull(lessons.difficultyLevel))
+      ))
       .orderBy(lessons.orderInUnit);
   }
   
