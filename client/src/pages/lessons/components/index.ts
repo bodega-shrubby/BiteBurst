@@ -4,3 +4,4 @@ export { default as LessonIncorrect } from './LessonIncorrect';
 export { default as LessonLearn } from './LessonLearn';
 export { default as LessonComplete } from './LessonComplete';
 export { default as ProgressBar } from './ProgressBar';
+export { default as LessonContent } from './LessonContent';

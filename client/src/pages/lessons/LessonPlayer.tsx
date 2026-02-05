@@ -21,20 +21,37 @@ function OrangeBurst({ filled = true, size = 20 }: { filled?: boolean; size?: nu
   );
 }
 import { Button } from '@/components/ui/button';
-import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, LessonComplete, ProgressBar } from './components';
+import { LessonAsking, LessonSuccess, LessonIncorrect, LessonLearn, LessonComplete, ProgressBar, LessonContent } from './components';
 
 interface LessonPlayerProps {
   lessonId: string;
 }
 
-type LessonState = 'intro' | 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
+type LessonState = 'intro' | 'lesson-content' | 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
 
 type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
+
+interface LessonContentData {
+  title: string;
+  intro?: {
+    greeting: string;
+    message: string;
+  };
+  sections: Array<{
+    emoji: string;
+    color: 'blue' | 'green' | 'yellow' | 'cyan' | 'orange';
+    heading: string;
+    subEmoji: string;
+    text: string;
+  }>;
+  keyPoints: string[];
+  mascotMessage: string;
+}
 
 interface LessonStep {
   id: string;
   stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank';
+  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank' | 'lesson-content';
   question: string;
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }> | string[];
@@ -47,6 +64,11 @@ interface LessonStep {
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
     items?: Array<{ id: string; text: string; category: string }>;
     blanks?: Array<{ id: string; correctAnswer: string }>;
+    title?: string;
+    intro?: { greeting: string; message: string };
+    sections?: LessonContentData['sections'];
+    keyPoints?: string[];
+    mascotMessage?: string;
   };
   xpReward: number;
   mascotAction?: string;
@@ -447,8 +469,12 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Reset state for next step
   const resetForNextStep = () => {
-    setCurrentStepIndex(prev => prev + 1);
-    setLessonState('asking');
+    const nextIndex = currentStepIndex + 1;
+    const nextStep = lessonData?.steps[nextIndex];
+    const nextState = nextStep?.questionType === 'lesson-content' ? 'lesson-content' : 'asking';
+    
+    setCurrentStepIndex(nextIndex);
+    setLessonState(nextState);
     setSelectedAnswer(null);
     setShowContinueButton(false);
     setCurrentAttempt(1);
@@ -546,6 +572,26 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setStepStartTime(Date.now());
   }, [currentStepIndex]);
 
+  // Auto-transition from intro to lesson-content if first step is lesson-content type
+  useEffect(() => {
+    if (lessonData && lessonState === 'intro') {
+      const firstStep = lessonData.steps[0];
+      if (firstStep?.questionType === 'lesson-content') {
+        setStepStartTime(Date.now());
+        setLessonState('lesson-content');
+      }
+    }
+  }, [lessonData, lessonState]);
+
+  // Guard: if current step is lesson-content but we're in asking state, redirect
+  useEffect(() => {
+    if (lessonData && lessonState === 'asking') {
+      const step = lessonData.steps[currentStepIndex];
+      if (step?.questionType === 'lesson-content') {
+        setLessonState('lesson-content');
+      }
+    }
+  }, [lessonData, lessonState, currentStepIndex]);
 
   if (!lessonData) {
     return (
@@ -607,6 +653,56 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     );
   }
 
+  if (lessonState === 'lesson-content') {
+    const contentStep = lessonData.steps[currentStepIndex];
+    if (!contentStep || contentStep.questionType !== 'lesson-content') {
+      return null;
+    }
+    
+    const getMascotInfo = () => {
+      const defaultMascots: Record<string, { name: string; emoji: string }> = {
+        'captain-carrot': { name: 'Captain Carrot', emoji: '🥕' },
+        'brainy-bolt': { name: 'Brainy Bolt', emoji: '⚡' },
+      };
+      const mascotId = lessonData.mascotId || 'brainy-bolt';
+      return defaultMascots[mascotId] || { name: 'Brainy Bolt', emoji: '⚡' };
+    };
+    
+    return (
+      <LessonContent
+        title={contentStep.content.title || lessonData.title}
+        mascot={getMascotInfo()}
+        intro={contentStep.content.intro || {
+          greeting: 'Hey there, superstar!',
+          message: lessonData.mascotIntro || "Let's learn something new!"
+        }}
+        sections={contentStep.content.sections || []}
+        keyPoints={contentStep.content.keyPoints || []}
+        mascotMessage={contentStep.content.mascotMessage || "Let's see what you learned! 🎉"}
+        currentStep={currentStepIndex + 1}
+        totalSteps={lessonData.totalSteps}
+        lives={lives}
+        onContinue={() => {
+          const nextIndex = currentStepIndex + 1;
+          if (nextIndex < lessonData.totalSteps) {
+            setCurrentStepIndex(nextIndex);
+            setStepStartTime(Date.now());
+            const nextStep = lessonData.steps[nextIndex];
+            if (nextStep?.questionType === 'lesson-content') {
+              setLessonState('lesson-content');
+            } else {
+              setLessonState('asking');
+            }
+          } else {
+            markCompleteMutation.mutate({ lessonId, xpEarned: totalXpEarned });
+            setLessonState('complete');
+          }
+        }}
+        onClose={handleClose}
+      />
+    );
+  }
+
   if (lessonState === 'complete') {
     return (
       <LessonComplete
@@ -646,7 +742,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
       {/* Lesson Content */}
       <div className="flex-1 px-4 py-6">
-        {lessonState === 'asking' && currentStep && (
+        {lessonState === 'asking' && currentStep && currentStep.questionType !== 'lesson-content' && (
           <LessonAsking
             step={currentStep}
             selectedAnswer={selectedAnswer}
