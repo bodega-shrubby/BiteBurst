@@ -288,6 +288,21 @@ export const lessonAttempts = pgTable("lesson_attempts", {
   stepIdx: index("lesson_attempts_step_idx").on(table.stepId)
 }));
 
+// Treasure chest rewards for completing all levels of a lesson
+export const treasureChests = pgTable("treasure_chests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  childId: varchar("child_id").references(() => children.id, { onDelete: 'cascade' }),
+  lessonBaseId: varchar("lesson_base_id").notNull(),
+  unlockedAt: timestamp("unlocked_at"),
+  claimedAt: timestamp("claimed_at"),
+  xpReward: integer("xp_reward").notNull().default(50),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  userLessonIdx: index("treasure_chests_user_lesson_idx").on(table.userId, table.lessonBaseId),
+  childLessonIdx: index("treasure_chests_child_lesson_idx").on(table.childId, table.lessonBaseId)
+}));
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -314,6 +329,8 @@ export type LessonAttempt = typeof lessonAttempts.$inferSelect;
 export type InsertLessonAttempt = typeof lessonAttempts.$inferInsert;
 export type Child = typeof children.$inferSelect;
 export type InsertChild = typeof children.$inferInsert;
+export type TreasureChest = typeof treasureChests.$inferSelect;
+export type InsertTreasureChest = typeof treasureChests.$inferInsert;
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({

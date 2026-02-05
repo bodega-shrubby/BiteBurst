@@ -13,6 +13,7 @@ import {
   mascots,
   topics,
   children,
+  treasureChests,
   type User,
   type InsertUser,
   type Log,
@@ -29,6 +30,7 @@ import {
   type Topic,
   type Child,
   type InsertChild,
+  type TreasureChest,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, or, isNull } from "drizzle-orm";
@@ -115,6 +117,11 @@ export interface IStorage {
   
   // Lesson progress operations
   getCompletedLessonIds(userId: string, childId?: string): Promise<string[]>;
+  
+  // Treasure chest operations
+  getTreasureChests(userId: string, childId?: string): Promise<TreasureChest[]>;
+  getTreasureChest(userId: string, lessonBaseId: string, childId?: string): Promise<TreasureChest | undefined>;
+  claimTreasureChest(userId: string, lessonBaseId: string, childId?: string): Promise<TreasureChest>;
   
   // Lesson by age operations
   getLessonsByAge(age: number): Promise<Lesson[]>;
@@ -545,6 +552,67 @@ export class DatabaseStorage implements IStorage {
         eq(lessons.isActive, true)
       ))
       .orderBy(lessons.orderInUnit);
+  }
+  
+  // Treasure chest operations
+  async getTreasureChests(userId: string, childId?: string): Promise<TreasureChest[]> {
+    if (childId) {
+      return await db.select().from(treasureChests)
+        .where(and(
+          eq(treasureChests.userId, userId),
+          eq(treasureChests.childId, childId)
+        ));
+    }
+    return await db.select().from(treasureChests)
+      .where(and(
+        eq(treasureChests.userId, userId),
+        isNull(treasureChests.childId)
+      ));
+  }
+  
+  async getTreasureChest(userId: string, lessonBaseId: string, childId?: string): Promise<TreasureChest | undefined> {
+    const conditions = [
+      eq(treasureChests.userId, userId),
+      eq(treasureChests.lessonBaseId, lessonBaseId)
+    ];
+    
+    if (childId) {
+      conditions.push(eq(treasureChests.childId, childId));
+    } else {
+      conditions.push(isNull(treasureChests.childId));
+    }
+    
+    const [chest] = await db.select().from(treasureChests)
+      .where(and(...conditions));
+    return chest || undefined;
+  }
+  
+  async claimTreasureChest(userId: string, lessonBaseId: string, childId?: string): Promise<TreasureChest> {
+    const now = new Date();
+    
+    // Check if treasure already exists
+    const existing = await this.getTreasureChest(userId, lessonBaseId, childId);
+    
+    if (existing) {
+      // Update to claimed
+      const [updated] = await db.update(treasureChests)
+        .set({ claimedAt: now })
+        .where(eq(treasureChests.id, existing.id))
+        .returning();
+      return updated;
+    }
+    
+    // Create new claimed treasure
+    const [chest] = await db.insert(treasureChests).values({
+      userId,
+      childId: childId || null,
+      lessonBaseId,
+      unlockedAt: now,
+      claimedAt: now,
+      xpReward: 50
+    }).returning();
+    
+    return chest;
   }
   
   // Children operations (new architecture - ALL children including first)

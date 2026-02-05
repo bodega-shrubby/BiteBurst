@@ -1145,4 +1145,68 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
       res.status(500).json({ error: 'Failed to mark lesson complete' });
     }
   });
+
+  // Get claimed treasure chests for a user
+  app.get('/api/treasures', requireAuth, async (req: any, res: any) => {
+    try {
+      const userId = req.query.userId as string;
+      const childId = req.query.childId as string | undefined;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+      
+      const auth = await resolveUserAuth(userId, req.userId);
+      if (!auth.valid) {
+        return res.status(403).json({ error: auth.error });
+      }
+      
+      const treasures = await storage.getTreasureChests(userId, childId);
+      res.json(treasures);
+    } catch (error) {
+      console.error('Get treasures error:', error);
+      res.status(500).json({ error: 'Failed to get treasures' });
+    }
+  });
+
+  // Claim a treasure chest
+  app.post('/api/treasures/:lessonBaseId/claim', requireAuth, async (req: any, res: any) => {
+    try {
+      const { lessonBaseId } = req.params;
+      const { userId, childId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+      
+      const auth = await resolveUserAuth(userId, req.userId);
+      if (!auth.valid) {
+        return res.status(403).json({ error: auth.error });
+      }
+      
+      const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
+      }
+      
+      // Claim the treasure and award XP
+      const treasure = await storage.claimTreasureChest(userId, lessonBaseId, childId);
+      
+      // Award XP to user - get current user and update their XP
+      const user = await storage.getUser(userId);
+      if (user) {
+        const newXp = (user.totalXp || 0) + treasure.xpReward;
+        await storage.updateUser(userId, { totalXp: newXp });
+      }
+      
+      res.json({
+        success: true,
+        xpEarned: treasure.xpReward,
+        message: `🎉 Treasure claimed! You earned ${treasure.xpReward} XP!`
+      });
+    } catch (error) {
+      console.error('Claim treasure error:', error);
+      res.status(500).json({ error: 'Failed to claim treasure' });
+    }
+  });
 }
