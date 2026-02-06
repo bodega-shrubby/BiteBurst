@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Check } from 'lucide-react';
-import treasureChestImg from '@assets/treasure_chest_1769687520313.jpg';
+import treasureChestImg from '@/assets/images/treasure-chest.png';
 
 const THEMED_ICONS = [
   '🍎', '🥦', '🏀', '🥕', '🍌', '🧘', '🥗', '⚽',
