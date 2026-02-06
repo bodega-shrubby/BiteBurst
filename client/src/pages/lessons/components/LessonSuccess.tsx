@@ -92,7 +92,6 @@ export default function LessonSuccess({
         {getFeedbackText(step.content.feedback, 'success', step.content) && (
           <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">🎉</span>
               <div>
                 <p className="font-bold text-green-700">Perfect order!</p>
                 <p className="text-gray-600 mt-1 text-sm">
@@ -116,14 +115,6 @@ export default function LessonSuccess({
 
   return (
     <div className="min-h-[400px] rounded-3xl bg-gradient-to-b from-green-50 to-emerald-100 p-6 relative overflow-hidden">
-      {/* Sparkle Overlay */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <span className="absolute top-4 left-1/4 text-4xl animate-bounce" style={{ animationDelay: '0.1s' }}>⭐</span>
-        <span className="absolute top-8 right-1/4 text-3xl animate-bounce" style={{ animationDelay: '0.2s' }}>✨</span>
-        <span className="absolute top-2 right-1/3 text-2xl animate-bounce" style={{ animationDelay: '0.3s' }}>🌟</span>
-        <span className="absolute top-6 left-1/3 text-2xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}>🎉</span>
-      </div>
-
       <div className="max-w-md mx-auto space-y-5 relative z-10">
         {/* Celebrating Mascot */}
         <div className="relative flex justify-center pt-2">
@@ -134,8 +125,6 @@ export default function LessonSuccess({
               className="w-32 h-32 object-contain animate-bounce"
               style={{ animationDuration: '2s' }}
             />
-            <span className="absolute -top-2 -right-2 text-3xl">🎉</span>
-            <span className="absolute -bottom-1 -left-2 text-2xl">⭐</span>
           </div>
         </div>
 
@@ -166,7 +155,6 @@ export default function LessonSuccess({
                 {getFeedbackText(step.content.feedback, 'success', step.content) && (
                   <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl">🎉</span>
                       <div>
                         <p className="font-bold text-green-700">Perfect matches!</p>
                         <p className="text-gray-600 mt-1 text-sm whitespace-pre-line">
@@ -205,7 +193,6 @@ export default function LessonSuccess({
             {getFeedbackText(step.content.feedback, 'success', step.content) && (
               <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl">🎉</span>
                   <div>
                     <p className="font-bold text-green-700">Correct! You're amazing!</p>
                     <p className="text-gray-600 mt-1 text-sm">
@@ -221,7 +208,7 @@ export default function LessonSuccess({
         {/* XP Badge - Large & Animated */}
         <div className="flex justify-center">
           <div className="bg-gradient-to-r from-orange-400 to-yellow-400 px-8 py-3 rounded-full shadow-lg animate-pulse">
-            <span className="text-white font-bold text-2xl">+{xpEarned} XP ✨</span>
+            <span className="text-white font-bold text-2xl">+{xpEarned} XP</span>
           </div>
         </div>
 
