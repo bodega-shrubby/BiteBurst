@@ -58,14 +58,14 @@ export default function LessonIncorrect({
       <div className="max-w-md mx-auto space-y-5">
         {/* Mascot with animation */}
         <div className="relative flex justify-center pt-2">
-          {isHintMode && (
-            <span className="absolute -top-4 right-1/4 text-3xl animate-bounce">💡</span>
-          )}
-          <div className={`w-28 h-28 rounded-full ${isHintMode ? 'bg-gradient-to-br from-purple-400 to-purple-600' : 'bg-gradient-to-br from-orange-400 to-red-400'} p-1 shadow-xl ${shouldShake && !isHintMode ? 'animate-shake' : ''}`}>
+          <div className={`relative ${shouldShake && !isHintMode ? 'animate-shake' : ''}`}>
+            {isHintMode && (
+              <span className="absolute -top-4 -right-2 text-3xl animate-bounce">💡</span>
+            )}
             <img
               src={mascotImage}
               alt={isHintMode ? "Oni giving hint" : "Oni encouraging"}
-              className="w-full h-full object-contain rounded-full"
+              className="w-28 h-28 object-contain"
             />
           </div>
         </div>

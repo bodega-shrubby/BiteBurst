@@ -29,15 +29,15 @@ export default function LessonLearn({
       <div className="max-w-md mx-auto space-y-5">
         {/* Teaching Mode Mascot */}
         <div className="flex justify-center">
-          <div className="w-24 h-24 bg-purple-400 rounded-full flex items-center justify-center shadow-lg border-4 border-purple-500">
+          <div className="relative">
             <img
               src={oniSadImage}
               alt="Oni teaching"
-              className="w-16 h-16 object-contain"
+              className="w-28 h-28 object-contain"
             />
+            <span className="absolute -top-2 -right-2 text-2xl">📚</span>
           </div>
         </div>
-        <p className="text-center text-xs text-gray-500">[Teaching mode]</p>
 
         {/* Learning Moment Header */}
         <div className="text-center">

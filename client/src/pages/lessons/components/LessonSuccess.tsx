@@ -156,12 +156,15 @@ export default function LessonSuccess({
       <div className="max-w-md mx-auto space-y-5 relative z-10">
         {/* Celebrating Mascot */}
         <div className="relative flex justify-center pt-2">
-          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 p-1 shadow-2xl animate-bounce" style={{ animationDuration: '2s' }}>
+          <div className="relative">
             <img
               src={oniCelebrateImage}
               alt="Celebrating!"
-              className="w-full h-full object-contain rounded-full"
+              className="w-32 h-32 object-contain animate-bounce"
+              style={{ animationDuration: '2s' }}
             />
+            <span className="absolute -top-2 -right-2 text-3xl">🎉</span>
+            <span className="absolute -bottom-1 -left-2 text-2xl">⭐</span>
           </div>
         </div>
 
