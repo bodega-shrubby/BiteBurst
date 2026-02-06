@@ -100,7 +100,7 @@ export default function Settings() {
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition text-left"
             >
               <div>
-                <p className="font-semibold text-gray-900">Profile Settings</p>
+                <p className="font-semibold text-gray-900">Parent Settings</p>
                 <p className="text-sm text-gray-500">Edit name, avatar & learning goal</p>
               </div>
               <span className="text-gray-400">→</span>
