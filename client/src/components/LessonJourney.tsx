@@ -225,16 +225,16 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                     <div className={`flex items-center mb-12 ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}>
                       <div className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
                         <div
-                          className={`w-16 h-16 flex items-center justify-center transition-all ${
+                          className={`w-16 h-16 rounded-full border-4 flex items-center justify-center overflow-hidden transition-all ${
                             treasureUnlocked
-                              ? 'animate-bounce cursor-pointer hover:scale-110 drop-shadow-lg'
-                              : ''
+                              ? 'bg-amber-100 border-amber-400 animate-bounce cursor-pointer hover:scale-110 shadow-lg'
+                              : 'bg-gray-100 border-gray-300'
                           }`}
                         >
                           <img
                             src={treasureChestImg}
                             alt="Treasure Chest"
-                            className={`w-16 h-16 object-contain transition-all ${
+                            className={`w-10 h-10 object-contain transition-all ${
                               treasureUnlocked ? '' : 'grayscale opacity-40'
                             }`}
                           />
