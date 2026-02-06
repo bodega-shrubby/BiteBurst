@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Star, Sparkles, PartyPopper, Trophy, Flame, X } from 'lucide-react';
 import oniProudImage from '@assets/Mascots/Oni_proud.png';
 
 interface LessonCompleteProps {
@@ -31,12 +32,12 @@ export default function LessonComplete({
     <div className="min-h-screen bg-gradient-to-b from-orange-100 via-yellow-50 to-white relative overflow-hidden">
       {/* Confetti Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <span className="absolute top-4 left-8 text-2xl animate-bounce" style={{ animationDelay: '0s' }}>🎊</span>
-        <span className="absolute top-4 right-8 text-2xl animate-bounce" style={{ animationDelay: '0.2s' }}>🎉</span>
-        <span className="absolute top-12 left-1/4 text-xl animate-bounce" style={{ animationDelay: '0.4s' }}>⭐</span>
-        <span className="absolute top-12 right-1/4 text-xl animate-bounce" style={{ animationDelay: '0.6s' }}>✨</span>
-        <span className="absolute top-20 left-12 text-lg animate-bounce" style={{ animationDelay: '0.3s' }}>🌟</span>
-        <span className="absolute top-20 right-12 text-lg animate-bounce" style={{ animationDelay: '0.5s' }}>🎊</span>
+        <PartyPopper className="absolute top-4 left-8 w-7 h-7 text-orange-400 animate-bounce" style={{ animationDelay: '0s' }} />
+        <PartyPopper className="absolute top-4 right-8 w-7 h-7 text-yellow-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
+        <Star className="absolute top-12 left-1/4 w-6 h-6 text-orange-400 animate-bounce fill-orange-400" style={{ animationDelay: '0.4s' }} />
+        <Sparkles className="absolute top-12 right-1/4 w-6 h-6 text-yellow-400 animate-bounce" style={{ animationDelay: '0.6s' }} />
+        <Star className="absolute top-20 left-12 w-5 h-5 text-yellow-500 animate-bounce fill-yellow-500" style={{ animationDelay: '0.3s' }} />
+        <PartyPopper className="absolute top-20 right-12 w-5 h-5 text-orange-400 animate-bounce" style={{ animationDelay: '0.5s' }} />
       </div>
 
       {/* Header (Progress Complete) */}
@@ -45,7 +46,7 @@ export default function LessonComplete({
           onClick={onBackToDashboard}
           className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100"
         >
-          <span className="text-gray-500 text-xl">✕</span>
+          <X className="w-5 h-5 text-gray-500" />
         </button>
         <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-orange-500 rounded-full w-full"></div>
@@ -68,15 +69,15 @@ export default function LessonComplete({
               alt="Oni Celebrating"
               className="w-32 h-32 object-contain mascot-celebrate"
             />
-            <span className="absolute -top-2 -right-2 text-3xl">🎉</span>
-            <span className="absolute -bottom-1 -left-2 text-2xl">⭐</span>
+            <PartyPopper className="absolute -top-2 -right-2 w-8 h-8 text-yellow-500" />
+            <Star className="absolute -bottom-1 -left-2 w-7 h-7 text-orange-400 fill-orange-400" />
           </div>
         </div>
 
         {/* Completion Message */}
         <div className="text-center mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Lesson Complete!</h1>
-          <p className="text-orange-600 font-medium">Amazing work, you're a star! ⭐</p>
+          <p className="text-orange-600 font-medium flex items-center justify-center gap-1">Amazing work, you're a star! <Star className="w-4 h-4 text-orange-500 fill-orange-500 inline" /></p>
         </div>
 
         {/* Stats Card */}
@@ -102,7 +103,7 @@ export default function LessonComplete({
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 text-white mb-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🏆</span>
+                <Trophy className="w-7 h-7 text-white" />
               </div>
               <div>
                 <p className="text-xs opacity-80">Achievement Unlocked!</p>
@@ -115,7 +116,7 @@ export default function LessonComplete({
         {/* Streak Bonus */}
         {streakDays && streakDays > 1 && (
           <div className="flex items-center justify-center gap-3 bg-orange-50 rounded-xl p-3 mb-6 animate-slide-up" style={{ animationDelay: '0.8s' }}>
-            <span className="text-2xl">🔥</span>
+            <Flame className="w-7 h-7 text-orange-500 fill-orange-500" />
             <div>
               <p className="font-bold text-orange-600">{streakDays} Day Streak!</p>
               <p className="text-xs text-orange-500">+5 bonus XP</p>
