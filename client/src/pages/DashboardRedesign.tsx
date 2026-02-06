@@ -367,8 +367,8 @@ export default function DashboardRedesign() {
 
               {/* 4. QUICK LOG - Two buttons only */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h3 className="font-bold text-xl mb-5 flex items-center gap-2">
-                  <span>⚡</span> Quick Log
+                <h3 className="font-bold text-xl mb-5">
+                  Quick Log
                 </h3>
 
                 <div className="flex gap-4">
