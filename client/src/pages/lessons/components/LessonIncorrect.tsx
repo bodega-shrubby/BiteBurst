@@ -59,9 +59,6 @@ export default function LessonIncorrect({
         {/* Mascot with animation */}
         <div className="relative flex justify-center pt-2">
           <div className={`relative ${shouldShake && !isHintMode ? 'animate-shake' : ''}`}>
-            {isHintMode && (
-              <span className="absolute -top-4 -right-2 text-3xl animate-bounce">💡</span>
-            )}
             <img
               src={mascotImage}
               alt={isHintMode ? "Oni giving hint" : "Oni encouraging"}
@@ -103,31 +100,26 @@ export default function LessonIncorrect({
           aria-live="assertive"
           data-testid="incorrect-banner"
         >
-          <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">
-              {isHintMode ? '💡' : '🤔'}
-            </span>
-            <div className="flex-1">
-              {isHintMode ? (
-                <>
-                  <p className="font-bold text-blue-800 mb-1">
-                    Here's a hint!
-                  </p>
-                  <p className="text-blue-700 text-sm leading-relaxed">
-                    {hint}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="font-bold text-orange-800 mb-1">
-                    Oops! Not quite right...
-                  </p>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {message || "Don't worry! Think about it and give it another try! 💪"}
-                  </p>
-                </>
-              )}
-            </div>
+          <div>
+            {isHintMode ? (
+              <>
+                <p className="font-bold text-blue-800 mb-1">
+                  Here's a hint!
+                </p>
+                <p className="text-blue-700 text-sm leading-relaxed">
+                  {hint}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-bold text-orange-800 mb-1">
+                  Oops! Not quite right...
+                </p>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  {message || "Don't worry! Think about it and give it another try!"}
+                </p>
+              </>
+            )}
           </div>
         </div>
 
@@ -137,7 +129,7 @@ export default function LessonIncorrect({
         {/* Encouragement Message */}
         <div className="text-center">
           <p className="text-gray-500 text-sm">
-            Don't worry - everyone learns differently! You've got this. 💪
+            Don't worry - everyone learns differently! You've got this.
           </p>
         </div>
 
