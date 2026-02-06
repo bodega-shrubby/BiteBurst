@@ -1,4 +1,11 @@
 import { useMemo } from 'react';
+import { Check } from 'lucide-react';
+
+const THEMED_ICONS = [
+  '🍎', '🥦', '🏀', '🥕', '🍌', '🧘', '🥗', '⚽',
+  '🍇', '🌽', '🏊', '🍊', '🥑', '🚴', '🫐', '🥒',
+  '🏃', '🍓', '🧃', '🤸', '🥝', '🌶️', '🏋️', '🍉',
+];
 
 interface Lesson {
   id: string;
@@ -64,11 +71,11 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
       case 'completed':
         return 'bg-green-500 border-green-600 text-white shadow-lg';
       case 'current':
-        return 'bg-orange-500 border-orange-600 text-white shadow-lg animate-pulse ring-4 ring-orange-200';
+        return 'bg-white border-orange-500 shadow-lg ring-4 ring-orange-200';
       case 'unlocked':
-        return 'bg-blue-100 border-blue-300 text-blue-700';
+        return 'bg-white border-blue-300';
       default:
-        return 'bg-gray-200 border-gray-300 text-gray-400';
+        return 'bg-gray-100 border-gray-300';
     }
   };
 
@@ -78,10 +85,9 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
     return 'border-gray-100';
   };
 
-  const getNodeContent = (lesson: Lesson) => {
-    if (lesson.state === 'completed') return '✓';
-    if (lesson.state === 'locked') return '🔒';
-    return lesson.icon;
+  const getThemedIcon = (groupIndex: number, levelIndex: number) => {
+    const idx = (groupIndex * 3 + levelIndex) % THEMED_ICONS.length;
+    return THEMED_ICONS[idx];
   };
 
   const getLevelLabel = (level: number) => {
@@ -159,15 +165,16 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
         </svg>
 
         <div className="relative" style={{ zIndex: 1 }}>
-          {lessonGroups.map((group) => {
+          {lessonGroups.map((group, groupIndex) => {
             const treasureUnlocked = allLevelsComplete(group);
             
             return (
               <div key={group.baseId}>
-                {group.levels.map((lesson) => {
+                {group.levels.map((lesson, levelIndex) => {
                   const isEven = renderIndex % 2 === 0;
                   const isClickable = lesson.state === 'current' || lesson.state === 'unlocked' || lesson.state === 'completed';
                   renderIndex++;
+                  const themedIcon = getThemedIcon(groupIndex, levelIndex);
 
                   return (
                     <div key={lesson.id}>
@@ -179,9 +186,15 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                           onClick={() => isClickable && onLessonClick(lesson.id)}
                         >
                           <div
-                            className={`w-16 h-16 rounded-full border-4 flex items-center justify-center text-2xl transition-transform ${isClickable ? 'hover:scale-110' : ''} ${getNodeStyle(lesson.state)}`}
+                            className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-transform ${isClickable ? 'hover:scale-110' : ''} ${getNodeStyle(lesson.state)}`}
                           >
-                            {getNodeContent(lesson)}
+                            {lesson.state === 'completed' ? (
+                              <Check className="w-8 h-8 text-white" strokeWidth={3} />
+                            ) : (
+                              <span className={`text-2xl ${lesson.state === 'locked' ? 'grayscale opacity-40' : lesson.state === 'current' ? '' : 'grayscale opacity-60'}`} style={{ filter: lesson.state === 'locked' ? 'grayscale(100%)' : lesson.state === 'current' ? 'none' : 'grayscale(80%)' }}>
+                                {themedIcon}
+                              </span>
+                            )}
                           </div>
 
                           <div className={`bg-white rounded-xl px-4 py-2 shadow-lg max-w-[180px] border transition-shadow ${isClickable ? 'hover:shadow-xl' : ''} ${getBorderStyle(lesson.state)}`}>
