@@ -115,7 +115,7 @@ export function LessonContent({
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row min-h-full">
 
           {/* Left Side - Mascot */}
-          <div className="w-full md:w-2/5 lg:w-1/3 p-4 md:p-6 lg:p-8 flex flex-col items-center md:justify-start md:pt-24 justify-center bg-gradient-to-br from-orange-50 to-yellow-50 md:border-r-2 md:border-orange-100">
+          <div className="w-full md:w-2/5 lg:w-1/3 p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-yellow-50 md:border-r-2 md:border-orange-100">
             {/* Mascot Avatar */}
             <div className="relative mb-4 md:mb-6">
               {/* Glow */}
