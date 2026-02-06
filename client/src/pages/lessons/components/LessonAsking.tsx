@@ -26,7 +26,8 @@ interface LessonStep {
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
     items?: Array<{ id: string; text: string; category: string }>;
-    blanks?: Array<{ id: string; correctAnswer: string }>;
+    blanks?: Array<{ id: string; correctAnswer: string; hint?: string; acceptableAnswers?: string[] }>;
+    sentence?: string;
   };
   xpReward: number;
   mascotAction?: string;
@@ -734,7 +735,44 @@ export default function LessonAsking({
 
   // Render fill-blank question type - select word to complete sentence
   const renderFillBlank = () => {
+    const hasBlanks = step.content.blanks && step.content.blanks.length > 0;
     const normalizedOptions = getNormalizedOptions();
+    
+    if (hasBlanks && step.content.sentence) {
+      const blank = step.content.blanks![0];
+      const sentenceText = step.content.sentence;
+      const parts = sentenceText.split('_____');
+      
+      return (
+        <div className="space-y-4">
+          <div className="bg-gray-50 p-5 rounded-xl text-center">
+            <p className="text-lg text-gray-800 leading-relaxed">
+              {parts[0]}
+              <span className="inline-block mx-1 min-w-[100px] border-b-2 border-orange-400">
+                <input
+                  type="text"
+                  value={selectedAnswer || ''}
+                  onChange={(e) => onAnswerSelect(e.target.value)}
+                  disabled={isSubmitting}
+                  placeholder="type here..."
+                  className="w-full text-center text-lg font-bold text-orange-600 bg-transparent outline-none placeholder:text-gray-300 placeholder:font-normal"
+                  autoFocus
+                  data-testid="fill-blank-input"
+                />
+              </span>
+              {parts[1] || ''}
+            </p>
+          </div>
+          
+          {blank.hint && (
+            <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+              {blank.hint}
+            </div>
+          )}
+        </div>
+      );
+    }
+    
     if (normalizedOptions.length === 0) return null;
     
     const getSelectedText = () => {
@@ -745,7 +783,6 @@ export default function LessonAsking({
     
     return (
       <div className="space-y-4">
-        {/* Show the question with blank indicator */}
         <div className="bg-gray-50 p-4 rounded-xl text-center">
           <p className="text-lg text-gray-800 leading-relaxed">
             {step.question.includes('______') 

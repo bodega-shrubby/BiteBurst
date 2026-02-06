@@ -63,7 +63,8 @@ interface LessonStep {
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
     items?: Array<{ id: string; text: string; category: string }>;
-    blanks?: Array<{ id: string; correctAnswer: string }>;
+    blanks?: Array<{ id: string; correctAnswer: string; hint?: string; acceptableAnswers?: string[] }>;
+    sentence?: string;
     title?: string;
     intro?: { greeting: string; message: string };
     sections?: LessonContentData['sections'];

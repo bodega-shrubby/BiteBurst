@@ -899,14 +899,14 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   break;
                   
                 case 'fill-blank':
-                  // Validate fill-blank: answer matches correctAnswer or blanks[0].correctAnswer
                   if (step.content?.correctAnswer) {
-                    isCorrect = validatedData.answer === step.content.correctAnswer;
+                    isCorrect = validatedData.answer.toLowerCase().trim() === String(step.content.correctAnswer).toLowerCase().trim();
                   } else if (step.content?.blanks && Array.isArray(step.content.blanks)) {
-                    // New format: blanks array with correctAnswer field
-                    const blanks = step.content.blanks as Array<{id: string; correctAnswer: string}>;
+                    const blanks = step.content.blanks as Array<{id: string; correctAnswer: string; acceptableAnswers?: string[]}>;
                     if (blanks.length > 0) {
-                      isCorrect = validatedData.answer === blanks[0].correctAnswer;
+                      const userAnswer = validatedData.answer.toLowerCase().trim();
+                      const acceptable = blanks[0].acceptableAnswers || [blanks[0].correctAnswer];
+                      isCorrect = acceptable.some(a => a.toLowerCase().trim() === userAnswer);
                     }
                   }
                   break;
