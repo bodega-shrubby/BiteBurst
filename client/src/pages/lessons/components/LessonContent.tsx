@@ -8,6 +8,12 @@ interface LessonSection {
   text: string;
 }
 
+interface RememberCard {
+  id: number;
+  emoji: string;
+  text: string;
+}
+
 interface LessonContentProps {
   title: string;
   mascot: {
@@ -21,6 +27,7 @@ interface LessonContentProps {
   };
   sections: LessonSection[];
   keyPoints: string[];
+  rememberCards?: RememberCard[];
   mascotMessage: string;
   currentStep: number;
   totalSteps: number;
@@ -58,6 +65,7 @@ export function LessonContent({
   intro,
   sections,
   keyPoints,
+  rememberCards,
   mascotMessage,
   currentStep,
   totalSteps,
@@ -225,22 +233,35 @@ export function LessonContent({
                 <span className="text-2xl">🧠</span>
               </div>
 
-              {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {keyPoints.map((point, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-xl p-4 shadow-md border border-green-100 flex items-start gap-3"
-                  >
-                    <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold">✓</span>
+              {rememberCards && rememberCards.length > 0 ? (
+                <div className={`grid gap-3 ${rememberCards.length >= 9 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                  {(rememberCards.length >= 9 ? rememberCards.slice(0, 9) : rememberCards.slice(0, 4)).map((card) => (
+                    <div
+                      key={card.id}
+                      className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200 p-3 text-center shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <span className="text-3xl mb-1 block">{card.emoji}</span>
+                      <p className="text-xs sm:text-sm font-medium text-gray-700 leading-snug">{card.text}</p>
                     </div>
-                    <p className="text-gray-700 font-medium text-sm leading-relaxed">
-                      {point}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {keyPoints.map((point, i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-xl p-4 shadow-md border border-green-100 flex items-start gap-3"
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold">✓</span>
+                      </div>
+                      <p className="text-gray-700 font-medium text-sm leading-relaxed">
+                        {point}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Mascot Message */}

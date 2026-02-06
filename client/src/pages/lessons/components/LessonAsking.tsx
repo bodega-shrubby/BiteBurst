@@ -832,16 +832,62 @@ export default function LessonAsking({
     );
   };
 
-  // Render fill-blank question type - select word to complete sentence
   const renderFillBlank = () => {
-    const hasBlanks = step.content.blanks && step.content.blanks.length > 0;
     const normalizedOptions = getNormalizedOptions();
-    
-    if (hasBlanks && step.content.sentence) {
-      const blank = step.content.blanks![0];
-      const sentenceText = step.content.sentence;
-      const parts = sentenceText.split('_____');
-      
+    const hasSentence = !!step.content.sentence;
+    const hasOptions = normalizedOptions.length > 0;
+
+    const getSelectedText = () => {
+      if (!selectedAnswer) return '_____';
+      const option = normalizedOptions.find(o => o.id === selectedAnswer);
+      return option ? option.text : selectedAnswer;
+    };
+
+    if (hasSentence && hasOptions) {
+      const parts = step.content.sentence!.split('_____');
+      return (
+        <div className="space-y-5">
+          <div className="bg-gray-50 p-5 rounded-2xl text-center">
+            <p className="text-lg text-gray-800 leading-relaxed">
+              {parts[0]}
+              <span className={`inline-block mx-1 px-3 py-1 min-w-[80px] rounded-lg font-bold text-lg ${
+                selectedAnswer
+                  ? 'bg-orange-100 text-orange-700 border-2 border-orange-400'
+                  : 'border-b-3 border-orange-400 text-gray-400'
+              }`}>
+                {getSelectedText()}
+              </span>
+              {parts[1] || ''}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {normalizedOptions.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => onAnswerSelect(option.id)}
+                disabled={isSubmitting}
+                className={`
+                  p-4 rounded-xl text-lg font-medium transition-all duration-200
+                  ${selectedAnswer === option.id
+                    ? 'bg-orange-500 text-white border-2 border-orange-600 shadow-lg scale-[1.02]'
+                    : 'bg-gray-100 text-gray-800 border-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                  }
+                  ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+                `}
+                data-testid={`option-${option.id}`}
+              >
+                {option.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (hasSentence && step.content.blanks && step.content.blanks.length > 0) {
+      const blank = step.content.blanks[0];
+      const parts = step.content.sentence!.split('_____');
       return (
         <div className="space-y-4">
           <div className="bg-gray-50 p-5 rounded-xl text-center">
@@ -862,7 +908,6 @@ export default function LessonAsking({
               {parts[1] || ''}
             </p>
           </div>
-          
           {blank.hint && (
             <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
               {blank.hint}
@@ -871,30 +916,47 @@ export default function LessonAsking({
         </div>
       );
     }
-    
-    if (normalizedOptions.length === 0) return null;
-    
-    const getSelectedText = () => {
-      if (!selectedAnswer) return '______';
-      const option = normalizedOptions.find(o => o.id === selectedAnswer);
-      return option ? `[${option.text}]` : '______';
-    };
-    
+
+    if (!hasSentence && step.content.blanks && step.content.blanks.length > 0) {
+      const blank = step.content.blanks[0];
+      return (
+        <div className="space-y-4">
+          <div className="bg-gray-50 p-5 rounded-xl text-center">
+            <input
+              type="text"
+              value={selectedAnswer || ''}
+              onChange={(e) => onAnswerSelect(e.target.value)}
+              disabled={isSubmitting}
+              placeholder="Type your answer..."
+              className="w-full text-center text-lg font-bold text-orange-600 bg-transparent outline-none placeholder:text-gray-300 placeholder:font-normal border-b-2 border-orange-400 py-2"
+              autoFocus
+              data-testid="fill-blank-input"
+            />
+          </div>
+          {blank.hint && (
+            <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+              {blank.hint}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (!hasOptions) return null;
+
     return (
       <div className="space-y-4">
         <div className="bg-gray-50 p-4 rounded-xl text-center">
           <p className="text-lg text-gray-800 leading-relaxed">
-            {step.question.includes('______') 
-              ? step.question.replace('______', getSelectedText())
+            {step.question.includes('______')
+              ? step.question.replace('______', selectedAnswer ? `[${getSelectedText()}]` : '______')
               : step.question
             }
           </p>
         </div>
-        
         <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
           Choose the word that fits!
         </div>
-        
         <div className="flex flex-wrap justify-center gap-3">
           {normalizedOptions.map((option) => (
             <button

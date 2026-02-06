@@ -906,7 +906,14 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   break;
                   
                 case 'fill-blank':
-                  if (step.content?.correctAnswer) {
+                  if (step.content?.options && Array.isArray(step.content.options)) {
+                    const correctOption = (step.content.options as any[]).find((o: any) => o.correct === true);
+                    if (correctOption) {
+                      isCorrect = validatedData.answer === correctOption.id;
+                    } else if (step.content?.correctAnswer) {
+                      isCorrect = validatedData.answer.toLowerCase().trim() === String(step.content.correctAnswer).toLowerCase().trim();
+                    }
+                  } else if (step.content?.correctAnswer) {
                     isCorrect = validatedData.answer.toLowerCase().trim() === String(step.content.correctAnswer).toLowerCase().trim();
                   } else if (step.content?.blanks && Array.isArray(step.content.blanks)) {
                     const blanks = step.content.blanks as Array<{id: string; correctAnswer: string; acceptableAnswers?: string[]}>;

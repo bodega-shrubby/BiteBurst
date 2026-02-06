@@ -31,6 +31,12 @@ type LessonState = 'intro' | 'lesson-content' | 'asking' | 'incorrect' | 'learn'
 
 type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
 
+interface RememberCard {
+  id: number;
+  emoji: string;
+  text: string;
+}
+
 interface LessonContentData {
   title: string;
   intro?: {
@@ -45,6 +51,7 @@ interface LessonContentData {
     text: string;
   }>;
   keyPoints: string[];
+  rememberCards?: RememberCard[];
   mascotMessage: string;
 }
 
@@ -121,9 +128,18 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [showRetryBanner, setShowRetryBanner] = useState(false); // Show hint banner after retry
   const [correctAnswerCount, setCorrectAnswerCount] = useState(0); // Track correct answers for stats
 
-  // Helper to extract feedback message from step content
   const getStepFeedbackMessage = (step: LessonStep | undefined, type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
     if (!step) return undefined;
+
+    if (type === 'hint_after_2') {
+      const hint = (step.content as any).hint;
+      if (hint) return hint;
+    }
+    if (type === 'motivating_fail') {
+      const incorrectFb = (step.content as any).incorrectFeedback;
+      if (incorrectFb) return incorrectFb;
+    }
+
     const feedback = step.content.feedback;
     if (!feedback) return undefined;
     if (typeof feedback === 'string') return undefined;
@@ -681,6 +697,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         }}
         sections={contentStep.content.sections || []}
         keyPoints={contentStep.content.keyPoints || []}
+        rememberCards={(contentStep.content as any).rememberCards || undefined}
         mascotMessage={contentStep.content.mascotMessage || "Let's see what you learned! 🎉"}
         currentStep={currentStepIndex + 1}
         totalSteps={lessonData.totalSteps}

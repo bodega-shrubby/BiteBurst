@@ -2,7 +2,10 @@ import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
 
 type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
 
-function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | 'hint' | 'fail' = 'success'): string | undefined {
+function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | 'hint' | 'fail' = 'success', content?: any): string | undefined {
+  if (type === 'success' && content?.successFeedback) {
+    return content.successFeedback;
+  }
   if (!feedback) return undefined;
   if (typeof feedback === 'string') return feedback;
   switch (type) {
@@ -16,15 +19,20 @@ function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | '
 interface LessonStep {
   id: string;
   stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering';
+  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank';
   question: string;
   content: {
     options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
     correctAnswer?: string | boolean;
     feedback?: FeedbackType;
+    successFeedback?: string;
+    incorrectFeedback?: string;
+    hint?: string;
     matchingPairs?: Array<{ left: string; right: string }>;
+    pairs?: Array<{ id?: string; left: string; right: string }>;
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
+    sentence?: string;
   };
   xpReward: number;
   mascotAction?: string;
@@ -47,7 +55,7 @@ export default function LessonSuccess({
 }: LessonSuccessProps) {
 
   const getCorrectOption = () => {
-    if (step.questionType === 'multiple-choice' && step.content.options) {
+    if ((step.questionType === 'multiple-choice' || step.questionType === 'fill-blank') && step.content.options) {
       return step.content.options.find(opt => opt.correct || opt.id === selectedAnswer);
     }
     if (step.questionType === 'label-reading' && step.content.labelOptions) {
@@ -58,43 +66,6 @@ export default function LessonSuccess({
 
   const correctOption = getCorrectOption();
 
-  const renderMatchingSuccess = () => {
-    if (!step.content.matchingPairs) return null;
-    
-    return (
-      <div className="space-y-4">
-        <div className="space-y-3">
-          {step.content.matchingPairs.map((pair, index) => (
-            <div
-              key={index}
-              className="bg-white p-3 rounded-xl border border-green-200 text-left"
-            >
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="font-medium text-gray-800">{pair.left}</span>
-                <span className="text-green-600">→</span>
-                <span className="text-sm text-gray-600">{pair.right}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {getFeedbackText(step.content.feedback, 'success') && (
-          <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🎉</span>
-              <div>
-                <p className="font-bold text-green-700">Perfect matches!</p>
-                <p className="text-gray-600 mt-1 text-sm whitespace-pre-line">
-                  {getFeedbackText(step.content.feedback, 'success')?.replace(/\\n/g, '\n')}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-  
   const renderOrderingSuccess = () => {
     if (!step.content.orderingItems) return null;
     
@@ -118,14 +89,14 @@ export default function LessonSuccess({
           ))}
         </div>
         
-        {getFeedbackText(step.content.feedback, 'success') && (
+        {getFeedbackText(step.content.feedback, 'success', step.content) && (
           <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
             <div className="flex items-start gap-3">
               <span className="text-2xl">🎉</span>
               <div>
                 <p className="font-bold text-green-700">Perfect order!</p>
                 <p className="text-gray-600 mt-1 text-sm">
-                  {getFeedbackText(step.content.feedback, 'success')}
+                  {getFeedbackText(step.content.feedback, 'success', step.content)}
                 </p>
               </div>
             </div>
@@ -176,8 +147,38 @@ export default function LessonSuccess({
         </div>
 
         {/* Success Content */}
-        {step.questionType === 'matching' ? (
-          renderMatchingSuccess()
+        {step.questionType === 'matching' || (step.questionType === 'tap-pair' && step.content.pairs) ? (
+          (() => {
+            const pairs = step.content.matchingPairs || step.content.pairs || [];
+            return (
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  {pairs.map((pair, index) => (
+                    <div key={index} className="bg-white p-3 rounded-xl border border-green-200 text-left">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium text-gray-800">{pair.left}</span>
+                        <span className="text-green-600">→</span>
+                        <span className="text-sm text-gray-600">{pair.right}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {getFeedbackText(step.content.feedback, 'success', step.content) && (
+                  <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">🎉</span>
+                      <div>
+                        <p className="font-bold text-green-700">Perfect matches!</p>
+                        <p className="text-gray-600 mt-1 text-sm whitespace-pre-line">
+                          {getFeedbackText(step.content.feedback, 'success', step.content)?.replace(/\\n/g, '\n')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()
         ) : step.questionType === 'ordering' ? (
           renderOrderingSuccess()
         ) : (
@@ -201,14 +202,14 @@ export default function LessonSuccess({
             </div>
 
             {/* Explanation Card */}
-            {getFeedbackText(step.content.feedback, 'success') && (
+            {getFeedbackText(step.content.feedback, 'success', step.content) && (
               <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">🎉</span>
                   <div>
                     <p className="font-bold text-green-700">Correct! You're amazing!</p>
                     <p className="text-gray-600 mt-1 text-sm">
-                      {getFeedbackText(step.content.feedback, 'success')}
+                      {getFeedbackText(step.content.feedback, 'success', step.content)}
                     </p>
                   </div>
                 </div>
