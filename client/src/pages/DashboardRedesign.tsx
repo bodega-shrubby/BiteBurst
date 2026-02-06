@@ -278,7 +278,6 @@ export default function DashboardRedesign() {
     <div className="min-h-screen bg-[#FAFAFA]">
       {/* Sidebar for tablet/desktop */}
       <Sidebar />
-      
       {/* Main content - offset for sidebar on larger screens */}
       <div className="md:ml-[200px]">
         {/* TWO-COLUMN LAYOUT */}
@@ -300,9 +299,7 @@ export default function DashboardRedesign() {
                     <p className="text-gray-500 mt-1">
                       Ready to fuel your body and get moving?
                     </p>
-                    <span className="inline-block bg-orange-50 text-orange-500 px-4 py-1.5 rounded-full text-sm font-bold mt-2">
-                      🍊 Health Hero 🏃
-                    </span>
+                    <span className="inline-block bg-orange-50 text-orange-500 px-4 py-1.5 rounded-full text-sm font-bold mt-2">Health Hero </span>
                   </div>
                 </div>
               </div>
@@ -527,13 +524,10 @@ export default function DashboardRedesign() {
           </div>
         </div>
       </div>
-
       {/* Bottom Navigation - Mobile only */}
       <BottomNavigation />
-
       {/* Celebrations */}
       {showConfetti && <Confetti />}
-      
       {badgeToast && (
         <BadgeToast
           badge={badgeToast.badge}
@@ -541,7 +535,6 @@ export default function DashboardRedesign() {
           onClose={() => setBadgeToast(null)}
         />
       )}
-      
       {/* XP Burst Animation */}
       <XPBurst 
         amount={xpBurst.amount} 
