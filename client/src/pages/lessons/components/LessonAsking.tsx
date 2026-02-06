@@ -22,7 +22,7 @@ interface LessonStep {
     correctPair?: string[];
     feedback?: string | { success?: string; hint_after_2?: string; motivating_fail?: string };
     matchingPairs?: Array<{ left: string; right: string }>;
-    pairs?: Array<{ left: string; right: string }>;
+    pairs?: Array<{ id?: string; left: string; right: string }>;
     labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
     orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
     items?: Array<{ id: string; text: string; category: string }>;
@@ -92,6 +92,16 @@ export default function LessonAsking({
   // Mobile touch support state
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedOrderItem, setSelectedOrderItem] = useState<string | null>(null);
+  
+  // Tap-pair matching state (for pairs-based tap-pair questions)
+  const [activeLeft, setActiveLeft] = useState<string | null>(null);
+  const [shuffledRightState] = useState(() => {
+    const pairs = step.content.pairs;
+    if (pairs && pairs.length > 0) {
+      return pairs.map(p => ({ id: `right-${p.id || p.right}`, text: p.right })).sort(() => Math.random() - 0.5);
+    }
+    return [];
+  });
   
   // Get matching pairs from either legacy or new format
   const getMatchingPairs = () => step.content.matchingPairs || step.content.pairs || [];
@@ -652,9 +662,101 @@ export default function LessonAsking({
 
   // Render tap-pair question type - select 2 matching items from options
   const renderTapPair = () => {
+    const pairs = step.content.pairs;
+    if (pairs && pairs.length > 0) {
+      const leftItems = pairs.map(p => ({ id: `left-${p.id || p.left}`, text: p.left }));
+
+      let pairMatches: Record<string, string> = {};
+      try {
+        if (selectedAnswer && selectedAnswer.startsWith('{')) {
+          pairMatches = JSON.parse(selectedAnswer);
+        }
+      } catch (e) {
+        pairMatches = {};
+      }
+
+      const handleLeftTap = (leftText: string) => {
+        if (isSubmitting) return;
+        setActiveLeft(leftText);
+      };
+
+      const handleRightTap = (rightText: string) => {
+        if (isSubmitting || !activeLeft) return;
+        const newMatches = { ...pairMatches, [activeLeft]: rightText };
+        onAnswerSelect(JSON.stringify(newMatches));
+        setActiveLeft(null);
+      };
+
+      const isAllMatched = Object.keys(pairMatches).length === pairs.length;
+
+      return (
+        <div className="space-y-4">
+          <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+            Tap a food, then tap its energy type!
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-500 text-center uppercase">Food</p>
+              {leftItems.map((item) => {
+                const isMatched = pairMatches[item.text] !== undefined;
+                const isActive = activeLeft === item.text;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleLeftTap(item.text)}
+                    disabled={isSubmitting || isMatched}
+                    className={`
+                      w-full p-4 rounded-2xl border-2 transition-all duration-200 text-center
+                      ${isMatched ? 'border-green-400 bg-green-50 opacity-70' : ''}
+                      ${isActive ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200 scale-105' : ''}
+                      ${!isMatched && !isActive ? 'border-gray-200 bg-white hover:border-orange-300' : ''}
+                      ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+                    `}
+                  >
+                    <span className="text-base font-medium text-gray-900">{item.text}</span>
+                    {isMatched && <span className="ml-1 text-green-600">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-500 text-center uppercase">Energy Type</p>
+              {shuffledRightState.map((item) => {
+                const isMatched = Object.values(pairMatches).includes(item.text);
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleRightTap(item.text)}
+                    disabled={isSubmitting || isMatched || !activeLeft}
+                    className={`
+                      w-full p-4 rounded-2xl border-2 transition-all duration-200 text-center
+                      ${isMatched ? 'border-green-400 bg-green-50 opacity-70' : ''}
+                      ${!isMatched && activeLeft ? 'border-gray-200 bg-white hover:border-blue-300' : ''}
+                      ${!isMatched && !activeLeft ? 'border-gray-200 bg-gray-50' : ''}
+                      ${isSubmitting ? 'opacity-50 cursor-not-allowed' : activeLeft && !isMatched ? 'cursor-pointer active:scale-95' : 'cursor-default'}
+                    `}
+                  >
+                    <span className="text-base font-medium text-gray-900">{item.text}</span>
+                    {isMatched && <span className="ml-1 text-green-600">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="text-center text-sm text-gray-500">
+            {!activeLeft && !isAllMatched && "Tap a food to start matching"}
+            {activeLeft && "Now tap the matching energy type"}
+            {isAllMatched && "All matched! Ready to check!"}
+          </div>
+        </div>
+      );
+    }
+
     if (!step.content.options) return null;
     
-    // Track which items are selected (up to 2) - stored as JSON array
     let selectedItems: string[] = [];
     try {
       if (selectedAnswer && selectedAnswer.startsWith('[')) {
@@ -668,15 +770,12 @@ export default function LessonAsking({
       if (isSubmitting) return;
       
       if (selectedItems.includes(itemId)) {
-        // Deselect if already selected
         const newItems = selectedItems.filter(id => id !== itemId);
         onAnswerSelect(JSON.stringify(newItems));
       } else if (selectedItems.length < 2) {
-        // Add to selection (max 2)
         const newItems = [...selectedItems, itemId];
         onAnswerSelect(JSON.stringify(newItems));
       } else {
-        // Replace the first selection
         const newItems = [selectedItems[1], itemId];
         onAnswerSelect(JSON.stringify(newItems));
       }

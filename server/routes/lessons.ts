@@ -881,12 +881,19 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
                   break;
                   
                 case 'tap-pair':
-                  // Validate tap-pair: answer is JSON array of 2 IDs
-                  if (step.content?.correctPair) {
+                  if (step.content?.pairs && Array.isArray(step.content.pairs)) {
+                    try {
+                      const userMatches = JSON.parse(validatedData.answer) as Record<string, string>;
+                      const correctPairs = step.content.pairs as Array<{left: string; right: string}>;
+                      isCorrect = correctPairs.every(pair => userMatches[pair.left] === pair.right);
+                    } catch (e) {
+                      console.error('Failed to parse tap-pair answer:', e);
+                      isCorrect = false;
+                    }
+                  } else if (step.content?.correctPair) {
                     try {
                       const selectedIds = JSON.parse(validatedData.answer) as string[];
                       const correctPair = step.content.correctPair as string[];
-                      // Check if both selected IDs are in correctPair (order doesn't matter)
                       isCorrect = Array.isArray(selectedIds) && 
                         selectedIds.length === 2 && 
                         correctPair.includes(selectedIds[0]) && 
