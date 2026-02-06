@@ -117,6 +117,9 @@ export interface IStorage {
   
   // Lesson progress operations
   getCompletedLessonIds(userId: string, childId?: string): Promise<string[]>;
+  saveLessonProgress(userId: string, lessonId: string, currentStep: number, hearts: number, xpEarned: number, childId?: string): Promise<void>;
+  getLessonProgress(userId: string, lessonId: string, childId?: string): Promise<{ currentStep: number; hearts: number; totalXpEarned: number; completed: boolean; completedStepIds: string[] } | null>;
+  getCompletedStepIds(userId: string, lessonId: string, childId?: string): Promise<string[]>;
   
   // Treasure chest operations
   getTreasureChests(userId: string, childId?: string): Promise<TreasureChest[]>;
@@ -489,8 +492,6 @@ export class DatabaseStorage implements IStorage {
   // Mark a lesson as complete
   async markLessonComplete(userId: string, lessonId: string, xpEarned: number, childId?: string): Promise<void> {
     if (childId) {
-      // For additional children, we track completion via lesson_attempts with childId
-      // Check if there's already a completion record
       const existing = await db
         .select()
         .from(lessonAttempts)
@@ -502,11 +503,9 @@ export class DatabaseStorage implements IStorage {
         .limit(1);
       
       if (existing.length === 0) {
-        // Get the first step of the lesson to use as reference
         const steps = await db.select().from(lessonSteps).where(eq(lessonSteps.lessonId, lessonId)).limit(1);
         const stepId = steps[0]?.id || 'completion-step';
         
-        // Insert a completion record
         await db.insert(lessonAttempts).values({
           userId,
           childId,
@@ -520,30 +519,147 @@ export class DatabaseStorage implements IStorage {
         });
       }
     } else {
-      // For primary child, use user_lesson_progress
+      // Check if already completed (replay) - don't overwrite XP on replay
+      const existingCompletion = await db
+        .select()
+        .from(userLessonProgress)
+        .where(and(
+          eq(userLessonProgress.userId, userId),
+          eq(userLessonProgress.lessonId, lessonId),
+          eq(userLessonProgress.completed, true)
+        ))
+        .limit(1);
+
+      const isReplayCompletion = existingCompletion.length > 0;
+      const finalXp = isReplayCompletion ? existingCompletion[0].totalXpEarned : xpEarned;
+
       await db
         .insert(userLessonProgress)
         .values({
           userId,
           lessonId,
-          currentStep: 999, // All steps done
+          currentStep: 999,
           completed: true,
           completedAt: new Date(),
-          totalXpEarned: xpEarned,
+          totalXpEarned: finalXp,
           hearts: 5,
         })
         .onConflictDoUpdate({
           target: [userLessonProgress.userId, userLessonProgress.lessonId],
           set: {
             completed: true,
-            completedAt: new Date(),
-            totalXpEarned: xpEarned,
+            completedAt: isReplayCompletion ? existingCompletion[0].completedAt! : new Date(),
+            totalXpEarned: finalXp,
             updatedAt: new Date(),
           }
         });
     }
   }
   
+  async saveLessonProgress(userId: string, lessonId: string, currentStep: number, hearts: number, xpEarned: number, childId?: string): Promise<void> {
+    if (childId) {
+      return;
+    }
+
+    const [existing] = await db
+      .select({ completed: userLessonProgress.completed })
+      .from(userLessonProgress)
+      .where(and(
+        eq(userLessonProgress.userId, userId),
+        eq(userLessonProgress.lessonId, lessonId)
+      ))
+      .limit(1);
+
+    if (existing?.completed) {
+      return;
+    }
+
+    await db
+      .insert(userLessonProgress)
+      .values({
+        userId,
+        lessonId,
+        currentStep,
+        completed: false,
+        totalXpEarned: xpEarned,
+        hearts,
+      })
+      .onConflictDoUpdate({
+        target: [userLessonProgress.userId, userLessonProgress.lessonId],
+        set: {
+          currentStep,
+          totalXpEarned: xpEarned,
+          hearts,
+          updatedAt: new Date(),
+        }
+      });
+  }
+
+  async getLessonProgress(userId: string, lessonId: string, childId?: string): Promise<{ currentStep: number; hearts: number; totalXpEarned: number; completed: boolean; completedStepIds: string[] } | null> {
+    const completedStepIds = await this.getCompletedStepIds(userId, lessonId, childId);
+
+    if (childId) {
+      if (completedStepIds.length === 0) return null;
+      const maxStepAttempts = await db
+        .select({ stepNumber: lessonAttempts.stepNumber })
+        .from(lessonAttempts)
+        .where(and(
+          eq(lessonAttempts.childId, childId),
+          eq(lessonAttempts.lessonId, lessonId),
+          or(
+            eq(lessonAttempts.isCorrect, true),
+            eq(lessonAttempts.usedLearnCard, true)
+          )
+        ));
+      const maxStep = Math.max(...maxStepAttempts.map(a => a.stepNumber), 0);
+      return {
+        currentStep: maxStep + 1,
+        hearts: 5,
+        totalXpEarned: 0,
+        completed: false,
+        completedStepIds,
+      };
+    }
+
+    const [existingProgress] = await db
+      .select()
+      .from(userLessonProgress)
+      .where(and(
+        eq(userLessonProgress.userId, userId),
+        eq(userLessonProgress.lessonId, lessonId)
+      ))
+      .limit(1);
+
+    if (!existingProgress) return null;
+
+    return {
+      currentStep: existingProgress.currentStep,
+      hearts: existingProgress.hearts,
+      totalXpEarned: existingProgress.totalXpEarned,
+      completed: existingProgress.completed,
+      completedStepIds,
+    };
+  }
+
+  async getCompletedStepIds(userId: string, lessonId: string, childId?: string): Promise<string[]> {
+    const conditions = childId
+      ? [eq(lessonAttempts.childId, childId), eq(lessonAttempts.lessonId, lessonId)]
+      : [eq(lessonAttempts.userId, userId), eq(lessonAttempts.lessonId, lessonId), sql`${lessonAttempts.childId} IS NULL`];
+
+    const attempts = await db
+      .selectDistinct({ stepId: lessonAttempts.stepId })
+      .from(lessonAttempts)
+      .where(and(
+        ...conditions,
+        or(
+          eq(lessonAttempts.isCorrect, true),
+          eq(lessonAttempts.usedLearnCard, true)
+        )
+      ));
+
+    return attempts.map(a => a.stepId);
+  }
+
   // Get lessons by age
   async getLessonsByAge(age: number): Promise<Lesson[]> {
     return await db.select().from(lessons)

@@ -62,6 +62,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### XP Progress System Fix (Feb 2026)
+- **XP Calculation**: Fixed default XP scaling for steps without retryConfig: 1st attempt=100%, 2nd=70%, 3rd=30% (was returning 0 for 2nd/3rd attempts)
+- **Progress Saving**: Added mid-lesson progress save/load via `/api/lessons/:lessonId/progress` (GET/POST). Progress resumes when returning to a lesson.
+- **Duplicate XP Prevention**: Both frontend (completedStepIds tracking) and server-side (checking lesson_attempts before awarding XP). Replaying completed lessons awards 0 XP.
+- **Storage methods**: `saveLessonProgress`, `getLessonProgress`, `getCompletedStepIds` added to storage interface
+
 ### Schema & API Migration (Feb 2026)
 - **Simplified filtering system**: Replaced `yearGroup` + `curriculumId` with simple `age` (6-14) based filtering for lessons and topics
 - **Locale support**: Added explicit `locale` field (en-GB or en-US) for UK/US English content variants

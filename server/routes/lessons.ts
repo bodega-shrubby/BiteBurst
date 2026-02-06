@@ -1078,9 +1078,22 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
         xpReward = brainXpRewards[validatedData.stepId] || xpReward;
       }
 
-      const xpAwarded = isCorrect ? xpReward : 0;
+      // Check if step was already completed (prevent duplicate XP)
+      let isFirstTimeCompletion = true;
+      try {
+        const completedStepIds = await storage.getCompletedStepIds(
+          validatedData.userId,
+          validatedData.lessonId,
+          validatedData.childId
+        );
+        isFirstTimeCompletion = !completedStepIds.includes(validatedData.stepId);
+      } catch (e) {
+        console.error('Failed to check completed steps:', e);
+      }
 
-      // If correct, award XP to user
+      const xpAwarded = isCorrect && isFirstTimeCompletion ? xpReward : 0;
+
+      // If correct and first time, award XP to user
       if (isCorrect && xpAwarded > 0) {
         try {
           const user = await storage.getUser(validatedData.userId);
@@ -1091,12 +1104,10 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
               level: Math.floor((currentXp + xpAwarded) / 100) + 1
             });
             
-            // Log XP event (simplified for now)
-            console.log(`XP awarded: ${xpAwarded} for user ${validatedData.userId}`);
+            console.log(`XP awarded: ${xpAwarded} for user ${validatedData.userId} (first time)`);
           }
         } catch (xpError) {
           console.error('Error awarding XP:', xpError);
-          // Continue even if XP award fails
         }
       }
 
@@ -1135,6 +1146,67 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
     } catch (error) {
       console.error('Log attempt error:', error);
       res.status(500).json({ error: 'Failed to log attempt' });
+    }
+  });
+
+  // Save lesson progress (called after each step completion)
+  app.post('/api/lessons/:lessonId/progress', requireAuth, async (req: any, res: any) => {
+    try {
+      const { lessonId } = req.params;
+      const { userId, childId, currentStep, hearts, xpEarned } = req.body;
+
+      if (!userId || currentStep === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const auth = await resolveUserAuth(userId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
+      }
+
+      const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
+      }
+
+      await storage.saveLessonProgress(userId, lessonId, currentStep, hearts || 5, xpEarned || 0, childId);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+      res.status(500).json({ error: 'Failed to save progress' });
+    }
+  });
+
+  // Get lesson progress (to resume)
+  app.get('/api/lessons/:lessonId/progress', requireAuth, async (req: any, res: any) => {
+    try {
+      const { lessonId } = req.params;
+      const userId = req.query.userId as string;
+      const childId = req.query.childId as string | undefined;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'Missing userId' });
+      }
+
+      const auth = await resolveUserAuth(userId, req.userId);
+      if (!auth.valid) {
+        const statusCode = auth.error === 'User not found' ? 404 : 403;
+        return res.status(statusCode).json({ error: auth.error });
+      }
+
+      const childValidation = await validateChildOwnership(childId, auth.parentId!, auth.isChildSelf);
+      if (!childValidation.valid) {
+        return res.status(403).json({ error: childValidation.error });
+      }
+
+      const progress = await storage.getLessonProgress(userId, lessonId, childId);
+
+      res.json({ progress });
+    } catch (error) {
+      console.error('Failed to get progress:', error);
+      res.status(500).json({ error: 'Failed to get progress' });
     }
   });
 

@@ -110,6 +110,8 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   const [lastSelectedAnswer, setLastSelectedAnswer] = useState<string | null>(null); // Track previous selection for change detection
   const [showRetryBanner, setShowRetryBanner] = useState(false); // Show hint banner after retry
   const [correctAnswerCount, setCorrectAnswerCount] = useState(0); // Track correct answers for stats
+  const [completedStepIds, setCompletedStepIds] = useState<Set<string>>(new Set());
+  const [isReplay, setIsReplay] = useState(false);
 
   const getStepFeedbackMessage = (step: LessonStep | undefined, type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
     if (!step) return undefined;
@@ -167,6 +169,62 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     staleTime: 0,
   });
 
+  // Load existing progress to resume
+  const { data: existingProgress } = useQuery({
+    queryKey: ['lesson-progress', lessonId, user?.id, activeChild?.childId],
+    queryFn: async () => {
+      const params = new URLSearchParams({ userId: user!.id });
+      if (activeChild?.childId) params.set('childId', activeChild.childId);
+      const res = await fetch(`/api/lessons/${lessonId}/progress?${params}`, { credentials: 'include' });
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: !!user?.id && !!lessonId,
+  });
+
+  // Restore progress when loaded
+  useEffect(() => {
+    if (existingProgress?.progress && lessonData?.steps) {
+      const { currentStep, hearts, totalXpEarned: savedXp, completed, completedStepIds: savedStepIds } = existingProgress.progress;
+
+      if (completed) {
+        setIsReplay(true);
+        setCurrentStepIndex(0);
+      } else if (currentStep > 1) {
+        const resumeIndex = Math.min(currentStep - 1, lessonData.steps.length - 1);
+        setCurrentStepIndex(resumeIndex);
+        setLives(hearts || 5);
+        setTotalXpEarned(savedXp || 0);
+        setCompletedStepIds(new Set(savedStepIds || []));
+        const step = lessonData.steps[resumeIndex];
+        if (step?.questionType === 'lesson-content') {
+          setLessonState('lesson-content');
+        } else {
+          setLessonState('asking');
+        }
+      }
+    }
+  }, [existingProgress, lessonData]);
+
+  // Save progress mutation
+  const saveProgressMutation = useMutation({
+    mutationFn: async (data: { currentStep: number; hearts: number; xpEarned: number }) => {
+      if (!user?.id) return;
+      await fetch(`/api/lessons/${lessonId}/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: user.id,
+          childId: activeChild?.childId,
+          currentStep: data.currentStep,
+          hearts: data.hearts,
+          xpEarned: data.xpEarned,
+        })
+      });
+    }
+  });
+
   // Analytics logging mutation
   const logAttemptMutation = useMutation({
     mutationFn: async (attemptData: {
@@ -222,9 +280,18 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
       setIsAnswerCorrect(response.correct);
       
       if (response.correct) {
-        // ONLY award XP on SUCCESS state, scaled by attempts
-        const xpEarned = currentStep ? (calculateXP(currentStep, currentAttempt) ?? 0) : (response.xpAwarded || 0);
-        setTotalXpEarned(prev => prev + xpEarned);
+        const stepId = currentStep?.id;
+        const isFirstTimeCompletion = stepId ? !completedStepIds.has(stepId) : false;
+        const isReplayLesson = isReplay;
+
+        const xpEarned = (isFirstTimeCompletion && !isReplayLesson)
+          ? (currentStep ? (calculateXP(currentStep, currentAttempt) ?? 0) : (response.xpAwarded || 0))
+          : 0;
+
+        if (isFirstTimeCompletion && stepId) {
+          setTotalXpEarned(prev => prev + xpEarned);
+          setCompletedStepIds(prev => { const next = new Set(Array.from(prev)); next.add(stepId); return next; });
+        }
         
         // Log successful attempt
         if (currentStep && selectedAnswer) {
@@ -379,13 +446,17 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
   };
 
   const calculateXP = (step: LessonStep, attempt: number): number => {
-    if (!hasFullRetryConfig(step.retryConfig)) {
-      return attempt === 1 ? step.xpReward : 0;
+    const baseXP = step.xpReward || 10;
+
+    if (hasFullRetryConfig(step.retryConfig)) {
+      if (attempt === 1) return step.retryConfig!.xp.firstTry;
+      if (attempt === 2) return step.retryConfig!.xp.secondTry;
+      return step.retryConfig!.xp.learnCard;
     }
-    
-    if (attempt === 1) return step.retryConfig!.xp.firstTry;
-    if (attempt === 2) return step.retryConfig!.xp.secondTry;
-    return step.retryConfig!.xp.learnCard;
+
+    if (attempt === 1) return baseXP;
+    if (attempt === 2) return Math.round(baseXP * 0.7);
+    return Math.round(baseXP * 0.3);
   };
 
   // Calculate CHECK button state based on current lesson state and selection
@@ -460,12 +531,15 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const handleContinue = () => {
     if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
-      // Add a brief delay for smooth transition to next step
+      saveProgressMutation.mutate({
+        currentStep: currentStepIndex + 2,
+        hearts: lives,
+        xpEarned: totalXpEarned,
+      });
       setTimeout(() => {
         resetForNextStep();
       }, 400);
     } else {
-      // Lesson complete - mark it in the database
       markCompleteMutation.mutate({ lessonId, xpEarned: totalXpEarned });
       setLessonState('complete');
     }
@@ -483,18 +557,26 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Handle "Continue" from LEARN_CARD state (skip to next step, award XP)
   const handleLearnContinue = () => {
-    // Award XP for completing via learn card (only here, not when showing the card)
     let finalXp = totalXpEarned;
     if (currentStep) {
-      const learnXP = calculateXP(currentStep, 3) ?? 0;
+      const stepId = currentStep.id;
+      const isFirstTimeCompletion = !completedStepIds.has(stepId);
+      const learnXP = (isFirstTimeCompletion && !isReplay) ? (calculateXP(currentStep, 3) ?? 0) : 0;
       finalXp = totalXpEarned + learnXP;
-      setTotalXpEarned(finalXp);
+      if (isFirstTimeCompletion) {
+        setTotalXpEarned(finalXp);
+        setCompletedStepIds(prev => { const next = new Set(Array.from(prev)); next.add(stepId); return next; });
+      }
     }
     
     if (currentStepIndex < (lessonData?.totalSteps || 0) - 1) {
+      saveProgressMutation.mutate({
+        currentStep: currentStepIndex + 2,
+        hearts: lives,
+        xpEarned: finalXp,
+      });
       resetForNextStep();
     } else {
-      // Mark lesson as complete in database
       markCompleteMutation.mutate({ lessonId, xpEarned: finalXp });
       setLessonState('complete');
     }
@@ -623,6 +705,11 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         onContinue={() => {
           const nextIndex = currentStepIndex + 1;
           if (nextIndex < lessonData.totalSteps) {
+            saveProgressMutation.mutate({
+              currentStep: nextIndex + 1,
+              hearts: lives,
+              xpEarned: totalXpEarned,
+            });
             setCurrentStepIndex(nextIndex);
             setStepStartTime(Date.now());
             const nextStep = lessonData.steps[nextIndex];
