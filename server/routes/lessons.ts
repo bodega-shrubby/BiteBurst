@@ -307,7 +307,8 @@ export function registerLessonRoutes(app: Express, requireAuth: any) {
             topicOrder: topic.orderPosition ?? 0,
             sortOrder: lesson.orderInUnit ?? 0,
             description: lesson.description,
-            difficultyLevel: lesson.difficultyLevel ?? 1
+            difficultyLevel: lesson.difficultyLevel ?? 1,
+            mascotId: lesson.mascotId || null,
           });
         }
       }

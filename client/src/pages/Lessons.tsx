@@ -22,6 +22,13 @@ interface ApiLesson {
   description: string | null;
   state: LessonState;
   difficultyLevel: number;
+  mascotId?: string;
+  mascot?: {
+    id: string;
+    name: string;
+    emoji: string;
+    imagePath: string | null;
+  } | null;
 }
 
 interface TopicData {
@@ -281,7 +288,9 @@ export default function Lessons() {
           xp: 15,
           topicId: lesson.topicId,
           topicTitle: lesson.topicTitle,
-          difficultyLevel: lesson.difficultyLevel || 1
+          difficultyLevel: lesson.difficultyLevel || 1,
+          mascotId: lesson.mascotId,
+          mascot: lesson.mascot,
         }));
     }
     if (apiLessons && apiLessons.length > 0) {
@@ -293,7 +302,9 @@ export default function Lessons() {
         xp: 15,
         topicId: lesson.topicId,
         topicTitle: lesson.topicTitle,
-        difficultyLevel: lesson.difficultyLevel || 1
+        difficultyLevel: lesson.difficultyLevel || 1,
+        mascotId: lesson.mascotId,
+        mascot: lesson.mascot,
       }));
     }
     return cleanLessons.map(lesson => ({

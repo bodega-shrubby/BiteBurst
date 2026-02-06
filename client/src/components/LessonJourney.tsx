@@ -1,15 +1,30 @@
 import { useMemo } from 'react';
 import { Check } from 'lucide-react';
 import treasureChestImg from '@/assets/images/treasure-chest.png';
-import appleBuddyImg from '@/assets/Mascots/AppleBuddy.png';
-import snackTwinsImg from '@/assets/Mascots/SnackTwins.png';
-import yumYumImg from '@/assets/Mascots/YumYum.png';
 
-const GROUP_MASCOTS: Record<string, { src: string; alt: string }> = {
-  'morning-energy-boost': { src: appleBuddyImg, alt: 'Apple Buddy' },
-  'power-up-snacks': { src: snackTwinsImg, alt: 'Snack Twins' },
-  'super-foods-energy': { src: yumYumImg, alt: 'YumYum' },
+import appleBuddyImage from '@assets/Mascots/AppleBuddy.png';
+import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
+import captainCarrotImage from '@assets/Mascots/CaptainCarrot.png';
+import coachFlexImage from '@assets/Mascots/CoachFlex.png';
+import danceStarImage from '@assets/Mascots/DanceStar.png';
+import hydroHeroImage from '@assets/Mascots/HydroHero.png';
+import professorBloopImage from '@assets/Mascots/ProfessorBloop.png';
+import snackTwinsImage from '@assets/Mascots/SnackTwins.png';
+import yumYumImage from '@assets/Mascots/YumYum.png';
+
+const mascotImages: Record<string, string> = {
+  'apple-buddy': appleBuddyImage,
+  'brainy-bolt': brainyBoltImage,
+  'captain-carrot': captainCarrotImage,
+  'coach-flex': coachFlexImage,
+  'dance-star': danceStarImage,
+  'hydro-hero': hydroHeroImage,
+  'professor-bloop': professorBloopImage,
+  'snack-twins': snackTwinsImage,
+  'yum-yum': yumYumImage,
 };
+
+const DEFAULT_MASCOT = 'professor-bloop';
 
 const THEMED_ICONS = [
   '🍎', '🥦', '🏀', '🥕', '🍌', '🧘', '🥗', '⚽',
@@ -26,12 +41,20 @@ interface Lesson {
   topicId?: string;
   topicTitle?: string;
   difficultyLevel: number;
+  mascotId?: string;
+  mascot?: {
+    id: string;
+    name: string;
+    emoji: string;
+    imagePath: string | null;
+  } | null;
 }
 
 interface LessonGroup {
   baseId: string;
   baseName: string;
   icon: string;
+  mascotId: string | null;
   levels: Lesson[];
 }
 
@@ -59,6 +82,7 @@ function groupLessonsByBaseId(lessons: Lesson[]): LessonGroup[] {
         baseId,
         baseName,
         icon: lesson.icon,
+        mascotId: lesson.mascotId || null,
         levels: []
       });
     }
@@ -72,6 +96,11 @@ function groupLessonsByBaseId(lessons: Lesson[]): LessonGroup[] {
 
   return Array.from(groups.values());
 }
+
+const getMascotImage = (mascotId: string | null): string => {
+  if (!mascotId) return mascotImages[DEFAULT_MASCOT];
+  return mascotImages[mascotId] || mascotImages[DEFAULT_MASCOT];
+};
 
 export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyProps) {
   const lessonGroups = useMemo(() => groupLessonsByBaseId(lessons), [lessons]);
@@ -177,9 +206,6 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
         <div className="relative" style={{ zIndex: 1 }}>
           {lessonGroups.map((group, groupIndex) => {
             const treasureUnlocked = allLevelsComplete(group);
-            
-            const mascotKey = group.baseId.replace(/^age\d+-t\d+-L\d+-/, '');
-            const mascot = GROUP_MASCOTS[mascotKey];
 
             return (
               <div key={group.baseId}>
@@ -188,35 +214,33 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                   const isClickable = lesson.state === 'current' || lesson.state === 'unlocked' || lesson.state === 'completed';
                   renderIndex++;
                   const themedIcon = getThemedIcon(groupIndex, levelIndex);
-                  const showMascot = mascot && levelIndex === 0;
 
                   return (
                     <div key={lesson.id}>
                       <div
-                        className={`flex items-center mb-12 relative ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
+                        className={`flex items-center mb-12 ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
                       >
-                        {showMascot && (() => {
-                          const groupLocked = group.levels.every(l => l.state === 'locked');
-                          return (
-                            <img
-                              src={mascot.src}
-                              alt={mascot.alt}
-                              className={`w-20 h-20 object-contain absolute ${isEven ? 'right-2' : 'left-2'} transition-all ${groupLocked ? 'grayscale opacity-40' : 'drop-shadow-lg'}`}
-                              style={{ top: '50%', transform: 'translateY(-50%)' }}
-                            />
-                          );
-                        })()}
-                        <div 
+                        <div
                           className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'} ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
                           onClick={() => isClickable && onLessonClick(lesson.id)}
                         >
+                          {levelIndex === 0 && !isEven && (
+                            <div className={`w-20 h-20 transition-all flex-shrink-0 ${lesson.state === 'locked' ? 'grayscale opacity-50' : ''}`}>
+                              <img
+                                src={getMascotImage(group.mascotId)}
+                                alt={`${group.baseName} mascot`}
+                                className="w-full h-full object-contain drop-shadow-lg"
+                              />
+                            </div>
+                          )}
+
                           <div
-                            className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-transform ${isClickable ? 'hover:scale-110' : ''} ${getNodeStyle(lesson.state)}`}
+                            className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-transform flex-shrink-0 ${isClickable ? 'hover:scale-110' : ''} ${getNodeStyle(lesson.state)}`}
                           >
                             {lesson.state === 'completed' ? (
                               <Check className="w-8 h-8 text-white" strokeWidth={3} />
                             ) : (
-                              <span className={`text-2xl ${lesson.state === 'locked' ? 'grayscale opacity-40' : lesson.state === 'current' ? '' : 'grayscale opacity-60'}`} style={{ filter: lesson.state === 'locked' ? 'grayscale(100%)' : lesson.state === 'current' ? 'none' : 'grayscale(80%)' }}>
+                              <span className={`text-2xl ${lesson.state === 'locked' ? 'grayscale opacity-40' : ''}`}>
                                 {themedIcon}
                               </span>
                             )}
@@ -235,6 +259,16 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                               )}
                             </div>
                           </div>
+
+                          {levelIndex === 0 && isEven && (
+                            <div className={`w-20 h-20 transition-all flex-shrink-0 ${lesson.state === 'locked' ? 'grayscale opacity-50' : ''}`}>
+                              <img
+                                src={getMascotImage(group.mascotId)}
+                                alt={`${group.baseName} mascot`}
+                                className="w-full h-full object-contain drop-shadow-lg"
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

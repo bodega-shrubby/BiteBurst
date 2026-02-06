@@ -58,7 +58,7 @@ export function registerTopicRoutes(app: Express, requireAuth: any) {
       }
 
       let foundCurrent = false;
-      const lessonsWithState = allLessons.map((lesson, index) => {
+      const lessonsWithState = await Promise.all(allLessons.map(async (lesson, index) => {
         const isCompleted = completedLessonIds.has(lesson.id);
         let state: 'current' | 'unlocked' | 'locked' | 'completed' = 'locked';
 
@@ -71,6 +71,11 @@ export function registerTopicRoutes(app: Express, requireAuth: any) {
           state = 'unlocked';
         }
 
+        let mascotDetails = null;
+        if (lesson.mascotId) {
+          mascotDetails = await storage.getMascotById(lesson.mascotId);
+        }
+
         return {
           id: lesson.id,
           title: lesson.title,
@@ -80,13 +85,19 @@ export function registerTopicRoutes(app: Express, requireAuth: any) {
           learningTakeaway: lesson.learningTakeaway,
           mascotIntro: lesson.mascotIntro,
           mascotId: lesson.mascotId,
+          mascot: mascotDetails ? {
+            id: mascotDetails.id,
+            name: mascotDetails.name,
+            emoji: mascotDetails.emoji,
+            imagePath: mascotDetails.imagePath,
+          } : null,
           orderInUnit: lesson.orderInUnit,
           totalSteps: lesson.totalSteps,
           iconEmoji: lesson.iconEmoji,
           estimatedMinutes: lesson.estimatedMinutes,
           state,
         };
-      });
+      }));
 
       res.json(lessonsWithState);
     } catch (error) {
