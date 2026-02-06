@@ -1,12 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, Lightbulb } from "lucide-react";
 import { useState, useEffect } from "react";
 import oniOopsImage from '@assets/Mascots/Oni_oops.png';
 import oniHintImage from '@assets/Mascots/Oni_hint.png';
 
 function AttemptIndicator({ current, max = 3 }: { current: number; max?: number }) {
   return (
-    <div className="flex items-center justify-center gap-2 my-4">
+    <div className="flex items-center justify-center gap-2 my-3">
       <span className="text-sm text-gray-500">
         {current >= max ? 'Last chance!' : `Attempt ${current} of ${max}`}
       </span>
@@ -56,20 +54,27 @@ export default function LessonIncorrect({
   }, [attemptNumber]);
 
   return (
-    <div className={`min-h-[400px] rounded-3xl p-6 ${isHintMode ? 'bg-gradient-to-b from-blue-50 to-white' : 'bg-gradient-to-b from-red-50 to-white'}`}>
+    <div className={`min-h-[400px] rounded-3xl p-6 ${isHintMode ? 'bg-gradient-to-b from-blue-50 to-white' : 'bg-gradient-to-b from-red-50 to-orange-50'}`}>
       <div className="max-w-md mx-auto space-y-5">
-        {/* Mascot with shake animation */}
-        <div className="flex justify-center relative">
+        {/* Mascot with animation */}
+        <div className="relative flex justify-center pt-2">
           {isHintMode && (
-            <span className="absolute -top-4 right-1/4 text-3xl animate-float">💡</span>
+            <span className="absolute -top-4 right-1/4 text-3xl animate-bounce">💡</span>
           )}
-          <div className={`w-28 h-28 ${isHintMode ? 'bg-blue-400 border-blue-500' : 'bg-orange-400 border-orange-500'} rounded-full flex items-center justify-center shadow-lg border-4 ${shouldShake && !isHintMode ? 'animate-shake' : ''}`}>
+          <div className={`w-28 h-28 rounded-full ${isHintMode ? 'bg-gradient-to-br from-purple-400 to-purple-600' : 'bg-gradient-to-br from-orange-400 to-red-400'} p-1 shadow-xl ${shouldShake && !isHintMode ? 'animate-shake' : ''}`}>
             <img
               src={mascotImage}
               alt={isHintMode ? "Oni giving hint" : "Oni encouraging"}
-              className="w-20 h-20 object-contain"
+              className="w-full h-full object-contain rounded-full"
             />
           </div>
+        </div>
+
+        {/* Encouragement */}
+        <div className="text-center">
+          <p className={`font-bold text-xl ${isHintMode ? 'text-blue-600' : 'text-orange-600'}`}>
+            {isHintMode ? "You've got this!" : "Let's learn together!"}
+          </p>
         </div>
 
         {/* User's Wrong Answer Display */}
@@ -87,35 +92,26 @@ export default function LessonIncorrect({
           </div>
         )}
 
-        {/* Feedback Banner */}
+        {/* Feedback Card */}
         <div
-          className={`p-4 rounded-2xl border-2 ${
+          className={`rounded-2xl p-5 shadow-lg border-2 ${
             isHintMode
-              ? 'bg-blue-100 border-blue-400'
-              : 'bg-orange-50 border-orange-200'
+              ? 'bg-blue-50 border-blue-300'
+              : 'bg-white border-orange-200'
           }`}
           role="alert"
           aria-live="assertive"
           data-testid="incorrect-banner"
         >
-          <div className="flex items-start space-x-3">
-            {isHintMode ? (
-              <Lightbulb
-                className="w-6 h-6 mt-1 flex-shrink-0 text-blue-600"
-                aria-hidden="true"
-              />
-            ) : (
-              <AlertTriangle
-                className="w-6 h-6 mt-1 flex-shrink-0 text-orange-600"
-                aria-hidden="true"
-              />
-            )}
-
+          <div className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">
+              {isHintMode ? '💡' : '🤔'}
+            </span>
             <div className="flex-1">
               {isHintMode ? (
                 <>
-                  <p className="font-semibold text-blue-800 mb-1">
-                    💡 Here's a hint!
+                  <p className="font-bold text-blue-800 mb-1">
+                    Here's a hint!
                   </p>
                   <p className="text-blue-700 text-sm leading-relaxed">
                     {hint}
@@ -123,11 +119,11 @@ export default function LessonIncorrect({
                 </>
               ) : (
                 <>
-                  <p className="font-semibold text-orange-800 mb-1">
+                  <p className="font-bold text-orange-800 mb-1">
                     Oops! Not quite right...
                   </p>
-                  <p className="text-orange-700 text-sm leading-relaxed">
-                    {message || "Don't worry! Think about what makes something \"alive.\" Give it another try! 💪"}
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {message || "Don't worry! Think about it and give it another try! 💪"}
                   </p>
                 </>
               )}
@@ -138,31 +134,31 @@ export default function LessonIncorrect({
         {/* Attempt Indicator */}
         <AttemptIndicator current={attemptNumber} max={3} />
 
-        {/* Status Banner */}
-        <div className={`${isHintMode ? 'bg-blue-500' : 'bg-red-500'} text-white p-4 rounded-xl text-center`}>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-2xl">{isHintMode ? '💡' : '✗'}</span>
-            <span className="text-lg font-bold">{isHintMode ? "You've got this!" : 'Oops!'}</span>
-          </div>
+        {/* Encouragement Message */}
+        <div className="text-center">
+          <p className="text-gray-500 text-sm">
+            Don't worry - everyone learns differently! You've got this. 💪
+          </p>
         </div>
 
         {/* Try Again Button */}
         <div className="pt-2">
-          <Button
+          <button
             onClick={onTryAgain}
             disabled={!canTryAgain}
             className={`
-              w-full h-14 text-base font-bold uppercase tracking-wider rounded-2xl
+              w-full py-4 font-bold text-xl rounded-2xl shadow-lg
+              transition-all duration-200
               ${isHintMode
-                ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                : 'bg-[#FF6A00] hover:bg-[#E55A00] text-white'
+                ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
+                : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white'
               }
-              ${!canTryAgain ? 'opacity-50 cursor-not-allowed' : ''}
+              ${!canTryAgain ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-xl'}
             `}
             data-testid="try-again-button"
           >
-            {isHintMode ? 'Try One More Time' : 'Try Again'}
-          </Button>
+            {isHintMode ? 'GOT IT! CONTINUE' : 'TRY AGAIN'}
+          </button>
         </div>
       </div>
     </div>

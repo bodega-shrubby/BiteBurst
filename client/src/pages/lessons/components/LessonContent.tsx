@@ -111,7 +111,7 @@ export function LessonContent({
       </header>
 
       {/* Main Content - Responsive */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pb-24">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row min-h-full">
 
           {/* Left Side - Mascot */}
@@ -218,29 +218,26 @@ export function LessonContent({
             </div>
 
             {/* Remember Box */}
-            <div className="mt-4 md:mt-6 max-w-2xl mx-auto bg-gradient-to-br from-yellow-100 via-orange-50 to-pink-50 rounded-3xl border-2 border-yellow-300 p-4 md:p-5 shadow-lg">
-              <div className="flex items-center gap-2 mb-3 lg:justify-center">
-                <span className="text-xl md:text-2xl animate-bounce">💡</span>
-                <h3 className="font-black text-orange-700 text-base md:text-lg lg:text-xl">REMEMBER!</h3>
-                <span className="text-xl md:text-2xl animate-bounce" style={{ animationDelay: '0.5s' }}>🧠</span>
+            <div className="mt-4 md:mt-6 max-w-2xl mx-auto bg-gradient-to-br from-yellow-100 via-orange-50 to-pink-50 rounded-3xl border-2 border-yellow-300 p-4 md:p-6 shadow-lg">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="text-2xl">💡</span>
+                <h3 className="font-bold text-xl text-orange-600">REMEMBER!</h3>
+                <span className="text-2xl">🧠</span>
               </div>
 
-              {/* Mobile/Tablet: List */}
-              <ul className="space-y-2 lg:hidden">
+              {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {keyPoints.map((point, i) => (
-                  <li key={i} className="flex items-center gap-3 bg-white/70 rounded-xl px-3 py-2">
-                    <span className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center text-white text-sm font-bold">✓</span>
-                    <span className="text-gray-700 text-sm md:text-base font-medium">{point}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Desktop: Grid */}
-              <div className="hidden lg:grid grid-cols-3 gap-3">
-                {keyPoints.map((point, i) => (
-                  <div key={i} className="flex flex-col items-center gap-2 bg-white/70 rounded-xl px-4 py-3 text-center">
-                    <span className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-white font-bold text-lg">✓</span>
-                    <span className="text-gray-700 font-medium text-sm">{point}</span>
+                  <div
+                    key={i}
+                    className="bg-white rounded-xl p-4 shadow-md border border-green-100 flex items-start gap-3"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">✓</span>
+                    </div>
+                    <p className="text-gray-700 font-medium text-sm leading-relaxed">
+                      {point}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -254,18 +251,18 @@ export function LessonContent({
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t-2 border-orange-100 p-4">
-        <div className="max-w-md mx-auto">
+      {/* Footer - Full width sticky at bottom, outside grid */}
+      <footer className="sticky bottom-0 z-40 bg-gradient-to-t from-amber-50 via-amber-50/95 to-transparent pt-6 pb-6">
+        <div className="max-w-md mx-auto px-4">
           <button
             onClick={onContinue}
-            className="w-full h-12 md:h-14 bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 hover:from-orange-600 hover:via-orange-500 hover:to-yellow-500 text-white font-black text-base md:text-lg uppercase tracking-wide rounded-2xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 active:scale-95"
+            className="w-full py-4 px-8 bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 hover:from-orange-600 hover:via-orange-500 hover:to-yellow-500 text-white font-black text-lg md:text-xl uppercase tracking-wide rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3 active:scale-95"
             style={{ boxShadow: '0 0 20px rgba(255, 106, 0, 0.3)' }}
           >
-            <span>Let's Go!</span>
+            <span>LET'S GO!</span>
             <span className="text-xl md:text-2xl animate-bounce">🚀</span>
           </button>
-          <p className="text-center text-gray-400 text-xs mt-2 font-medium">
+          <p className="text-center text-sm text-gray-500 mt-2 font-medium">
             Tap to start the quiz! ✨
           </p>
         </div>

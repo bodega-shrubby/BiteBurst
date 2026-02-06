@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
 import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
 
 type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
@@ -65,10 +63,6 @@ export default function LessonSuccess({
     
     return (
       <div className="space-y-4">
-        <div className="text-lg font-bold text-green-800 mb-3">
-          ✅ Nice! Perfect matches!
-        </div>
-        
         <div className="space-y-3">
           {step.content.matchingPairs.map((pair, index) => (
             <div
@@ -85,9 +79,15 @@ export default function LessonSuccess({
         </div>
         
         {getFeedbackText(step.content.feedback, 'success') && (
-          <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
-            <div className="text-sm text-green-700 whitespace-pre-line">
-              {getFeedbackText(step.content.feedback, 'success')?.replace(/\\n/g, '\n')}
+          <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🎉</span>
+              <div>
+                <p className="font-bold text-green-700">Perfect matches!</p>
+                <p className="text-gray-600 mt-1 text-sm whitespace-pre-line">
+                  {getFeedbackText(step.content.feedback, 'success')?.replace(/\\n/g, '\n')}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -102,10 +102,6 @@ export default function LessonSuccess({
     
     return (
       <div className="space-y-4">
-        <div className="text-lg font-bold text-green-800 mb-3">
-          ✅ Nice! Perfect order!
-        </div>
-        
         <div className="space-y-2">
           {sortedItems.map((item, index) => (
             <div
@@ -123,9 +119,15 @@ export default function LessonSuccess({
         </div>
         
         {getFeedbackText(step.content.feedback, 'success') && (
-          <div className="bg-white p-3 rounded-xl border border-green-200 text-left">
-            <div className="text-sm text-green-700">
-              {getFeedbackText(step.content.feedback, 'success')}
+          <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🎉</span>
+              <div>
+                <p className="font-bold text-green-700">Perfect order!</p>
+                <p className="text-gray-600 mt-1 text-sm">
+                  {getFeedbackText(step.content.feedback, 'success')}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -133,34 +135,41 @@ export default function LessonSuccess({
     );
   };
 
+  const correctAnswerText = correctOption
+    ? ('text' in correctOption ? correctOption.text : 'name' in correctOption ? (correctOption as any).name : selectedAnswer)
+    : step.content.correctAnswer !== undefined
+      ? String(step.content.correctAnswer)
+      : selectedAnswer;
+
+  const correctAnswerEmoji = correctOption && 'emoji' in correctOption ? correctOption.emoji : undefined;
+
   return (
-    <div className="min-h-[400px] rounded-3xl bg-gradient-to-b from-green-50 to-white p-6 relative overflow-hidden">
-      {/* Confetti Overlay */}
+    <div className="min-h-[400px] rounded-3xl bg-gradient-to-b from-green-50 to-emerald-100 p-6 relative overflow-hidden">
+      {/* Sparkle Overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <span className="absolute top-0 left-1/4 text-2xl animate-ping" style={{ animationDuration: '1.5s' }}>🎊</span>
-        <span className="absolute top-2 right-1/4 text-xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }}>✨</span>
-        <span className="absolute top-4 left-1/3 text-lg animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.6s' }}>⭐</span>
-        <span className="absolute top-6 right-1/3 text-2xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.9s' }}>🎉</span>
+        <span className="absolute top-4 left-1/4 text-4xl animate-bounce" style={{ animationDelay: '0.1s' }}>⭐</span>
+        <span className="absolute top-8 right-1/4 text-3xl animate-bounce" style={{ animationDelay: '0.2s' }}>✨</span>
+        <span className="absolute top-2 right-1/3 text-2xl animate-bounce" style={{ animationDelay: '0.3s' }}>🌟</span>
+        <span className="absolute top-6 left-1/3 text-2xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}>🎉</span>
       </div>
 
       <div className="max-w-md mx-auto space-y-5 relative z-10">
-        {/* Celebrating Mascot with Sparkles */}
-        <div className="flex justify-center relative">
-          <span className="absolute -top-2 -left-8 text-2xl animate-ping" style={{ animationDuration: '1.5s' }}>✨</span>
-          <span className="absolute -top-2 -right-8 text-2xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }}>⭐</span>
-          <img
-            src={oniCelebrateImage}
-            alt="Oni Celebrating"
-            className="w-28 h-28 object-contain mascot-celebrate"
-          />
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xl animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.6s' }}>🌟</span>
+        {/* Celebrating Mascot */}
+        <div className="relative flex justify-center pt-2">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 p-1 shadow-2xl animate-bounce" style={{ animationDuration: '2s' }}>
+            <img
+              src={oniCelebrateImage}
+              alt="Celebrating!"
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
         </div>
 
         {/* Question Recap */}
         <div className="text-center">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">
+          <p className="text-gray-600 text-lg">
             {step.question}
-          </h2>
+          </p>
         </div>
 
         {/* Success Content */}
@@ -170,57 +179,59 @@ export default function LessonSuccess({
           renderOrderingSuccess()
         ) : (
           <div className="space-y-4">
-            {/* Correct Answer Highlighted */}
-            <div className="p-4 rounded-2xl border-2 border-green-400 bg-green-50">
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                {correctOption && 'emoji' in correctOption && correctOption.emoji && (
-                  <span className="text-2xl">{correctOption.emoji}</span>
-                )}
-                <span className="text-lg font-medium text-gray-900">
-                  {correctOption && 'text' in correctOption ? correctOption.text : 
-                   correctOption && 'name' in correctOption ? correctOption.name : selectedAnswer}
-                </span>
+            {/* Correct Answer Card - PROMINENT */}
+            <div className="bg-green-500 rounded-2xl p-6 shadow-xl border-4 border-green-300">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-green-500 text-2xl font-bold">✓</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    {correctAnswerEmoji && (
+                      <span className="text-2xl">{correctAnswerEmoji}</span>
+                    )}
+                    <p className="text-white font-bold text-xl">{correctAnswerText}</p>
+                  </div>
+                  <p className="text-green-100 text-sm">This is the correct answer!</p>
+                </div>
               </div>
             </div>
 
-            {/* Success Feedback Speech Bubble */}
+            {/* Explanation Card */}
             {getFeedbackText(step.content.feedback, 'success') && (
-              <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4">
-                <p className="text-green-800 font-semibold mb-2">🎉 Correct! You're amazing!</p>
-                <p className="text-green-700 text-sm">
-                  {getFeedbackText(step.content.feedback, 'success')}
-                </p>
+              <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🎉</span>
+                  <div>
+                    <p className="font-bold text-green-700">Correct! You're amazing!</p>
+                    <p className="text-gray-600 mt-1 text-sm">
+                      {getFeedbackText(step.content.feedback, 'success')}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* XP Reward */}
-        <div className="flex items-center justify-center">
-          <div className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full shadow-lg mascot-celebrate">
-            <span className="text-white font-bold text-xl">+{xpEarned} XP</span>
-            <span className="ml-2 text-2xl">✨</span>
-          </div>
-        </div>
-
-        {/* Success Banner - GREEN */}
-        <div className="bg-green-500 text-white p-4 rounded-xl text-center">
-          <div className="flex items-center justify-center gap-2">
-            <Check className="w-6 h-6" />
-            <span className="text-lg font-bold">Nice!</span>
+        {/* XP Badge - Large & Animated */}
+        <div className="flex justify-center">
+          <div className="bg-gradient-to-r from-orange-400 to-yellow-400 px-8 py-3 rounded-full shadow-lg animate-pulse">
+            <span className="text-white font-bold text-2xl">+{xpEarned} XP ✨</span>
           </div>
         </div>
 
         {/* CTA Button */}
         {showContinueButton && (
-          <Button
-            onClick={onContinue}
-            className="w-full h-14 text-base font-bold uppercase tracking-wider rounded-2xl bg-green-500 hover:bg-green-600 text-white"
-            data-testid="continue-button"
-          >
-            Continue
-          </Button>
+          <div className="pt-2">
+            <button
+              onClick={onContinue}
+              className="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold text-xl rounded-2xl shadow-lg transition-all duration-200"
+              data-testid="continue-button"
+            >
+              CONTINUE →
+            </button>
+          </div>
         )}
       </div>
     </div>
