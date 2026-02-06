@@ -74,6 +74,8 @@ interface LessonStep {
   mascotAction?: string;
   retryConfig?: {
     maxAttempts: number;
+    hintAfterAttempt?: number;
+    showAnswerAfterAttempt?: number;
     xp: { firstTry: number; secondTry: number; learnCard: number };
     messages: {
       tryAgain1: string;
@@ -289,9 +291,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           return undefined;
         };
         
-        // Enhanced state machine logic
-        if (!currentStep?.retryConfig) {
-          // Fallback behavior for steps without retryConfig: ASK → TRY_AGAIN → LEARN_CARD
+        if (!hasFullRetryConfig(currentStep?.retryConfig)) {
           if (currentAttempt === 1) {
             setLessonState('incorrect');
             setTryAgainMessage('Try again!');
@@ -439,16 +439,18 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
     setLastSelectedAnswer(answer);
   };
 
-  // Calculate XP based on current attempt and retryConfig
+  const hasFullRetryConfig = (config: LessonStep['retryConfig']): boolean => {
+    return !!config && !!config.xp && !!config.messages;
+  };
+
   const calculateXP = (step: LessonStep, attempt: number): number => {
-    if (!step.retryConfig) {
-      // Fallback behavior: only grant XP on first attempt, learn cards get 0 XP
+    if (!hasFullRetryConfig(step.retryConfig)) {
       return attempt === 1 ? step.xpReward : 0;
     }
     
-    if (attempt === 1) return step.retryConfig.xp.firstTry;
-    if (attempt === 2) return step.retryConfig.xp.secondTry;
-    return step.retryConfig.xp.learnCard; // Attempt 3 (learn card)
+    if (attempt === 1) return step.retryConfig!.xp.firstTry;
+    if (attempt === 2) return step.retryConfig!.xp.secondTry;
+    return step.retryConfig!.xp.learnCard;
   };
 
   // Calculate CHECK button state based on current lesson state and selection
@@ -774,7 +776,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
         {lessonState === 'learn' && currentStep && (
           <LessonLearn
             title={currentStep.question || "Learning Time"}
-            body={currentStep.retryConfig?.messages.learnCard || getStepFeedbackMessage(currentStep, 'motivating_fail') || "Let's learn more about this!"}
+            body={(hasFullRetryConfig(currentStep.retryConfig) ? currentStep.retryConfig?.messages.learnCard : undefined) || getStepFeedbackMessage(currentStep, 'motivating_fail') || "Let's learn more about this!"}
             onContinue={handleLearnContinue}
             xpEarned={calculateXP(currentStep, 3)}
             correctAnswer={getCorrectAnswerText(currentStep)}
