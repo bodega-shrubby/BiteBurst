@@ -298,130 +298,15 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           });
         }
         
-        // Helper to extract feedback messages from content.feedback
-        const getFeedbackMessage = (type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
-          const feedback = currentStep?.content?.feedback;
-          if (!feedback) return undefined;
-          if (typeof feedback === 'object') {
-            return type === 'hint_after_2' ? feedback.hint_after_2 : feedback.motivating_fail;
-          }
-          return undefined;
+        const getHintMessage = (): string | undefined => {
+          return getStepFeedbackMessage(currentStep, 'hint_after_2');
         };
-        
-        if (!hasFullRetryConfig(currentStep?.retryConfig)) {
-          if (currentAttempt === 1) {
-            setLessonState('incorrect');
-            setTryAgainMessage('Try again!');
-            setCurrentAttempt(2);
-            setSelectedAnswer(null);
-            setHasSelectionChanged(false);
-            setLastSelectedAnswer(null);
-          } else if (currentAttempt === 2) {
-            // Second attempt - use hint_after_2 if available
-            const hintAfter2 = getFeedbackMessage('hint_after_2');
-            if (hintAfter2) {
-              setLessonState('incorrect');
-              setTryAgainMessage(hintAfter2);
-              setCurrentAttempt(3);
-              setSelectedAnswer(null);
-              setHasSelectionChanged(false);
-              setLastSelectedAnswer(null);
-            } else {
-              // No hint_after_2, go directly to learn card
-              setLessonState('learn');
-              setSelectedAnswer(null);
-              
-              // Log learn card usage
-              if (currentStep) {
-                logAttemptMutation.mutate({
-                  lessonId,
-                  stepId: currentStep.id,
-                  stepNumber: currentStep.stepNumber,
-                  attemptNumber: 3,
-                  isCorrect: false,
-                  selectedAnswer: 'learn-card-shown',
-                  timeOnStepMs,
-                  heartsRemaining: heartsRemaining,
-                  xpEarned: 0,
-                  usedLearnCard: true
-                });
-              }
-            }
-          } else {
-            // Third attempt failed - go to learn card
-            setLessonState('learn');
-            setSelectedAnswer(null);
-            
-            // Log learn card usage
-            if (currentStep) {
-              logAttemptMutation.mutate({
-                lessonId,
-                stepId: currentStep.id,
-                stepNumber: currentStep.stepNumber,
-                attemptNumber: 3,
-                isCorrect: false,
-                selectedAnswer: 'learn-card-shown',
-                timeOnStepMs,
-                heartsRemaining: heartsRemaining,
-                xpEarned: 0, // No XP for fallback learn card
-                usedLearnCard: true
-              });
-            }
-          }
-          return;
-        }
-        
-        // Proper state machine with retryConfig
-        const maxAttempts = currentStep.retryConfig.maxAttempts ?? 3;
-        
-        // State transitions based on current attempt and config
-        if (currentAttempt === 1) {
-          // First incorrect: ASK → TRY_AGAIN
-          setLessonState('incorrect');
-          setTryAgainMessage(currentStep.retryConfig.messages.tryAgain1 || 'Try again!');
-          setCurrentAttempt(2);
-          setSelectedAnswer(null);
-          setHasSelectionChanged(false);
-          setLastSelectedAnswer(null);
-        } else if (currentAttempt === 2 && maxAttempts >= 3) {
-          // Second incorrect and max attempts allows third: TRY_AGAIN → TRY_AGAIN (with different message) or LEARN_CARD
-          // Use tryAgain2 from retryConfig or hint_after_2 from feedback
-          const hintAfter2 = getFeedbackMessage('hint_after_2');
-          const secondMessage = currentStep.retryConfig.messages.tryAgain2 || hintAfter2;
-          if (secondMessage) {
-            setLessonState('incorrect');
-            setTryAgainMessage(secondMessage);
-            setCurrentAttempt(3);
-            setSelectedAnswer(null);
-            setHasSelectionChanged(false);
-            setLastSelectedAnswer(null);
-          } else {
-            // No second message - go directly to learn card with XP (but only awarded on SUCCESS)
-            setLessonState('learn');
-            setSelectedAnswer(null);
-            
-            // Log learn card usage
-            if (currentStep) {
-              logAttemptMutation.mutate({
-                lessonId,
-                stepId: currentStep.id,
-                stepNumber: currentStep.stepNumber,
-                attemptNumber: 3,
-                isCorrect: false,
-                selectedAnswer: 'learn-card-shown',
-                timeOnStepMs,
-                heartsRemaining: heartsRemaining,
-                xpEarned: 0, // XP is awarded only on SUCCESS, not here
-                usedLearnCard: true
-              });
-            }
-          }
-        } else {
-          // Final incorrect (maxAttempts reached): TRY_AGAIN → learn card  
-          setLessonState('learn');
-          setSelectedAnswer(null);
-          
-          // Log learn card usage
+
+        const getIncorrectMessage = (): string | undefined => {
+          return getStepFeedbackMessage(currentStep, 'motivating_fail');
+        };
+
+        const logLearnCardUsage = () => {
           if (currentStep) {
             logAttemptMutation.mutate({
               lessonId,
@@ -432,10 +317,70 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
               selectedAnswer: 'learn-card-shown',
               timeOnStepMs,
               heartsRemaining: heartsRemaining,
-              xpEarned: 0, // XP is awarded only on SUCCESS, not here
+              xpEarned: 0,
               usedLearnCard: true
             });
           }
+        };
+        
+        if (!hasFullRetryConfig(currentStep?.retryConfig)) {
+          if (currentAttempt === 1) {
+            setLessonState('incorrect');
+            setTryAgainMessage(getIncorrectMessage() || 'Try again!');
+            setCurrentAttempt(2);
+            setSelectedAnswer(null);
+            setHasSelectionChanged(false);
+            setLastSelectedAnswer(null);
+          } else if (currentAttempt === 2) {
+            const hintMsg = getHintMessage();
+            if (hintMsg) {
+              setLessonState('incorrect');
+              setTryAgainMessage(hintMsg);
+              setCurrentAttempt(3);
+              setSelectedAnswer(null);
+              setHasSelectionChanged(false);
+              setLastSelectedAnswer(null);
+            } else {
+              setLessonState('learn');
+              setSelectedAnswer(null);
+              logLearnCardUsage();
+            }
+          } else {
+            setLessonState('learn');
+            setSelectedAnswer(null);
+            logLearnCardUsage();
+          }
+          return;
+        }
+        
+        const maxAttempts = currentStep.retryConfig.maxAttempts ?? 3;
+        
+        if (currentAttempt === 1) {
+          setLessonState('incorrect');
+          setTryAgainMessage(currentStep.retryConfig.messages.tryAgain1 || getIncorrectMessage() || 'Try again!');
+          setCurrentAttempt(2);
+          setSelectedAnswer(null);
+          setHasSelectionChanged(false);
+          setLastSelectedAnswer(null);
+        } else if (currentAttempt === 2 && maxAttempts >= 3) {
+          const hintMsg = getHintMessage();
+          const secondMessage = currentStep.retryConfig.messages.tryAgain2 || hintMsg;
+          if (secondMessage) {
+            setLessonState('incorrect');
+            setTryAgainMessage(secondMessage);
+            setCurrentAttempt(3);
+            setSelectedAnswer(null);
+            setHasSelectionChanged(false);
+            setLastSelectedAnswer(null);
+          } else {
+            setLessonState('learn');
+            setSelectedAnswer(null);
+            logLearnCardUsage();
+          }
+        } else {
+          setLessonState('learn');
+          setSelectedAnswer(null);
+          logLearnCardUsage();
         }
       }
     }
