@@ -23,7 +23,6 @@ export default function TodaysActivity({ recentLogs = [] }: TodaysActivityProps)
       <h3 className="font-bold text-base text-gray-800 mb-4 flex items-center gap-2">
         📋 Today's Activity
       </h3>
-
       {hasActivity ? (
         <div className="space-y-2">
           {recentLogs.slice(0, 3).map((log) => (
@@ -62,7 +61,7 @@ export default function TodaysActivity({ recentLogs = [] }: TodaysActivityProps)
         <div className="text-center py-4">
           <img src={coachFlex} alt="Coach Flex" className="w-[90px] h-[90px] object-contain mx-auto mb-3" />
           <p className="font-bold text-gray-800 text-base">No activity yet today</p>
-          <p className="text-sm text-gray-500 mt-1">Time to fuel up! 🍎</p>
+          <p className="text-sm text-gray-500 mt-1">Time to fuel up! </p>
 
           <div className="flex flex-col gap-2 mt-5">
             <button
