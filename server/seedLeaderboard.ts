@@ -4,7 +4,7 @@
  */
 
 import { db } from "./db";
-import { users, xpEvents, leagueBoards } from "@shared/schema";
+import { users, children, xpEvents, leagueBoards } from "@shared/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 const DEMO_USERS = [
@@ -66,11 +66,10 @@ async function checkCurrentWeekLeague(): Promise<boolean> {
 }
 
 async function createMockUsers(): Promise<string[]> {
-  const userIds: string[] = [];
+  const childIds: string[] = [];
   
   for (let i = 0; i < DEMO_USERS.length; i++) {
     const userData = DEMO_USERS[i];
-    // Generate unique mock email for each demo user
     const mockEmail = `mock-${userData.name.toLowerCase().replace(/[^a-z]/g, '')}-${i}@biteburst.mock`;
     
     const [user] = await db.insert(users).values({
@@ -87,10 +86,23 @@ async function createMockUsers(): Promise<string[]> {
       leagueTier: 'bronze',
     }).returning({ id: users.id });
     
-    userIds.push(user.id);
+    const [child] = await db.insert(children).values({
+      parentId: user.id,
+      name: userData.name,
+      username: `MOCK${userData.name.replace(/[^a-zA-Z]/g, '').toUpperCase()}${i}`,
+      avatar: userData.avatar,
+      age: 8,
+      locale: 'en-GB',
+      goal: 'energy',
+      totalXp: userData.xp,
+      level: Math.floor(userData.xp / 100) + 1,
+      streak: userData.streak,
+    }).returning({ id: children.id });
+    
+    childIds.push(child.id);
   }
   
-  return userIds;
+  return childIds;
 }
 
 async function seedWeeklyXP(userIds: string[]) {
@@ -145,7 +157,7 @@ export async function ensureLeaderboardData(): Promise<void> {
     if (!hasLeague) {
       console.log("🏆 Auto-seeding leaderboard data for current week...");
       
-      // Clear old mock users first
+      // Clear old mock users first (children cascade-deleted via FK)
       await db.delete(users).where(eq(users.isMock, true));
       
       // Create fresh mock users
