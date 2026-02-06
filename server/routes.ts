@@ -221,19 +221,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const parentAuthId = data.user.id;
 
-      // 2. Find parent user
-      const parentUser = await storage.getParentByAuthId(parentAuthId);
+      // 2. Find parent user (auto-create if auth exists but DB record is missing)
+      let parentUser = await storage.getParentByAuthId(parentAuthId);
 
       if (!parentUser) {
-        console.error("No parent user found for auth ID:", parentAuthId);
-        return res.status(404).json({ error: 'No account found. Please sign up.' });
+        console.log("Auto-creating parent user for auth ID:", parentAuthId);
+        parentUser = await storage.createParentUser({
+          parentAuthId,
+          email: data.user.email || email,
+          parentEmail: data.user.email || email,
+          parentConsent: true,
+          authProvider: 'supabase',
+          subscriptionPlan: 'free',
+          subscriptionChildrenLimit: 1,
+        });
+        console.log("Auto-created parent user:", parentUser.id);
       }
 
       // 3. Get children for this parent
       const children = await storage.getChildrenByParentId(parentUser.id);
 
       if (children.length === 0) {
-        return res.status(404).json({ error: 'No child profiles found. Please complete signup.' });
+        return res.json({
+          success: true,
+          needsOnboarding: true,
+          parentId: parentUser.id,
+          session: data.session,
+          message: 'Please complete your profile setup.'
+        });
       }
 
       // 4. Get active child (or default to first child)

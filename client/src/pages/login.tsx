@@ -37,6 +37,10 @@ export default function Login() {
       setLocation("/dashboard");
     } catch (err: any) {
       console.error("Login error:", err);
+      if (err.message === 'NEEDS_ONBOARDING') {
+        setLocation("/");
+        return;
+      }
       setError(err.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
