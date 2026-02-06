@@ -17,7 +17,7 @@ export default function OniMascotCard({ message, userName }: OniMascotCardProps)
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 flex items-center gap-4">
-      <div className="w-[70px] h-[70px] flex-shrink-0">
+      <div className="w-[90px] h-[90px] flex-shrink-0">
         <img
           src={oniImage}
           alt="Oni the Orange"
