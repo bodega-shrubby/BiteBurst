@@ -7,9 +7,9 @@ interface OniMascotCardProps {
 
 export default function OniMascotCard({ message, userName }: OniMascotCardProps) {
   const defaultMessages = [
-    `Great job logging your breakfast! Keep it up! 🎉`,
+    `Great job logging your breakfast! Keep it up!`,
     `You're doing amazing today, ${userName || 'champ'}!`,
-    `Ready to crush your goals today? 💪`,
+    `Ready to crush your goals today?`,
     `Let's make today healthy and fun!`,
   ];
 

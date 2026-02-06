@@ -135,30 +135,30 @@ function getMascotGreeting(displayName: string, xpToday: number, xpGoal: number)
   const percentToGoal = (xpToday / xpGoal) * 100;
   
   if (xpToday >= xpGoal) {
-    return `You did it, ${displayName}! Goal crushed! 🎉`;
+    return `You did it, ${displayName}! Goal crushed!`;
   }
   
   if (percentToGoal >= 80) {
-    return `So close! Just ${xpGoal - xpToday} XP to go! 🎯`;
+    return `So close! Just ${xpGoal - xpToday} XP to go!`;
   }
   
   if (percentToGoal >= 50) {
-    return `You're halfway there! Keep it up! 💪`;
+    return `You're halfway there! Keep it up!`;
   }
   
   if (xpToday > 0) {
-    return `Great start! Let's keep going! 🚀`;
+    return `Great start! Let's keep going!`;
   }
   
   if (hour < 12) {
-    return `Good morning, ${displayName}! Ready to start? ☀️`;
+    return `Good morning, ${displayName}! Ready to start?`;
   } else if (hour < 17) {
-    return `Hey ${displayName}! Ready for a healthy snack? 🍎`;
+    return `Hey ${displayName}! Ready for a healthy snack?`;
   } else if (hour < 22) {
-    return `Evening, ${displayName}! How was your day? 🌙`;
+    return `Evening, ${displayName}! How was your day?`;
   }
   
-  return `Still up? Log before bed! 😴`;
+  return `Still up? Log before bed!`;
 }
 
 function DashboardSkeleton() {
