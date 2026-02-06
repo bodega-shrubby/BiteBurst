@@ -139,7 +139,7 @@ export function LessonContent({
               </div>
 
               {/* Name Badge */}
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full border-2 border-orange-300 shadow-md">
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full border-2 border-orange-300 shadow-md">
                 <span className="text-xs md:text-sm font-bold text-orange-600">{mascot.name}</span>
               </div>
             </div>
