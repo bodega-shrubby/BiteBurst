@@ -1,11 +1,7 @@
 import oniCelebrateImage from '@assets/Mascots/Oni_celebrate.png';
+import { FeedbackType, LessonStep } from '../types';
 
-type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
-
-function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | 'hint' | 'fail' = 'success', content?: any): string | undefined {
-  if (type === 'success' && content?.successFeedback) {
-    return content.successFeedback;
-  }
+function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | 'hint' | 'fail' = 'success'): string | undefined {
   if (!feedback) return undefined;
   if (typeof feedback === 'string') return feedback;
   switch (type) {
@@ -14,28 +10,6 @@ function getFeedbackText(feedback: FeedbackType | undefined, type: 'success' | '
     case 'fail': return feedback.motivating_fail;
     default: return feedback.success;
   }
-}
-
-interface LessonStep {
-  id: string;
-  stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank';
-  question: string;
-  content: {
-    options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }>;
-    correctAnswer?: string | boolean;
-    feedback?: FeedbackType;
-    successFeedback?: string;
-    incorrectFeedback?: string;
-    hint?: string;
-    matchingPairs?: Array<{ left: string; right: string }>;
-    pairs?: Array<{ id?: string; left: string; right: string }>;
-    labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
-    orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
-    sentence?: string;
-  };
-  xpReward: number;
-  mascotAction?: string;
 }
 
 interface LessonSuccessProps {
@@ -56,7 +30,8 @@ export default function LessonSuccess({
 
   const getCorrectOption = () => {
     if ((step.questionType === 'multiple-choice' || step.questionType === 'fill-blank') && step.content.options) {
-      return step.content.options.find(opt => opt.correct || opt.id === selectedAnswer);
+      const objOptions = step.content.options.filter((opt): opt is { id: string; text: string; emoji?: string; correct?: boolean } => typeof opt !== 'string');
+      return objOptions.find(opt => opt.correct || opt.id === selectedAnswer);
     }
     if (step.questionType === 'label-reading' && step.content.labelOptions) {
       return step.content.labelOptions.find(opt => opt.correct || opt.id === selectedAnswer);
@@ -89,13 +64,13 @@ export default function LessonSuccess({
           ))}
         </div>
         
-        {getFeedbackText(step.content.feedback, 'success', step.content) && (
+        {getFeedbackText(step.content.feedback, 'success') && (
           <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
             <div className="flex items-start gap-3">
               <div>
                 <p className="font-bold text-green-700">Perfect order!</p>
                 <p className="text-gray-600 mt-1 text-sm">
-                  {getFeedbackText(step.content.feedback, 'success', step.content)}
+                  {getFeedbackText(step.content.feedback, 'success')}
                 </p>
               </div>
             </div>
@@ -111,7 +86,7 @@ export default function LessonSuccess({
       ? String(step.content.correctAnswer)
       : selectedAnswer;
 
-  const correctAnswerEmoji = correctOption && 'emoji' in correctOption ? correctOption.emoji : undefined;
+  const correctAnswerEmoji = correctOption && typeof correctOption === 'object' && 'emoji' in correctOption ? correctOption.emoji : undefined;
 
   return (
     <div className="min-h-[400px] rounded-3xl bg-gradient-to-b from-green-50 to-emerald-100 p-6 relative overflow-hidden">
@@ -152,13 +127,13 @@ export default function LessonSuccess({
                     </div>
                   ))}
                 </div>
-                {getFeedbackText(step.content.feedback, 'success', step.content) && (
+                {getFeedbackText(step.content.feedback, 'success') && (
                   <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
                     <div className="flex items-start gap-3">
                       <div>
                         <p className="font-bold text-green-700">Perfect matches!</p>
                         <p className="text-gray-600 mt-1 text-sm whitespace-pre-line">
-                          {getFeedbackText(step.content.feedback, 'success', step.content)?.replace(/\\n/g, '\n')}
+                          {getFeedbackText(step.content.feedback, 'success')?.replace(/\\n/g, '\n')}
                         </p>
                       </div>
                     </div>
@@ -190,13 +165,13 @@ export default function LessonSuccess({
             </div>
 
             {/* Explanation Card */}
-            {getFeedbackText(step.content.feedback, 'success', step.content) && (
+            {getFeedbackText(step.content.feedback, 'success') && (
               <div className="bg-white rounded-2xl p-5 shadow-lg border border-green-200">
                 <div className="flex items-start gap-3">
                   <div>
                     <p className="font-bold text-green-700">Correct! You're amazing!</p>
                     <p className="text-gray-600 mt-1 text-sm">
-                      {getFeedbackText(step.content.feedback, 'success', step.content)}
+                      {getFeedbackText(step.content.feedback, 'success')}
                     </p>
                   </div>
                 </div>

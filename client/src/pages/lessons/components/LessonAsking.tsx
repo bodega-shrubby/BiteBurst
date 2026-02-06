@@ -11,27 +11,7 @@ import oniGrooveImage from '@assets/Mascots/Oni_groove.png';
 import oniLoveImage from '@assets/Mascots/Oni_love.png';
 import oniSadImage from '@assets/Mascots/Oni_sad.png';
 
-interface LessonStep {
-  id: string;
-  stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank';
-  question: string;
-  content: {
-    options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }> | string[];
-    correctAnswer?: string | boolean;
-    correctPair?: string[];
-    feedback?: string | { success?: string; hint_after_2?: string; motivating_fail?: string };
-    matchingPairs?: Array<{ left: string; right: string }>;
-    pairs?: Array<{ id?: string; left: string; right: string }>;
-    labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
-    orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
-    items?: Array<{ id: string; text: string; category: string }>;
-    blanks?: Array<{ id: string; correctAnswer: string; hint?: string; acceptableAnswers?: string[] }>;
-    sentence?: string;
-  };
-  xpReward: number;
-  mascotAction?: string;
-}
+import { LessonStep } from '../types';
 
 // Map mascot action strings to images
 const getMascotImage = (mascotAction?: string, lessonId?: string): string => {

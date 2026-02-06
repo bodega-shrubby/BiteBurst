@@ -29,7 +29,7 @@ interface LessonPlayerProps {
 
 type LessonState = 'intro' | 'lesson-content' | 'asking' | 'incorrect' | 'learn' | 'success' | 'complete';
 
-type FeedbackType = string | { success?: string; hint_after_2?: string; motivating_fail?: string };
+import { FeedbackType, LessonStep as BaseLessonStep } from './types';
 
 interface RememberCard {
   id: number;
@@ -55,31 +55,14 @@ interface LessonContentData {
   mascotMessage: string;
 }
 
-interface LessonStep {
-  id: string;
-  stepNumber: number;
-  questionType: 'multiple-choice' | 'true-false' | 'matching' | 'label-reading' | 'ordering' | 'tap-pair' | 'fill-blank' | 'lesson-content';
-  question: string;
-  content: {
-    options?: Array<{ id: string; text: string; emoji?: string; correct?: boolean }> | string[];
-    correctAnswer?: string | boolean;
-    correctPair?: string[];
-    feedback?: FeedbackType;
-    matchingPairs?: Array<{ left: string; right: string }>;
-    pairs?: Array<{ left: string; right: string }>;
-    labelOptions?: Array<{ id: string; name: string; sugar: string; fiber: string; protein: string; correct?: boolean }>;
-    orderingItems?: Array<{ id: string; text: string; correctOrder: number }>;
-    items?: Array<{ id: string; text: string; category: string }>;
-    blanks?: Array<{ id: string; correctAnswer: string; hint?: string; acceptableAnswers?: string[] }>;
-    sentence?: string;
+interface LessonStep extends BaseLessonStep {
+  content: BaseLessonStep['content'] & {
     title?: string;
     intro?: { greeting: string; message: string };
     sections?: LessonContentData['sections'];
     keyPoints?: string[];
     mascotMessage?: string;
   };
-  xpReward: number;
-  mascotAction?: string;
   retryConfig?: {
     maxAttempts: number;
     hintAfterAttempt?: number;
@@ -130,16 +113,6 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   const getStepFeedbackMessage = (step: LessonStep | undefined, type: 'hint_after_2' | 'motivating_fail'): string | undefined => {
     if (!step) return undefined;
-
-    if (type === 'hint_after_2') {
-      const hint = (step.content as any).hint;
-      if (hint) return hint;
-    }
-    if (type === 'motivating_fail') {
-      const incorrectFb = (step.content as any).incorrectFeedback;
-      if (incorrectFb) return incorrectFb;
-    }
-
     const feedback = step.content.feedback;
     if (!feedback) return undefined;
     if (typeof feedback === 'string') return undefined;
