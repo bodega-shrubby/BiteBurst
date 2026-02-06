@@ -173,7 +173,7 @@ export function LessonContent({
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[12px] border-l-transparent border-r-transparent border-b-orange-200" />
               <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-r-[8px] border-b-[10px] border-l-transparent border-r-transparent border-b-white" />
               <p className="text-gray-700 text-sm md:text-base leading-relaxed text-center font-medium">
-                {intro.greeting} ⚡<br />
+                {intro.greeting}<br />
                 {intro.message}
               </p>
             </div>
