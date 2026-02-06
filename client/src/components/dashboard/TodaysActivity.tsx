@@ -60,7 +60,7 @@ export default function TodaysActivity({ recentLogs = [] }: TodaysActivityProps)
         </div>
       ) : (
         <div className="text-center py-4">
-          <img src={coachFlex} alt="Coach Flex" className="w-16 h-16 object-contain mx-auto mb-3" />
+          <img src={coachFlex} alt="Coach Flex" className="w-[90px] h-[90px] object-contain mx-auto mb-3" />
           <p className="font-bold text-gray-800 text-base">No activity yet today</p>
           <p className="text-sm text-gray-500 mt-1">Time to fuel up! 🍎</p>
 
