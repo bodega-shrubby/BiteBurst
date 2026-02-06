@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Star, Sparkles, PartyPopper, Trophy, Flame, X } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import oniProudImage from '@assets/Mascots/Oni_proud.png';
 
 interface LessonCompleteProps {
@@ -32,12 +32,6 @@ export default function LessonComplete({
     <div className="min-h-screen bg-gradient-to-b from-orange-100 via-yellow-50 to-white relative overflow-hidden">
       {/* Confetti Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <PartyPopper className="absolute top-4 left-8 w-7 h-7 text-orange-400 animate-bounce" style={{ animationDelay: '0s' }} />
-        <PartyPopper className="absolute top-4 right-8 w-7 h-7 text-yellow-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
-        <Star className="absolute top-12 left-1/4 w-6 h-6 text-orange-400 animate-bounce fill-orange-400" style={{ animationDelay: '0.4s' }} />
-        <Sparkles className="absolute top-12 right-1/4 w-6 h-6 text-yellow-400 animate-bounce" style={{ animationDelay: '0.6s' }} />
-        <Star className="absolute top-20 left-12 w-5 h-5 text-yellow-500 animate-bounce fill-yellow-500" style={{ animationDelay: '0.3s' }} />
-        <PartyPopper className="absolute top-20 right-12 w-5 h-5 text-orange-400 animate-bounce" style={{ animationDelay: '0.5s' }} />
       </div>
 
       {/* Header (Progress Complete) */}
@@ -46,7 +40,7 @@ export default function LessonComplete({
           onClick={onBackToDashboard}
           className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <span className="text-gray-500 text-xl">&#x2715;</span>
         </button>
         <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-orange-500 rounded-full w-full"></div>
@@ -69,15 +63,13 @@ export default function LessonComplete({
               alt="Oni Celebrating"
               className="w-32 h-32 object-contain mascot-celebrate"
             />
-            <PartyPopper className="absolute -top-2 -right-2 w-8 h-8 text-yellow-500" />
-            <Star className="absolute -bottom-1 -left-2 w-7 h-7 text-orange-400 fill-orange-400" />
           </div>
         </div>
 
         {/* Completion Message */}
         <div className="text-center mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Lesson Complete!</h1>
-          <p className="text-orange-600 font-medium flex items-center justify-center gap-1">Amazing work, you're a star! <Star className="w-4 h-4 text-orange-500 fill-orange-500 inline" /></p>
+          <p className="text-orange-600 font-medium">Amazing work, you're a star!</p>
         </div>
 
         {/* Stats Card */}
@@ -103,7 +95,7 @@ export default function LessonComplete({
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 text-white mb-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Trophy className="w-7 h-7 text-white" />
+                <span className="text-2xl font-bold">!</span>
               </div>
               <div>
                 <p className="text-xs opacity-80">Achievement Unlocked!</p>
