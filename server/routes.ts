@@ -242,13 +242,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const children = await storage.getChildrenByParentId(parentUser.id);
 
       if (children.length === 0) {
-        return res.json({
-          success: true,
-          needsOnboarding: true,
+        console.log("No child profiles found, auto-creating default child for parent:", parentUser.id);
+        const displayName = parentUser.displayName || email.split('@')[0];
+        const username = displayName.toUpperCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000);
+        const defaultChild = await storage.createChildProfile({
           parentId: parentUser.id,
-          session: data.session,
-          message: 'Please complete your profile setup.'
+          name: displayName,
+          username,
+          avatar: '🧒',
+          age: 8,
+          locale: 'en-GB',
+          goal: 'energy',
         });
+        await storage.setActiveChildId(parentUser.id, defaultChild.id);
+        console.log("Auto-created child profile:", defaultChild.id);
+        children.push(defaultChild);
       }
 
       // 4. Get active child (or default to first child)
@@ -322,7 +330,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const children = await storage.getChildrenByParentId(parentUser.id);
 
       if (children.length === 0) {
-        return res.status(404).json({ error: 'No child profiles found' });
+        const displayName = parentUser.displayName || parentUser.email?.split('@')[0] || 'Child';
+        const username = displayName.toUpperCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000);
+        const defaultChild = await storage.createChildProfile({
+          parentId: parentUser.id,
+          name: displayName,
+          username,
+          avatar: '🧒',
+          age: 8,
+          locale: 'en-GB',
+          goal: 'energy',
+        });
+        await storage.setActiveChildId(parentUser.id, defaultChild.id);
+        children.push(defaultChild);
       }
 
       // 3. Get active child (or default to first child)

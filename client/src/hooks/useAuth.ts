@@ -117,10 +117,6 @@ export function useAuth() {
       });
     }
 
-    if (data.needsOnboarding) {
-      throw new Error('NEEDS_ONBOARDING');
-    }
-
     setUser(data.user);
     return data.user;
   };
