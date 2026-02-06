@@ -82,6 +82,9 @@ export function registerStripeRoutes(app: Express, requireAuth: any) {
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         mode: 'subscription',
+        subscription_data: {
+          trial_period_days: 7,
+        },
         success_url: `${baseUrl}/settings/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/settings/subscription?canceled=true`,
         metadata: {

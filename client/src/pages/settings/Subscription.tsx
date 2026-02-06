@@ -271,6 +271,7 @@ export default function Subscription() {
                   <div className="text-center mb-4">
                     <span className="text-3xl font-bold text-gray-900">${displayIndividualPrice}</span>
                     <span className="text-gray-500">/month</span>
+                    <p className="text-xs text-orange-600 font-semibold mt-1">7-day free trial</p>
                   </div>
 
                   <Button 
@@ -286,7 +287,7 @@ export default function Subscription() {
                     {checkoutMutation.isPending && selectedPlan === 'individual' ? (
                       <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
                     ) : (
-                      'Choose Plan'
+                      'Start Free Trial'
                     )}
                   </Button>
                 </div>
@@ -313,6 +314,7 @@ export default function Subscription() {
                     <span className="text-3xl font-bold text-gray-900">${displayFamilyPrice}</span>
                     <span className="text-gray-500">/month</span>
                     <p className="text-xs text-green-600 mt-1">Save up to 55%</p>
+                    <p className="text-xs text-orange-600 font-semibold mt-1">7-day free trial</p>
                   </div>
 
                   <Button 
@@ -323,7 +325,7 @@ export default function Subscription() {
                     className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition"
                     disabled={!familyPrice}
                   >
-                    Choose Plan
+                    Start Free Trial
                   </Button>
 
                   {selectedPlan === 'family' && familyPrice && (
