@@ -160,10 +160,10 @@ export function LessonContent({
                     {title.split('SUPERPOWER')[0]}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500">
                       SUPERPOWER!
-                    </span> 💪
+                    </span>
                   </>
                 ) : (
-                  <>{title} 💪</>
+                  <>{title}</>
                 )}
               </h1>
             </div>
