@@ -3,10 +3,12 @@ import { Check } from 'lucide-react';
 import treasureChestImg from '@/assets/images/treasure-chest.png';
 import appleBuddyImg from '@/assets/Mascots/AppleBuddy.png';
 import snackTwinsImg from '@/assets/Mascots/SnackTwins.png';
+import yumYumImg from '@/assets/Mascots/YumYum.png';
 
 const GROUP_MASCOTS: Record<string, { src: string; alt: string }> = {
   'morning-energy-boost': { src: appleBuddyImg, alt: 'Apple Buddy' },
   'power-up-snacks': { src: snackTwinsImg, alt: 'Snack Twins' },
+  'super-foods-energy': { src: yumYumImg, alt: 'YumYum' },
 };
 
 const THEMED_ICONS = [
@@ -193,14 +195,17 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                       <div
                         className={`flex items-center mb-12 relative ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
                       >
-                        {showMascot && (
-                          <img
-                            src={mascot.src}
-                            alt={mascot.alt}
-                            className={`w-20 h-20 object-contain drop-shadow-lg absolute ${isEven ? 'right-2' : 'left-2'}`}
-                            style={{ top: '50%', transform: 'translateY(-50%)' }}
-                          />
-                        )}
+                        {showMascot && (() => {
+                          const groupLocked = group.levels.every(l => l.state === 'locked');
+                          return (
+                            <img
+                              src={mascot.src}
+                              alt={mascot.alt}
+                              className={`w-20 h-20 object-contain absolute ${isEven ? 'right-2' : 'left-2'} transition-all ${groupLocked ? 'grayscale opacity-40' : 'drop-shadow-lg'}`}
+                              style={{ top: '50%', transform: 'translateY(-50%)' }}
+                            />
+                          );
+                        })()}
                         <div 
                           className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'} ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
                           onClick={() => isClickable && onLessonClick(lesson.id)}
