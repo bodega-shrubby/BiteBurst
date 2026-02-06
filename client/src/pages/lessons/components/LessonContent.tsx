@@ -130,9 +130,6 @@ export function LessonContent({
               <div className="absolute inset-0 w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 mx-auto rounded-full bg-orange-300/30 blur-xl animate-pulse" />
 
               {/* Sparkles */}
-              <span className="absolute -top-2 -right-4 text-xl md:text-2xl animate-pulse">✨</span>
-              <span className="absolute -top-1 left-0 text-lg md:text-xl animate-pulse" style={{ animationDelay: '0.3s' }}>⭐</span>
-              <span className="absolute bottom-0 -right-2 text-base md:text-lg animate-pulse" style={{ animationDelay: '0.6s' }}>💫</span>
 
               {/* Mascot Image */}
               <div
@@ -281,10 +278,9 @@ export function LessonContent({
             style={{ boxShadow: '0 0 20px rgba(255, 106, 0, 0.3)' }}
           >
             <span>LET'S GO!</span>
-            <span className="text-xl md:text-2xl animate-bounce">🚀</span>
           </button>
           <p className="text-center text-sm text-gray-500 mt-2 font-medium">
-            Tap to start the quiz! ✨
+            Tap to start the quiz!
           </p>
         </div>
       </footer>
