@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { CharacterAvatar } from '@/components/dashboard/CharacterAvatar';
+import oniTheOrange from '@assets/Mascots/Oni_the_orange.png';
 
 interface NavItem {
   id: string;
@@ -43,7 +44,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center space-x-2">
-          <span className="text-2xl">🍊</span>
+          <img src={oniTheOrange} alt="Oni the Orange" className="w-8 h-8 object-contain" />
           <span className="text-lg font-bold text-[#FF6A00]">BiteBurst</span>
         </div>
       </div>
