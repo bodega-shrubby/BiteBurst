@@ -190,18 +190,17 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
 
                   return (
                     <div key={lesson.id}>
-                      {showMascot && (
-                        <div className={`flex mb-4 ${isEven ? 'justify-end pr-6' : 'justify-start pl-6'}`}>
+                      <div
+                        className={`flex items-center mb-12 relative ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
+                      >
+                        {showMascot && (
                           <img
                             src={mascot.src}
                             alt={mascot.alt}
-                            className="w-14 h-14 object-contain drop-shadow-md"
+                            className={`w-20 h-20 object-contain drop-shadow-lg absolute ${isEven ? 'right-2' : 'left-2'}`}
+                            style={{ top: '50%', transform: 'translateY(-50%)' }}
                           />
-                        </div>
-                      )}
-                      <div
-                        className={`flex items-center mb-12 ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
-                      >
+                        )}
                         <div 
                           className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'} ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
                           onClick={() => isClickable && onLessonClick(lesson.id)}
