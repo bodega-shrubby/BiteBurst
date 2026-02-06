@@ -782,7 +782,7 @@ export default function LessonPlayer({ lessonId }: LessonPlayerProps) {
           <LessonIncorrect
             message={tryAgainMessage || "Not quite right. Try again!"}
             hint={getStepFeedbackMessage(currentStep, 'hint_after_2')}
-            attemptNumber={currentAttempt}
+            attemptNumber={currentAttempt - 1}
             onTryAgain={handleTryAgain}
             canTryAgain={true}
             selectedAnswer={selectedAnswer || lastSelectedAnswer || undefined}
