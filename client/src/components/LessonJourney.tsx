@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import { Check } from 'lucide-react';
 import treasureChestImg from '@/assets/images/treasure-chest.png';
+import appleBuddyImg from '@/assets/Mascots/AppleBuddy.png';
+import snackTwinsImg from '@/assets/Mascots/SnackTwins.png';
+
+const GROUP_MASCOTS: Record<string, { src: string; alt: string }> = {
+  'morning-energy-boost': { src: appleBuddyImg, alt: 'Apple Buddy' },
+  'power-up-snacks': { src: snackTwinsImg, alt: 'Snack Twins' },
+};
 
 const THEMED_ICONS = [
   '🍎', '🥦', '🏀', '🥕', '🍌', '🧘', '🥗', '⚽',
@@ -169,6 +176,9 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
           {lessonGroups.map((group, groupIndex) => {
             const treasureUnlocked = allLevelsComplete(group);
             
+            const mascotKey = group.baseId.replace(/^age\d+-t\d+-L\d+-/, '');
+            const mascot = GROUP_MASCOTS[mascotKey];
+
             return (
               <div key={group.baseId}>
                 {group.levels.map((lesson, levelIndex) => {
@@ -176,9 +186,19 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                   const isClickable = lesson.state === 'current' || lesson.state === 'unlocked' || lesson.state === 'completed';
                   renderIndex++;
                   const themedIcon = getThemedIcon(groupIndex, levelIndex);
+                  const showMascot = mascot && levelIndex === 0;
 
                   return (
                     <div key={lesson.id}>
+                      {showMascot && (
+                        <div className={`flex mb-4 ${isEven ? 'justify-end pr-6' : 'justify-start pl-6'}`}>
+                          <img
+                            src={mascot.src}
+                            alt={mascot.alt}
+                            className="w-14 h-14 object-contain drop-shadow-md"
+                          />
+                        </div>
+                      )}
                       <div
                         className={`flex items-center mb-12 ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}
                       >
