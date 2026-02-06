@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Check } from 'lucide-react';
+import treasureChestImg from '@assets/treasure_chest_1769687520313.jpg';
 
 const THEMED_ICONS = [
   '🍎', '🥦', '🏀', '🥕', '🍌', '🧘', '🥗', '⚽',
@@ -224,25 +225,25 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                     <div className={`flex items-center mb-12 ${isEven ? 'justify-start pl-4' : 'justify-end pr-4'}`}>
                       <div className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
                         <div
-                          className={`w-16 h-16 rounded-2xl border-4 flex items-center justify-center text-2xl transition-all ${
+                          className={`w-16 h-16 flex items-center justify-center transition-all ${
                             treasureUnlocked
-                              ? 'bg-amber-400 border-amber-500 animate-bounce shadow-lg shadow-amber-300 cursor-pointer hover:scale-110'
-                              : 'bg-amber-100 border-amber-200 opacity-50'
+                              ? 'animate-bounce cursor-pointer hover:scale-110 drop-shadow-lg'
+                              : ''
                           }`}
                         >
-                          {treasureUnlocked ? '🎁' : '🎁'}
+                          <img
+                            src={treasureChestImg}
+                            alt="Treasure Chest"
+                            className={`w-16 h-16 object-contain transition-all ${
+                              treasureUnlocked ? '' : 'grayscale opacity-40'
+                            }`}
+                          />
                         </div>
-                        <div className={`bg-white rounded-xl px-4 py-2 shadow-lg max-w-[160px] border ${treasureUnlocked ? 'border-amber-300' : 'border-gray-200 opacity-50'}`}>
-                          <p className="font-bold text-sm text-amber-800">Checkpoint Reward</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-amber-600 font-medium">+50 XP</span>
-                            {!treasureUnlocked && (
-                              <span className="text-xs text-gray-400">Complete all levels</span>
-                            )}
-                            {treasureUnlocked && (
-                              <span className="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">CLAIM</span>
-                            )}
-                          </div>
+                        <div className={`bg-white rounded-xl px-4 py-2 shadow-lg max-w-[160px] border transition-all ${
+                          treasureUnlocked ? 'border-amber-300' : 'border-gray-200 opacity-50'
+                        }`}>
+                          <p className="font-bold text-sm text-gray-800">+50 XP</p>
+                          <p className="text-xs text-gray-500">Complete all levels</p>
                         </div>
                       </div>
                     </div>
