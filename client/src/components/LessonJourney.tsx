@@ -224,7 +224,7 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                           className={`flex items-center gap-3 ${isEven ? 'flex-row' : 'flex-row-reverse'} ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
                           onClick={() => isClickable && onLessonClick(lesson.id)}
                         >
-                          {levelIndex === 0 && !isEven && (
+                          {levelIndex === 0 && groupIndex % 2 === 1 && (
                             <div className={`w-20 h-20 transition-all flex-shrink-0 ${lesson.state === 'locked' ? 'grayscale opacity-50' : ''}`}>
                               <img
                                 src={getMascotImage(group.mascotId)}
@@ -260,7 +260,7 @@ export default function LessonJourney({ lessons, onLessonClick }: LessonJourneyP
                             </div>
                           </div>
 
-                          {levelIndex === 0 && isEven && (
+                          {levelIndex === 0 && groupIndex % 2 === 0 && (
                             <div className={`w-20 h-20 transition-all flex-shrink-0 ${lesson.state === 'locked' ? 'grayscale opacity-50' : ''}`}>
                               <img
                                 src={getMascotImage(group.mascotId)}
