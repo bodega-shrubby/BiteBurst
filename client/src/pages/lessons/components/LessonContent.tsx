@@ -1,5 +1,19 @@
 import brainyBoltImage from '@assets/Mascots/BrainyBolt.png';
 
+function OrangeBurst({ filled = true, size = 20 }: { filled?: boolean; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={filled ? "#FF6A00" : "#E5E5E5"}
+      className={`transition-all duration-200 ${filled ? 'opacity-100 scale-100' : 'opacity-40 scale-90'}`}
+    >
+      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+    </svg>
+  );
+}
+
 interface LessonSection {
   emoji: string;
   color: 'blue' | 'green' | 'yellow' | 'cyan' | 'orange';
@@ -104,15 +118,9 @@ export function LessonContent({
           </div>
 
           {/* Lives */}
-          <div className="flex items-center gap-1 bg-yellow-50 px-2 md:px-4 py-1 md:py-2 rounded-full border-2 border-yellow-200">
-            {[...Array(lives)].map((_, i) => (
-              <span
-                key={i}
-                className="text-lg md:text-xl animate-bounce"
-                style={{ animationDelay: `${i * 0.1}s`, animationDuration: '2s' }}
-              >
-                ⭐
-              </span>
+          <div className="flex items-center gap-0.5" title="Bursts remaining">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <OrangeBurst key={i} filled={i < lives} size={20} />
             ))}
           </div>
         </div>
