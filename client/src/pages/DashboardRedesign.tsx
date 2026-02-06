@@ -462,7 +462,6 @@ export default function DashboardRedesign() {
               <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xl">⚡</span>
                     <span className="font-bold">Daily XP Goal</span>
                   </div>
                   <span className="text-sm">
