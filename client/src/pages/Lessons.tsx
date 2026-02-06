@@ -9,6 +9,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import LessonMascot from '@/components/LessonMascot';
 import LessonJourney from '@/components/LessonJourney';
 import { cleanLessons, type CleanLesson, type LessonState } from '@/data/clean-lessons';
+import treasureChestImg from '@assets/treasure_chest_1769687520313.jpg';
 
 interface ApiLesson {
   id: string;
@@ -169,8 +170,10 @@ function TopicLessonsList({ lessons, completed }: { lessons: LessonListItem[]; c
               })}
               
               <div className={`flex items-center space-x-3 py-2 px-2 rounded-lg ${allComplete ? 'bg-amber-50' : 'opacity-50'}`}>
-                <span className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 text-xs">🎁</span>
-                <span className="text-sm text-amber-700 flex-1">Checkpoint Reward</span>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
+                  <img src={treasureChestImg} alt="Treasure Chest" className={`w-6 h-6 object-contain ${allComplete ? '' : 'grayscale opacity-50'}`} />
+                </span>
+                <span className="text-sm text-amber-700 flex-1">XP Reward</span>
                 {allComplete ? (
                   <span className="text-amber-600 text-xs font-bold">CLAIM</span>
                 ) : (
